@@ -123,4 +123,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    // SRD v6.2 Seksi 8.1 — Web Artisan Security
+    'artisan_secret'      => env('ARTISAN_SECRET', ''),
+    'artisan_allowed_ips' => env('ARTISAN_ALLOWED_IPS', ''),
+
 ];

@@ -1,3 +1,16 @@
 @import "tailwindcss";
 @plugin "flowbite/plugin";
-@source "../node_modules/flowbite";
+
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../vendor/laravel/framework/src/Illuminate/View/Components/*.php";
+@source "../views/**/*.blade.php";
+@source "../js/**/*.js";
+
+@theme {
+    --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Alpine.js: hide elements before initialization */
+[x-cloak] {
+    display: none !important;
+}

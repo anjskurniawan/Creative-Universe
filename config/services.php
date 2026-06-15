@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // SRD v6.2 Seksi 11.2 — Fonnte WhatsApp API
+    'fonnte' => [
+        'token'  => env('FONNTE_TOKEN'),
+        'sender' => env('FONNTE_SENDER'),
+    ],
+
 ];

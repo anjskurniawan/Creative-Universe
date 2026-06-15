@@ -19,6 +19,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // SRD v6.2 Seksi 11.8 — Audit Login & Logout
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Login::class,
+            [\App\Listeners\LogAuthActivity::class, 'handleLogin']
+        );
+
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Auth\Events\Logout::class,
+            [\App\Listeners\LogAuthActivity::class, 'handleLogout']
+        );
     }
 }
