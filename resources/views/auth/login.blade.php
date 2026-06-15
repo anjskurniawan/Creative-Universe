@@ -1,9 +1,12 @@
 @section('title', 'Masuk')
 
 <x-guest-layout>
-    <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl mb-6">
-        Masuk ke akunmu
-    </h1>
+    <div class="mb-6">
+        <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+            Login your account
+        </h1>
+        <p class="text-gray-500 text-xs">You can login using your email or username.</p>
+    </div>
 
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
