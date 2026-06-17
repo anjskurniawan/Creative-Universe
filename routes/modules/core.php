@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 // ─── Halaman Landing (Guest) ────────────────────────────
 Route::get('/', function () {
-    return view('index');
+    return view('ui_test');
 })->name('home');
 
 // ─── Halaman Pending Approval ────────────────────────────
