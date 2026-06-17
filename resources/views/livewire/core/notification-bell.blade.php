@@ -1,9 +1,9 @@
 {{-- 
     Open/close state managed by Alpine.js only (not Livewire @entangle).
-    Livewire handles: polling count, mark as read, notification list.
+    Livewire handles: event refresh, mark as read, notification list.
     Alpine handles: panel visibility, animation, click-outside.
 --}}
-<div wire:poll.15s="loadCount" class="relative" x-data="{ open: false }">
+<div class="relative" x-data="{ open: false }">
     {{-- Bell Button --}}
     <button @click="open = !open" type="button"
         class="relative p-1.5 text-gray-300 hover:text-white rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 transition-colors">

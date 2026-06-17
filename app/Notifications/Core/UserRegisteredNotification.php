@@ -6,6 +6,7 @@ use App\Models\Core\User;
 use App\Notifications\Channels\FonnteChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 /**
@@ -25,7 +26,12 @@ class UserRegisteredNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['database', FonnteChannel::class];
+        return ['database', 'broadcast', FonnteChannel::class];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->toArray($notifiable));
     }
 
     public function toFonnte(object $notifiable): string

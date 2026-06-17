@@ -2,16 +2,16 @@
 
 namespace App\Livewire\Core;
 
-use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 /**
- * NotificationBell — Real-time notification panel
+ * NotificationBell - real-time notification panel.
  *
- * Polling setiap 15 detik untuk cek notifikasi baru.
- * Open/close state dikelola oleh Alpine.js (bukan Livewire)
- * agar tidak terjadi re-render yang membuka panel otomatis.
+ * Open/close state dikelola oleh Alpine.js agar tidak terjadi re-render
+ * yang membuka panel otomatis.
  */
 class NotificationBell extends Component
 {
@@ -27,18 +27,26 @@ class NotificationBell extends Component
         $this->unreadCount = auth()->user()->unreadNotifications()->count();
     }
 
+    #[On('notification-received')]
+    public function refreshBell(): void
+    {
+        $this->loadCount();
+    }
+
     public function markAsRead(string $notificationId): void
     {
         $notification = auth()->user()->notifications()->find($notificationId);
+
         if ($notification) {
             $notification->markAsRead();
         }
+
         $this->loadCount();
     }
 
     public function markAllAsRead(): void
     {
-        auth()->user()->unreadNotifications->markAsRead();
+        auth()->user()->unreadNotifications()->update(['read_at' => now()]);
         $this->unreadCount = 0;
     }
 
@@ -47,7 +55,7 @@ class NotificationBell extends Component
         return auth()->user()->notifications()->latest()->take(10)->get();
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.core.notification-bell');
     }

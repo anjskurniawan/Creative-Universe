@@ -60,3 +60,8 @@ Route::middleware(['auth', 'verified-active'])
             ->middleware('can:approve-users')
             ->name('reject');
     });
+
+// Dynamic Role Management
+Route::get('/roles', fn () => view('pages.core.roles.index'))
+    ->middleware(['auth', 'verified-active', 'can:manage-roles'])
+    ->name('core.roles.index');

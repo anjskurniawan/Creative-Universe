@@ -62,6 +62,14 @@
                                 </a>
                             </li>
                             @endcan
+                            @can('manage-roles')
+                            <li>
+                                <a href="{{ route('core.roles.index') }}" wire:navigate @click="open = false"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    Kelola Role
+                                </a>
+                            </li>
+                            @endcan
                             @can('approve-users')
                             <li>
                                 <a href="{{ route('core.users.pending') }}" wire:navigate @click="open = false"

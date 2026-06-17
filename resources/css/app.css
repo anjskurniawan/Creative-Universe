@@ -7,7 +7,7 @@
 @source "../js/**/*.js";
 
 @theme {
-    --font-sans: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Google Sans Flex', ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Alpine.js: hide elements before initialization */
