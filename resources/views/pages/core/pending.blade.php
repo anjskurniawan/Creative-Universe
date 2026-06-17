@@ -1,48 +1,42 @@
-{{-- SRD v6.2 Seksi 8.2 Step [3] — Halaman Pending Approval --}}
+{{-- SRD v6.2 Seksi 8.2 Step [3] - Halaman Pending Approval --}}
 @section('title', 'Menunggu Persetujuan')
 
 <x-app-layout>
-    <div class="flex flex-col items-center justify-center py-16 px-4">
-
-        <!-- Icon -->
-        <div class="w-20 h-20 bg-amber-500/10 border border-amber-500/30 rounded-full flex items-center justify-center mb-6">
-            <svg class="w-10 h-10 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+    <div class="flex flex-col items-center justify-center px-4 py-16">
+        <div class="mb-6 flex size-20 items-center justify-center rounded-full border border-cu-warning/20 bg-cu-warning-soft text-cu-warning">
+            <x-material-icon name="pending_actions" size="xl" />
         </div>
 
-        <!-- Message -->
-        <h1 class="text-2xl font-bold text-white mb-3">Akunmu Sedang Menunggu Persetujuan</h1>
-        <p class="text-gray-400 text-center max-w-md mb-2">
+        <h1 class="mb-3 text-center text-2xl font-semibold text-cu-ink">Akunmu Sedang Menunggu Persetujuan</h1>
+        <p class="mb-2 max-w-md text-center text-cu-muted">
             Terima kasih telah mendaftar di Creative Universe. Admin akan meninjau akunmu
             dan memberikan persetujuan dalam waktu dekat.
         </p>
-        <p class="text-gray-500 text-sm text-center max-w-md mb-8">
+        <p class="mb-8 max-w-md text-center text-sm text-cu-muted">
             Kamu akan menerima notifikasi melalui WhatsApp atau email saat akunmu telah disetujui.
             Saat ini kamu belum bisa mengakses fitur apapun.
         </p>
 
-        <!-- User Info -->
-        <div class="bg-gray-800/50 border border-gray-700/50 rounded-lg p-5 w-full max-w-sm mb-6">
-            <div class="text-sm text-gray-400 mb-1">Terdaftar sebagai</div>
-            <div class="text-white font-semibold">{{ auth()->user()->name }}</div>
-            <div class="text-gray-400 text-sm">{{ auth()->user()->email }}</div>
+        <x-app-panel class="mb-6 w-full max-w-sm">
+            <div class="mb-1 text-sm text-cu-muted">Terdaftar sebagai</div>
+            <div class="font-semibold text-cu-ink">{{ auth()->user()->name }}</div>
+            <div class="text-sm text-cu-muted">{{ auth()->user()->email }}</div>
+
             @if(auth()->user()->registration_note)
-                <div class="mt-3 pt-3 border-t border-gray-700/50">
-                    <div class="text-sm text-gray-400 mb-1">Catatan registrasi</div>
-                    <div class="text-gray-300 text-sm">{{ auth()->user()->registration_note }}</div>
+                <div class="mt-3 border-t border-cu-line pt-3">
+                    <div class="mb-1 text-sm text-cu-muted">Catatan registrasi</div>
+                    <div class="text-sm text-cu-ink">{{ auth()->user()->registration_note }}</div>
                 </div>
             @endif
-        </div>
+        </x-app-panel>
 
-        <!-- Logout Button -->
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit"
-                class="text-gray-400 hover:text-white text-sm font-medium transition-colors duration-200">
+                class="inline-flex items-center gap-2 text-sm font-medium text-cu-muted transition-colors duration-200 hover:text-cu-ink">
+                <x-material-icon name="logout" />
                 Keluar dari akun
             </button>
         </form>
-
     </div>
 </x-app-layout>

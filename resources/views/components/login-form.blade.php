@@ -1,53 +1,44 @@
-<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-
-    <div class="w-full bg-white rounded-lg shadow-md border border-gray-200 md:mt-0 sm:max-w-md xl:p-0">
-        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-
-            <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                Sign in to your account
-            </h1>
-
-            <form class="space-y-4 md:space-y-6" action="#">
-                <div>
-                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email</label>
-                    <input type="email" name="email" id="email"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-md focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
-                        placeholder="Email" required="">
-                </div>
-
-                <div>
-                    <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
-                    <input type="password" name="password" id="password" placeholder="Password"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-md focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
-                        required="">
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input id="remember" aria-describedby="remember" type="checkbox"
-                                class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300"
-                                required="">
-                        </div>
-                        <div class="ml-3 text-sm">
-                            <label for="remember" class="text-gray-500">Remember me</label>
-                        </div>
-                    </div>
-                    <a href="#" class="text-sm font-medium text-blue-600 hover:underline">Forgot
-                        password?</a>
-                </div>
-
-                <button type="submit"
-                    class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors">
-                    Continue
-                </button>
-
-                <p class="text-sm font-light text-gray-500">
-                    Don’t have an account yet?
-                    <a href="#" class="font-medium text-blue-600 hover:underline">Sign up</a>
-                </p>
-            </form>
-
+<div class="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 py-8">
+    <x-app-panel padding="lg" class="w-full">
+        <div class="mb-6 flex items-start gap-3">
+            <div class="flex size-11 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
+                <x-material-icon name="login" size="md" />
+            </div>
+            <div>
+                <h1 class="text-2xl font-semibold leading-tight text-cu-ink">
+                    Sign in to your account
+                </h1>
+                <p class="mt-1 text-sm text-cu-muted">Use your email to continue.</p>
+            </div>
         </div>
-    </div>
+
+        <form class="space-y-4" action="#">
+            <div>
+                <x-input-label for="email" value="Email" />
+                <x-text-input id="email" name="email" type="email" class="mt-2 w-full" placeholder="Email" required />
+            </div>
+
+            <div>
+                <x-input-label for="password" value="Password" />
+                <x-text-input id="password" name="password" type="password" class="mt-2 w-full" placeholder="Password" required />
+            </div>
+
+            <div class="flex items-center justify-between">
+                <label for="remember" class="flex items-center gap-2 text-sm text-cu-muted">
+                    <input id="remember" type="checkbox" class="size-4 rounded border-cu-border text-cu-ink focus:ring-cu-ink">
+                    Remember me
+                </label>
+                <a href="#" class="text-sm font-medium text-cu-info hover:text-cu-info-hover">Forgot password?</a>
+            </div>
+
+            <x-primary-button class="w-full">
+                Continue
+            </x-primary-button>
+
+            <p class="text-sm text-cu-muted">
+                Don't have an account yet?
+                <a href="#" class="font-medium text-cu-info hover:text-cu-info-hover">Sign up</a>
+            </p>
+        </form>
+    </x-app-panel>
 </div>

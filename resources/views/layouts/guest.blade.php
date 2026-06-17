@@ -13,34 +13,34 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
 
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased bg-white" {{-- style="background-image: url('{{ asset('images/background/bg-test.jpg') }}');" --}} class="bg-cover bg-center bg-no-repeat min-h-screen">
+<body class="min-h-screen bg-cu-surface font-sans text-cu-ink antialiased">
 
-    <div class="min-h-screen flex flex-col items-center justify-center px-4 py-8
-                    backdrop-blur-sm">
+    <div class="flex min-h-screen flex-col items-center justify-center px-4 py-8">
 
         <!-- Logo -->
         <div class="mb-6">
-            <a href="{{ route('home') }}">
-                <img src="{{ asset('images/icon-app/Logo_White.png') }}" alt="Creative Universe" class="h-10">
+            <a href="{{ route('home') }}" class="inline-flex rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cu-ink">
+                <img src="{{ asset('images/icon-app/Logo_White.png') }}" alt="Creative Universe" class="h-10 brightness-0">
             </a>
         </div>
 
         <!-- Flash Messages -->
         @if (session('status'))
             <div class="w-full sm:max-w-md mb-4">
-                <div class="bg-green-900/50 border border-green-700 text-green-300 px-4 py-3 rounded-md text-sm">
+                <x-app-alert type="success">
                     {{ session('status') }}
-                </div>
+                </x-app-alert>
             </div>
         @endif
 
         <!-- Card Content -->
-        <div class="w-full sm:max-w-md bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="w-full overflow-hidden rounded-lg border border-cu-line bg-cu-panel shadow-sm sm:max-w-md">
             <div class="p-6 sm:p-8">
                 {{ $slot }}
             </div>

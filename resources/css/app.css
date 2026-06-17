@@ -8,6 +8,35 @@
 
 @theme {
     --font-sans: "Google Sans Flex", ui-sans-serif, system-ui, sans-serif;
+
+    --color-cu-ink: #0a0a0a;
+    --color-cu-ink-hover: #262626;
+    --color-cu-muted: #6b7280;
+    --color-cu-soft: #9ca3af;
+    --color-cu-surface: #ffffff;
+    --color-cu-surface-soft: #f9fafb;
+    --color-cu-panel: #ffffff;
+    --color-cu-panel-soft: #f3f4f6;
+    --color-cu-line: #e5e7eb;
+    --color-cu-border: #d1d5db;
+    --color-cu-border-hover: #9ca3af;
+    --color-cu-overlay: #0a0a0a;
+    --color-cu-focus: #0a0a0a;
+    --color-cu-info: #2563eb;
+    --color-cu-info-hover: #1d4ed8;
+    --color-cu-info-soft: #eff6ff;
+    --color-cu-success: #16a34a;
+    --color-cu-success-hover: #15803d;
+    --color-cu-success-soft: #f0fdf4;
+    --color-cu-warning: #d97706;
+    --color-cu-warning-hover: #b45309;
+    --color-cu-warning-soft: #fffbeb;
+    --color-cu-danger: #dc2626;
+    --color-cu-danger-hover: #b91c1c;
+    --color-cu-danger-soft: #fef2f2;
+    --color-cu-gradient-start: #d946ef;
+    --color-cu-gradient-middle: #3b82f6;
+    --color-cu-gradient-end: #22d3ee;
 }
 
 @layer base {
@@ -19,6 +48,42 @@
             "wdth" 100,
             "GRAD" 0,
             "ROND" 0;
+    }
+}
+
+@layer components {
+    .cu-material-icon {
+        font-size: 1em;
+        font-weight: normal;
+        font-style: normal;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
+        vertical-align: middle;
+        font-variation-settings:
+            "FILL" 0,
+            "wght" 350,
+            "GRAD" 0,
+            "opsz" 24;
+    }
+
+    .cu-material-icon-auto {
+        width: 1em;
+        height: 1em;
+        font-size: 1em;
+    }
+
+    .cu-material-icon-light {
+        font-variation-settings:
+            "FILL" 0,
+            "wght" 300,
+            "GRAD" 0,
+            "opsz" 20;
     }
 }
 

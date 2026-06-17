@@ -17,8 +17,18 @@ use Illuminate\Support\Facades\Route;
 
 // ─── Halaman Landing (Guest) ────────────────────────────
 Route::get('/', function () {
-    return view('ui_test');
+    return view('index');
 })->name('home');
+
+Route::view('/ui-test', 'ui_test')->name('ui-test');
+
+if (app()->environment('local')) {
+    Route::prefix('dev')->name('dev.')->group(function () {
+        Route::view('/', 'dev.index')->name('index');
+        Route::view('/components', 'dev.components')->name('components');
+        Route::view('/playground', 'dev.playground')->name('playground');
+    });
+}
 
 // ─── Halaman Pending Approval ────────────────────────────
 // Akses: user yang sudah login tapi is_active = false
