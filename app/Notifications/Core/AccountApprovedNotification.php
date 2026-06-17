@@ -18,7 +18,8 @@ class AccountApprovedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public int $tries   = 3;
+    public int $tries = 3;
+
     public int $backoff = 60;
 
     public function via(object $notifiable): array
@@ -34,14 +35,14 @@ class AccountApprovedNotification extends Notification implements ShouldQueue
     public function toFonnte(object $notifiable): string
     {
         return "Halo {$notifiable->name}! Akunmu di Creative Universe telah disetujui. "
-             . "Kamu sekarang bisa login dan menggunakan aplikasi.";
+             .'Kamu sekarang bisa login dan menggunakan aplikasi.';
     }
 
     public function toArray(object $notifiable): array
     {
         return [
             'message' => 'Akunmu telah disetujui. Selamat datang di Creative Universe!',
-            'url'     => route('dashboard'),
+            'url' => route('dashboard'),
         ];
     }
 }

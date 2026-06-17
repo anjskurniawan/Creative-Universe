@@ -39,6 +39,7 @@ Artisan::command('clean:temp-uploads', function () {
 
     if (! File::isDirectory($path)) {
         $this->info('No temporary upload directory found.');
+
         return;
     }
 
@@ -71,3 +72,6 @@ Schedule::command('clean:failed-jobs')->daily();
 Schedule::command('auth:clear-resets')->daily();
 Schedule::command('clean:temp-uploads')->daily();
 Schedule::command('clean:stale-records')->monthly();
+
+// SRD v6.3 Seksi 11 — cPanel Cron Job Queue runner
+Schedule::command('queue:work --stop-when-empty')->everyMinute();

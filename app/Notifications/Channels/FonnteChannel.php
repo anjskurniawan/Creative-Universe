@@ -18,7 +18,7 @@ class FonnteChannel
     {
         $target = $notifiable->whatsapp_number;
 
-        if (!$target) {
+        if (! $target) {
             return; // User tidak punya nomor WA — skip tanpa error
         }
 

@@ -18,13 +18,13 @@ class RegisterUserAction
     public function handle(RegisterForm $form): User
     {
         $user = User::create([
-            'name'              => $form->name,
-            'username'          => $form->username,
-            'email'             => $form->email,
-            'whatsapp_number'   => $form->whatsapp_number,
-            'password'          => bcrypt($form->password),
+            'name' => $form->name,
+            'username' => $form->username,
+            'email' => $form->email,
+            'whatsapp_number' => $form->whatsapp_number,
+            'password' => bcrypt($form->password),
             'registration_note' => $form->registration_note,
-            'is_active'         => false, // WAJIB false — pending approval
+            'is_active' => false, // WAJIB false — pending approval
         ]);
 
         // Notifikasi ke semua user yang bisa approve
@@ -36,9 +36,9 @@ class RegisterUserAction
         activity('auth')
             ->performedOn($user)
             ->withProperties(['ip' => request()->ip()])
-            ->log('[CORE] New user registered — pending approval: ' . $user->email);
+            ->log('[CORE] New user registered — pending approval: '.$user->email);
 
-        Log::info('[CORE] New registration: ' . $user->email);
+        Log::info('[CORE] New registration: '.$user->email);
 
         return $user;
     }

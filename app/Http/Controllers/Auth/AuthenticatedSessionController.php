@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         // Jika user belum diapprove, redirect ke halaman pending
-        if (!auth()->user()->is_active) {
+        if (! auth()->user()->is_active) {
             return redirect()->route('pending');
         }
 

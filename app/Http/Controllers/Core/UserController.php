@@ -9,7 +9,6 @@ use App\Models\Core\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Role;
 
 /**
  * UserController — SRD v6.2 Seksi 8.2
@@ -51,7 +50,7 @@ class UserController extends Controller
             'role' => 'required|string|exists:roles,name',
         ], [
             'role.required' => 'Role wajib dipilih untuk user yang disetujui.',
-            'role.exists'   => 'Role yang dipilih tidak valid.',
+            'role.exists' => 'Role yang dipilih tidak valid.',
         ]);
 
         $action->handle($user, $request->user(), $request->input('role'));

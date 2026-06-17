@@ -20,15 +20,18 @@ class DatabaseSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@creativeuniverse.test'],
             [
-                'name'      => 'Superadmin',
-                'username'  => 'superadmin',
-                'password'  => bcrypt('password'),
+                'name' => 'Superadmin',
+                'username' => 'superadmin',
+                'password' => bcrypt('password'),
                 'is_active' => true,
             ]
         );
 
-        if (!$admin->hasRole('Superadmin')) {
+        if (! $admin->hasRole('Superadmin')) {
             $admin->assignRole('Superadmin');
         }
+
+        // 3. Seed data test Pricetag Generator
+        $this->call(PricetagTestDataSeeder::class);
     }
 }

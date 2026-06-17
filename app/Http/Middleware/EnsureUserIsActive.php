@@ -17,7 +17,7 @@ class EnsureUserIsActive
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && !auth()->user()->is_active) {
+        if (auth()->check() && ! auth()->user()->is_active) {
             return redirect()->route('pending');
         }
 

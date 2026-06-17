@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Listeners\LogAuthActivity;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,14 +24,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // SRD v6.2 Seksi 11.8 — Audit Login & Logout
-        \Illuminate\Support\Facades\Event::listen(
-            \Illuminate\Auth\Events\Login::class,
-            [\App\Listeners\LogAuthActivity::class, 'handleLogin']
+        Event::listen(
+            Login::class,
+            [LogAuthActivity::class, 'handleLogin']
         );
 
-        \Illuminate\Support\Facades\Event::listen(
-            \Illuminate\Auth\Events\Logout::class,
-            [\App\Listeners\LogAuthActivity::class, 'handleLogout']
+        Event::listen(
+            Logout::class,
+            [LogAuthActivity::class, 'handleLogout']
         );
     }
 }

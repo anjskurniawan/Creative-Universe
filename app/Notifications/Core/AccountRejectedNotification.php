@@ -18,7 +18,8 @@ class AccountRejectedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public int $tries   = 3;
+    public int $tries = 3;
+
     public int $backoff = 60;
 
     public function via(object $notifiable): array
@@ -34,14 +35,14 @@ class AccountRejectedNotification extends Notification implements ShouldQueue
     public function toFonnte(object $notifiable): string
     {
         return "Halo {$notifiable->name}. Pendaftaran akunmu di Creative Universe "
-             . "tidak dapat disetujui. Hubungi admin divisi untuk informasi lebih lanjut.";
+             .'tidak dapat disetujui. Hubungi admin divisi untuk informasi lebih lanjut.';
     }
 
     public function toArray(object $notifiable): array
     {
         return [
             'message' => 'Pendaftaran akunmu tidak disetujui. Hubungi admin divisi.',
-            'url'     => null,
+            'url' => null,
         ];
     }
 }

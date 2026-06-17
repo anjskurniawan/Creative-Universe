@@ -17,24 +17,24 @@ class ApproveUserAction
     public function handle(User $user, User $admin, string $roleName): void
     {
         $user->update([
-            'is_active'   => true,
+            'is_active' => true,
             'approved_by' => $admin->id,
             'approved_at' => now(),
-            'updated_by'  => $admin->id,
+            'updated_by' => $admin->id,
         ]);
 
         $user->assignRole($roleName);
-        $user->notify(new AccountApprovedNotification());
+        $user->notify(new AccountApprovedNotification);
 
         activity('auth')
             ->causedBy($admin)
             ->performedOn($user)
             ->withProperties([
-                'ip'            => request()->ip(),
+                'ip' => request()->ip(),
                 'role_assigned' => $roleName,
             ])
-            ->log('[CORE] User account approved: ' . $user->email);
+            ->log('[CORE] User account approved: '.$user->email);
 
-        Log::info('[CORE] Account approved: ' . $user->email . ' by admin#' . $admin->id);
+        Log::info('[CORE] Account approved: '.$user->email.' by admin#'.$admin->id);
     }
 }

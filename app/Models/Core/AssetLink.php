@@ -17,7 +17,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
  */
 class AssetLink extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'linkable_type',

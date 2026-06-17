@@ -37,15 +37,13 @@ Semua tabel di bawah ini **WAJIB** mematuhi **ERD Seksi 10.5** (memiliki kolom `
     
     - `id`, `name`
         
-- `pricetag_products` (Produk)
+- `pricetag_products` (Produk & Varian)
     
-    - `id`, `category_id`, `name`
-        
-- `pricetag_variants` (Varian)
-    
-    - `id`, `product_id`, `sku_code` (_Unique_), `name`
+    - `id`, `category_id`, `name`, `variant_name` (_Default: 'Default'_)
         
     - `normal_price`, `discount_price` (Integer)
+    
+    - Indeks unik komposit: `['name', 'variant_name']`
         
 
 ### 3.2. Tabel Pendukung Multi Generate
@@ -63,9 +61,9 @@ Semua tabel di bawah ini **WAJIB** mematuhi **ERD Seksi 10.5** (memiliki kolom `
 
 Sesuai **ERD Seksi 2.1**, _link download_ dari Google Drive TIDAK disimpan di tabel `pricetag_variants`, melainkan di- _insert_ ke tabel `asset_links` milik _Core Main App_ dengan relasi:
 
-- `assetable_type` = `App\Models\PricetagVariant`
+- `assetable_type` = `App\Models\Pricetag\PricetagProduct`
     
-- `assetable_id` = ID Varian
+- `assetable_id` = ID Produk
     
 
 ## 4. Alur Kerja (Workflows) & Performa
@@ -87,7 +85,7 @@ Mengacu pada **SRD Seksi 2** (Batas _Shared Hosting_) dan batas waktu eksekusi s
 
 1. _User_ mengunggah CSV berformat template khusus.
     
-2. Sistem memvalidasi eksistensi `sku_code` terhadap tabel `pricetag_variants`. SKU yang tidak valid ditolak.
+2. Sistem memvalidasi eksistensi kombinasi produk dan varian terhadap database. Data yang tidak valid ditolak.
     
 3. Sistem membuat _record_ di `pricetag_batches`.
     

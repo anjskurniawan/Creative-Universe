@@ -27,6 +27,7 @@ class PendingUsers extends Component
 
         if (empty($this->selectedRole)) {
             session()->flash('error', 'Pilih role terlebih dahulu.');
+
             return;
         }
 

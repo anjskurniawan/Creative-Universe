@@ -2,10 +2,10 @@
 
 namespace App\Models\Core;
 
+use Database\Factories\Core\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,14 +21,14 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes, HasRoles, LogsActivity;
+    use HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
 
     /**
      * Create a new factory instance for the model.
      */
     protected static function newFactory()
     {
-        return \Database\Factories\Core\UserFactory::new();
+        return UserFactory::new();
     }
 
     protected $fillable = [
@@ -54,9 +54,9 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'is_active'   => 'boolean',
+            'is_active' => 'boolean',
             'approved_at' => 'datetime',
-            'password'    => 'hashed',
+            'password' => 'hashed',
         ];
     }
 

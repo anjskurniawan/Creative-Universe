@@ -26,10 +26,12 @@ class ForgotPassword extends Component
 
     // Step 2
     public string $otp = '';
+
     public string $maskedPhone = '';
 
     // Step 3
     public string $password = '';
+
     public string $password_confirmation = '';
 
     // Internal
@@ -48,13 +50,15 @@ class ForgotPassword extends Component
             ->orWhere('username', $this->login)
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             $this->addError('login', 'Akun dengan email/username tersebut tidak ditemukan.');
+
             return;
         }
 
         if (empty($user->whatsapp_number)) {
             $this->addError('login', 'Akun ini tidak memiliki nomor WhatsApp. Hubungi admin untuk reset password.');
+
             return;
         }
 
@@ -65,7 +69,7 @@ class ForgotPassword extends Component
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $user->email],
             [
-                'token'      => Hash::make($otpCode),
+                'token' => Hash::make($otpCode),
                 'created_at' => now(),
             ]
         );
@@ -73,15 +77,15 @@ class ForgotPassword extends Component
         // Send OTP via WhatsApp
         $fonnte = app(FonnteService::class);
         $message = "🔐 *Creative Universe — Reset Password*\n\n"
-            . "Kode OTP kamu: *{$otpCode}*\n\n"
-            . "Kode ini berlaku 15 menit.\n"
-            . "Jangan bagikan kode ini kepada siapapun.";
+            ."Kode OTP kamu: *{$otpCode}*\n\n"
+            ."Kode ini berlaku 15 menit.\n"
+            .'Jangan bagikan kode ini kepada siapapun.';
 
         $fonnte->send($user->whatsapp_number, $message);
 
         // Mask phone number for display
         $phone = $user->whatsapp_number;
-        $this->maskedPhone = substr($phone, 0, 4) . '****' . substr($phone, -4);
+        $this->maskedPhone = substr($phone, 0, 4).'****'.substr($phone, -4);
 
         // Store user email in session for verification
         session()->put('password_reset_email', $user->email);
@@ -95,14 +99,15 @@ class ForgotPassword extends Component
             'otp' => 'required|string|size:6',
         ], [
             'otp.required' => 'Masukkan kode OTP.',
-            'otp.size'     => 'Kode OTP harus 6 digit.',
+            'otp.size' => 'Kode OTP harus 6 digit.',
         ]);
 
         $email = session('password_reset_email');
 
-        if (!$email) {
+        if (! $email) {
             $this->addError('otp', 'Sesi expired. Silakan ulangi dari awal.');
             $this->step = 1;
+
             return;
         }
 
@@ -110,8 +115,9 @@ class ForgotPassword extends Component
             ->where('email', $email)
             ->first();
 
-        if (!$record) {
+        if (! $record) {
             $this->addError('otp', 'Kode OTP tidak valid atau sudah digunakan.');
+
             return;
         }
 
@@ -120,12 +126,14 @@ class ForgotPassword extends Component
             DB::table('password_reset_tokens')->where('email', $email)->delete();
             $this->addError('otp', 'Kode OTP sudah kadaluarsa. Silakan kirim ulang.');
             $this->step = 1;
+
             return;
         }
 
         // Verify OTP hash
-        if (!Hash::check($this->otp, $record->token)) {
+        if (! Hash::check($this->otp, $record->token)) {
             $this->addError('otp', 'Kode OTP salah. Periksa kembali.');
+
             return;
         }
 
@@ -137,24 +145,26 @@ class ForgotPassword extends Component
         $this->validate([
             'password' => 'required|string|min:8|confirmed',
         ], [
-            'password.required'  => 'Password baru wajib diisi.',
-            'password.min'       => 'Password minimal 8 karakter.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         $email = session('password_reset_email');
 
-        if (!$email) {
+        if (! $email) {
             session()->flash('error', 'Sesi expired. Silakan ulangi dari awal.');
             $this->step = 1;
+
             return;
         }
 
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             session()->flash('error', 'Akun tidak ditemukan.');
             $this->step = 1;
+
             return;
         }
 
@@ -171,7 +181,7 @@ class ForgotPassword extends Component
         activity('auth')
             ->performedOn($user)
             ->withProperties(['ip' => request()->ip()])
-            ->log('[CORE] Password reset via WhatsApp OTP: ' . $user->email);
+            ->log('[CORE] Password reset via WhatsApp OTP: '.$user->email);
 
         // Redirect to login with success message
         session()->flash('status', 'Password berhasil direset. Silakan masuk dengan password baru.');

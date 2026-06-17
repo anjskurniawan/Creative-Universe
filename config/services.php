@@ -37,8 +37,13 @@ return [
 
     // SRD v6.2 Seksi 11.2 — Fonnte WhatsApp API
     'fonnte' => [
-        'token'  => env('FONNTE_TOKEN'),
+        'token' => env('FONNTE_TOKEN'),
         'sender' => env('FONNTE_SENDER'),
+    ],
+
+    // Google Services Integration for Sub-Apps
+    'google' => [
+        'apps_script_pricetag_url' => env('GOOGLE_APPS_SCRIPT_PRICETAG_URL', ''),
     ],
 
 ];

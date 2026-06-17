@@ -17,9 +17,9 @@ class LogAuthActivity
         activity('auth')
             ->causedBy($event->user)
             ->withProperties([
-                'ip'         => request()->ip(),
+                'ip' => request()->ip(),
                 'user_agent' => request()->userAgent(),
-                'sub_app'    => 'core',
+                'sub_app' => 'core',
             ])
             ->log('User login');
     }
@@ -30,7 +30,7 @@ class LogAuthActivity
             activity('auth')
                 ->causedBy($event->user)
                 ->withProperties([
-                    'ip'      => request()->ip(),
+                    'ip' => request()->ip(),
                     'sub_app' => 'core',
                 ])
                 ->log('User logout');

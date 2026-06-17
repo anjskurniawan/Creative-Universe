@@ -55,6 +55,15 @@
                                     Dashboard
                                 </a>
                             </li>
+                            @can('access-pricetag')
+                                <li>
+                                    <a href="{{ route('pricetag.search') }}" wire:navigate @click="open = false"
+                                        class="{{ $menuLinkClass }}">
+                                        <x-material-icon name="label" size="sm" />
+                                        Pricetag Studio
+                                    </a>
+                                </li>
+                            @endcan
                             @can('manage-users')
                                 <li>
                                     <a href="{{ route('core.users.index') }}" wire:navigate @click="open = false"

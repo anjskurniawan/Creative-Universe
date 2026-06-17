@@ -21,3 +21,4 @@ require __DIR__.'/auth.php';
 
 // Tambahkan baris baru per Sub-App baru:
 // require __DIR__.'/modules/odds.php';
+require __DIR__.'/modules/pricetag.php';

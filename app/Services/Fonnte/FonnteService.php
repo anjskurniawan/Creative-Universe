@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Log;
 class FonnteService
 {
     private string $token;
+
     private string $sender;
+
     private string $baseUrl = 'https://api.fonnte.com';
 
     public function __construct()
     {
-        $this->token  = config('services.fonnte.token', '');
+        $this->token = config('services.fonnte.token', '');
         $this->sender = config('services.fonnte.sender', '');
     }
 
@@ -27,6 +29,7 @@ class FonnteService
     {
         if (empty($this->token)) {
             Log::warning('[CORE] Fonnte token not configured — skipping WhatsApp notification');
+
             return false;
         }
 
@@ -34,23 +37,25 @@ class FonnteService
             $response = Http::withHeaders([
                 'Authorization' => $this->token,
             ])->post("{$this->baseUrl}/send", [
-                'target'  => $target,
+                'target' => $target,
                 'message' => $message,
-                'sender'  => $this->sender,
+                'sender' => $this->sender,
             ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('[CORE] Fonnte API error', [
-                    'target'   => $target,
-                    'status'   => $response->status(),
+                    'target' => $target,
+                    'status' => $response->status(),
                     'response' => $response->body(),
                 ]);
+
                 return false;
             }
 
             return true;
         } catch (\Exception $e) {
             Log::error('[CORE] Fonnte request failed', ['error' => $e->getMessage()]);
+
             return false;
         }
     }

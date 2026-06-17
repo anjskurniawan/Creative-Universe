@@ -17,7 +17,7 @@ class EnsureUserCanAccessApp
 {
     public function handle(Request $request, Closure $next, string $app): Response
     {
-        if (!auth()->user()->can('access-' . $app)) {
+        if (! auth()->user()->can('access-'.$app)) {
             abort(403, 'Kamu tidak memiliki akses ke aplikasi ini.');
         }
 

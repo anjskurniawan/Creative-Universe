@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\ArtisanTokenMiddleware;
+use App\Http\Middleware\EnsureUserCanAccessApp;
+use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,9 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // SRD v6.2 Seksi 8.3 — Middleware aliases
         $middleware->alias([
-            'verified-active' => \App\Http\Middleware\EnsureUserIsActive::class,
-            'app'             => \App\Http\Middleware\EnsureUserCanAccessApp::class,
-            'artisan-token'   => \App\Http\Middleware\ArtisanTokenMiddleware::class,
+            'verified-active' => EnsureUserIsActive::class,
+            'app' => EnsureUserCanAccessApp::class,
+            'artisan-token' => ArtisanTokenMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -25,9 +28,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->reportable(function (Throwable $e) {
             Log::error('Unhandled Exception', [
                 'message' => $e->getMessage(),
-                'url'     => request()->fullUrl(),
+                'url' => request()->fullUrl(),
                 'user_id' => auth()->id() ?? 'guest',
-                'app'     => request()->segment(1),
+                'app' => request()->segment(1),
             ]);
         });
     })

@@ -29,28 +29,14 @@ Tabel master untuk menyimpan kategori produk.
 
 ### 1.2 Tabel `pricetag_products`
 
-Tabel master untuk menyimpan produk yang terikat pada suatu kategori.
+Tabel master untuk menyimpan produk dan varian beserta harganya.
 
 |**Kolom**|**Tipe Data**|**Modifiers / Constraints**|**Deskripsi**|
 |---|---|---|---|
 |`id`|`BIGINT`|Primary Key, Auto Increment|ID Produk|
 |`category_id`|`BIGINT`|Not Null, FK -> `pricetag_categories.id`|Relasi ke Kategori|
 |`name`|`VARCHAR(255)`|Not Null|Nama produk|
-|`created_by`|`BIGINT`|Not Null, FK -> `users.id`|Pembuat data|
-|`updated_by`|`BIGINT`|Nullable, FK -> `users.id`|Pengubah data terakhir|
-|`deleted_by`|`BIGINT`|Nullable, FK -> `users.id`|Penghapus data|
-|_(Timestamps)_|`TIMESTAMP`|`created_at`, `updated_at`, `deleted_at`|Standar audit waktu|
-
-### 1.3 Tabel `pricetag_variants`
-
-Tabel utama operasional tempat harga diatur dan pencarian dilakukan.
-
-|**Kolom**|**Tipe Data**|**Modifiers / Constraints**|**Deskripsi**|
-|---|---|---|---|
-|`id`|`BIGINT`|Primary Key, Auto Increment|ID Varian|
-|`product_id`|`BIGINT`|Not Null, FK -> `pricetag_products.id`|Relasi ke Produk|
-|`sku_code`|`VARCHAR(100)`|Not Null, Unique|Kode SKU (Untuk validasi CSV)|
-|`name`|`VARCHAR(255)`|Not Null|Nama varian (misal: "64GB / Hitam")|
+|`variant_name`|`VARCHAR(100)`|Nullable, Default 'Default'|Nama variasi (misal: "Hitam")|
 |`normal_price`|`INTEGER`|Not Null, Default 0|Harga asli produk|
 |`discount_price`|`INTEGER`|Nullable, Default 0|Harga promo/diskon saat ini|
 |`created_by`|`BIGINT`|Not Null, FK -> `users.id`|Pembuat data|
@@ -58,7 +44,7 @@ Tabel utama operasional tempat harga diatur dan pencarian dilakukan.
 |`deleted_by`|`BIGINT`|Nullable, FK -> `users.id`|Penghapus data|
 |_(Timestamps)_|`TIMESTAMP`|`created_at`, `updated_at`, `deleted_at`|Standar audit waktu|
 
-### 1.4 Tabel `pricetag_batches`
+### 1.3 Tabel `pricetag_batches`
 
 Tabel pendukung untuk fitur _Multi Generate_ (Manajemen Antrean / _Chunking_).
 
@@ -81,8 +67,7 @@ Bagian ini menjelaskan secara rinci kardinalitas tabel di dalam Sub-App maupun i
 |**Tabel Asal**|**Relasi**|**Tabel Tujuan**|**Keterangan / Tipe Relasi**|
 |---|---|---|---|
 |`pricetag_categories`|**One-to-Many**|`pricetag_products`|1 Kategori memiliki banyak Produk.|
-|`pricetag_products`|**One-to-Many**|`pricetag_variants`|1 Produk memiliki banyak Varian.|
-|`pricetag_variants`|**MorphMany**|`asset_links` _(Core)_|**(CRITICAL)** Varian memiliki banyak hasil gambar Pricetag. Disimpan di Core via _Polymorphic_.|
+|`pricetag_products`|**MorphMany**|`asset_links` _(Core)_|**(CRITICAL)** Produk memiliki banyak hasil gambar Pricetag. Disimpan di Core via _Polymorphic_.|
 |`Semua Tabel Sub-App`|**Many-to-One**|`users` _(Core)_|Relasi dari `created_by`, `updated_by`, dan `deleted_by` ke `users.id`.|
 
 ## 3. Checklist Kepatuhan ERD Core

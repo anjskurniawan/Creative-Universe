@@ -15,7 +15,7 @@ class RejectUserAction
 {
     public function handle(User $user, User $admin): void
     {
-        $user->notify(new AccountRejectedNotification());
+        $user->notify(new AccountRejectedNotification);
 
         $user->update(['deleted_by' => $admin->id]);
         $user->delete(); // soft delete
@@ -24,8 +24,8 @@ class RejectUserAction
             ->causedBy($admin)
             ->performedOn($user)
             ->withProperties(['ip' => request()->ip()])
-            ->log('[CORE] User account rejected and removed: ' . $user->email);
+            ->log('[CORE] User account rejected and removed: '.$user->email);
 
-        Log::info('[CORE] Account rejected: ' . $user->email . ' by admin#' . $admin->id);
+        Log::info('[CORE] Account rejected: '.$user->email.' by admin#'.$admin->id);
     }
 }

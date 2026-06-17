@@ -17,15 +17,15 @@ class ArtisanTokenMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $token      = $request->header('X-Artisan-Token');
+        $token = $request->header('X-Artisan-Token');
         $validToken = config('app.artisan_secret');
 
-        if (!$token || !hash_equals($validToken, $token)) {
+        if (! $token || ! hash_equals($validToken, $token)) {
             abort(403);
         }
 
         $allowedIps = array_filter(explode(',', config('app.artisan_allowed_ips', '')));
-        if (!empty($allowedIps) && !in_array($request->ip(), $allowedIps)) {
+        if (! empty($allowedIps) && ! in_array($request->ip(), $allowedIps)) {
             abort(403);
         }
 
