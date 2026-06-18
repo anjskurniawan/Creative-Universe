@@ -38,6 +38,12 @@ Route::middleware(['artisan-token'])->prefix('_cmd')->group(function () {
         return response()->json(['output' => Artisan::output()]);
     });
 
+    Route::get('/seed', function () {
+        Artisan::call('db:seed', ['--force' => true]);
+
+        return response()->json(['output' => Artisan::output()]);
+    });
+
     Route::get('/queue-restart', function () {
         Artisan::call('queue:restart');
 

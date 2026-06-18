@@ -32,11 +32,12 @@
 # ------------------------------------------------------------------------------
 # Untuk menjalankan command Artisan dari browser, panggil URL berikut:
 #
-# - Migrasi Database:      GET https://creative.doran.com/_cmd/migrate
-# - Hapus Cache & Optimize: GET https://creative.doran.com/_cmd/clear-cache
-# - Buat Storage Symlink:  GET https://creative.doran.com/_cmd/storage-link
-# - Restart Queue Worker:   GET https://creative.doran.com/_cmd/queue-restart
-# - Seed Role & Permission: GET https://creative.doran.com/_cmd/seed-permissions
+# - Migrasi Database:      GET https://creative.doran.id/_cmd/migrate
+# - Hapus Cache & Optimize: GET https://creative.doran.id/_cmd/clear-cache
+# - Buat Storage Symlink:  GET https://creative.doran.id/_cmd/storage-link
+# - Restart Queue Worker:   GET https://creative.doran.id/_cmd/queue-restart
+# - Seed Role & Permission: GET https://creative.doran.id/_cmd/seed-permissions
+# - Run Database Seeder:    GET https://creative.doran.id/_cmd/seed
 #
 # Wajib menambahkan HTTP Header berikut pada request Anda:
 #   X-Artisan-Token: cr_universe_cpanel_secure_token_2026_ab99cd
@@ -49,7 +50,7 @@ APP_ENV=production
 APP_KEY=base64:9kUKJ0Bi8gBbFHMzI4t1fiiqaCIoP7Vlw0xAGwtu/y4=
 APP_DEBUG=false
 APP_TIMEZONE=Asia/Jakarta
-APP_URL=https://creative.doran.com
+APP_URL=https://creative.doran.id
 
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en
