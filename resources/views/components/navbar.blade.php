@@ -1,6 +1,14 @@
 @props(['variant' => 'solid'])
 
 @php
+    // Dynamically override navbar variant based on user setting if authenticated
+    if (auth()->check()) {
+        $preferredVariant = auth()->user()->getSetting('navbar_variant');
+        if ($preferredVariant) {
+            $variant = $preferredVariant;
+        }
+    }
+
     $navClass = match ($variant) {
         'glass' => 'border-b border-cu-line/70 bg-cu-surface/80 backdrop-blur-md text-cu-ink',
         'dark-glass' => 'border-b border-white/10 bg-black/20 backdrop-blur-md text-white',
@@ -12,8 +20,8 @@
         : 'flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft';
 
     $iconButtonClass = $variant === 'dark-glass'
-        ? 'inline-flex size-10 items-center justify-center rounded-full border border-transparent text-white/90 transition-colors hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-white/30'
-        : 'inline-flex size-10 items-center justify-center rounded-full border border-transparent text-cu-ink transition-colors hover:border-cu-border hover:bg-cu-panel-soft focus:outline-none focus:ring-1 focus:ring-cu-border-hover';
+        ? 'inline-flex size-9 sm:size-10 items-center justify-center rounded-full border border-transparent text-white/90 transition-colors hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-white/30'
+        : 'inline-flex size-9 sm:size-10 items-center justify-center rounded-full border border-transparent text-cu-ink transition-colors hover:border-cu-border hover:bg-cu-panel-soft focus:outline-none focus:ring-1 focus:ring-cu-border-hover';
 
     $dropdownPanelClass = $variant === 'dark-glass'
         ? 'absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-[#0d0d0d]/90 backdrop-blur-md shadow-2xl text-white'
@@ -44,7 +52,7 @@
     <div class="flex w-full items-center justify-between px-4 py-2 sm:px-6 lg:px-32">
         <x-navbar.brand :href="route('home')" />
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 sm:gap-2">
             @guest
                 <x-navbar.action-button :href="route('login')">
                     <x-material-icon class="cu-icon-login" />
@@ -114,6 +122,15 @@
                                         class="{{ $menuLinkClass }}">
                                         <x-material-icon class="cu-icon-pending-actions" size="sm" />
                                         Akun Pending
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('run-artisan')
+                                <li>
+                                    <a href="{{ route('core.maintenance') }}" wire:navigate @click="open = false"
+                                        class="{{ $menuLinkClass }}">
+                                        <x-material-icon class="cu-icon-settings" size="sm" />
+                                        Maintenance Panel
                                     </a>
                                 </li>
                             @endcan

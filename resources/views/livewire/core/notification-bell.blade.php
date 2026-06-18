@@ -4,7 +4,7 @@
 --}}
 <div class="relative" x-data="{ open: false }">
     <button @click="open = !open" type="button"
-        class="relative inline-flex size-10 items-center justify-center rounded-full border border-transparent transition-colors focus:outline-none focus:ring-1 {{ $variant === 'dark' ? 'text-white hover:border-white/20 hover:bg-white/10 focus:ring-white/30' : 'text-cu-ink hover:border-cu-border hover:bg-cu-panel-soft focus:ring-cu-border-hover' }}">
+        class="relative inline-flex size-9 sm:size-10 items-center justify-center rounded-full border border-transparent transition-colors focus:outline-none focus:ring-1 {{ $variant === 'dark' ? 'text-white hover:border-white/20 hover:bg-white/10 focus:ring-white/30' : 'text-cu-ink hover:border-cu-border hover:bg-cu-panel-soft focus:ring-cu-border-hover' }}">
         <span class="sr-only">Lihat notifikasi</span>
         <x-material-icon class="cu-icon-notifications" size="md" />
 
@@ -22,7 +22,7 @@
         x-transition:leave="transition ease-in duration-100"
         x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
-        class="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border {{ $variant === 'dark' ? 'border-white/10 bg-[#0d0d0d]/90 backdrop-blur-md shadow-2xl text-white' : 'border-cu-line bg-cu-panel shadow-xl text-cu-ink' }}">
+        class="absolute right-[-80px] sm:right-0 z-50 mt-2 w-[calc(100vw-2rem)] sm:w-80 overflow-hidden rounded-xl border {{ $variant === 'dark' ? 'border-white/10 bg-[#0d0d0d]/90 backdrop-blur-md shadow-2xl text-white' : 'border-cu-line bg-cu-panel shadow-xl text-cu-ink' }}">
 
         <div class="flex items-center justify-between border-b {{ $variant === 'dark' ? 'border-white/10 bg-black/40 text-white' : 'border-cu-line bg-cu-panel-soft' }} px-4 py-3">
             <h3 class="text-sm font-semibold {{ $variant === 'dark' ? 'text-white' : 'text-cu-ink' }}">Notifikasi</h3>
@@ -35,7 +35,8 @@
 
         <div class="max-h-80 divide-y {{ $variant === 'dark' ? 'divide-white/10' : 'divide-cu-line' }} overflow-y-auto">
             @forelse($this->notifications as $notification)
-                <div class="px-4 py-3 transition-colors {{ $variant === 'dark' ? 'hover:bg-white/5' : 'hover:bg-cu-panel-soft' }} {{ is_null($notification->read_at) ? ($variant === 'dark' ? 'bg-blue-500/10' : 'bg-cu-info-soft') : '' }}">
+                <div wire:click="handleNotificationClick('{{ $notification->id }}')"
+                    class="px-4 py-3 transition-colors cursor-pointer {{ $variant === 'dark' ? 'hover:bg-white/5' : 'hover:bg-cu-panel-soft' }} {{ is_null($notification->read_at) ? ($variant === 'dark' ? 'bg-blue-500/10' : 'bg-cu-info-soft') : '' }}">
                     <div class="flex items-start gap-3">
                         <div class="min-w-0 flex-1">
                             <p class="text-sm {{ $variant === 'dark' ? 'text-white/95' : 'text-cu-ink' }} {{ is_null($notification->read_at) ? 'font-medium' : '' }}">
@@ -46,10 +47,7 @@
                             </p>
                         </div>
                         @if(is_null($notification->read_at))
-                            <button wire:click="markAsRead('{{ $notification->id }}')"
-                                class="mt-1.5 size-3 shrink-0 cursor-pointer rounded-full bg-cu-info transition-colors hover:bg-cu-info-hover"
-                                title="Tandai dibaca">
-                            </button>
+                            <span class="mt-1.5 size-3 shrink-0 rounded-full bg-cu-info" title="Belum dibaca"></span>
                         @endif
                     </div>
                 </div>

@@ -4,6 +4,7 @@ namespace App\Livewire\Core;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -45,13 +46,30 @@ class NotificationBell extends Component
         $this->loadCount();
     }
 
+    public function handleNotificationClick(string $notificationId)
+    {
+        $notification = auth()->user()->notifications()->find($notificationId);
+
+        if ($notification) {
+            $notification->markAsRead();
+            
+            $url = $notification->data['url'] ?? null;
+            if ($url) {
+                return $this->redirect($url, navigate: true);
+            }
+        }
+
+        $this->loadCount();
+    }
+
     public function markAllAsRead(): void
     {
         auth()->user()->unreadNotifications()->update(['read_at' => now()]);
         $this->unreadCount = 0;
     }
 
-    public function getNotificationsProperty(): Collection
+    #[Computed]
+    public function notifications(): Collection
     {
         return auth()->user()->notifications()->latest()->take(10)->get();
     }

@@ -42,6 +42,7 @@ class User extends Authenticatable
         'approved_by',
         'approved_at',
         'avatar_path',
+        'settings',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -57,6 +58,7 @@ class User extends Authenticatable
             'is_active' => 'boolean',
             'approved_at' => 'datetime',
             'password' => 'hashed',
+            'settings' => 'array',
         ];
     }
 
@@ -122,5 +124,22 @@ class User extends Authenticatable
     public function scopePending($query)
     {
         return $query->where('is_active', false);
+    }
+
+    // ──────────────────────────────────────────────
+    // Settings Helper Methods
+    // ──────────────────────────────────────────────
+
+    public function getSetting(string $key, $default = null)
+    {
+        return data_get($this->settings, $key, $default);
+    }
+
+    public function setSetting(string $key, $value): void
+    {
+        $settings = $this->settings ?? [];
+        data_set($settings, $key, $value);
+        $this->settings = $settings;
+        $this->save();
     }
 }

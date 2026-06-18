@@ -47,6 +47,8 @@ Route::middleware(['auth', 'verified-active'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/session/{session}', [ProfileController::class, 'revokeSession'])->name('profile.session.revoke');
+    Route::post('/profile/role-settings', [ProfileController::class, 'updateRoleSettings'])->name('profile.role-settings.update');
 });
 
 // ─── Route Superadmin: User Management ────────────────────
@@ -75,3 +77,8 @@ Route::middleware(['auth', 'verified-active'])
 Route::get('/roles', fn () => view('pages.core.roles.index'))
     ->middleware(['auth', 'verified-active', 'can:manage-roles'])
     ->name('core.roles.index');
+
+// Superadmin Developer & Maintenance Panel
+Route::get('/maintenance', \App\Livewire\Core\MaintenancePanel::class)
+    ->middleware(['auth', 'verified-active', 'can:run-artisan'])
+    ->name('core.maintenance');
