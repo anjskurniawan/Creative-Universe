@@ -20,9 +20,11 @@
             </div>
             <div class="flex flex-col gap-3 sm:flex-row">
                 <button type="button" class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-5 text-sm font-medium leading-none text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover">
-                    <span class="flex h-full items-center justify-center leading-none">
-                        <span aria-hidden="true" class="material-symbols-outlined cu-material-icon cu-material-icon-auto cu-material-icon-light inline-flex shrink-0 items-center justify-center leading-none">save</span>
-                    </span>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960"
+                        class="cu-material-icon cu-material-icon-auto cu-material-icon-light cu-icon-save shrink-0">
+                        <use href="{{ asset('images/icons/material-symbols.svg') }}#material-icon-save-light" width="100%"
+                            height="100%" />
+                    </svg>
                     <span class="flex h-full items-center justify-center whitespace-nowrap leading-none">Save</span>
                 </button>
                 <button type="button" class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-border bg-cu-surface px-5 text-sm font-medium leading-none text-cu-ink transition duration-200 hover:border-cu-border-hover hover:bg-cu-surface-soft">Cancel</button>
@@ -42,7 +44,11 @@
                 <p class="mt-1 text-sm text-cu-muted">Deskripsi modal kosong.</p>
             </div>
             <div class="px-5 py-8 text-center">
-                <span aria-hidden="true" class="material-symbols-outlined cu-material-icon mx-auto mb-3 inline-flex size-10 shrink-0 items-center justify-center text-4xl leading-none text-cu-soft">dashboard_customize</span>
+                <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960"
+                    class="cu-material-icon cu-icon-dashboard-customize mx-auto mb-3 size-10 shrink-0 text-cu-soft">
+                    <use href="{{ asset('images/icons/material-symbols.svg') }}#material-icon-dashboard_customize" width="100%"
+                        height="100%" />
+                </svg>
                 <p class="text-sm text-cu-muted">Modal content placeholder.</p>
             </div>
             <div class="flex justify-end gap-3 border-t border-cu-line px-5 py-4">

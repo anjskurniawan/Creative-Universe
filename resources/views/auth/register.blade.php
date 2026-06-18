@@ -3,7 +3,7 @@
 <x-guest-layout>
     <div class="mb-6 flex items-start gap-3">
         <div class="flex size-11 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-            <x-material-icon name="person_add" size="md" />
+            <x-material-icon class="cu-icon-person-add" size="md" />
         </div>
         <div>
             <h1 class="text-2xl font-semibold leading-tight tracking-normal text-cu-ink">
@@ -72,7 +72,7 @@
 
         <x-primary-button class="w-full">
             <span class="flex h-full items-center justify-center leading-none">
-                <x-material-icon name="person_add" />
+                <x-material-icon class="cu-icon-person-add" />
             </span>
             <span class="flex h-full items-center justify-center whitespace-nowrap leading-none">Daftar Akun</span>
         </x-primary-button>

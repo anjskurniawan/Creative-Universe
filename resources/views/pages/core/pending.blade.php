@@ -4,7 +4,7 @@
 <x-app-layout>
     <div class="flex flex-col items-center justify-center px-4 py-16">
         <div class="mb-6 flex size-20 items-center justify-center rounded-full border border-cu-warning/20 bg-cu-warning-soft text-cu-warning">
-            <x-material-icon name="pending_actions" size="xl" />
+            <x-material-icon class="cu-icon-pending-actions" size="xl" />
         </div>
 
         <h1 class="mb-3 text-center text-2xl font-semibold text-cu-ink">Akunmu Sedang Menunggu Persetujuan</h1>
@@ -34,7 +34,7 @@
             @csrf
             <button type="submit"
                 class="inline-flex items-center gap-2 text-sm font-medium text-cu-muted transition-colors duration-200 hover:text-cu-ink">
-                <x-material-icon name="logout" />
+                <x-material-icon class="cu-icon-logout" />
                 Keluar dari akun
             </button>
         </form>

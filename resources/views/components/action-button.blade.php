@@ -20,9 +20,7 @@
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
         <span class="flex h-full items-center justify-center gap-2">
             @if ($icon)
-                <span class="flex h-full items-center justify-center leading-none">
-                    <x-material-icon :name="$icon" size="auto" />
-                </span>
+                <x-material-icon :class="'cu-icon-' . str_replace('_', '-', $icon)" size="auto" />
             @endif
 
             <span class="flex h-full items-center justify-center whitespace-nowrap leading-none">{{ $slot }}</span>
@@ -32,9 +30,7 @@
     <button type="{{ $type }}" {{ $attributes->merge(['class' => $classes]) }}>
         <span class="flex h-full items-center justify-center gap-2">
             @if ($icon)
-                <span class="flex h-full items-center justify-center leading-none">
-                    <x-material-icon :name="$icon" size="auto" />
-                </span>
+                <x-material-icon :class="'cu-icon-' . str_replace('_', '-', $icon)" size="auto" />
             @endif
 
             <span class="flex h-full items-center justify-center whitespace-nowrap leading-none">{{ $slot }}</span>

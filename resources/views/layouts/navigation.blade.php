@@ -25,7 +25,7 @@
                         <button class="inline-flex items-center gap-2 rounded-full border border-transparent bg-cu-surface px-3 py-2 text-sm font-medium leading-4 text-cu-muted transition ease-in-out duration-150 hover:bg-cu-panel-soft hover:text-cu-ink focus:outline-none">
                             <div>{{ Auth::user()->name }}</div>
 
-                            <x-material-icon name="expand_more" size="xs" />
+                            <x-material-icon class="cu-icon-expand-more" size="xs" />
                         </button>
                     </x-slot>
 
@@ -52,10 +52,10 @@
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center rounded-md p-2 text-cu-muted transition duration-150 ease-in-out hover:bg-cu-panel-soft hover:text-cu-ink focus:bg-cu-panel-soft focus:text-cu-ink focus:outline-none">
                     <span :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex">
-                        <x-material-icon name="menu" size="md" />
+                        <x-material-icon class="cu-icon-menu" size="md" />
                     </span>
                     <span :class="{'hidden': ! open, 'inline-flex': open }" class="hidden">
-                        <x-material-icon name="close" size="md" />
+                        <x-material-icon class="cu-icon-close" size="md" />
                     </span>
                 </button>
             </div>

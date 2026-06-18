@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-6 flex items-start gap-3">
         <div class="flex size-11 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-            <x-material-icon name="lock" size="md" />
+            <x-material-icon class="cu-icon-lock" size="md" />
         </div>
         <div>
             <h1 class="text-2xl font-semibold text-cu-ink">{{ __('Confirm Password') }}</h1>

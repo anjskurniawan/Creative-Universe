@@ -1,4 +1,5 @@
 import './bootstrap';
+import './landing/interactive-hero';
 
 // NOTE: Alpine.js is bundled with Livewire v3 — do NOT import it here.
 // Importing Alpine separately causes double-initialization which breaks

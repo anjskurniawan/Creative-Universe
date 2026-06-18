@@ -3,17 +3,17 @@
     <div class="mb-6 border-b border-cu-line bg-cu-surface rounded-t-xl p-1 flex flex-wrap gap-2">
         <button wire:click="selectTab('categories')"
             class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition {{ $activeTab === 'categories' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon name="category" size="sm" />
+            <x-material-icon class="cu-icon-category" size="sm" />
             Data Kategori
         </button>
         <button wire:click="selectTab('products')"
             class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition {{ $activeTab === 'products' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon name="inventory_2" size="sm" />
+            <x-material-icon class="cu-icon-inventory-2" size="sm" />
             Data Produk
         </button>
         <button wire:click="selectTab('csv_import')"
             class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition {{ $activeTab === 'csv_import' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon name="upload_file" size="sm" />
+            <x-material-icon class="cu-icon-upload-file" size="sm" />
             Tambah Data Massal (CSV)
         </button>
     </div>
@@ -41,7 +41,7 @@
         <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="relative flex-1 max-w-md">
                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
-                    <x-material-icon name="search" size="sm" />
+                    <x-material-icon class="cu-icon-search" size="sm" />
                 </div>
                 <input type="search" wire:model.live.debounce.300ms="dbSearch"
                     class="block w-full rounded-lg border border-cu-line bg-cu-surface py-2 pl-10 pr-4 text-sm text-cu-ink placeholder-cu-muted shadow-sm focus:border-cu-focus focus:outline-none"
@@ -52,13 +52,13 @@
                 @if ($activeTab === 'categories')
                     <button wire:click="openCategoryModal()"
                         class="inline-flex items-center gap-1.5 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm">
-                        <x-material-icon name="add" size="sm" />
+                        <x-material-icon class="cu-icon-add" size="sm" />
                         Tambah Kategori
                     </button>
                 @elseif ($activeTab === 'products')
                     <button wire:click="openProductModal()"
                         class="inline-flex items-center gap-1.5 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm">
-                        <x-material-icon name="add" size="sm" />
+                        <x-material-icon class="cu-icon-add" size="sm" />
                         Tambah Produk
                     </button>
                 @endif
@@ -89,11 +89,11 @@
                                     <div class="flex items-center justify-end gap-2">
                                         <button wire:click="openCategoryModal({{ $cat->id }})"
                                             class="inline-flex size-8 items-center justify-center rounded-lg border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft transition">
-                                            <x-material-icon name="edit" size="xs" />
+                                            <x-material-icon class="cu-icon-edit" size="xs" />
                                         </button>
                                         <button onclick="confirmDelete({{ $cat->id }}, 'category')"
                                             class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent bg-cu-danger-soft text-cu-danger hover:bg-cu-danger hover:text-cu-surface transition">
-                                            <x-material-icon name="delete" size="xs" />
+                                            <x-material-icon class="cu-icon-delete" size="xs" />
                                         </button>
                                     </div>
                                 </td>
@@ -148,11 +148,11 @@
                                     <div class="flex items-center justify-end gap-2">
                                         <button wire:click="openProductModal({{ $prod->id }})"
                                             class="inline-flex size-8 items-center justify-center rounded-lg border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft transition">
-                                            <x-material-icon name="edit" size="xs" />
+                                            <x-material-icon class="cu-icon-edit" size="xs" />
                                         </button>
                                         <button onclick="confirmDelete({{ $prod->id }}, 'product')"
                                             class="inline-flex size-8 items-center justify-center rounded-lg border border-transparent bg-cu-danger-soft text-cu-danger hover:bg-cu-danger hover:text-cu-surface transition">
-                                            <x-material-icon name="delete" size="xs" />
+                                            <x-material-icon class="cu-icon-delete" size="xs" />
                                         </button>
                                     </div>
                                 </td>
@@ -184,7 +184,7 @@
                     </div>
                     <a href="#" onclick="downloadImportTemplate()"
                         class="inline-flex items-center gap-1 text-xs font-semibold text-cu-info hover:underline">
-                        <x-material-icon name="download_for_offline" size="sm" />
+                        <x-material-icon class="cu-icon-download-for-offline" size="sm" />
                         Download Template CSV
                     </a>
                 </div>
@@ -195,14 +195,14 @@
                         <div class="flex items-center justify-center w-full">
                             <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-cu-line rounded-lg cursor-pointer bg-cu-surface hover:bg-cu-panel-soft transition duration-200">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <x-material-icon name="upload_file" class="text-cu-soft mb-2" size="lg" />
+                                    <x-material-icon class="cu-icon-upload-file text-cu-soft mb-2" size="lg" />
                                     <p class="mb-1 text-sm text-cu-ink"><span class="font-semibold">Klik untuk memilih file</span></p>
                                     <p class="text-xs text-cu-muted">Kolom wajib: kategori, produk, harga_normal</p>
                                     <p class="text-[10px] text-cu-soft mt-0.5">Kolom opsional: varian (default "Default"), harga_diskon</p>
 
                                     @if ($updateCsvFile)
                                         <div class="mt-3 flex items-center gap-1.5 rounded-full bg-cu-info-soft border border-cu-info/20 px-3 py-1 text-xs text-cu-info font-medium">
-                                            <x-material-icon name="insert_drive_file" size="xs" />
+                                            <x-material-icon class="cu-icon-insert-drive-file" size="xs" />
                                             {{ $updateCsvFile->getClientOriginalName() }}
                                         </div>
                                     @endif
@@ -218,7 +218,7 @@
                     <div class="pt-4 border-t border-cu-line flex items-center gap-3">
                         <button type="submit" wire:loading.attr="disabled"
                             class="inline-flex items-center justify-center gap-2 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover disabled:opacity-50">
-                            <x-material-icon name="save" size="sm" wire:loading.remove wire:target="importCsv" />
+                            <x-material-icon class="cu-icon-save" size="sm" wire:loading.remove wire:target="importCsv" />
                             <svg class="animate-spin h-4 w-4 text-cu-surface" wire:loading wire:target="importCsv" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -240,7 +240,7 @@
                         {{ $selectedCategoryId ? 'Edit Kategori' : 'Tambah Kategori' }}
                     </h3>
                     <button wire:click="$set('showCategoryModal', false)" class="text-cu-muted hover:text-cu-ink transition">
-                        <x-material-icon name="close" size="sm" />
+                        <x-material-icon class="cu-icon-close" size="sm" />
                     </button>
                 </div>
                 <form wire:submit.prevent="saveCategory" class="space-y-4">
@@ -276,7 +276,7 @@
                         {{ $selectedProductId ? 'Edit Produk' : 'Tambah Produk' }}
                     </h3>
                     <button wire:click="$set('showProductModal', false)" class="text-cu-muted hover:text-cu-ink transition">
-                        <x-material-icon name="close" size="sm" />
+                        <x-material-icon class="cu-icon-close" size="sm" />
                     </button>
                 </div>
                 <form wire:submit.prevent="saveProduct" class="space-y-4">

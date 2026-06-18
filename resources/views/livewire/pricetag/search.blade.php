@@ -5,7 +5,7 @@
         <!-- Search Input -->
         <div class="relative flex-1 max-w-md">
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
-                <x-material-icon name="search" size="sm" />
+                <x-material-icon class="cu-icon-search" size="sm" />
             </div>
             <input type="search" wire:model.live.debounce.300ms="search"
                 class="block w-full rounded-lg border border-cu-line bg-cu-surface py-2 pl-10 pr-4 text-sm text-cu-ink placeholder-cu-muted shadow-sm focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus"
@@ -27,14 +27,14 @@
                 <button type="button" @click="viewType = 'grid'"
                     class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all duration-200"
                     :class="viewType === 'grid' ? 'bg-cu-ink text-cu-surface shadow-sm' : 'text-cu-muted hover:text-cu-ink'">
-                    <x-material-icon name="grid_view" size="xs" />
+                    <x-material-icon class="cu-icon-grid-view" size="xs" />
                     Grid
                 </button>
                 <!-- List Button -->
                 <button type="button" @click="viewType = 'list'"
                     class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all duration-200"
                     :class="viewType === 'list' ? 'bg-cu-ink text-cu-surface shadow-sm' : 'text-cu-muted hover:text-cu-ink'">
-                    <x-material-icon name="view_list" size="xs" />
+                    <x-material-icon class="cu-icon-view-list" size="xs" />
                     Tabel
                 </button>
             </div>
@@ -60,7 +60,7 @@
                         </span>
                         
                         <span class="flex items-center gap-1 text-[10px] text-cu-success font-medium">
-                            <x-material-icon name="check_circle" size="xs" class="text-cu-success" />
+                            <x-material-icon size="xs" class="cu-icon-check-circle text-cu-success" />
                             Ready
                         </span>
                     </div>
@@ -89,7 +89,7 @@
                 <!-- Last generated time -->
                 <div class="mt-4 border-t border-cu-line/40 pt-3 flex items-center justify-between text-[10px] text-cu-muted">
                     <span class="flex items-center gap-1">
-                        <x-material-icon name="schedule" size="xs" />
+                        <x-material-icon class="cu-icon-schedule" size="xs" />
                         @if($viewLink && $viewLink->updated_at)
                             {{ $viewLink->updated_at->setTimezone('Asia/Jakarta')->format('d M, H:i') }}
                         @else
@@ -103,7 +103,7 @@
                             <a href="{{ $viewLink->url }}" target="_blank" rel="noopener noreferrer"
                                 class="inline-flex size-7 items-center justify-center rounded-md border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft transition shadow-sm"
                                 title="Buka Drive">
-                                <x-material-icon name="visibility" size="xs" />
+                                <x-material-icon class="cu-icon-visibility" size="xs" />
                             </a>
                         @endif
 
@@ -111,7 +111,7 @@
                             <a href="{{ $downloadLink->url }}" target="_blank" rel="noopener noreferrer"
                                 class="inline-flex size-7 items-center justify-center rounded-md bg-cu-ink text-cu-surface hover:bg-cu-ink-hover transition shadow-sm"
                                 title="Unduh">
-                                <x-material-icon name="download" size="xs" />
+                                <x-material-icon class="cu-icon-download" size="xs" />
                             </a>
                         @endif
                     </div>
@@ -121,7 +121,7 @@
             <div class="col-span-full">
                 <x-app-panel padding="lg" class="text-center text-cu-muted border-dashed py-12">
                     <div class="flex flex-col items-center justify-center gap-2">
-                        <x-material-icon name="search_off" size="lg" class="text-cu-soft" />
+                        <x-material-icon size="lg" class="cu-icon-search-off text-cu-soft" />
                         <h3 class="text-sm font-medium text-cu-ink">Belum Ada Pricetag</h3>
                         <p class="text-xs text-cu-muted max-w-sm">Gunakan menu Generator untuk membuat pricetag baru terlebih dahulu.</p>
                     </div>
@@ -184,7 +184,7 @@
                                             <a href="{{ $viewLink->url }}" target="_blank" rel="noopener noreferrer"
                                                 class="inline-flex items-center gap-1 rounded-md border border-cu-line bg-cu-surface px-2.5 py-1.5 text-xs font-medium text-cu-ink transition hover:bg-cu-panel-soft"
                                                 title="Buka Drive">
-                                                <x-material-icon name="visibility" size="xs" />
+                                                <x-material-icon class="cu-icon-visibility" size="xs" />
                                                 Lihat
                                             </a>
                                         @endif
@@ -193,7 +193,7 @@
                                             <a href="{{ $downloadLink->url }}" target="_blank" rel="noopener noreferrer"
                                                 class="inline-flex items-center gap-1 rounded-md bg-cu-ink px-2.5 py-1.5 text-xs font-medium text-cu-surface transition hover:bg-cu-ink-hover shadow-sm"
                                                 title="Unduh">
-                                                <x-material-icon name="download" size="xs" />
+                                                <x-material-icon class="cu-icon-download" size="xs" />
                                                 Unduh
                                             </a>
                                         @endif

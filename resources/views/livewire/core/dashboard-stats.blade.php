@@ -7,7 +7,7 @@
                     <p class="text-3xl font-semibold text-cu-ink">{{ $totalActiveUsers }}</p>
                 </div>
                 <div class="flex size-12 items-center justify-center rounded-lg bg-cu-info-soft text-cu-info">
-                    <x-material-icon name="groups" size="md" />
+                    <x-material-icon class="cu-icon-groups" size="md" />
                 </div>
             </div>
         </x-app-panel>
@@ -20,7 +20,7 @@
                         <p class="text-3xl font-semibold text-cu-ink">{{ $totalPendingUsers }}</p>
                     </div>
                     <div class="flex size-12 items-center justify-center rounded-lg bg-cu-warning-soft text-cu-warning">
-                        <x-material-icon name="pending_actions" size="md" />
+                        <x-material-icon class="cu-icon-pending-actions" size="md" />
                     </div>
                 </div>
 
@@ -28,7 +28,7 @@
                     <a href="{{ route('core.users.pending') }}" wire:navigate
                         class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-cu-warning transition-colors hover:text-cu-warning-hover">
                         Tinjau akun pending
-                        <x-material-icon name="arrow_forward" />
+                        <x-material-icon class="cu-icon-arrow-forward" />
                     </a>
                 @endif
             </x-app-panel>
@@ -41,7 +41,7 @@
                     <p class="text-xl font-semibold text-cu-ink">{{ $userRoles }}</p>
                 </div>
                 <div class="flex size-12 items-center justify-center rounded-lg bg-cu-success-soft text-cu-success">
-                    <x-material-icon name="verified_user" size="md" />
+                    <x-material-icon class="cu-icon-verified-user" size="md" />
                 </div>
             </div>
         </x-app-panel>

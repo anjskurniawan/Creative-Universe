@@ -10,7 +10,7 @@
 
             <a href="{{ route('core.users.index') }}" wire:navigate
                 class="inline-flex items-center gap-2 text-sm font-medium text-cu-muted transition-colors duration-200 hover:text-cu-ink">
-                <x-material-icon name="arrow_back" />
+                <x-material-icon class="cu-icon-arrow-back" />
                 Kembali ke Daftar User
             </a>
         </div>

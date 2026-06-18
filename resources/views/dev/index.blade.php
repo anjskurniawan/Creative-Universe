@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -27,7 +26,7 @@
             <a href="{{ route('dev.components') }}"
                 class="group rounded-lg border border-cu-line bg-cu-panel p-6 shadow-sm transition-colors hover:border-cu-border-hover hover:bg-cu-surface">
                 <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-                    <x-material-icon name="widgets" size="md" />
+                    <x-material-icon class="cu-icon-widgets" size="md" />
                 </div>
                 <h2 class="text-xl font-semibold text-cu-ink">Components</h2>
                 <p class="mt-2 text-sm text-cu-muted">
@@ -35,14 +34,14 @@
                 </p>
                 <span class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-cu-info group-hover:text-cu-info-hover">
                     Buka components
-                    <x-material-icon name="arrow_forward" />
+                    <x-material-icon class="cu-icon-arrow-forward" />
                 </span>
             </a>
 
             <a href="{{ route('dev.playground') }}"
                 class="group rounded-lg border border-cu-line bg-cu-panel p-6 shadow-sm transition-colors hover:border-cu-border-hover hover:bg-cu-surface">
                 <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-                    <x-material-icon name="dashboard_customize" size="md" />
+                    <x-material-icon class="cu-icon-dashboard-customize" size="md" />
                 </div>
                 <h2 class="text-xl font-semibold text-cu-ink">Playground</h2>
                 <p class="mt-2 text-sm text-cu-muted">
@@ -50,7 +49,7 @@
                 </p>
                 <span class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-cu-info group-hover:text-cu-info-hover">
                     Buka playground
-                    <x-material-icon name="arrow_forward" />
+                    <x-material-icon class="cu-icon-arrow-forward" />
                 </span>
             </a>
         </div>

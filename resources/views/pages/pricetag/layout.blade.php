@@ -18,26 +18,26 @@
             <nav class="flex flex-wrap gap-1.5 p-1 bg-white/5 backdrop-blur-md rounded-xl border border-white/10 self-start md:self-center">
                 <a href="{{ route('pricetag.search') }}" wire:navigate
                     class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('pricetag.search') ? 'bg-white text-cu-ink shadow-md font-bold' : 'text-slate-300 hover:text-white hover:bg-white/5' }}">
-                    <x-material-icon name="search" size="sm" />
+                    <x-material-icon class="cu-icon-search" size="sm" />
                     Cari Pricetag
                 </a>
 
                 <a href="{{ route('pricetag.generator') }}" wire:navigate
                     class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('pricetag.generator') ? 'bg-white text-cu-ink shadow-md font-bold' : 'text-slate-300 hover:text-white hover:bg-white/5' }}">
-                    <x-material-icon name="auto_awesome" size="sm" />
+                    <x-material-icon class="cu-icon-auto-awesome" size="sm" />
                     Generator
                 </a>
 
                 <a href="{{ route('pricetag.history') }}" wire:navigate
                     class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('pricetag.history') ? 'bg-white text-cu-ink shadow-md font-bold' : 'text-slate-300 hover:text-white hover:bg-white/5' }}">
-                    <x-material-icon name="history" size="sm" />
+                    <x-material-icon class="cu-icon-history" size="sm" />
                     Riwayat
                 </a>
 
                 @can('pricetag.manage')
                     <a href="{{ route('pricetag.database') }}" wire:navigate
                         class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-200 {{ request()->routeIs('pricetag.database') ? 'bg-white text-cu-ink shadow-md font-bold' : 'text-slate-300 hover:text-white hover:bg-white/5' }}">
-                        <x-material-icon name="database" size="sm" />
+                        <x-material-icon class="cu-icon-database" size="sm" />
                         Database
                     </a>
                 @endcan

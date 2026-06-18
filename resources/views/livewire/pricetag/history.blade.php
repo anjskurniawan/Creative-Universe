@@ -59,7 +59,7 @@
                             <span class="text-xs font-mono font-bold text-cu-ink block leading-none">{{ $batch->processed_items }}/{{ $batch->total_items }}</span>
                             <span class="text-[10px] text-cu-muted mt-0.5 block font-medium leading-none">{{ $percentage }}%</span>
                         </div>
-                        <x-material-icon name="expand_more" size="xs" class="text-cu-muted transition-transform duration-200 shrink-0" x-bind:class="expanded ? 'rotate-180' : ''" />
+                        <x-material-icon size="xs" class="cu-icon-expand-more text-cu-muted transition-transform duration-200 shrink-0" x-bind:class="expanded ? 'rotate-180' : ''" />
                     </div>
                 </div>
 
@@ -76,7 +76,7 @@
                             <button wire:click.stop="downloadZip({{ $batch->id }})" wire:loading.attr="disabled"
                                 class="inline-flex items-center gap-1.5 rounded-lg bg-cu-ink px-3 py-1.5 text-[11px] font-semibold text-cu-surface transition hover:bg-cu-ink-hover disabled:opacity-50 shadow-sm">
                                 <span wire:loading.remove wire:target="downloadZip({{ $batch->id }})" class="flex items-center gap-1.5">
-                                    <x-material-icon name="download_for_offline" size="xs" />
+                                    <x-material-icon class="cu-icon-download-for-offline" size="xs" />
                                     Download ZIP
                                 </span>
                                 <span wire:loading wire:target="downloadZip({{ $batch->id }})" class="flex items-center gap-1.5">
@@ -107,7 +107,7 @@
                                             </div>
                                             @if($viewUrl)
                                                 <a href="{{ $viewUrl }}" target="_blank" class="text-cu-muted hover:text-cu-info shrink-0 ml-0.5" title="Buka Hasil Label" @click.stop>
-                                                    <x-material-icon name="open_in_new" size="xs" />
+                                                    <x-material-icon class="cu-icon-open-in-new" size="xs" />
                                                 </a>
                                             @endif
                                         </div>
@@ -117,7 +117,7 @@
                                                 <span class="size-1.5 rounded-full bg-cu-danger shrink-0"></span>
                                                 <span class="truncate" title="{{ $displayName }}">{{ $displayName }}</span>
                                             </div>
-                                            <x-material-icon name="info" size="xs" class="text-cu-danger hover:text-cu-danger shrink-0 cursor-help" />
+                                            <x-material-icon size="xs" class="cu-icon-info text-cu-danger hover:text-cu-danger shrink-0 cursor-help" />
                                         </div>
                                     @endif
                                 @endforeach
@@ -131,7 +131,7 @@
         @empty
             <x-app-panel padding="lg" class="text-center text-cu-muted border-dashed py-12">
                 <div class="flex flex-col items-center justify-center gap-2">
-                    <x-material-icon name="history_toggle_off" size="lg" class="text-cu-soft" />
+                    <x-material-icon size="lg" class="cu-icon-history-toggle-off text-cu-soft" />
                     <h3 class="text-sm font-semibold text-cu-ink">Belum Ada Riwayat</h3>
                     <p class="text-xs text-cu-muted max-w-sm">Daftar unggahan CSV dan generator antrean Anda akan tampil di sini.</p>
                 </div>

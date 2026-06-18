@@ -10,18 +10,18 @@
     $iconButtonClass = 'inline-flex size-10 items-center justify-center rounded-full border border-transparent text-cu-ink transition-colors hover:border-cu-border hover:bg-cu-panel-soft focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2';
 @endphp
 
-<nav class="sticky top-0 z-50 border-b shadow-sm {{ $navClass }}">
-    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+<nav class="sticky top-0 z-50{{ $navClass }}">
+    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
         <a href="{{ route('home') }}" wire:navigate
-            class="inline-flex items-center rounded-md outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cu-ink">
+            class="inline-flex items-center">
             <img src="{{ asset('images/icon-app/Logo_White.png') }}" alt="Creative Universe" class="h-8 brightness-0">
         </a>
 
         <div class="flex items-center gap-2">
             @guest
                 <a href="{{ route('login') }}" wire:navigate
-                    class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-4 text-sm font-medium text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2">
-                    <x-material-icon name="login" />
+                    class="inline-flex py-1 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-4 text-sm font-medium text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2">
+                    <x-material-icon class="cu-icon-login" />
                     Masuk
                 </a>
             @endguest
@@ -32,7 +32,7 @@
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" type="button" class="{{ $iconButtonClass }}">
                         <span class="sr-only">Buka menu aplikasi</span>
-                        <x-material-icon name="apps" size="md" />
+                        <x-material-icon class="cu-icon-apps" size="md" />
                     </button>
 
                     <div x-show="open" x-cloak @click.outside="open = false"
@@ -51,7 +51,7 @@
                             <li>
                                 <a href="{{ route('dashboard') }}" wire:navigate @click="open = false"
                                     class="{{ $menuLinkClass }}">
-                                    <x-material-icon name="dashboard" size="sm" />
+                                    <x-material-icon class="cu-icon-dashboard" size="sm" />
                                     Dashboard
                                 </a>
                             </li>
@@ -59,7 +59,7 @@
                                 <li>
                                     <a href="{{ route('pricetag.search') }}" wire:navigate @click="open = false"
                                         class="{{ $menuLinkClass }}">
-                                        <x-material-icon name="label" size="sm" />
+                                        <x-material-icon class="cu-icon-label" size="sm" />
                                         Pricetag Studio
                                     </a>
                                 </li>
@@ -68,7 +68,7 @@
                                 <li>
                                     <a href="{{ route('core.users.index') }}" wire:navigate @click="open = false"
                                         class="{{ $menuLinkClass }}">
-                                        <x-material-icon name="group" size="sm" />
+                                        <x-material-icon class="cu-icon-group" size="sm" />
                                         Kelola User
                                     </a>
                                 </li>
@@ -77,7 +77,7 @@
                                 <li>
                                     <a href="{{ route('core.roles.index') }}" wire:navigate @click="open = false"
                                         class="{{ $menuLinkClass }}">
-                                        <x-material-icon name="admin_panel_settings" size="sm" />
+                                        <x-material-icon class="cu-icon-admin-panel-settings" size="sm" />
                                         Kelola Role
                                     </a>
                                 </li>
@@ -86,7 +86,7 @@
                                 <li>
                                     <a href="{{ route('core.users.pending') }}" wire:navigate @click="open = false"
                                         class="{{ $menuLinkClass }}">
-                                        <x-material-icon name="pending_actions" size="sm" />
+                                        <x-material-icon class="cu-icon-pending-actions" size="sm" />
                                         Akun Pending
                                     </a>
                                 </li>
@@ -125,14 +125,14 @@
                             <li>
                                 <a href="{{ route('dashboard') }}" wire:navigate @click="open = false"
                                     class="{{ $menuLinkClass }}">
-                                    <x-material-icon name="dashboard" size="sm" />
+                                    <x-material-icon class="cu-icon-dashboard" size="sm" />
                                     Dashboard
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('profile.edit') }}" wire:navigate @click="open = false"
                                     class="{{ $menuLinkClass }}">
-                                    <x-material-icon name="person" size="sm" />
+                                    <x-material-icon class="cu-icon-person" size="sm" />
                                     Profil Saya
                                 </a>
                             </li>
@@ -141,7 +141,7 @@
                                     @csrf
                                     <button type="submit"
                                         class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-cu-danger transition-colors hover:bg-cu-danger-soft">
-                                        <x-material-icon name="logout" size="sm" />
+                                        <x-material-icon class="cu-icon-logout" size="sm" />
                                         Keluar
                                     </button>
                                 </form>

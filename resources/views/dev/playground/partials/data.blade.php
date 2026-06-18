@@ -6,9 +6,11 @@
                 <p class="mt-1 text-sm text-cu-muted">Representasi halaman users / roles.</p>
             </div>
             <button class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-4 text-sm font-medium text-cu-surface">
-                <span class="flex h-full items-center justify-center leading-none">
-                    <span aria-hidden="true" class="material-symbols-outlined cu-material-icon cu-material-icon-auto cu-material-icon-light inline-flex shrink-0 items-center justify-center leading-none">add</span>
-                </span>
+                <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960"
+                    class="cu-material-icon cu-material-icon-auto cu-material-icon-light cu-icon-add shrink-0">
+                    <use href="{{ asset('images/icons/material-symbols.svg') }}#material-icon-add-light" width="100%"
+                        height="100%" />
+                </svg>
                 <span class="flex h-full items-center justify-center whitespace-nowrap leading-none">Create</span>
             </button>
         </div>
@@ -26,7 +28,11 @@
                 <tbody>
                     <tr>
                         <td colspan="4" class="px-6 py-16 text-center">
-                            <span aria-hidden="true" class="material-symbols-outlined cu-material-icon mx-auto mb-3 inline-flex size-10 shrink-0 items-center justify-center text-4xl leading-none text-cu-soft">inbox</span>
+                            <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960"
+                                class="cu-material-icon cu-icon-inbox mx-auto mb-3 size-10 shrink-0 text-cu-soft">
+                                <use href="{{ asset('images/icons/material-symbols.svg') }}#material-icon-inbox" width="100%"
+                                    height="100%" />
+                            </svg>
                             <p class="font-medium text-cu-ink">Belum ada data</p>
                             <p class="mt-1 text-sm text-cu-muted">Konten kosong untuk mengecek empty state.</p>
                         </td>
@@ -43,7 +49,11 @@
                 <span class="flex size-8 items-center justify-center rounded-full bg-cu-danger text-xs font-semibold text-cu-surface">0</span>
             </div>
             <div class="rounded-lg border border-dashed border-cu-border p-8 text-center">
-                <span aria-hidden="true" class="material-symbols-outlined cu-material-icon mx-auto mb-2 inline-flex size-8 shrink-0 items-center justify-center text-3xl leading-none text-cu-soft">notifications_off</span>
+                <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960"
+                    class="cu-material-icon cu-icon-notifications-off mx-auto mb-2 size-8 shrink-0 text-cu-soft">
+                    <use href="{{ asset('images/icons/material-symbols.svg') }}#material-icon-notifications_off" width="100%"
+                        height="100%" />
+                </svg>
                 <p class="text-sm text-cu-muted">Belum ada notifikasi.</p>
             </div>
         </div>

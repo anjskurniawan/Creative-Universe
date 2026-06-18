@@ -19,7 +19,7 @@
 
         <button type="button" wire:click="openCreateModal"
             class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-4 text-sm font-medium text-cu-surface transition-colors hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2">
-            <x-material-icon name="add" />
+            <x-material-icon class="cu-icon-add" />
             Buat Role
         </button>
     </div>
@@ -43,7 +43,7 @@
                                     <span class="font-medium text-cu-ink">{{ $role->name }}</span>
                                     @if (in_array($role->name, $protectedRoles, true))
                                         <span class="inline-flex items-center gap-1 rounded-full border border-cu-warning/20 bg-cu-warning-soft px-2 py-0.5 text-xs font-medium text-cu-warning">
-                                            <x-material-icon name="lock" size="xs" />
+                                            <x-material-icon class="cu-icon-lock" size="xs" />
                                             Dilindungi
                                         </span>
                                     @endif
@@ -69,14 +69,14 @@
                                 <div class="flex justify-end gap-2">
                                     <button type="button" wire:click="editRole({{ $role->id }})"
                                         class="inline-flex size-10 items-center justify-center rounded-full border border-cu-border text-cu-ink transition-colors hover:border-cu-border-hover hover:bg-cu-panel-soft focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2">
-                                        <x-material-icon name="edit" size="xs" />
+                                        <x-material-icon class="cu-icon-edit" size="xs" />
                                         <span class="sr-only">Ubah permission {{ $role->name }}</span>
                                     </button>
 
                                     <button type="button" wire:click="confirmDeleteRole({{ $role->id }})"
                                         @disabled(in_array($role->name, $protectedRoles, true))
                                         class="inline-flex size-10 items-center justify-center rounded-full border border-cu-danger/30 text-cu-danger transition-colors hover:bg-cu-danger-soft focus:outline-none focus:ring-2 focus:ring-cu-danger focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
-                                        <x-material-icon name="delete" size="xs" />
+                                        <x-material-icon class="cu-icon-delete" size="xs" />
                                         <span class="sr-only">Hapus {{ $role->name }}</span>
                                     </button>
                                 </div>

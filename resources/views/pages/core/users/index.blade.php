@@ -11,7 +11,7 @@
             @can('approve-users')
                 <a href="{{ route('core.users.pending') }}" wire:navigate
                     class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-warning bg-cu-warning px-4 text-sm font-medium text-cu-surface transition-colors duration-200 hover:border-cu-warning-hover hover:bg-cu-warning-hover">
-                    <x-material-icon name="pending_actions" />
+                    <x-material-icon class="cu-icon-pending-actions" />
                     Akun Pending
                 </a>
             @endcan

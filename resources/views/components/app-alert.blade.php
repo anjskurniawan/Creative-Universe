@@ -21,6 +21,6 @@
 @endphp
 
 <div role="alert" {{ $attributes->merge(['class' => $classes]) }}>
-    <x-material-icon :name="$icons[$type] ?? $icons['info']" size="sm" class="mt-0.5" />
+    <x-material-icon :class="'cu-icon-' . str_replace('_', '-', $icons[$type] ?? $icons['info']) . ' mt-0.5'" size="sm" />
     <div>{{ $slot }}</div>
 </div>

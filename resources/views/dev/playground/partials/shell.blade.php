@@ -13,9 +13,11 @@
         <div class="flex flex-col gap-3 sm:flex-row">
             <a href="#" class="inline-flex h-11 items-center justify-center rounded-full border border-cu-ink bg-cu-ink px-5 text-base font-medium leading-none text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover sm:h-14 sm:px-7 sm:text-lg">
                 <span class="flex h-full items-center justify-center gap-2">
-                    <span class="flex h-full items-center justify-center leading-none">
-                        <span aria-hidden="true" class="material-symbols-outlined cu-material-icon cu-material-icon-auto cu-material-icon-light inline-flex shrink-0 items-center justify-center leading-none">login</span>
-                    </span>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960"
+                        class="cu-material-icon cu-material-icon-auto cu-material-icon-light cu-icon-login shrink-0">
+                        <use href="{{ asset('images/icons/material-symbols.svg') }}#material-icon-login-light" width="100%"
+                            height="100%" />
+                    </svg>
                     <span class="flex h-full items-center justify-center whitespace-nowrap leading-none">Primary Action</span>
                 </span>
             </a>

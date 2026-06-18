@@ -2,7 +2,7 @@
     @if($step === 1)
         <div class="mb-6 flex items-start gap-3">
             <div class="flex size-11 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-                <x-material-icon name="lock_reset" size="md" />
+                <x-material-icon class="cu-icon-lock-reset" size="md" />
             </div>
             <div>
                 <h1 class="text-2xl font-semibold leading-tight tracking-normal text-cu-ink">
@@ -39,7 +39,7 @@
     @if($step === 2)
         <div class="mb-6 flex items-start gap-3">
             <div class="flex size-11 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-                <x-material-icon name="pin" size="md" />
+                <x-material-icon class="cu-icon-pin" size="md" />
             </div>
             <div>
                 <h1 class="text-2xl font-semibold leading-tight tracking-normal text-cu-ink">
@@ -81,7 +81,7 @@
     @if($step === 3)
         <div class="mb-6 flex items-start gap-3">
             <div class="flex size-11 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-                <x-material-icon name="password" size="md" />
+                <x-material-icon class="cu-icon-password" size="md" />
             </div>
             <div>
                 <h1 class="text-2xl font-semibold leading-tight tracking-normal text-cu-ink">

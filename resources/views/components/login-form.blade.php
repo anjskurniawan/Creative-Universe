@@ -2,7 +2,7 @@
     <x-app-panel padding="lg" class="w-full">
         <div class="mb-6 flex items-start gap-3">
             <div class="flex size-11 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-                <x-material-icon name="login" size="md" />
+                <x-material-icon class="cu-icon-login" size="md" />
             </div>
             <div>
                 <h1 class="text-2xl font-semibold leading-tight text-cu-ink">

@@ -7,7 +7,11 @@
                     <div class="mt-3 h-9 w-20 rounded-md bg-cu-panel-soft"></div>
                 </div>
                 <div class="flex size-12 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-muted">
-                    <span aria-hidden="true" class="material-symbols-outlined cu-material-icon inline-flex size-6 shrink-0 items-center justify-center text-xl leading-none">{{ $icon }}</span>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960"
+                        class="cu-material-icon cu-icon-{{ str_replace('_', '-', $icon) }} size-6 shrink-0">
+                        <use href="{{ asset('images/icons/material-symbols.svg') }}#material-icon-{{ $icon }}" width="100%"
+                            height="100%" />
+                    </svg>
                 </div>
             </div>
         </div>

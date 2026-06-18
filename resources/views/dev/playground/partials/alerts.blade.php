@@ -6,7 +6,11 @@
         ['error', 'danger', 'border-cu-danger/20 bg-cu-danger-soft text-cu-danger', 'Danger state kosong.'],
     ] as [$icon, $label, $classes, $message])
         <div class="flex flex-row gap-3 rounded-lg border px-4 py-3 text-sm font-medium {{ $classes }}">
-            <span aria-hidden="true" class="material-symbols-outlined cu-material-icon cu-material-icon-auto cu-material-icon-light items-center justify-center leading-none">{{ $icon }}</span>
+            <svg aria-hidden="true" focusable="false" viewBox="0 -960 960 960"
+                class="cu-material-icon cu-material-icon-auto cu-material-icon-light cu-icon-{{ str_replace('_', '-', $icon) }} shrink-0">
+                <use href="{{ asset('images/icons/material-symbols.svg') }}#material-icon-{{ $icon }}-light" width="100%"
+                    height="100%" />
+            </svg>
             <div class="flex flex-col items-center ">
                 <span class="sr-only">{{ $label }}</span>
                 {{ $message }}

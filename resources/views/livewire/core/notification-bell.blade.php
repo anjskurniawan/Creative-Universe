@@ -6,7 +6,7 @@
     <button @click="open = !open" type="button"
         class="relative inline-flex size-10 items-center justify-center rounded-full border border-transparent text-cu-ink transition-colors hover:border-cu-border hover:bg-cu-panel-soft focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2">
         <span class="sr-only">Lihat notifikasi</span>
-        <x-material-icon name="notifications" size="md" />
+        <x-material-icon class="cu-icon-notifications" size="md" />
 
         @if($unreadCount > 0)
             <div class="pointer-events-none absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 border-cu-surface bg-cu-danger px-1">
@@ -55,7 +55,7 @@
                 </div>
             @empty
                 <div class="px-4 py-8 text-center">
-                    <x-material-icon name="notifications_off" size="lg" class="mx-auto mb-2 text-cu-soft" />
+                    <x-material-icon size="lg" class="cu-icon-notifications-off mx-auto mb-2 text-cu-soft" />
                     <p class="text-sm text-cu-muted">Belum ada notifikasi</p>
                 </div>
             @endforelse

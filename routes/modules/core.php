@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 // ─── Halaman Landing (Guest) ────────────────────────────
 Route::get('/', function () {
-    return view('ui_test');
+    return view('index');
 })->name('home');
 
 Route::view('/ui-test', 'ui_test')->name('ui-test');

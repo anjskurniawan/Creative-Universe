@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div class="mb-6 flex items-start gap-3">
         <div class="flex size-11 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-ink">
-            <x-material-icon name="mark_email_read" size="md" />
+            <x-material-icon class="cu-icon-mark-email-read" size="md" />
         </div>
         <div>
             <h1 class="text-2xl font-semibold text-cu-ink">{{ __('Verify Email') }}</h1>
@@ -28,7 +28,7 @@
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="inline-flex items-center gap-2 text-sm font-medium text-cu-muted hover:text-cu-ink">
-                <x-material-icon name="logout" />
+                <x-material-icon class="cu-icon-logout" />
                 {{ __('Log Out') }}
             </button>
         </form>

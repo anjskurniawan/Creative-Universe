@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -61,7 +60,7 @@
                     <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-cu-muted">Base Buttons</h3>
                     <div class="flex flex-wrap items-center gap-3">
                         <x-primary-button>
-                            <span class="flex h-full items-center justify-center leading-none"><x-material-icon name="check" /></span>
+                            <x-material-icon class="cu-icon-check" />
                             <span class="flex h-full items-center justify-center whitespace-nowrap leading-none">Primary</span>
                         </x-primary-button>
 
@@ -70,7 +69,7 @@
                         </x-secondary-button>
 
                         <x-danger-button type="button">
-                            <span class="flex h-full items-center justify-center leading-none"><x-material-icon name="delete" /></span>
+                            <x-material-icon class="cu-icon-delete" />
                             <span class="flex h-full items-center justify-center whitespace-nowrap leading-none">Danger</span>
                         </x-danger-button>
 
@@ -84,11 +83,11 @@
                     <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-cu-muted">Small Text With Light Icon</h3>
                     <div class="flex flex-wrap items-center gap-4 text-sm">
                         <a href="#" class="inline-flex items-center gap-2 font-medium text-cu-muted hover:text-cu-ink">
-                            <span class="flex items-center justify-center leading-none"><x-material-icon name="arrow_back" /></span>
+                            <x-material-icon class="cu-icon-arrow-back" />
                             <span class="leading-none">Kembali</span>
                         </a>
                         <a href="#" class="inline-flex items-center gap-2 font-medium text-cu-info hover:text-cu-info-hover">
-                            <span class="flex items-center justify-center leading-none"><x-material-icon name="arrow_forward" /></span>
+                            <x-material-icon class="cu-icon-arrow-forward" />
                             <span class="leading-none">Lanjutkan</span>
                         </a>
                     </div>
@@ -176,7 +175,7 @@
             <div class="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3 lg:grid-cols-6">
                 @foreach (['login', 'dashboard', 'person', 'group', 'pending_actions', 'notifications', 'sell', 'add', 'edit', 'delete', 'check', 'close'] as $icon)
                     <div class="flex items-center gap-2 rounded-lg border border-cu-line bg-cu-surface px-3 py-2">
-                        <x-material-icon :name="$icon" />
+                        <x-material-icon :class="'cu-icon-' . str_replace('_', '-', $icon)" />
                         <span class="truncate text-cu-muted">{{ $icon }}</span>
                     </div>
                 @endforeach

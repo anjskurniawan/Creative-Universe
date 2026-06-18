@@ -3,17 +3,17 @@
     <div class="mb-6 border-b border-cu-line bg-cu-surface rounded-t-xl p-1 flex gap-2">
         <button wire:click="selectTab('single')"
             class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition duration-200 {{ $activeTab === 'single' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon name="edit_note" size="sm" />
+            <x-material-icon class="cu-icon-edit-note" size="sm" />
             Buat Label Satuan
         </button>
         <button wire:click="selectTab('checklist')"
             class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition duration-200 {{ $activeTab === 'checklist' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon name="checklist" size="sm" />
+            <x-material-icon class="cu-icon-checklist" size="sm" />
             Buat Label Sekaligus (Pilihan)
         </button>
         <button wire:click="selectTab('bulk')"
             class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition duration-200 {{ $activeTab === 'bulk' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon name="upload_file" size="sm" />
+            <x-material-icon class="cu-icon-upload-file" size="sm" />
             Buat Label Massal (Upload CSV)
         </button>
     </div>
@@ -66,7 +66,7 @@
                 <!-- Step 5 Result -->
                 <div class="flex flex-col items-center gap-1.5">
                     <div class="size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 {{ $wizardStep >= 6 ? 'bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10' : 'bg-cu-panel-soft text-cu-muted border border-cu-line' }}">
-                        <x-material-icon name="check" size="xs" />
+                        <x-material-icon class="cu-icon-check" size="xs" />
                     </div>
                     <span class="text-[10px] uppercase font-bold tracking-wider {{ $wizardStep >= 6 ? 'text-cu-ink' : 'text-cu-muted' }}">Selesai</span>
                 </div>
@@ -81,7 +81,7 @@
                 <!-- Search Bar -->
                 <div class="relative mb-4">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
-                        <x-material-icon name="search" size="sm" />
+                        <x-material-icon class="cu-icon-search" size="sm" />
                     </span>
                     <input type="text" wire:model.live="wizardCategorySearch"
                         class="block w-full rounded-xl border border-cu-line bg-cu-surface py-3 pl-10 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus transition"
@@ -95,7 +95,7 @@
                             class="w-full flex items-center justify-between p-4 hover:bg-cu-panel-soft/50 transition text-left group">
                             <span class="text-sm font-semibold text-cu-ink group-hover:text-cu-focus transition-colors">{{ $cat->name }}</span>
                             <div class="text-cu-muted group-hover:text-cu-ink transition">
-                                <x-material-icon name="chevron_right" size="sm" />
+                                <x-material-icon class="cu-icon-chevron-right" size="sm" />
                             </div>
                         </button>
                     @empty
@@ -113,14 +113,14 @@
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-bold text-cu-ink">Pilih Produk</h3>
                     <button type="button" wire:click="$set('wizardStep', 1)" class="inline-flex items-center gap-1 text-xs text-cu-muted hover:text-cu-ink transition">
-                        <x-material-icon name="arrow_back" size="xs" /> Kembali
+                        <x-material-icon class="cu-icon-arrow-back" size="xs" /> Kembali
                     </button>
                 </div>
 
                 <!-- Search Bar -->
                 <div class="relative mb-4">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
-                        <x-material-icon name="search" size="sm" />
+                        <x-material-icon class="cu-icon-search" size="sm" />
                     </span>
                     <input type="text" wire:model.live="wizardProductSearch"
                         class="block w-full rounded-xl border border-cu-line bg-cu-surface py-3 pl-10 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus transition"
@@ -134,7 +134,7 @@
                             class="w-full flex items-center justify-between p-4 hover:bg-cu-panel-soft/50 transition text-left group">
                             <span class="text-sm font-semibold text-cu-ink group-hover:text-cu-focus transition-colors">{{ $prodName }}</span>
                             <div class="text-cu-muted group-hover:text-cu-ink transition">
-                                <x-material-icon name="chevron_right" size="sm" />
+                                <x-material-icon class="cu-icon-chevron-right" size="sm" />
                             </div>
                         </button>
                     @empty
@@ -152,14 +152,14 @@
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-bold text-cu-ink">Pilih Varian</h3>
                     <button type="button" wire:click="$set('wizardStep', 2)" class="inline-flex items-center gap-1 text-xs text-cu-muted hover:text-cu-ink transition">
-                        <x-material-icon name="arrow_back" size="xs" /> Kembali
+                        <x-material-icon class="cu-icon-arrow-back" size="xs" /> Kembali
                     </button>
                 </div>
 
                 <!-- Search Bar -->
                 <div class="relative mb-4">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
-                        <x-material-icon name="search" size="sm" />
+                        <x-material-icon class="cu-icon-search" size="sm" />
                     </span>
                     <input type="text" wire:model.live="wizardVariantSearch"
                         class="block w-full rounded-xl border border-cu-line bg-cu-surface py-3 pl-10 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus transition"
@@ -178,7 +178,7 @@
                                 <span class="text-xs text-cu-muted">Harga Normal: Rp{{ number_format($v->normal_price, 0, ',', '.') }}</span>
                             </div>
                             <div class="text-cu-muted group-hover:text-cu-ink transition">
-                                <x-material-icon name="chevron_right" size="sm" />
+                                <x-material-icon class="cu-icon-chevron-right" size="sm" />
                             </div>
                         </button>
                     @empty
@@ -196,7 +196,7 @@
                 <div class="flex items-center justify-between mb-5 border-b border-cu-line pb-3">
                     <h3 class="text-base font-bold text-cu-ink">Atur Harga Promo</h3>
                     <button type="button" wire:click="backFromStep4()" class="inline-flex items-center gap-1 text-xs text-cu-muted hover:text-cu-ink transition">
-                        <x-material-icon name="arrow_back" size="xs" /> Kembali
+                        <x-material-icon class="cu-icon-arrow-back" size="xs" /> Kembali
                     </button>
                 </div>
 
@@ -243,7 +243,7 @@
                     <div class="pt-4 border-t border-cu-line flex items-center gap-3">
                         <button type="submit"
                             class="inline-flex items-center justify-center gap-2 rounded-lg bg-cu-ink px-5 py-2.5 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm">
-                            <x-material-icon name="photo_filter" size="sm" />
+                            <x-material-icon class="cu-icon-photo-filter" size="sm" />
                             <span>Buat Gambar Label</span>
                         </button>
                     </div>
@@ -259,7 +259,7 @@
                     <div class="relative flex items-center justify-center">
                         <span class="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-info opacity-20"></span>
                         <div class="size-16 rounded-full bg-cu-info-soft flex items-center justify-center text-cu-info shadow-sm">
-                            <x-material-icon name="cloud_sync" size="md" class="animate-pulse" />
+                            <x-material-icon size="md" class="cu-icon-cloud-sync animate-pulse" />
                         </div>
                     </div>
 
@@ -282,7 +282,7 @@
             <x-app-panel padding="lg" class="shadow-sm max-w-xl mx-auto text-center py-12">
                 <div class="flex flex-col items-center justify-center space-y-5">
                     <div class="size-16 rounded-full bg-cu-success-soft text-cu-success flex items-center justify-center shadow-sm">
-                        <x-material-icon name="check_circle" size="lg" />
+                        <x-material-icon class="cu-icon-check-circle" size="lg" />
                     </div>
 
                     <div class="space-y-1">
@@ -295,14 +295,14 @@
                         @if ($generatedViewUrl)
                             <a href="{{ $generatedViewUrl }}" target="_blank" rel="noopener noreferrer"
                                 class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-cu-line bg-cu-surface px-4 py-2 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft">
-                                <x-material-icon name="visibility" size="xs" />
+                                <x-material-icon class="cu-icon-visibility" size="xs" />
                                 Lihat Label
                             </a>
                         @endif
                         @if ($generatedDownloadUrl)
                             <a href="{{ $generatedDownloadUrl }}" target="_blank" rel="noopener noreferrer"
                                 class="flex items-center justify-center gap-1.5 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm">
-                                <x-material-icon name="download" size="xs" />
+                                <x-material-icon class="cu-icon-download" size="xs" />
                                 Unduh Gambar
                             </a>
                         @endif
@@ -311,7 +311,7 @@
                     <div class="pt-4">
                         <button type="button" wire:click="resetWizard"
                             class="inline-flex items-center gap-1 text-xs font-semibold text-cu-info hover:underline">
-                            <x-material-icon name="replay" size="xs" /> Buat Label Lainnya
+                            <x-material-icon class="cu-icon-replay" size="xs" /> Buat Label Lainnya
                         </button>
                     </div>
                 </div>
@@ -375,7 +375,7 @@
                             <label for="checklistSearch" class="block text-sm font-medium text-cu-ink mb-1.5">Cari Produk</label>
                             <div class="relative">
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
-                                    <x-material-icon name="search" size="sm" />
+                                    <x-material-icon class="cu-icon-search" size="sm" />
                                 </div>
                                 <input type="search" id="checklistSearch" wire:model.live.debounce.300ms="checklistSearch"
                                     class="block w-full rounded-lg border border-cu-line bg-cu-surface py-2 pl-10 pr-4 text-sm text-cu-ink placeholder-cu-muted shadow-sm focus:border-cu-focus focus:outline-none"
@@ -464,7 +464,7 @@
                     <div class="pt-4 border-t border-cu-line flex items-center gap-3">
                         <button type="submit" wire:loading.attr="disabled"
                             class="inline-flex items-center justify-center gap-2 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:opacity-50">
-                            <x-material-icon name="playlist_play" size="sm" wire:loading.remove wire:target="generateChecklist" />
+                            <x-material-icon class="cu-icon-playlist-play" size="sm" wire:loading.remove wire:target="generateChecklist" />
                             <svg class="animate-spin h-4 w-4 text-cu-surface" wire:loading wire:target="generateChecklist" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -489,7 +489,7 @@
                     </div>
                     <a href="#" onclick="downloadCSVTemplate()"
                         class="inline-flex items-center gap-1 text-xs font-semibold text-cu-info hover:underline">
-                        <x-material-icon name="download_for_offline" size="sm" />
+                        <x-material-icon class="cu-icon-download-for-offline" size="sm" />
                         Download Template CSV
                     </a>
                 </div>
@@ -539,13 +539,13 @@
                         <div class="flex items-center justify-center w-full">
                             <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-cu-line rounded-lg cursor-pointer bg-cu-surface hover:bg-cu-panel-soft transition duration-200">
                                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                    <x-material-icon name="cloud_upload" class="text-cu-soft mb-2" size="lg" />
+                                    <x-material-icon class="cu-icon-cloud-upload text-cu-soft mb-2" size="lg" />
                                     <p class="mb-1 text-sm text-cu-ink"><span class="font-semibold">Klik untuk memilih file</span> atau tarik file ke sini</p>
                                     <p class="text-xs text-cu-muted">File CSV (Maks. 2MB)</p>
                                     
                                     @if ($bulkForm->csvFile)
                                         <div class="mt-3 flex items-center gap-1.5 rounded-full bg-cu-info-soft border border-cu-info/20 px-3 py-1 text-xs text-cu-info font-medium">
-                                            <x-material-icon name="insert_drive_file" size="xs" />
+                                            <x-material-icon class="cu-icon-insert-drive-file" size="xs" />
                                             {{ $bulkForm->csvFile->getClientOriginalName() }}
                                         </div>
                                     @endif
@@ -560,7 +560,7 @@
 
                     <!-- Warning limitations -->
                     <div class="rounded-lg bg-cu-warning-soft border border-cu-warning/20 p-4 flex gap-3">
-                        <x-material-icon name="info" class="text-cu-warning shrink-0" size="sm" />
+                        <x-material-icon class="cu-icon-info text-cu-warning shrink-0" size="sm" />
                         <div class="text-xs text-cu-warning-hover leading-relaxed">
                             <span class="font-bold">Informasi Antrean Pemrosesan:</span>
                             Sistem Creative Universe akan memproses daftar produk Anda secara bertahap dalam antrean untuk menjamin kestabilan dan kecepatan pembuatan gambar.
@@ -570,7 +570,7 @@
                     <div class="pt-4 border-t border-cu-line flex items-center gap-3">
                         <button type="submit" wire:loading.attr="disabled"
                             class="inline-flex items-center justify-center gap-2 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:opacity-50">
-                            <x-material-icon name="queue" size="sm" wire:loading.remove wire:target="generateBulk" />
+                            <x-material-icon class="cu-icon-queue" size="sm" wire:loading.remove wire:target="generateBulk" />
                             <svg class="animate-spin h-4 w-4 text-cu-surface" wire:loading wire:target="generateBulk" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

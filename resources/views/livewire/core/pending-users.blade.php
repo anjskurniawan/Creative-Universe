@@ -59,14 +59,14 @@
 
                     <button wire:click="approve({{ $pendingUser->id }})"
                         class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-cu-success bg-cu-success px-4 text-sm font-medium text-cu-surface transition-colors duration-200 hover:border-cu-success-hover hover:bg-cu-success-hover">
-                        <x-material-icon name="check" />
+                        <x-material-icon class="cu-icon-check" />
                         Setujui Akun
                     </button>
 
                     <button wire:click="reject({{ $pendingUser->id }})"
                         wire:confirm="Akun ini akan ditolak dan dihapus dari sistem. Yakin?"
                         class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-cu-danger/30 bg-cu-danger-soft px-4 text-sm font-medium text-cu-danger transition-colors duration-200 hover:border-cu-danger hover:bg-cu-danger hover:text-cu-surface">
-                        <x-material-icon name="close" />
+                        <x-material-icon class="cu-icon-close" />
                         Tolak Akun
                     </button>
                 </div>
@@ -74,7 +74,7 @@
         </x-app-panel>
     @empty
         <x-app-panel class="p-12 text-center">
-            <x-material-icon name="how_to_reg" size="xl" class="mx-auto mb-4 text-cu-soft" />
+            <x-material-icon size="xl" class="cu-icon-how-to-reg mx-auto mb-4 text-cu-soft" />
             <p class="text-cu-muted">Tidak ada akun yang menunggu persetujuan.</p>
         </x-app-panel>
     @endforelse

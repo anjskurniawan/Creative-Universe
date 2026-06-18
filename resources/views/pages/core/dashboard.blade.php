@@ -15,14 +15,14 @@
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <a href="{{ route('profile.edit') }}" wire:navigate
                 class="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft">
-                <x-material-icon name="person" size="sm" class="text-cu-muted" />
+                <x-material-icon size="sm" class="cu-icon-person text-cu-muted" />
                 <span class="text-sm font-medium text-cu-ink">Edit Profil</span>
             </a>
 
             @can('manage-users')
             <a href="{{ route('core.users.index') }}" wire:navigate
                 class="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft">
-                <x-material-icon name="group" size="sm" class="text-cu-muted" />
+                <x-material-icon size="sm" class="cu-icon-group text-cu-muted" />
                 <span class="text-sm font-medium text-cu-ink">Kelola User</span>
             </a>
             @endcan
@@ -30,7 +30,7 @@
             @can('approve-users')
             <a href="{{ route('core.users.pending') }}" wire:navigate
                 class="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft">
-                <x-material-icon name="how_to_reg" size="sm" class="text-cu-muted" />
+                <x-material-icon size="sm" class="cu-icon-how-to-reg text-cu-muted" />
                 <span class="text-sm font-medium text-cu-ink">Persetujuan Akun</span>
             </a>
             @endcan

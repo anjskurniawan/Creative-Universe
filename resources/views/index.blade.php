@@ -14,116 +14,62 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="min-h-screen bg-cu-surface font-sans text-cu-ink antialiased">
-    <x-navbar variant="glass" />
+    <div data-interactive-hero class="relative isolate flex min-h-screen flex-col overflow-hidden bg-cu-surface">
+        <canvas data-particle-canvas aria-hidden="true"
+            class="pointer-events-none absolute inset-0 z-0 size-full"></canvas>
 
-    <main class="flex min-h-[calc(100vh-65px)] items-center justify-center px-10 pb-10 pt-20 sm:px-10 lg:px-16">
-        <section aria-labelledby="landing-title" class="mx-auto w-full max-w-6xl text-center lg:-translate-y-3">
-            @php
-                $typewriterText = auth()->check()
-                    ? 'Hi, ' . auth()->user()->name
-                    : 'Creative Universe is under maintenance';
-            @endphp
+        <div aria-hidden="true" class="cu-landing-readability pointer-events-none absolute inset-0 z-10"></div>
+        <div aria-hidden="true"
+            class="cu-landing-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40"></div>
 
-            <h1 id="landing-title" aria-label="{{ $typewriterText }}" data-typewriter="{{ $typewriterText }}"
-                class="text-center text-5xl font-medium leading-none tracking-normal md:text-8xl lg:text-9xl">
-                <span data-typewriter-text></span><span aria-hidden="true" data-typewriter-cursor
-                    class="ml-2 inline-block h-12 w-1 bg-gradient-to-b from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end align-middle opacity-0 md:h-24 lg:h-28"></span>
-                <noscript>{{ $typewriterText }}</noscript>
-            </h1>
+        <div class="relative z-30">
+            <x-navbar variant="glass" />
+        </div>
 
-            <div data-typewriter-actions
-                class="mt-10 flex flex-col items-center justify-center gap-3 opacity-0 blur-sm sm:mt-12 sm:flex-row">
-                @auth
-                    <x-action-button :href="route('dashboard')" variant="black" icon="dashboard">
-                        Dashboard
-                    </x-action-button>
+        <main class="relative z-20 flex flex-1 items-center justify-center px-10 py-10 sm:px-10 lg:px-16">
+            <section aria-labelledby="landing-title" class="mx-auto w-full max-w-6xl text-center lg:-translate-y-3">
+                @php
+                    $typewriterText = auth()->check()
+                        ? 'Hi, ' . auth()->user()->name
+                        : 'Creative Universe is under maintenance';
+                @endphp
 
-                    <x-action-button :href="route('profile.edit')" variant="gray" icon="person">
-                        Profil Saya
-                    </x-action-button>
-                @else
-                    <x-action-button :href="route('login')" variant="black" icon="login">
-                        Masuk atau Daftar
-                    </x-action-button>
+                <h1 id="landing-title" aria-label="{{ $typewriterText }}" data-typewriter="{{ $typewriterText }}"
+                    class="text-center text-5xl font-medium leading-none tracking-normal md:text-8xl lg:text-9xl">
+                    <span data-typewriter-text>{{ $typewriterText }}</span><span aria-hidden="true"
+                        data-typewriter-cursor
+                        class="ml-2 inline-block h-12 w-1 bg-gradient-to-b from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end align-middle opacity-0 md:h-24 lg:h-28"></span>
+                    <noscript>{{ $typewriterText }}</noscript>
+                </h1>
 
-                    <x-action-button :href="route('register')" variant="gray">
-                        Daftar Akun
-                    </x-action-button>
-                @endauth
-            </div>
-        </section>
-    </main>
+                <div data-typewriter-actions
+                    class="mt-10 flex flex-col items-center justify-center gap-3 sm:mt-12 sm:flex-row">
+                    @auth
+                        <x-action-button :href="route('dashboard')" variant="black" icon="dashboard">
+                            Dashboard
+                        </x-action-button>
 
-    <script>
-        window.addEventListener('load', () => {
-            const title = document.querySelector('[data-typewriter]');
+                        <x-action-button :href="route('profile.edit')" variant="gray" icon="person">
+                            Profil Saya
+                        </x-action-button>
+                    @else
+                        <x-action-button :href="route('login')" variant="black" icon="login">
+                            Masuk atau Daftar
+                        </x-action-button>
 
-            if (!title || !window.gsap) {
-                return;
-            }
-
-            const text = title.dataset.typewriter;
-            const textTarget = title.querySelector('[data-typewriter-text]');
-            const cursor = title.querySelector('[data-typewriter-cursor]');
-            const actions = document.querySelector('[data-typewriter-actions]');
-
-            if (!text || !textTarget || !cursor) {
-                return;
-            }
-
-            const progress = {
-                count: 0,
-            };
-
-            textTarget.textContent = '';
-            cursor.classList.remove('opacity-0');
-
-            const blink = gsap.to(cursor, {
-                opacity: 0.2,
-                duration: 0.55,
-                repeat: -1,
-                yoyo: true,
-                ease: 'power1.inOut',
-            });
-
-            gsap.to(progress, {
-                count: text.length,
-                duration: Math.max(2.8, text.length * 0.075),
-                ease: 'none',
-                onUpdate: () => {
-                    textTarget.textContent = text.slice(0, Math.round(progress.count));
-                },
-                onComplete: () => {
-                    textTarget.textContent = text;
-
-                    if (actions) {
-                        gsap.to(actions, {
-                            opacity: 1,
-                            filter: 'blur(0px)',
-                            duration: 1.5,
-                            ease: 'power2.out',
-                        });
-                    }
-
-                    gsap.delayedCall(2, () => {
-                        blink.kill();
-
-                        gsap.to(cursor, {
-                            opacity: 0,
-                            duration: 0.25,
-                            ease: 'power1.out',
-                        });
-                    });
-                },
-            });
-        });
-    </script>
+                        <x-action-button :href="route('register')" variant="gray">
+                            Daftar Akun
+                        </x-action-button>
+                    @endauth
+                </div>
+            </section>
+        </main>
+    </div>
 </body>
 
 </html>
