@@ -2,32 +2,58 @@
 
 @php
     $navClass = match ($variant) {
-        'glass' => 'border-cu-line/70 bg-cu-surface/80 backdrop-blur-md',
-        default => 'border-cu-line bg-cu-surface/95 backdrop-blur-md',
+        'glass' => 'border-b border-cu-line/70 bg-cu-surface/80 backdrop-blur-md text-cu-ink',
+        'dark-glass' => 'border-b border-white/10 bg-black/20 backdrop-blur-md text-white',
+        default => 'border-b border-cu-line bg-cu-surface/95 backdrop-blur-md text-cu-ink',
     };
 
-    $menuLinkClass = 'flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft';
-    $iconButtonClass = 'inline-flex size-10 items-center justify-center rounded-full border border-transparent text-cu-ink transition-colors hover:border-cu-border hover:bg-cu-panel-soft focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2';
+    $menuLinkClass = $variant === 'dark-glass'
+        ? 'flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white'
+        : 'flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft';
+
+    $iconButtonClass = $variant === 'dark-glass'
+        ? 'inline-flex size-10 items-center justify-center rounded-full border border-transparent text-white/90 transition-colors hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-white/30'
+        : 'inline-flex size-10 items-center justify-center rounded-full border border-transparent text-cu-ink transition-colors hover:border-cu-border hover:bg-cu-panel-soft focus:outline-none focus:ring-1 focus:ring-cu-border-hover';
+
+    $dropdownPanelClass = $variant === 'dark-glass'
+        ? 'absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-[#0d0d0d]/90 backdrop-blur-md shadow-2xl text-white'
+        : 'absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-cu-line bg-cu-panel shadow-lg text-cu-ink';
+
+    $dropdownHeaderClass = $variant === 'dark-glass'
+        ? 'border-b border-white/10 px-4 py-3'
+        : 'border-b border-cu-line px-4 py-3';
+
+    $dropdownTitleClass = $variant === 'dark-glass'
+        ? 'block text-xs font-semibold uppercase tracking-wider text-white/50'
+        : 'block text-xs font-semibold uppercase tracking-wider text-cu-muted';
+
+    $dropdownUserEmailClass = $variant === 'dark-glass'
+        ? 'block truncate text-xs text-white/50'
+        : 'block truncate text-xs text-cu-muted';
+
+    $dropdownUserTitleClass = $variant === 'dark-glass'
+        ? 'block truncate text-sm font-semibold text-white'
+        : 'block truncate text-sm font-semibold text-cu-ink';
+
+    $logoutButtonClass = $variant === 'dark-glass'
+        ? 'flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-cu-danger transition-colors hover:bg-red-500/10'
+        : 'flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-cu-danger transition-colors hover:bg-cu-danger-soft';
 @endphp
 
-<nav class="sticky top-0 z-50{{ $navClass }}">
-    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
-        <a href="{{ route('home') }}" wire:navigate
-            class="inline-flex items-center">
-            <img src="{{ asset('images/icon-app/Logo_White.png') }}" alt="Creative Universe" class="h-8 brightness-0">
-        </a>
+<nav class="sticky top-0 z-50 {{ $navClass }}">
+    <div class="flex w-full items-center justify-between px-4 py-2 sm:px-6 lg:px-32">
+        <x-navbar.brand :href="route('home')" />
 
         <div class="flex items-center gap-2">
             @guest
-                <a href="{{ route('login') }}" wire:navigate
-                    class="inline-flex py-1 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-4 text-sm font-medium text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2">
+                <x-navbar.action-button :href="route('login')">
                     <x-material-icon class="cu-icon-login" />
                     Masuk
-                </a>
+                </x-navbar.action-button>
             @endguest
 
             @auth
-                <livewire:core.notification-bell />
+                <livewire:core.notification-bell :variant="$variant === 'dark-glass' ? 'dark' : 'light'" />
 
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" type="button" class="{{ $iconButtonClass }}">
@@ -42,9 +68,9 @@
                         x-transition:leave="transition ease-in duration-100"
                         x-transition:leave-start="opacity-100 scale-100"
                         x-transition:leave-end="opacity-0 scale-95"
-                        class="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-cu-line bg-cu-panel shadow-lg">
-                        <div class="border-b border-cu-line px-4 py-3">
-                            <span class="block text-xs font-semibold uppercase tracking-wider text-cu-muted">Menu</span>
+                        class="{{ $dropdownPanelClass }}">
+                        <div class="{{ $dropdownHeaderClass }}">
+                            <span class="{{ $dropdownTitleClass }}">Menu</span>
                         </div>
 
                         <ul class="py-1">
@@ -96,12 +122,15 @@
                 </div>
 
                 <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" type="button"
-                        class="inline-flex size-10 items-center justify-center overflow-hidden rounded-full border border-cu-line bg-cu-panel focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2">
-                        <span class="sr-only">Buka menu profil</span>
-                        <img class="size-10 object-cover"
-                            src="{{ auth()->user()->avatar_path ? asset('storage/' . auth()->user()->avatar_path) : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=0A0A0A&color=fff' }}"
-                            alt="Foto Profil">
+                    <button @click="open = !open" type="button" class="focus:outline-none">
+                        @php
+                            $user = auth()->user();
+                            $initials = collect(explode(' ', $user->name))->map(fn($n) => mb_substr($n, 0, 1))->take(2)->join('');
+                            $avatarUrl = $user->avatar_path ? asset('storage/' . $user->avatar_path) : null;
+                        @endphp
+                        <x-navbar.avatar
+                            :initials="$initials"
+                            :imageUrl="$avatarUrl" />
                     </button>
 
                     <div x-show="open" x-cloak @click.outside="open = false"
@@ -111,12 +140,12 @@
                         x-transition:leave="transition ease-in duration-100"
                         x-transition:leave-start="opacity-100 scale-100"
                         x-transition:leave-end="opacity-0 scale-95"
-                        class="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-cu-line bg-cu-panel shadow-lg">
-                        <div class="border-b border-cu-line px-4 py-3">
-                            <span class="block truncate text-sm font-semibold text-cu-ink">
+                        class="{{ $dropdownPanelClass }}">
+                        <div class="{{ $dropdownHeaderClass }}">
+                            <span class="{{ $dropdownUserTitleClass }}">
                                 {{ auth()->user()->name }}
                             </span>
-                            <span class="block truncate text-xs text-cu-muted">
+                            <span class="{{ $dropdownUserEmailClass }}">
                                 {{ auth()->user()->email }}
                             </span>
                         </div>
@@ -140,7 +169,7 @@
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-cu-danger transition-colors hover:bg-cu-danger-soft">
+                                        class="{{ $logoutButtonClass }}">
                                         <x-material-icon class="cu-icon-logout" size="sm" />
                                         Keluar
                                     </button>

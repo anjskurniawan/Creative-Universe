@@ -1,19 +1,19 @@
 <div x-data="{ viewType: 'grid' }">
 
     <!-- Search & Control Header -->
-    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between w-full">
         <!-- Search Input -->
-        <div class="relative flex-1 max-w-md">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
+        <div class="relative flex-1">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cu-muted">
                 <x-material-icon class="cu-icon-search" size="sm" />
             </div>
             <input type="search" wire:model.live.debounce.300ms="search"
-                class="block w-full rounded-lg border border-cu-line bg-cu-surface py-2 pl-10 pr-4 text-sm text-cu-ink placeholder-cu-muted shadow-sm focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus"
+                class="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-11 pr-4 text-sm text-cu-ink placeholder-cu-muted shadow-sm focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
                 placeholder="Cari nama produk, kategori...">
         </div>
 
         <!-- Interactive Controls (View Switcher) -->
-        <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center justify-between md:justify-end gap-4 shrink-0">
             <div wire:loading class="text-xs text-cu-muted animate-pulse flex items-center gap-1.5">
                 <svg class="animate-spin h-3.5 w-3.5 text-cu-muted" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -22,18 +22,18 @@
                 Memfilter...
             </div>
             
-            <div class="inline-flex rounded-lg border border-cu-line bg-cu-surface p-1 shadow-sm">
+            <div class="inline-flex rounded-full border border-cu-line bg-cu-surface p-1 shadow-sm">
                 <!-- Grid Button -->
                 <button type="button" @click="viewType = 'grid'"
-                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all duration-200"
-                    :class="viewType === 'grid' ? 'bg-cu-ink text-cu-surface shadow-sm' : 'text-cu-muted hover:text-cu-ink'">
+                    class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
+                    :class="viewType === 'grid' ? 'bg-cu-ink text-cu-surface shadow-sm font-bold' : 'text-cu-muted hover:text-cu-ink'">
                     <x-material-icon class="cu-icon-grid-view" size="xs" />
                     Grid
                 </button>
                 <!-- List Button -->
                 <button type="button" @click="viewType = 'list'"
-                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all duration-200"
-                    :class="viewType === 'list' ? 'bg-cu-ink text-cu-surface shadow-sm' : 'text-cu-muted hover:text-cu-ink'">
+                    class="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
+                    :class="viewType === 'list' ? 'bg-cu-ink text-cu-surface shadow-sm font-bold' : 'text-cu-muted hover:text-cu-ink'">
                     <x-material-icon class="cu-icon-view-list" size="xs" />
                     Tabel
                 </button>
@@ -137,30 +137,35 @@
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="border-b border-cu-line bg-cu-panel-soft text-xs font-semibold uppercase tracking-wider text-cu-muted">
-                            <th class="px-6 py-4">Varian</th>
+                            <th class="px-6 py-4 hidden sm:table-cell">Varian</th>
                             <th class="px-6 py-4">Produk</th>
-                            <th class="px-6 py-4">Kategori</th>
-                            <th class="px-6 py-4 text-right">Harga Normal</th>
+                            <th class="px-6 py-4 hidden sm:table-cell">Kategori</th>
+                            <th class="px-6 py-4 text-right hidden sm:table-cell">Harga Normal</th>
                             <th class="px-6 py-4 text-right text-cu-success">Harga Diskon</th>
-                            <th class="px-6 py-4">Terakhir Generate</th>
+                            <th class="px-6 py-4 hidden md:table-cell">Terakhir Generate</th>
                             <th class="px-6 py-4 text-center">Aksi Link</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-cu-line bg-cu-surface">
                         @forelse ($products as $product)
                             <tr class="hover:bg-cu-panel-soft/30 transition-colors">
-                                <td class="px-6 py-4 font-medium text-cu-ink">
+                                <td class="px-6 py-4 font-medium text-cu-ink hidden sm:table-cell">
                                     {{ $product->variant_name }}
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="font-semibold text-cu-ink">{{ $product->name ?? '-' }}</div>
+                                    <div class="sm:hidden text-[10px] text-cu-muted mt-1 space-y-0.5">
+                                        <span>Varian: {{ $product->variant_name }}</span>
+                                        <span>• Kategori: {{ $product->category->name ?? '-' }}</span>
+                                        <span class="block line-through">Normal: Rp{{ number_format($product->normal_price, 0, ',', '.') }}</span>
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4 hidden sm:table-cell">
                                     <span class="inline-flex items-center rounded bg-cu-panel-soft px-2.5 py-0.5 text-xs font-semibold text-cu-muted border border-cu-line/30">
                                         {{ $product->category->name ?? '-' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-right font-medium text-cu-ink line-through">
+                                <td class="px-6 py-4 text-right font-medium text-cu-ink line-through hidden sm:table-cell">
                                     Rp{{ number_format($product->normal_price, 0, ',', '.') }}
                                 </td>
                                 <td class="px-6 py-4 text-right font-bold text-cu-success">
@@ -171,7 +176,7 @@
                                     $downloadLink = $product->assetLinks->firstWhere('label', 'Google Drive Download Link') ?? $viewLink;
                                     $hasViewLink = !empty($viewLink);
                                 @endphp
-                                <td class="px-6 py-4 text-cu-muted text-xs whitespace-nowrap">
+                                <td class="px-6 py-4 text-cu-muted text-xs whitespace-nowrap hidden md:table-cell">
                                     @if($hasViewLink && $viewLink->updated_at)
                                         {{ $viewLink->updated_at->setTimezone('Asia/Jakarta')->format('d M Y, H:i') }}
                                     @else
@@ -185,7 +190,7 @@
                                                 class="inline-flex items-center gap-1 rounded-md border border-cu-line bg-cu-surface px-2.5 py-1.5 text-xs font-medium text-cu-ink transition hover:bg-cu-panel-soft"
                                                 title="Buka Drive">
                                                 <x-material-icon class="cu-icon-visibility" size="xs" />
-                                                Lihat
+                                                <span class="hidden sm:inline">Lihat</span>
                                             </a>
                                         @endif
 
@@ -194,7 +199,7 @@
                                                 class="inline-flex items-center gap-1 rounded-md bg-cu-ink px-2.5 py-1.5 text-xs font-medium text-cu-surface transition hover:bg-cu-ink-hover shadow-sm"
                                                 title="Unduh">
                                                 <x-material-icon class="cu-icon-download" size="xs" />
-                                                Unduh
+                                                <span class="hidden sm:inline">Unduh</span>
                                             </a>
                                         @endif
                                     </div>

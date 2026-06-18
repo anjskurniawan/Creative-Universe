@@ -422,8 +422,17 @@ function initializeParticleBackground(gsap, state) {
 
 async function initializeInteractiveHero() {
     const canvas = document.querySelector('[data-particle-canvas]');
+    const typewriter = document.querySelector('[data-typewriter]');
 
-    if (!canvas || currentHero?.canvas === canvas) {
+    if (!canvas && !typewriter) {
+        return;
+    }
+
+    if (canvas && currentHero?.canvas === canvas) {
+        const gsap = window.gsap;
+        if (gsap && typewriter && typewriter.dataset.typewriterInitialized !== 'true') {
+            initializeTypewriter(gsap, currentHero);
+        }
         return;
     }
 
@@ -440,7 +449,7 @@ async function initializeInteractiveHero() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (reducedMotion) {
-        canvas.hidden = true;
+        if (canvas) canvas.hidden = true;
         applyStaticHero();
         return;
     }
@@ -452,7 +461,7 @@ async function initializeInteractiveHero() {
     }
 
     if (!gsap) {
-        canvas.hidden = true;
+        if (canvas) canvas.hidden = true;
         applyStaticHero();
 
         if (!hasWarnedMissingGsap) {
@@ -463,8 +472,12 @@ async function initializeInteractiveHero() {
         return;
     }
 
-    initializeTypewriter(gsap, state);
-    initializeParticleBackground(gsap, state);
+    if (typewriter) {
+        initializeTypewriter(gsap, state);
+    }
+    if (canvas) {
+        initializeParticleBackground(gsap, state);
+    }
 }
 
 function destroyInteractiveHero() {

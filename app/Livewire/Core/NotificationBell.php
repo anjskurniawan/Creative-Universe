@@ -15,6 +15,7 @@ use Livewire\Component;
  */
 class NotificationBell extends Component
 {
+    public string $variant = 'light';
     public int $unreadCount = 0;
 
     public function mount(): void

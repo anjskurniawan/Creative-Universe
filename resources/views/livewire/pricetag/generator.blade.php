@@ -1,21 +1,20 @@
 <div>
     <!-- Tabs Header -->
-    <div class="mb-6 border-b border-cu-line bg-cu-surface rounded-t-xl p-1 flex gap-2">
-        <button wire:click="selectTab('single')"
-            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition duration-200 {{ $activeTab === 'single' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon class="cu-icon-edit-note" size="sm" />
-            Buat Label Satuan
-        </button>
-        <button wire:click="selectTab('checklist')"
-            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition duration-200 {{ $activeTab === 'checklist' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon class="cu-icon-checklist" size="sm" />
-            Buat Label Sekaligus (Pilihan)
-        </button>
-        <button wire:click="selectTab('bulk')"
-            class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition duration-200 {{ $activeTab === 'bulk' ? 'bg-cu-panel-soft text-cu-ink font-semibold border-b-2 border-cu-focus' : 'text-cu-muted hover:text-cu-ink' }}">
-            <x-material-icon class="cu-icon-upload-file" size="sm" />
-            Buat Label Massal (Upload CSV)
-        </button>
+    <div class="mb-8 flex justify-start sm:justify-center w-full max-w-full overflow-x-auto scrollbar-none px-4 sm:px-0">
+        <div class="inline-flex p-1 rounded-full border border-cu-line bg-cu-surface-soft gap-1 md:gap-1.5 shadow-sm flex-nowrap">
+            <button wire:click="selectTab('single')"
+                class="flex items-center justify-center px-3 py-2 md:px-6 md:py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover whitespace-nowrap {{ $activeTab === 'single' ? 'bg-cu-ink text-white shadow-sm font-extrabold' : 'text-cu-muted hover:text-cu-ink hover:bg-cu-panel-soft/50' }}">
+                Buat Label Satuan
+            </button>
+            <button wire:click="selectTab('checklist')"
+                class="flex items-center justify-center px-3 py-2 md:px-6 md:py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover whitespace-nowrap {{ $activeTab === 'checklist' ? 'bg-cu-ink text-white shadow-sm font-extrabold' : 'text-cu-muted hover:text-cu-ink hover:bg-cu-panel-soft/50' }}">
+                Buat Label Sekaligus
+            </button>
+            <button wire:click="selectTab('bulk')"
+                class="flex items-center justify-center px-3 py-2 md:px-6 md:py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover whitespace-nowrap {{ $activeTab === 'bulk' ? 'bg-cu-ink text-white shadow-sm font-extrabold' : 'text-cu-muted hover:text-cu-ink hover:bg-cu-panel-soft/50' }}">
+                Buat Label Massal (CSV)
+            </button>
+        </div>
     </div>
 
     <!-- Buat Label Satuan Panel -->
@@ -28,7 +27,7 @@
                     <div class="size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 {{ $wizardStep >= 1 ? 'bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10' : 'bg-cu-panel-soft text-cu-muted border border-cu-line' }}">
                         1
                     </div>
-                    <span class="text-[10px] uppercase font-bold tracking-wider {{ $wizardStep >= 1 ? 'text-cu-ink' : 'text-cu-muted' }}">Kategori</span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider hidden sm:block {{ $wizardStep >= 1 ? 'text-cu-ink' : 'text-cu-muted' }}">Kategori</span>
                 </div>
 
                 <div class="h-0.5 flex-1 mx-2 transition-all duration-300 {{ $wizardStep >= 2 ? 'bg-cu-ink' : 'bg-cu-line' }}"></div>
@@ -38,7 +37,7 @@
                     <div class="size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 {{ $wizardStep >= 2 ? 'bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10' : 'bg-cu-panel-soft text-cu-muted border border-cu-line' }}">
                         2
                     </div>
-                    <span class="text-[10px] uppercase font-bold tracking-wider {{ $wizardStep >= 2 ? 'text-cu-ink' : 'text-cu-muted' }}">Produk</span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider hidden sm:block {{ $wizardStep >= 2 ? 'text-cu-ink' : 'text-cu-muted' }}">Produk</span>
                 </div>
 
                 <div class="h-0.5 flex-1 mx-2 transition-all duration-300 {{ $wizardStep >= 3 ? 'bg-cu-ink' : 'bg-cu-line' }}"></div>
@@ -48,7 +47,7 @@
                     <div class="size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 {{ $wizardStep >= 3 ? 'bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10' : 'bg-cu-panel-soft text-cu-muted border border-cu-line' }}">
                         3
                     </div>
-                    <span class="text-[10px] uppercase font-bold tracking-wider {{ $wizardStep >= 3 ? 'text-cu-ink' : 'text-cu-muted' }}">Varian</span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider hidden sm:block {{ $wizardStep >= 3 ? 'text-cu-ink' : 'text-cu-muted' }}">Varian</span>
                 </div>
 
                 <div class="h-0.5 flex-1 mx-2 transition-all duration-300 {{ $wizardStep >= 4 ? 'bg-cu-ink' : 'bg-cu-line' }}"></div>
@@ -58,7 +57,7 @@
                     <div class="size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 {{ $wizardStep >= 4 ? 'bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10' : 'bg-cu-panel-soft text-cu-muted border border-cu-line' }}">
                         4
                     </div>
-                    <span class="text-[10px] uppercase font-bold tracking-wider {{ $wizardStep >= 4 ? 'text-cu-ink' : 'text-cu-muted' }}">Harga</span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider hidden sm:block {{ $wizardStep >= 4 ? 'text-cu-ink' : 'text-cu-muted' }}">Harga</span>
                 </div>
 
                 <div class="h-0.5 flex-1 mx-2 transition-all duration-300 {{ $wizardStep >= 6 ? 'bg-cu-ink' : 'bg-cu-line' }}"></div>
@@ -68,7 +67,7 @@
                     <div class="size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 {{ $wizardStep >= 6 ? 'bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10' : 'bg-cu-panel-soft text-cu-muted border border-cu-line' }}">
                         <x-material-icon class="cu-icon-check" size="xs" />
                     </div>
-                    <span class="text-[10px] uppercase font-bold tracking-wider {{ $wizardStep >= 6 ? 'text-cu-ink' : 'text-cu-muted' }}">Selesai</span>
+                    <span class="text-[10px] uppercase font-bold tracking-wider hidden sm:block {{ $wizardStep >= 6 ? 'text-cu-ink' : 'text-cu-muted' }}">Selesai</span>
                 </div>
             </div>
         </div>
@@ -80,11 +79,11 @@
                 
                 <!-- Search Bar -->
                 <div class="relative mb-4">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-cu-muted">
                         <x-material-icon class="cu-icon-search" size="sm" />
                     </span>
                     <input type="text" wire:model.live="wizardCategorySearch"
-                        class="block w-full rounded-xl border border-cu-line bg-cu-surface py-3 pl-10 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus transition"
+                        class="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-11 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover transition"
                         placeholder="Cari kategori...">
                 </div>
 
@@ -119,11 +118,11 @@
 
                 <!-- Search Bar -->
                 <div class="relative mb-4">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-cu-muted">
                         <x-material-icon class="cu-icon-search" size="sm" />
                     </span>
                     <input type="text" wire:model.live="wizardProductSearch"
-                        class="block w-full rounded-xl border border-cu-line bg-cu-surface py-3 pl-10 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus transition"
+                        class="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-11 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover transition"
                         placeholder="Cari produk...">
                 </div>
 
@@ -158,11 +157,11 @@
 
                 <!-- Search Bar -->
                 <div class="relative mb-4">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-cu-muted">
                         <x-material-icon class="cu-icon-search" size="sm" />
                     </span>
                     <input type="text" wire:model.live="wizardVariantSearch"
-                        class="block w-full rounded-xl border border-cu-line bg-cu-surface py-3 pl-10 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus transition"
+                        class="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-11 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover transition"
                         placeholder="Cari varian...">
                 </div>
 
@@ -232,7 +231,7 @@
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-semibold text-cu-muted">Rp</span>
                             <input type="number" id="wizardDiscountPrice" wire:model="wizardDiscountPrice"
-                                class="block w-full rounded-lg border border-cu-line bg-cu-surface py-2.5 pl-9 pr-3 text-sm text-cu-ink focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus"
+                                class="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-9 pr-3 text-sm text-cu-ink focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
                                 placeholder="0">
                         </div>
                         @error('wizardDiscountPrice')
@@ -242,7 +241,7 @@
 
                     <div class="pt-4 border-t border-cu-line flex items-center gap-3">
                         <button type="submit"
-                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-cu-ink px-5 py-2.5 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm">
+                            class="inline-flex items-center justify-center gap-2 rounded-full bg-cu-ink px-6 py-2.5 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm focus:outline-none focus:ring-1 focus:ring-cu-border-hover">
                             <x-material-icon class="cu-icon-photo-filter" size="sm" />
                             <span>Buat Gambar Label</span>
                         </button>
@@ -294,14 +293,14 @@
                     <div class="flex flex-col sm:flex-row gap-3 w-full justify-center pt-4 border-t border-cu-line/40">
                         @if ($generatedViewUrl)
                             <a href="{{ $generatedViewUrl }}" target="_blank" rel="noopener noreferrer"
-                                class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-cu-line bg-cu-surface px-4 py-2 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft">
+                                class="inline-flex items-center justify-center gap-1.5 rounded-full border border-cu-line bg-cu-surface px-5 py-2 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft focus:outline-none focus:ring-1 focus:ring-cu-border-hover">
                                 <x-material-icon class="cu-icon-visibility" size="xs" />
                                 Lihat Label
                             </a>
                         @endif
                         @if ($generatedDownloadUrl)
                             <a href="{{ $generatedDownloadUrl }}" target="_blank" rel="noopener noreferrer"
-                                class="flex items-center justify-center gap-1.5 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm">
+                                class="flex items-center justify-center gap-1.5 rounded-full bg-cu-ink px-5 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm focus:outline-none focus:ring-1 focus:ring-cu-border-hover">
                                 <x-material-icon class="cu-icon-download" size="xs" />
                                 Unduh Gambar
                             </a>
@@ -363,7 +362,7 @@
                         <div>
                             <label for="checklistBatchName" class="block text-sm font-medium text-cu-ink mb-1.5">Nama Kelompok Promo</label>
                             <input type="text" id="checklistBatchName" wire:model="checklistBatchName"
-                                class="block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink placeholder-cu-muted focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus"
+                                class="block w-full rounded-full border border-cu-line bg-cu-surface px-4 py-2.5 text-sm text-cu-ink placeholder-cu-muted focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
                                 placeholder="Contoh: Promo Akhir Tahun Audio">
                             @error('checklistBatchName')
                                 <span class="text-xs text-cu-danger mt-1 block">{{ $message }}</span>
@@ -374,11 +373,11 @@
                         <div>
                             <label for="checklistSearch" class="block text-sm font-medium text-cu-ink mb-1.5">Cari Produk</label>
                             <div class="relative">
-                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-cu-muted">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cu-muted">
                                     <x-material-icon class="cu-icon-search" size="sm" />
                                 </div>
                                 <input type="search" id="checklistSearch" wire:model.live.debounce.300ms="checklistSearch"
-                                    class="block w-full rounded-lg border border-cu-line bg-cu-surface py-2 pl-10 pr-4 text-sm text-cu-ink placeholder-cu-muted shadow-sm focus:border-cu-focus focus:outline-none"
+                                    class="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-11 pr-4 text-sm text-cu-ink placeholder-cu-muted shadow-sm focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
                                     placeholder="Cari nama produk...">
                             </div>
                         </div>
@@ -386,14 +385,14 @@
 
                     <!-- Checklist Table -->
                     <div class="border border-cu-line rounded-lg overflow-hidden bg-cu-surface">
-                        <div class="bg-cu-panel-soft px-4 py-3 flex items-center justify-between border-b border-cu-line text-xs font-semibold text-cu-muted">
+                        <div class="bg-cu-panel-soft px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between border-b border-cu-line text-xs font-semibold text-cu-muted gap-2">
                             <div class="flex items-center gap-3">
                                 <span>Pilihan: {{ count($selectedVariants) }} Produk Terpilih</span>
                             </div>
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 justify-between sm:justify-end">
                                 <button type="button" wire:click="$set('selectedVariants', {{ json_encode($checklistVariants->pluck('id')->toArray()) }})"
                                     class="text-cu-info hover:text-cu-info-hover transition">
-                                    Pilih Semua di Halaman Ini
+                                    Pilih Semua
                                 </button>
                                 <span class="text-cu-line">|</span>
                                 <button type="button" wire:click="$set('selectedVariants', [])"
@@ -408,10 +407,10 @@
                                 <thead>
                                     <tr class="border-b border-cu-line bg-cu-panel-soft/50 text-xs font-semibold uppercase tracking-wider text-cu-muted">
                                         <th class="px-6 py-3 text-center w-12">Pilih</th>
-                                        <th class="px-6 py-3">Varian</th>
+                                        <th class="px-6 py-3 hidden sm:table-cell">Varian</th>
                                         <th class="px-6 py-3">Nama Produk</th>
-                                        <th class="px-6 py-3">Kategori</th>
-                                        <th class="px-6 py-3 text-right">Harga Normal</th>
+                                        <th class="px-6 py-3 hidden sm:table-cell">Kategori</th>
+                                        <th class="px-6 py-3 text-right hidden sm:table-cell">Harga Normal</th>
                                         <th class="px-6 py-3 text-right text-cu-success">Harga Diskon</th>
                                     </tr>
                                 </thead>
@@ -422,19 +421,28 @@
                                                 <input type="checkbox" wire:model.live="selectedVariants" value="{{ $var->id }}"
                                                     class="rounded border-cu-line text-cu-focus focus:ring-cu-focus size-4">
                                             </td>
-                                            <td class="px-6 py-4 font-medium text-cu-ink">{{ $var->variant_name }}</td>
+                                            <td class="px-6 py-4 font-medium text-cu-ink hidden sm:table-cell">
+                                                {{ $var->variant_name }}
+                                            </td>
                                             <td class="px-6 py-4">
                                                 <div class="font-semibold text-cu-ink">{{ $var->name }}</div>
+                                                <div class="sm:hidden text-[10px] text-cu-muted mt-1 space-y-0.5">
+                                                    <span>Varian: {{ $var->variant_name }}</span>
+                                                    <span>• Kategori: {{ $var->category->name ?? '-' }}</span>
+                                                    <span class="block line-through">Normal: Rp{{ number_format($var->normal_price, 0, ',', '.') }}</span>
+                                                </div>
                                             </td>
-                                            <td class="px-6 py-4 text-cu-muted">{{ $var->category->name ?? '-' }}</td>
-                                            <td class="px-6 py-4 text-right font-medium text-cu-ink">
+                                            <td class="px-6 py-4 text-cu-muted hidden sm:table-cell">
+                                                {{ $var->category->name ?? '-' }}
+                                            </td>
+                                            <td class="px-6 py-4 text-right font-medium text-cu-ink hidden sm:table-cell">
                                                 Rp{{ number_format($var->normal_price, 0, ',', '.') }}
                                             </td>
                                             <td class="px-6 py-4 text-right">
                                                 <div class="relative max-w-[150px] ml-auto">
                                                     <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-xs font-semibold text-cu-muted">Rp</span>
                                                     <input type="number" wire:model="checklistPrices.{{ $var->id }}" placeholder="{{ $var->discount_price }}"
-                                                        class="block w-full rounded-lg border border-cu-line bg-cu-surface py-1 pl-8 pr-2 text-right text-sm text-cu-ink focus:border-cu-focus focus:outline-none">
+                                                        class="block w-full rounded-full border border-cu-line bg-cu-surface py-1 pl-8 pr-3 text-right text-sm text-cu-ink focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover">
                                                 </div>
                                             </td>
                                         </tr>
@@ -463,7 +471,7 @@
                     <!-- Submit Section -->
                     <div class="pt-4 border-t border-cu-line flex items-center gap-3">
                         <button type="submit" wire:loading.attr="disabled"
-                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:opacity-50">
+                            class="inline-flex items-center justify-center gap-2 rounded-full bg-cu-ink px-5 py-2.5 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover disabled:opacity-50">
                             <x-material-icon class="cu-icon-playlist-play" size="sm" wire:loading.remove wire:target="generateChecklist" />
                             <svg class="animate-spin h-4 w-4 text-cu-surface" wire:loading wire:target="generateChecklist" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -526,7 +534,7 @@
                     <div>
                         <label for="batchName" class="block text-sm font-medium text-cu-ink mb-1.5">Nama Kelompok Promo</label>
                         <input type="text" id="batchName" wire:model="bulkForm.batchName"
-                            class="block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink placeholder-cu-muted focus:border-cu-focus focus:outline-none focus:ring-1 focus:ring-cu-focus"
+                            class="block w-full rounded-full border border-cu-line bg-cu-surface px-4 py-2.5 text-sm text-cu-ink placeholder-cu-muted focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
                             placeholder="Misal: Promo Harbolnas 12.12">
                         @error('bulkForm.batchName')
                             <span class="text-xs text-cu-danger mt-1 block">{{ $message }}</span>
@@ -569,7 +577,7 @@
 
                     <div class="pt-4 border-t border-cu-line flex items-center gap-3">
                         <button type="submit" wire:loading.attr="disabled"
-                            class="inline-flex items-center justify-center gap-2 rounded-lg bg-cu-ink px-4 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:opacity-50">
+                            class="inline-flex items-center justify-center gap-2 rounded-full bg-cu-ink px-5 py-2.5 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover disabled:opacity-50">
                             <x-material-icon class="cu-icon-queue" size="sm" wire:loading.remove wire:target="generateBulk" />
                             <svg class="animate-spin h-4 w-4 text-cu-surface" wire:loading wire:target="generateBulk" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

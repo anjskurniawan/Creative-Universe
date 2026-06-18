@@ -29,32 +29,32 @@
                 $percentage = $batch->total_items > 0 ? round(($batch->processed_items / $batch->total_items) * 100) : 0;
             @endphp
 
-            <x-app-panel padding="sm" class="shadow-sm hover:border-cu-border transition-all duration-200 cursor-pointer border border-cu-line/60 rounded-xl bg-cu-surface" x-data="{ expanded: false }" @click="expanded = !expanded">
-                <div class="flex items-center justify-between p-2">
+            <x-app-panel padding="sm" class="shadow-sm hover:border-cu-border transition-all duration-200 cursor-pointer border border-cu-line/60 rounded-2xl bg-cu-surface" x-data="{ expanded: false }" @click="expanded = !expanded">
+                <div class="flex items-center justify-between p-2 gap-4">
                     <!-- Left Section: Status Dot & Batch Info -->
-                    <div class="flex items-center gap-3.5">
+                    <div class="flex items-center gap-3.5 min-w-0">
                         <!-- Status Indicator -->
-                        <span class="relative flex h-2 w-2">
+                        <span class="relative flex h-2 w-2 shrink-0">
                             @if($batch->status === 'processing')
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cu-info opacity-75"></span>
                             @endif
                             <span class="relative inline-flex rounded-full h-2 w-2 {{ $batch->status === 'completed' ? 'bg-cu-success' : ($batch->status === 'failed' ? 'bg-cu-danger' : ($batch->status === 'processing' ? 'bg-cu-info' : 'bg-cu-warning')) }}"></span>
                         </span>
 
-                        <div>
+                        <div class="min-w-0">
                             <div class="flex items-center gap-2">
-                                <h3 class="text-sm font-semibold text-cu-ink">{{ $batch->batch_name }}</h3>
+                                <h3 class="text-sm font-semibold text-cu-ink truncate" title="{{ $batch->batch_name }}">{{ $batch->batch_name }}</h3>
                             </div>
                             <div class="flex items-center gap-2 text-[10px] text-cu-muted mt-0.5 font-medium">
-                                <span>{{ $batch->creator->name ?? 'System' }}</span>
-                                <span>•</span>
-                                <span>{{ $batch->created_at->setTimezone('Asia/Jakarta')->format('d M, H:i') }} WIB</span>
+                                <span class="truncate">{{ $batch->creator->name ?? 'System' }}</span>
+                                <span class="shrink-0">•</span>
+                                <span class="shrink-0">{{ $batch->created_at->setTimezone('Asia/Jakarta')->format('d M, H:i') }} WIB</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Right Section: Progress Numbers & Expansion chevron -->
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 shrink-0">
                         <div class="text-right">
                             <span class="text-xs font-mono font-bold text-cu-ink block leading-none">{{ $batch->processed_items }}/{{ $batch->total_items }}</span>
                             <span class="text-[10px] text-cu-muted mt-0.5 block font-medium leading-none">{{ $percentage }}%</span>
@@ -74,7 +74,7 @@
                     @if(!str_starts_with($batch->batch_name, 'Single:') && $batch->status === 'completed' && $batch->processed_items > 0)
                         <div class="mb-2.5 flex justify-end">
                             <button wire:click.stop="downloadZip({{ $batch->id }})" wire:loading.attr="disabled"
-                                class="inline-flex items-center gap-1.5 rounded-lg bg-cu-ink px-3 py-1.5 text-[11px] font-semibold text-cu-surface transition hover:bg-cu-ink-hover disabled:opacity-50 shadow-sm">
+                                class="inline-flex items-center gap-1.5 rounded-full bg-cu-ink px-4 py-2 text-[11px] font-semibold text-cu-surface transition hover:bg-cu-ink-hover disabled:opacity-50 shadow-sm">
                                 <span wire:loading.remove wire:target="downloadZip({{ $batch->id }})" class="flex items-center gap-1.5">
                                     <x-material-icon class="cu-icon-download-for-offline" size="xs" />
                                     Download ZIP
@@ -100,7 +100,7 @@
                                         $displayName = $itemProduct ? $itemProduct->name . ($itemProduct->variant_name !== 'Default' ? ' (' . $itemProduct->variant_name . ')' : '') : 'Produk';
                                     @endphp
                                     @if($item->status === 'success')
-                                        <div class="flex items-center justify-between gap-1.5 rounded-lg px-2.5 py-1.5 bg-cu-panel-soft/60 border border-cu-line/40 text-xs font-medium text-cu-ink hover:bg-cu-panel-soft transition-colors duration-200">
+                                        <div class="flex items-center justify-between gap-1.5 rounded-xl px-3 py-1.5 bg-cu-panel-soft/60 border border-cu-line/40 text-xs font-medium text-cu-ink hover:bg-cu-panel-soft transition-colors duration-200">
                                             <div class="flex items-center gap-1.5 min-w-0">
                                                 <span class="size-1.5 rounded-full bg-cu-success shrink-0"></span>
                                                 <span class="truncate" title="{{ $displayName }}">{{ $displayName }}</span>
@@ -112,7 +112,7 @@
                                             @endif
                                         </div>
                                     @else
-                                        <div class="flex items-center justify-between gap-1.5 rounded-lg px-2.5 py-1.5 bg-cu-danger-soft/10 border border-cu-danger/20 text-xs font-medium text-cu-danger hover:bg-cu-danger-soft/20 transition-colors duration-200" title="{{ $item->error_message ?? 'Proses gagal' }}">
+                                        <div class="flex items-center justify-between gap-1.5 rounded-xl px-3 py-1.5 bg-cu-danger-soft/10 border border-cu-danger/20 text-xs font-medium text-cu-danger hover:bg-cu-danger-soft/20 transition-colors duration-200" title="{{ $item->error_message ?? 'Proses gagal' }}">
                                             <div class="flex items-center gap-1.5 min-w-0">
                                                 <span class="size-1.5 rounded-full bg-cu-danger shrink-0"></span>
                                                 <span class="truncate" title="{{ $displayName }}">{{ $displayName }}</span>

@@ -17,6 +17,11 @@ Route::prefix('pricetag')
     ->name('pricetag.')
     ->group(function () {
 
+        // Redirect root prefix to search
+        Route::get('/', function () {
+            return redirect()->route('pricetag.search');
+        });
+
         // Halaman Cari Pricetag (Semua User Sub-App)
         Route::get('/search', function () {
             return view('pages.pricetag.search');
