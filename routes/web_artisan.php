@@ -20,6 +20,12 @@ Route::middleware(['artisan-token'])->prefix('_cmd')->group(function () {
         return response()->json(['output' => Artisan::output()]);
     });
 
+    Route::get('/migrate-fresh', function () {
+        Artisan::call('migrate:fresh', ['--force' => true]);
+
+        return response()->json(['output' => Artisan::output()]);
+    });
+
     Route::get('/storage-link', function () {
         Artisan::call('storage:link');
 

@@ -33,6 +33,7 @@
 # Untuk menjalankan command Artisan dari browser, panggil URL berikut:
 #
 # - Migrasi Database:      GET https://creative.doran.id/_cmd/migrate
+# - Drop & Reset Database: GET https://creative.doran.id/_cmd/migrate-fresh
 # - Hapus Cache & Optimize: GET https://creative.doran.id/_cmd/clear-cache
 # - Buat Storage Symlink:  GET https://creative.doran.id/_cmd/storage-link
 # - Restart Queue Worker:   GET https://creative.doran.id/_cmd/queue-restart

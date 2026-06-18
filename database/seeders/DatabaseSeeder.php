@@ -16,16 +16,20 @@ class DatabaseSeeder extends Seeder
         // 1. Seed roles & permissions terlebih dahulu
         $this->call(RolePermissionSeeder::class);
 
-        // 2. Buat akun Superadmin pertama (sudah aktif, sudah punya role)
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@creativeuniverse.test'],
-            [
+        // 2. Buat akun Superadmin pertama (sudah aktif, sudah punya role) jika belum ada
+        $admin = User::where('email', 'admin@creativeuniverse.test')
+            ->orWhere('username', 'superadmin')
+            ->first();
+
+        if (! $admin) {
+            $admin = User::create([
                 'name' => 'Superadmin',
+                'email' => 'admin@creativeuniverse.test',
                 'username' => 'superadmin',
                 'password' => bcrypt('password'),
                 'is_active' => true,
-            ]
-        );
+            ]);
+        }
 
         if (! $admin->hasRole('Superadmin')) {
             $admin->assignRole('Superadmin');
