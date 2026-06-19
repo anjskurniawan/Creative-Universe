@@ -27,5 +27,7 @@ class RejectUserAction
             ->log('[CORE] User account rejected and removed: '.$user->email);
 
         Log::info('[CORE] Account rejected: '.$user->email.' by admin#'.$admin->id);
+
+        event(new \App\Events\Core\UserStatusUpdated());
     }
 }

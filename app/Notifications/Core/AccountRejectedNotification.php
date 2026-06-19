@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notification;
  * AccountRejectedNotification — SRD v6.2 Seksi 11.4
  *
  * Penerima: user yang ditolak
- * Trigger: setelah Superadmin reject akun
+ * Trigger: setelah Root/Manajer reject akun
  */
 class AccountRejectedNotification extends Notification implements ShouldQueue
 {

@@ -21,20 +21,20 @@ class MaintenancePanelTest extends TestCase
             ->assertRedirect('/login');
     }
 
-    public function test_non_superadmin_cannot_access_maintenance_panel(): void
+    public function test_non_root_cannot_access_maintenance_panel(): void
     {
         $this->seed(RolePermissionSeeder::class);
         $user = User::factory()->create(['is_active' => true]);
-        $user->assignRole('Desainer'); // Desainer tidak memiliki permission 'run-artisan'
+        $user->assignRole('Designer'); // Designer tidak memiliki permission 'run-artisan'
 
         $this->actingAs($user)
             ->get('/maintenance')
             ->assertStatus(403);
     }
 
-    public function test_superadmin_can_access_maintenance_panel(): void
+    public function test_root_can_access_maintenance_panel(): void
     {
-        $admin = $this->makeSuperadmin();
+        $admin = $this->makeRoot();
 
         $this->actingAs($admin)
             ->get('/maintenance')
@@ -42,9 +42,9 @@ class MaintenancePanelTest extends TestCase
             ->assertSee('Panel Maintenance');
     }
 
-    public function test_superadmin_can_trigger_artisan_commands(): void
+    public function test_root_can_trigger_artisan_commands(): void
     {
-        $admin = $this->makeSuperadmin();
+        $admin = $this->makeRoot();
 
         Livewire::actingAs($admin)
             ->test(MaintenancePanel::class)
@@ -54,9 +54,9 @@ class MaintenancePanelTest extends TestCase
             ->assertSee("Running 'php artisan optimize:clear'");
     }
 
-    public function test_superadmin_can_send_test_notification(): void
+    public function test_root_can_send_test_notification(): void
     {
-        $admin = $this->makeSuperadmin();
+        $admin = $this->makeRoot();
         Notification::fake();
 
         // 1. Test Database Only
@@ -90,12 +90,12 @@ class MaintenancePanelTest extends TestCase
         );
     }
 
-    private function makeSuperadmin(): User
+    private function makeRoot(): User
     {
         $this->seed(RolePermissionSeeder::class);
 
         $admin = User::factory()->create(['is_active' => true]);
-        $admin->assignRole('Superadmin');
+        $admin->assignRole('Root');
 
         return $admin;
     }

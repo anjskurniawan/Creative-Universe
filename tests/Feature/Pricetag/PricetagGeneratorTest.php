@@ -25,7 +25,7 @@ class PricetagGeneratorTest extends TestCase
 
     private User $admin;
 
-    private User $desainer;
+    private User $designer;
 
     protected function setUp(): void
     {
@@ -36,30 +36,30 @@ class PricetagGeneratorTest extends TestCase
         Permission::firstOrCreate(['name' => 'access-pricetag']);
         Permission::firstOrCreate(['name' => 'pricetag.manage']);
 
-        $superadmin = Role::firstOrCreate(['name' => 'Superadmin']);
-        $superadmin->syncPermissions(['access-core', 'access-pricetag', 'pricetag.manage']);
+        $root = Role::firstOrCreate(['name' => 'Root']);
+        $root->syncPermissions(['access-core', 'access-pricetag', 'pricetag.manage']);
 
-        $desainerRole = Role::firstOrCreate(['name' => 'Desainer']);
-        $desainerRole->syncPermissions(['access-core', 'access-pricetag']);
+        $designerRole = Role::firstOrCreate(['name' => 'Designer']);
+        $designerRole->syncPermissions(['access-core', 'access-pricetag']);
 
         // Create users using standard factory
         $this->admin = User::create([
-            'name' => 'Super Admin',
-            'username' => 'superadmin_test',
+            'name' => 'Root Admin',
+            'username' => 'root_test',
             'email' => 'admin@test.com',
             'password' => bcrypt('password'),
             'is_active' => true,
         ]);
-        $this->admin->assignRole('Superadmin');
+        $this->admin->assignRole('Root');
 
-        $this->desainer = User::create([
-            'name' => 'Desainer User',
-            'username' => 'desainer_test',
+        $this->designer = User::create([
+            'name' => 'Designer User',
+            'username' => 'designer_test',
             'email' => 'desainer@test.com',
             'password' => bcrypt('password'),
             'is_active' => true,
         ]);
-        $this->desainer->assignRole('Desainer');
+        $this->designer->assignRole('Designer');
     }
 
     public function test_guest_cannot_access_pricetag_pages()
@@ -85,7 +85,7 @@ class PricetagGeneratorTest extends TestCase
 
     public function test_authorized_user_can_access_search_page()
     {
-        $this->actingAs($this->desainer);
+        $this->actingAs($this->designer);
 
         $response = $this->get(route('pricetag.search'));
         $response->assertStatus(200);
@@ -93,8 +93,8 @@ class PricetagGeneratorTest extends TestCase
 
     public function test_only_admin_can_access_database_management_page()
     {
-        // Desainer cannot
-        $this->actingAs($this->desainer);
+        // Designer cannot
+        $this->actingAs($this->designer);
         $response = $this->get(route('pricetag.database'));
         $response->assertStatus(403);
 

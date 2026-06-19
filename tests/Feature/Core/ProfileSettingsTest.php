@@ -128,34 +128,34 @@ class ProfileSettingsTest extends TestCase
     {
         $this->seed(RolePermissionSeeder::class);
 
-        $superadmin = User::factory()->create(['is_active' => true]);
-        $superadmin->assignRole('Superadmin');
+        $root = User::factory()->create(['is_active' => true]);
+        $root->assignRole('Root');
 
-        $desainer = User::factory()->create(['is_active' => true]);
-        $desainer->assignRole('Desainer');
+        $designer = User::factory()->create(['is_active' => true]);
+        $designer->assignRole('Designer');
 
-        // Test updating Superadmin-specific system settings
-        $response = $this->actingAs($superadmin)->post('/profile/role-settings', [
+        // Test updating Root-specific system settings
+        $response = $this->actingAs($root)->post('/profile/role-settings', [
             'settings' => [
                 'maintenance_mode' => '1',
                 'pusher_app_key' => 'test_key',
             ],
         ]);
         $response->assertRedirect('/profile');
-        $superadmin->refresh();
-        $this->assertEquals('1', $superadmin->getSetting('maintenance_mode'));
-        $this->assertEquals('test_key', $superadmin->getSetting('pusher_app_key'));
+        $root->refresh();
+        $this->assertEquals('1', $root->getSetting('maintenance_mode'));
+        $this->assertEquals('test_key', $root->getSetting('pusher_app_key'));
 
-        // Desainer cannot update Superadmin-specific settings like 'maintenance_mode'
-        $response = $this->actingAs($desainer)->post('/profile/role-settings', [
+        // Designer cannot update Root-specific settings like 'maintenance_mode'
+        $response = $this->actingAs($designer)->post('/profile/role-settings', [
             'settings' => [
-                'maintenance_mode' => '1', // Superadmin-only
-                'default_pricetag_layout' => 'modern', // Desainer allowed
+                'maintenance_mode' => '1', // Root-only
+                'default_pricetag_layout' => 'modern', // Designer allowed
             ],
         ]);
         $response->assertRedirect('/profile');
-        $desainer->refresh();
-        $this->assertNull($desainer->getSetting('maintenance_mode')); // Should filter this out
-        $this->assertEquals('modern', $desainer->getSetting('default_pricetag_layout')); // Allowed
+        $designer->refresh();
+        $this->assertNull($designer->getSetting('maintenance_mode')); // Should filter this out
+        $this->assertEquals('modern', $designer->getSetting('default_pricetag_layout')); // Allowed
     }
 }

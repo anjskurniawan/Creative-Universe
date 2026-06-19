@@ -36,5 +36,7 @@ class ApproveUserAction
             ->log('[CORE] User account approved: '.$user->email);
 
         Log::info('[CORE] Account approved: '.$user->email.' by admin#'.$admin->id);
+
+        event(new \App\Events\Core\UserStatusUpdated());
     }
 }

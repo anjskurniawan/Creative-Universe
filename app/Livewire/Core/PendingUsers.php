@@ -5,6 +5,7 @@ namespace App\Livewire\Core;
 use App\Actions\Core\ApproveUserAction;
 use App\Actions\Core\RejectUserAction;
 use App\Models\Core\User;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Role;
@@ -47,6 +48,13 @@ class PendingUsers extends Component
         app(RejectUserAction::class)->handle($user, auth()->user());
 
         session()->flash('success', "Akun {$name} telah ditolak.");
+    }
+
+    #[On('user-status-updated')]
+    #[On('notification-received')]
+    public function refreshPendingList(): void
+    {
+        $this->resetPage();
     }
 
     public function render()

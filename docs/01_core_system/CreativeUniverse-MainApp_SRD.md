@@ -11,7 +11,7 @@ version: "6.3 (Real-Time Notifications & Dynamic RBAC)"
 created: 2026-06-14
 revised: 2026-06-16
 locked: 2026-06-16
-owner: Divisi Creative — PT Doran Sukses Indonesia (JETE)
+owner: Divisi Creative  -  PT Doran Sukses Indonesia (JETE)
 supersedes: "v6.2 (2026-06-15)"
 changelog:
     - "v6.1: Auth package ditetapkan → Laravel Breeze + Laravel Socialite (SSO Google)"
@@ -31,11 +31,11 @@ changelog:
     - "v6.1: Queue worker cPanel via Cron Job didefinisikan di Seksi 11"
     - "v6.1: RolePermissionSeeder idempotent didefinisikan di Seksi 6"
     - "v6.1: Seluruh Open Questions dari audit v6.0 diselesaikan"
-    - "v6.1 LOCKED: Scope Seksi 16 dikecilkan — skema domain entity didelegasikan ke SRD per Sub-App"
-    - "v6.2 EMERGENCY: SSO Google dihapus total — laravel/socialite dan socialiteproviders/google dikeluarkan dari stack"
+    - "v6.1 LOCKED: Scope Seksi 16 dikecilkan  -  skema domain entity didelegasikan ke SRD per Sub-App"
+    - "v6.2 EMERGENCY: SSO Google dihapus total  -  laravel/socialite dan socialiteproviders/google dikeluarkan dari stack"
     - "v6.2 EMERGENCY: Kolom google_id dihapus dari skema tabel users"
     - "v6.2 EMERGENCY: Kolom password dikembalikan NOT NULL (tidak ada lagi akun SSO-only)"
-    - "v6.2 EMERGENCY: is_active default diubah false — semua akun baru wajib approval admin"
+    - "v6.2 EMERGENCY: is_active default diubah false  -  semua akun baru wajib approval admin"
     - "v6.2 EMERGENCY: Alur registrasi self-register + approval admin didefinisikan eksplisit"
     - "v6.2 EMERGENCY: Kolom registration_note ditambahkan ke tabel users"
     - "v6.2 EMERGENCY: Permission approve-users ditambahkan ke matrix"
@@ -44,23 +44,23 @@ changelog:
     - "v6.2 EMERGENCY: Index google_id dihapus dari Seksi 10"
     - "v6.2 EMERGENCY: Referensi SSO dihapus dari Seksi 12, 15, 18"
     - "v6.2 EMERGENCY: .env.example dibersihkan dari entri Google"
-    - "v6.2 EMERGENCY: Audit Requirement Matrix diperbarui — tambah aksi Approve/Reject Akun"
+    - "v6.2 EMERGENCY: Audit Requirement Matrix diperbarui  -  tambah aksi Approve/Reject Akun"
     - "v6.3: Sistem notifikasi in-app diubah dari Livewire polling ke Pusher (Laravel Broadcasting + Laravel Echo)"
     - "v6.3: `pusher/pusher-php-server` ditambahkan ke PHP dependencies; `laravel-echo` dan `pusher-js` ditambahkan ke NPM dependencies (dikompilasi lokal)"
-    - "v6.3: Klarifikasi eksplisit: Pusher adalah cloud SaaS — server hanya membuat HTTP call ke Pusher API, tidak membutuhkan WebSocket server sendiri, sepenuhnya kompatibel dengan Shared Hosting"
+    - "v6.3: Klarifikasi eksplisit: Pusher adalah cloud SaaS  -  server hanya membuat HTTP call ke Pusher API, tidak membutuhkan WebSocket server sendiri, sepenuhnya kompatibel dengan Shared Hosting"
     - "v6.3: `BROADCAST_CONNECTION`, `PUSHER_APP_ID/KEY/SECRET/CLUSTER`, dan `VITE_PUSHER_APP_KEY/CLUSTER` ditambahkan ke .env.example (Seksi 8.4)"
-    - "v6.3: Seksi 11 direstrukturisasi — Seksi 11.2 baru ditambahkan untuk Pusher Broadcasting Setup"
-    - "v6.3: Seksi 11.1 ditulis ulang — NotificationBell tidak lagi menggunakan wire:poll, diganti Livewire + Laravel Echo listener"
-    - "v6.3: Seksi 11.5 dan 11.6 diperbarui — semua Notification class menambahkan channel `broadcast` dan method `toBroadcast()`"
+    - "v6.3: Seksi 11 direstrukturisasi  -  Seksi 11.2 baru ditambahkan untuk Pusher Broadcasting Setup"
+    - "v6.3: Seksi 11.1 ditulis ulang  -  NotificationBell tidak lagi menggunakan wire:poll, diganti Livewire + Laravel Echo listener"
+    - "v6.3: Seksi 11.5 dan 11.6 diperbarui  -  semua Notification class menambahkan channel `broadcast` dan method `toBroadcast()`"
     - "v6.3: `routes/channels.php` didefinisikan eksplisit di Seksi 11.2 untuk otorisasi Pusher private channel"
-    - "v6.3: RBAC diubah ke pola Dynamic — Superadmin dapat membuat, mengubah, dan menghapus Role via UI tanpa menyentuh seeder"
-    - "v6.3: Seksi 6.2 diperbarui — prinsip Role diperluas dengan dukungan dynamic role creation"
+    - "v6.3: RBAC diubah ke pola Dynamic  -  Root dapat membuat, mengubah, dan menghapus Role via UI tanpa menyentuh seeder"
+    - "v6.3: Seksi 6.2 diperbarui  -  prinsip Role diperluas dengan dukungan dynamic role creation"
     - "v6.3: Seksi 6.3 di-reframe sebagai Initial Default State, bukan fixed matrix permanen"
-    - "v6.3: Seksi 6.4 RolePermissionSeeder diperbarui — seeder tidak me-reset role dinamis yang dibuat via UI; hanya me-sync tiga role inti"
-    - "v6.3: Seksi 6.5 (Dynamic Role Management) ditambahkan — aturan lengkap pengelolaan role via UI termasuk protected roles, cache invalidation, dan tiga Action Class baru"
-    - "v6.3: Seksi 10.2 diperbarui — tambah aturan wajib cache invalidation Spatie setiap kali Role/Permission diubah"
-    - "v6.3: Seksi 15.1 diperbarui — tambah dua baris debug untuk masalah Pusher dan bell notification"
-    - "v6.3: Seksi 16.3 Audit Requirement Matrix diperbarui — tambah aksi Create/Update/Delete Role"
+    - "v6.3: Seksi 6.4 RolePermissionSeeder diperbarui  -  seeder tidak me-reset role dinamis yang dibuat via UI; hanya me-sync tiga role inti"
+    - "v6.3: Seksi 6.5 (Dynamic Role Management) ditambahkan  -  aturan lengkap pengelolaan role via UI termasuk protected roles, cache invalidation, dan tiga Action Class baru"
+    - "v6.3: Seksi 10.2 diperbarui  -  tambah aturan wajib cache invalidation Spatie setiap kali Role/Permission diubah"
+    - "v6.3: Seksi 15.1 diperbarui  -  tambah dua baris debug untuk masalah Pusher dan bell notification"
+    - "v6.3: Seksi 16.3 Audit Requirement Matrix diperbarui  -  tambah aksi Create/Update/Delete Role"
 ---
 
 # CreativeUniverse-MainApp_SRD
@@ -115,7 +115,7 @@ Aplikasi dibangun di atas ekosistem modern TALL Stack dengan batasan _environmen
 | ---------------------- | ---------------------------------------------------------- |
 | Bahasa Pemrograman     | PHP 8.2                                                    |
 | Framework Utama        | Laravel 11                                                 |
-| Frontend Engine        | Livewire `^3.6` — Volt SFC Architecture                    |
+| Frontend Engine        | Livewire `^3.6`  -  Volt SFC Architecture                    |
 | Styling                | Tailwind CSS v4, dikompilasi via Vite (lokal)              |
 | Database               | MySQL 8.0+                                                 |
 | Package Auth           | Laravel Breeze (Blade stack)                               |
@@ -123,19 +123,19 @@ Aplikasi dibangun di atas ekosistem modern TALL Stack dengan batasan _environmen
 | Package Activity Log   | `spatie/laravel-activitylog`                               |
 | Package Log Viewer     | `opcodesio/log-viewer`                                     |
 | WhatsApp API           | Fonnte (`api.fonnte.com`)                                  |
-| Broadcasting Driver    | Pusher (`api.pusherapp.com`) — `pusher/pusher-php-server`  |
-| NPM Dependencies       | `laravel-echo`, `pusher-js` — dikompilasi via Vite (lokal) |
+| Broadcasting Driver    | Pusher (`api.pusherapp.com`)  -  `pusher/pusher-php-server`  |
+| NPM Dependencies       | `laravel-echo`, `pusher-js`  -  dikompilasi via Vite (lokal) |
 | Queue Driver           | Database (cPanel compatible)                               |
-| Environment Production | Shared Hosting cPanel — **TANPA akses SSH/Terminal**       |
+| Environment Production | Shared Hosting cPanel  -  **TANPA akses SSH/Terminal**       |
 
 > [!danger] LARANGAN KERAS
 > Jangan menggunakan Node.js, Redis, atau fitur apapun yang membutuhkan akses terminal di production. Seluruh kompilasi asset (`npm run build`) **hanya** dilakukan di environment lokal sebelum di-upload.
 
 > [!info] Pusher Kompatibel dengan Shared Hosting
-> Pusher adalah layanan WebSocket **cloud SaaS** — bukan server yang harus dijalankan sendiri. Kompatibilitasnya dengan Shared Hosting terjamin karena:
+> Pusher adalah layanan WebSocket **cloud SaaS**  -  bukan server yang harus dijalankan sendiri. Kompatibilitasnya dengan Shared Hosting terjamin karena:
 >
 > - **Server-side**: `pusher/pusher-php-server` hanya membuat HTTP POST ke `api.pusherapp.com` dari dalam PHP process (queue job). Tidak ada persistent process, tidak butuh SSH.
-> - **Client-side**: `pusher-js` dan `laravel-echo` dikompilasi oleh Vite di lokal, lalu di-upload sebagai file statis ke `public/build/`. Browser user yang terhubung ke `ws.pusherapp.com` — tidak ada keterlibatan server production dalam koneksi WebSocket ini.
+> - **Client-side**: `pusher-js` dan `laravel-echo` dikompilasi oleh Vite di lokal, lalu di-upload sebagai file statis ke `public/build/`. Browser user yang terhubung ke `ws.pusherapp.com`  -  tidak ada keterlibatan server production dalam koneksi WebSocket ini.
 
 > [!danger] SSO Google Dihapus Permanen
 > `laravel/socialite` dan `socialiteproviders/google` **TIDAK** masuk ke dalam project ini dalam bentuk apapun. Jangan install, jangan referensikan, jangan rencanakan penggunaannya tanpa membuka versi SRD baru dengan audit keamanan terlebih dahulu. Keputusan ini final per v6.2.
@@ -144,7 +144,7 @@ Aplikasi dibangun di atas ekosistem modern TALL Stack dengan batasan _environmen
 > SRD ini menggunakan Livewire `^3.6`. Volt SFC (Single File Component) tersedia sejak Livewire v3. Jangan upgrade ke versi major baru tanpa audit breaking change terlebih dahulu dan pembaruan SRD ini.
 
 > [!info] Catatan Auth Package
-> Laravel Breeze digunakan dengan **Blade stack** (bukan Livewire stack Breeze) agar tidak konflik dengan pola Volt SFC yang dikelola manual. Breeze menyediakan scaffolding untuk Login, Register, Forgot Password, dan Reset Password. Alur Register dimodifikasi untuk kebutuhan approval — lihat [[#8.2 Alur Registrasi & Approval Akun|Seksi 8.2]].
+> Laravel Breeze digunakan dengan **Blade stack** (bukan Livewire stack Breeze) agar tidak konflik dengan pola Volt SFC yang dikelola manual. Breeze menyediakan scaffolding untuk Login, Register, Forgot Password, dan Reset Password. Alur Register dimodifikasi untuk kebutuhan approval  -  lihat [[#8.2 Alur Registrasi & Approval Akun|Seksi 8.2]].
 
 ---
 
@@ -204,7 +204,7 @@ routes/
 ```
 
 > [!info] Folder `Services/`
-> Folder `app/Services/` digunakan **khusus** untuk integrasi layanan eksternal (Fonnte WhatsApp API, dll.). Jangan tempatkan logika bisnis domain di sini — itu milik `app/Actions/`. Lihat [[#18. Environment, API & Future Integration Standards|Seksi 18.4]] untuk aturan lengkap.
+> Folder `app/Services/` digunakan **khusus** untuk integrasi layanan eksternal (Fonnte WhatsApp API, dll.). Jangan tempatkan logika bisnis domain di sini  -  itu milik `app/Actions/`. Lihat [[#18. Environment, API & Future Integration Standards|Seksi 18.4]] untuk aturan lengkap.
 
 ### 3.2 Aturan Route per Sub-App
 
@@ -302,13 +302,13 @@ Konsistensi naming adalah fondasi codebase yang bisa dibaca dan di-debug dengan 
 - **Core App:** `App\Http\Controllers\Core\`, `App\Models\Core\`
 - **ODDS:** `App\Http\Controllers\Odds\`, `App\Models\Odds\`, `App\Actions\Odds\`
 - **Services:** `App\Services\Fonnte\`, `App\Services\[IntegrationName]\`
-- **Sub-App baru:** gunakan nama PascalCase dari slug app — contoh: `App\Models\DesignReview\`
+- **Sub-App baru:** gunakan nama PascalCase dari slug app  -  contoh: `App\Models\DesignReview\`
 
 ---
 
 ## 5. Standar Arsitektur Kode (Livewire Volt)
 
-### 5.1 Manajemen Input & Validasi — Form Objects
+### 5.1 Manajemen Input & Validasi  -  Form Objects
 
 > [!danger] LARANGAN KERAS
 > Dilarang mendeklarasikan variabel form (`$title`, `$body`, `$status`) langsung di dalam blok `<?php ?>` komponen SFC Volt. Semua form field dan rules **WAJIB** dipisah ke Form Object di `app/Livewire/Forms/[SubApp]/`.
@@ -358,7 +358,7 @@ $save = function (CreateTicketAction $action) {
 ?>
 ```
 
-### 5.3 Ekstraksi Logika Bisnis — Action Classes
+### 5.3 Ekstraksi Logika Bisnis  -  Action Classes
 
 Jika sebuah fungsi mengandung lebih dari **10 baris logika eksekusi** (tidak menghitung baris komentar, baris kosong, dan deklarasi tipe) atau menyentuh lebih dari **1 tabel database**, WAJIB diekstrak ke Action Class di `app/Actions/[SubApp]/`.
 
@@ -378,26 +378,26 @@ class CreateTicketAction
 }
 ```
 
-### 5.4 Pembatasan Query — Model Scopes
+### 5.4 Pembatasan Query  -  Model Scopes
 
 > [!danger] LARANGAN
 > Dilarang menulis query builder berantai langsung di komponen Livewire atau file Blade. Semua logika filter dan query wajib dipindah ke **Local Scope** di file Model.
 
 ```php
-// app/Models/Odds/Ticket.php — BENAR
+// app/Models/Odds/Ticket.php  -  BENAR
 public function scopeOpenByUser($query, int $userId): Builder
 {
     return $query->where('status', 'open')->where('assigned_to', $userId);
 }
 
-// Di SFC Volt — BENAR
+// Di SFC Volt  -  BENAR
 computed(fn() => Ticket::openByUser(auth()->id())->latest()->paginate(20));
 
-// Di SFC Volt — SALAH
+// Di SFC Volt  -  SALAH
 computed(fn() => Ticket::where('status','open')->where('assigned_to', auth()->id())->get());
 ```
 
-### 5.5 Dekomposisi UI — Blade Components
+### 5.5 Dekomposisi UI  -  Blade Components
 
 Elemen visual yang berulang (Modal, Card, Badge, Alert, Button) **WAJIB** dipisah ke `resources/views/components/`.
 
@@ -410,7 +410,7 @@ Elemen visual yang berulang (Modal, Card, Badge, Alert, Button) **WAJIB** dipisa
 
 ### 6.1 Skema Tabel `users`
 
-Tabel ini wajib mendukung `SoftDeletes` — kebijakan data abadi, data karyawan resign tidak pernah dihapus permanen.
+Tabel ini wajib mendukung `SoftDeletes`  -  kebijakan data abadi, data karyawan resign tidak pernah dihapus permanen.
 
 | Kolom                       | Tipe        | Constraint                | Keterangan                                                                            |
 | --------------------------- | ----------- | ------------------------- | ------------------------------------------------------------------------------------- |
@@ -421,8 +421,8 @@ Tabel ini wajib mendukung `SoftDeletes` — kebijakan data abadi, data karyawan 
 | `whatsapp_number`           | String(20)  | Nullable                  | Format: `628xxxx` untuk notifikasi Fonnte                                             |
 | `password`                  | String(255) | NOT NULL                  | Bcrypt hashed. Wajib diisi saat registrasi                                            |
 | `is_active`                 | Boolean     | Default: **false**, index | `false` = pending approval. `true` = akun aktif dan dapat login penuh                 |
-| `registration_note`         | Text        | Nullable                  | Catatan dari pendaftar saat registrasi — membantu admin mengenali identitas pendaftar |
-| `approved_by`               | BigInt      | Nullable, FK → users.id   | Superadmin yang menyetujui akun ini                                                   |
+| `registration_note`         | Text        | Nullable                  | Catatan dari pendaftar saat registrasi  -  membantu admin mengenali identitas pendaftar |
+| `approved_by`               | BigInt      | Nullable, FK → users.id   | Root yang menyetujui akun ini                                                   |
 | `approved_at`               | Timestamp   | Nullable                  | Waktu approval                                                                        |
 | `avatar_path`               | String(500) | Nullable                  | UUID-based filename, max 2MB                                                          |
 | `created_by`                | BigInt      | Nullable, FK → users.id   | Nullable karena registrasi mandiri tidak memiliki `created_by`                        |
@@ -433,41 +433,41 @@ Tabel ini wajib mendukung `SoftDeletes` — kebijakan data abadi, data karyawan 
 
 > [!danger] Perubahan Kritis dari v6.1
 >
-> - Kolom `google_id` **dihapus** — SSO Google tidak ada di ekosistem ini.
-> - Kolom `password` **NOT NULL** — tidak ada lagi akun tanpa password.
-> - Kolom `is_active` **default: false** — semua akun baru masuk sebagai pending, tidak bisa login ke Sub-App sampai diapprove Superadmin.
+> - Kolom `google_id` **dihapus**  -  SSO Google tidak ada di ekosistem ini.
+> - Kolom `password` **NOT NULL**  -  tidak ada lagi akun tanpa password.
+> - Kolom `is_active` **default: false**  -  semua akun baru masuk sebagai pending, tidak bisa login ke Sub-App sampai diapprove Root.
 > - Kolom `registration_note`, `approved_by`, `approved_at` **ditambahkan** untuk mendukung alur approval.
 
 > [!warning] Kebijakan Penamaan File Avatar
 > File avatar **WAJIB** di-rename saat upload menggunakan `Storage::putFile()` yang auto-generate UUID filename. Format: `{uuid}.{ext}`. Jangan pakai nama asli file dari user karena rentan path traversal dan naming collision.
 
 > [!info] Kolom `created_by` Nullable pada `users`
-> Kolom `created_by` di tabel `users` bersifat Nullable sebagai pengecualian dari aturan ownership global. Alasannya: user yang mendaftar sendiri (self-register) tidak memiliki `created_by`. Kolom ini terisi hanya jika akun dibuat manual oleh Superadmin.
+> Kolom `created_by` di tabel `users` bersifat Nullable sebagai pengecualian dari aturan ownership global. Alasannya: user yang mendaftar sendiri (self-register) tidak memiliki `created_by`. Kolom ini terisi hanya jika akun dibuat manual oleh Root.
 
-### 6.2 Strategi RBAC — Spatie Permission
+### 6.2 Strategi RBAC  -  Spatie Permission
 
 Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permission dikelola dinamis melalui Spatie.
 
 > [!success] Prinsip Role Universal & Scalable
 > Role bersifat **universal dan tidak di-scope per Sub-App**. Satu Role berlaku di seluruh ekosistem Creative Universe. Pembatasan akses per Sub-App dikendalikan oleh **Permission** (bukan Role), menggunakan konvensi prefix `access-[app-slug]` dan `[app].[resource].[action]`.
 >
-> Sistem RBAC dirancang **scalable** — tiga role default (Superadmin, Manajer, Desainer) adalah titik awal, bukan batas. Superadmin dapat membuat role baru dan mengelola permission-nya sepenuhnya via UI tanpa menyentuh seeder atau kode. Skema tabel Spatie tidak berubah saat role baru ditambahkan — semua operasi dilakukan di application layer.
+> Sistem RBAC dirancang **scalable**  -  tiga role default (Root, Manajer, Designer) adalah titik awal, bukan batas. Root dapat membuat role baru dan mengelola permission-nya sepenuhnya via UI tanpa menyentuh seeder atau kode. Skema tabel Spatie tidak berubah saat role baru ditambahkan  -  semua operasi dilakukan di application layer.
 
 > [!info] Akun Pending dan Role
-> User yang baru mendaftar (is_active = false / pending) **tidak memiliki Role apapun**. Role diberikan oleh Superadmin bersamaan dengan atau setelah proses approval. Sebelum Role diberikan, user hanya bisa mengakses halaman `/pending` dan `/profile`.
+> User yang baru mendaftar (is_active = false / pending) **tidak memiliki Role apapun**. Role diberikan oleh Root bersamaan dengan atau setelah proses approval. Sebelum Role diberikan, user hanya bisa mengakses halaman `/pending` dan `/profile`.
 
-> [!warning] Cache Spatie — Aturan Kritis
-> Spatie Permission menggunakan cache internal untuk menyimpan data Role dan Permission demi performa. Setiap kali Role atau Permission diubah — baik via seeder maupun via UI — cache **WAJIB** di-reset secara eksplisit. Lihat [[#6.5 Dynamic Role Management|Seksi 6.5]] untuk detail.
+> [!warning] Cache Spatie  -  Aturan Kritis
+> Spatie Permission menggunakan cache internal untuk menyimpan data Role dan Permission demi performa. Setiap kali Role atau Permission diubah  -  baik via seeder maupun via UI  -  cache **WAJIB** di-reset secara eksplisit. Lihat [[#6.5 Dynamic Role Management|Seksi 6.5]] untuk detail.
 
-### 6.3 Role-Permission Matrix — Initial Default State
+### 6.3 Role-Permission Matrix  -  Initial Default State
 
 > [!note] Konteks Tabel Ini
-> Tabel di bawah adalah **Initial Default State** yang di-seed saat inisialisasi pertama. Di production, role dan permission aktual dapat berbeda karena Superadmin telah mengelolanya via UI. Tabel ini mendefinisikan _minimum yang harus ada_, bukan _batas maksimum_ yang membekukan sistem.
+> Tabel di bawah adalah **Initial Default State** yang di-seed saat inisialisasi pertama. Di production, role dan permission aktual dapat berbeda karena Root telah mengelolanya via UI. Tabel ini mendefinisikan _minimum yang harus ada_, bukan _batas maksimum_ yang membekukan sistem.
 
 > [!note] Single Source of Truth untuk Seed Awal
 > Tabel ini adalah acuan untuk `RolePermissionSeeder`. Setiap permission inti yang ditambahkan via seeder **WAJIB** didokumentasikan di sini. Permission dari Sub-App baru juga wajib ditambahkan ke sini sebelum di-deploy.
 
-| Permission Slug        | Superadmin | Manajer | Desainer | Keterangan                                 |
+| Permission Slug        | Root | Manajer | Designer | Keterangan                                 |
 | ---------------------- | :--------: | :-----: | :------: | ------------------------------------------ |
 | `access-core`          |     ✅     |   ✅    |    ✅    | Akses ke Master App (dashboard)            |
 | `access-odds`          |     ✅     |   ✅    |    ✅    | Akses ke Sub-App ODDS                      |
@@ -475,7 +475,7 @@ Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permi
 | `manage-roles`         |     ✅     |   ❌    |    ❌    | Buat, edit, & hapus Role/Permission via UI |
 | `approve-users`        |     ✅     |   ❌    |    ❌    | Approve / reject akun pending              |
 | `odds.tickets.create`  |     ✅     |   ✅    |    ✅    | Buat tiket baru di ODDS                    |
-| `odds.tickets.assign`  |     ✅     |   ✅    |    ❌    | Assign tiket ke desainer                   |
+| `odds.tickets.assign`  |     ✅     |   ✅    |    ❌    | Assign tiket ke designer                   |
 | `odds.tickets.approve` |     ✅     |   ✅    |    ❌    | Approve / reject output                    |
 | `odds.tickets.delete`  |     ✅     |   ❌    |    ❌    | Hapus tiket (soft delete)                  |
 | `odds.reports.view`    |     ✅     |   ✅    |    ❌    | Lihat laporan & analytics                  |
@@ -485,13 +485,13 @@ Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permi
 > [!info] Aturan Permission Naming
 > Format slug: `[app-prefix].[resource].[action]` untuk permission spesifik Sub-App. Permission lintas app menggunakan format tanpa prefix: `manage-users`, `approve-users`, `view-logs`.
 
-### 6.4 RolePermissionSeeder — Pola Idempotent untuk Initial Seed
+### 6.4 RolePermissionSeeder  -  Pola Idempotent untuk Initial Seed
 
 > [!danger] Aturan Seeder Production
-> Seeder yang dijalankan di production **WAJIB** menggunakan `RolePermissionSeeder` yang terpisah dari `DatabaseSeeder`. Seeder ini harus bersifat **idempotent** — aman dijalankan berulang kali tanpa menduplikasi data.
+> Seeder yang dijalankan di production **WAJIB** menggunakan `RolePermissionSeeder` yang terpisah dari `DatabaseSeeder`. Seeder ini harus bersifat **idempotent**  -  aman dijalankan berulang kali tanpa menduplikasi data.
 
 > [!warning] Seeder vs UI Management
-> `RolePermissionSeeder` hanya bertanggung jawab untuk **tiga role inti** (Superadmin, Manajer, Desainer) dan seluruh permission default. Role tambahan yang dibuat Superadmin via UI **tidak tersentuh** oleh seeder. Menjalankan seeder ulang akan me-reset permission tiga role inti ke default-nya, namun tidak akan menghapus role dinamis maupun permission yang sudah ada di database.
+> `RolePermissionSeeder` hanya bertanggung jawab untuk **tiga role inti** (Root, Manajer, Designer) dan seluruh permission default. Role tambahan yang dibuat Root via UI **tidak tersentuh** oleh seeder. Menjalankan seeder ulang akan me-reset permission tiga role inti ke default-nya, namun tidak akan menghapus role dinamis maupun permission yang sudah ada di database.
 
 ```php
 // database/seeders/RolePermissionSeeder.php
@@ -518,27 +518,27 @@ class RolePermissionSeeder extends Seeder
         // Reset cache Spatie sebelum operasi
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Step 1: Buat semua permission — firstOrCreate menjamin idempotent.
+        // Step 1: Buat semua permission  -  firstOrCreate menjamin idempotent.
         // Permission yang sudah ada tidak akan terduplikasi atau dihapus.
         foreach ($this->corePermissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Step 2: Buat tiga role inti — firstOrCreate menjamin idempotent.
-        $superadmin = Role::firstOrCreate(['name' => 'Superadmin']);
+        // Step 2: Buat tiga role inti  -  firstOrCreate menjamin idempotent.
+        $root = Role::firstOrCreate(['name' => 'Root']);
         $manajer    = Role::firstOrCreate(['name' => 'Manajer']);
-        $desainer   = Role::firstOrCreate(['name' => 'Desainer']);
+        $designer   = Role::firstOrCreate(['name' => 'Designer']);
 
         // Step 3: Sync permission ke tiga role inti.
         // CATATAN: syncPermissions menimpa assignment permission yang ada pada role-role ini.
-        // Role dinamis yang dibuat via UI tidak disentuh — seeder hanya mengelola tiga role di bawah.
-        $superadmin->syncPermissions($this->corePermissions);
+        // Role dinamis yang dibuat via UI tidak disentuh  -  seeder hanya mengelola tiga role di bawah.
+        $root->syncPermissions($this->corePermissions);
         $manajer->syncPermissions([
             'access-core', 'access-odds',
             'odds.tickets.create', 'odds.tickets.assign',
             'odds.tickets.approve', 'odds.reports.view',
         ]);
-        $desainer->syncPermissions([
+        $designer->syncPermissions([
             'access-core', 'access-odds',
             'odds.tickets.create',
         ]);
@@ -552,14 +552,14 @@ class RolePermissionSeeder extends Seeder
 > [!warning] Cara Menjalankan di Production
 > Gunakan Web Artisan Route: `GET /_cmd/seed-permissions`. Route ini memanggil `db:seed --class=RolePermissionSeeder --force`, bukan `DatabaseSeeder`. `DatabaseSeeder` hanya dijalankan sekali saat inisialisasi pertama di environment Local.
 
-### 6.5 Dynamic Role Management — Pengelolaan Role via UI
+### 6.5 Dynamic Role Management  -  Pengelolaan Role via UI
 
 > [!info] Tujuan
 > Seksi ini mendefinisikan standar untuk mengelola Role dan Permission secara dinamis melalui antarmuka admin, tanpa menyentuh seeder atau codebase. Ini adalah mekanisme utama untuk menambah role baru seiring berkembangnya organisasi.
 
 #### Prinsip Dynamic RBAC
 
-1. Skema tabel Spatie (`roles`, `permissions`, `model_has_roles`, `role_has_permissions`) **tidak pernah berubah** saat role baru ditambahkan — semua operasi di application layer.
+1. Skema tabel Spatie (`roles`, `permissions`, `model_has_roles`, `role_has_permissions`) **tidak pernah berubah** saat role baru ditambahkan  -  semua operasi di application layer.
 2. Permission baru yang di-deploy via seeder (Sub-App baru) dapat langsung di-assign ke role lama maupun baru via UI.
 3. Role yang dibuat via UI tidak terpengaruh saat `RolePermissionSeeder` dijalankan ulang.
 4. Hanya user dengan permission `manage-roles` yang dapat membuat, mengubah, atau menghapus Role.
@@ -568,25 +568,25 @@ class RolePermissionSeeder extends Seeder
 
 | Aturan   | Keterangan                                                                |
 | -------- | ------------------------------------------------------------------------- |
-| Format   | Title Case — contoh: `Koordinator`, `Kepala Tim`, `Kontributor Eksternal` |
+| Format   | Title Case  -  contoh: `Koordinator`, `Kepala Tim`, `Kontributor Eksternal` |
 | Panjang  | Maksimum 100 karakter                                                     |
-| Karakter | Huruf, angka, dan spasi — tidak boleh ada karakter khusus                 |
-| Keunikan | Nama role harus unik — dijaga oleh UNIQUE constraint di tabel `roles`     |
-| Guard    | Selalu `web` — tidak ada guard lain di ekosistem ini                      |
+| Karakter | Huruf, angka, dan spasi  -  tidak boleh ada karakter khusus                 |
+| Keunikan | Nama role harus unik  -  dijaga oleh UNIQUE constraint di tabel `roles`     |
+| Guard    | Selalu `web`  -  tidak ada guard lain di ekosistem ini                      |
 
 #### Role yang Dilindungi (Protected Roles)
 
 Tiga role inti di bawah **tidak boleh dihapus** dalam kondisi apapun. Proteksi ini diberlakukan di level Action Class, bukan level database.
 
 ```php
-// Daftar protected roles — tidak boleh dihapus via UI
-const PROTECTED_ROLES = ['Superadmin', 'Manajer', 'Desainer'];
+// Daftar protected roles  -  tidak boleh dihapus via UI
+const PROTECTED_ROLES = ['Root', 'Manajer', 'Designer'];
 ```
 
-#### Cache Invalidation — WAJIB di Setiap Perubahan Role/Permission
+#### Cache Invalidation  -  WAJIB di Setiap Perubahan Role/Permission
 
 > [!danger] Aturan Kritis
-> Setiap Action Class yang mengubah Role atau Permission **WAJIB** memanggil reset cache Spatie di akhir eksekusinya. Tanpa ini, perubahan tidak akan terdeteksi oleh sistem permission check sampai cache kedaluwarsa secara natural — menyebabkan bug akses yang sulit di-debug.
+> Setiap Action Class yang mengubah Role atau Permission **WAJIB** memanggil reset cache Spatie di akhir eksekusinya. Tanpa ini, perubahan tidak akan terdeteksi oleh sistem permission check sampai cache kedaluwarsa secara natural  -  menyebabkan bug akses yang sulit di-debug.
 
 ```php
 // Wajib dipanggil di akhir setiap Action yang mengubah Role atau Permission:
@@ -668,7 +668,7 @@ use App\Models\Core\User;
 
 class DeleteRoleAction
 {
-    private const PROTECTED_ROLES = ['Superadmin', 'Manajer', 'Desainer'];
+    private const PROTECTED_ROLES = ['Root', 'Manajer', 'Designer'];
 
     public function handle(Role $role, User $admin): void
     {
@@ -687,7 +687,7 @@ class DeleteRoleAction
         }
 
         $roleName = $role->name;
-        $role->delete(); // Hard delete — Role tidak menggunakan SoftDeletes
+        $role->delete(); // Hard delete  -  Role tidak menggunakan SoftDeletes
 
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
@@ -711,14 +711,14 @@ Seluruh operasi CRUD pada Role dan Permission via UI wajib masuk ke audit trail 
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------- |
 | **Local System (Kantor)**            | Source code master, file PSD/AI/Raw Video. Tidak pernah diupload ke cPanel.                           |
 | **cPanel Server**                    | Avatar karyawan (max 2MB), thumbnail preview desain (max 2MB), PDF brief. WAJIB validasi MIME + size. |
-| **Cloud Link (Tabel `asset_links`)** | File besar (video, ZIP, drive folder). App menyimpan metadata URL — bukan file-nya.                   |
+| **Cloud Link (Tabel `asset_links`)** | File besar (video, ZIP, drive folder). App menyimpan metadata URL  -  bukan file-nya.                   |
 
 ### 7.1 Aturan Upload File ke cPanel
 
-1. Semua file yang diupload ke cPanel **WAJIB** melalui `Storage::putFile()` — auto UUID naming.
+1. Semua file yang diupload ke cPanel **WAJIB** melalui `Storage::putFile()`  -  auto UUID naming.
 2. Wajib validasi MIME type di setiap form upload: `'mimes:jpg,jpeg,png,pdf'`
 3. Wajib validasi ukuran maksimum: `'max:2048'` (2MB dalam kilobytes)
-4. Jangan pernah expose path storage asli ke user — gunakan signed URL atau route proxy.
+4. Jangan pernah expose path storage asli ke user  -  gunakan signed URL atau route proxy.
 5. Wajib implementasi `storage:link` via Web Artisan Routes untuk symlink `public/storage`.
 
 ### 7.2 Skema Tabel `asset_links` (Cloud Link Storage)
@@ -729,7 +729,7 @@ Tabel ini menyimpan referensi URL ke file eksternal yang di-host di cloud storag
 | --------------------------- | ----------- | ----------------------- | ---------------------------------------------------------------- |
 | `id`                        | BigInt      | PK, Auto Increment      | Primary key                                                      |
 | `linkable_type`             | String(255) | NOT NULL, index         | Polymorphic type (e.g., `App\Models\Odds\Ticket`)                |
-| `linkable_id`               | BigInt      | NOT NULL, index         | Polymorphic ID — ID entitas terkait                              |
+| `linkable_id`               | BigInt      | NOT NULL, index         | Polymorphic ID  -  ID entitas terkait                              |
 | `provider`                  | Enum        | NOT NULL                | Nilai: `google_drive`, `dropbox`, `onedrive`, `youtube`, `other` |
 | `label`                     | String(255) | NOT NULL                | Nama tampilan link (e.g., "File Revisi Final v3")                |
 | `url`                       | Text        | NOT NULL                | URL lengkap ke resource cloud                                    |
@@ -756,7 +756,7 @@ Tabel ini menyimpan referensi URL ke file eksternal yang di-host di cloud storag
 
 ## 8. Security Standards & Auth Flow
 
-### 8.1 Web Artisan Routes — Keamanan Token
+### 8.1 Web Artisan Routes  -  Keamanan Token
 
 > [!warning] Keamanan Token
 > Token autentikasi Web Artisan Routes menggunakan HTTP Header `X-Artisan-Token`, bukan query string, untuk menghindari paparan di browser history, server access log, dan proxy log.
@@ -798,7 +798,7 @@ Route::middleware(['artisan-token'])->prefix('_cmd')->group(function () {
 ### 8.2 Alur Registrasi & Approval Akun
 
 > [!danger] Aturan Kritis
-> Tidak ada akun yang dapat mengakses fitur apapun (termasuk Dashboard dan Sub-App) sebelum Superadmin memberikan approval. Ini adalah garis pertahanan utama akses tidak sah ke `creative.doran.id`.
+> Tidak ada akun yang dapat mengakses fitur apapun (termasuk Dashboard dan Sub-App) sebelum Root memberikan approval. Ini adalah garis pertahanan utama akses tidak sah ke `creative.doran.id`.
 
 #### Alur Lengkap Registrasi → Approval → Login
 
@@ -820,25 +820,25 @@ Route::middleware(['artisan-token'])->prefix('_cmd')->group(function () {
     → Tidak bisa mengakses halaman lain selain /pending dan /profile
     → Bisa logout
 
-[4] Superadmin buka /users/pending
+[4] Root buka /users/pending
     → Lihat antrian akun pending
     → Tindakan per akun: Approve atau Reject
 
-[5a] Superadmin klik Approve:
+[5a] Root klik Approve:
     → is_active = true
-    → approved_by = Superadmin ID
+    → approved_by = Root ID
     → approved_at = now()
     → Assign Role sesuai jabatan
     → Kirim AccountApprovedNotification ke user (in-app real-time via Pusher + WhatsApp Fonnte)
     → User sudah bisa login penuh
 
-[5b] Superadmin klik Reject:
-    → Akun di-soft delete (deleted_at = now(), deleted_by = Superadmin ID)
+[5b] Root klik Reject:
+    → Akun di-soft delete (deleted_at = now(), deleted_by = Root ID)
     → Kirim AccountRejectedNotification ke user (in-app real-time via Pusher + WhatsApp Fonnte)
     → Jika user sedang login → sesi di-invalidate saat request berikutnya
 ```
 
-#### Form Registrasi — Validasi Wajib
+#### Form Registrasi  -  Validasi Wajib
 
 ```php
 // app/Livewire/Forms/Core/RegisterForm.php
@@ -875,10 +875,10 @@ class RegisterUserAction
             'whatsapp_number'   => $form->whatsapp_number,
             'password'          => bcrypt($form->password),
             'registration_note' => $form->registration_note,
-            'is_active'         => false, // WAJIB false — pending approval
+            'is_active'         => false, // WAJIB false  -  pending approval
         ]);
 
-        // Notifikasi ke semua Superadmin (in-app real-time + WhatsApp)
+        // Notifikasi ke semua Root (in-app real-time + WhatsApp)
         $admins = User::permission('approve-users')->where('is_active', true)->get();
         foreach ($admins as $admin) {
             $admin->notify(new UserRegisteredNotification($user));
@@ -887,7 +887,7 @@ class RegisterUserAction
         activity('auth')
             ->performedOn($user)
             ->withProperties(['ip' => request()->ip()])
-            ->log('[CORE] New user registered — pending approval: '.$user->email);
+            ->log('[CORE] New user registered  -  pending approval: '.$user->email);
 
         return $user;
     }
@@ -1000,7 +1000,7 @@ ARTISAN_ALLOWED_IPS=
 FONNTE_TOKEN=
 FONNTE_SENDER=
 
-# Broadcasting — Pusher
+# Broadcasting  -  Pusher
 BROADCAST_CONNECTION=pusher
 PUSHER_APP_ID=
 PUSHER_APP_KEY=
@@ -1013,22 +1013,22 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 ```
 
 > [!info] Kenapa Ada Dua Set Pusher Keys?
-> Variabel `PUSHER_APP_*` digunakan oleh PHP server untuk mengirim event ke Pusher API. Variabel `VITE_PUSHER_*` digunakan oleh Vite saat kompilasi aset — nilainya identik, namun prefix `VITE_` membuatnya tersedia di JavaScript frontend via `import.meta.env`.
+> Variabel `PUSHER_APP_*` digunakan oleh PHP server untuk mengirim event ke Pusher API. Variabel `VITE_PUSHER_*` digunakan oleh Vite saat kompilasi aset  -  nilainya identik, namun prefix `VITE_` membuatnya tersedia di JavaScript frontend via `import.meta.env`.
 
 > [!danger] Entri Google Dihapus
 > Entri `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, dan `GOOGLE_REDIRECT_URI` **tidak ada** di `.env.example`. Jangan tambahkan entri ini.
 
 ### 8.5 Rate Limiting
 
-- **Login endpoint:** `throttle:5,1` — 5 percobaan per menit, kunci 1 menit
-- **Register endpoint:** `throttle:3,10` — 3 percobaan per 10 menit per IP
-- **Web Artisan Routes:** `throttle:3,60` — 3 eksekusi per jam
-- **File upload endpoint:** `throttle:10,1` — 10 upload per menit per user
+- **Login endpoint:** `throttle:5,1`  -  5 percobaan per menit, kunci 1 menit
+- **Register endpoint:** `throttle:3,10`  -  3 percobaan per 10 menit per IP
+- **Web Artisan Routes:** `throttle:3,60`  -  3 eksekusi per jam
+- **File upload endpoint:** `throttle:10,1`  -  10 upload per menit per user
 
 ### 8.6 Proteksi Data Umum
 
 - Seluruh input user **WAJIB** melewati Form Object validation sebelum menyentuh database.
-- Gunakan Eloquent ORM untuk semua query — hindari raw SQL kecuali sangat diperlukan.
+- Gunakan Eloquent ORM untuk semua query  -  hindari raw SQL kecuali sangat diperlukan.
 - Jika raw SQL diperlukan, **WAJIB** menggunakan parameter binding: `DB::select('SELECT * FROM x WHERE id = ?', [$id])`
 - Semua aksi destruktif (delete, reject, revoke) **WAJIB** dipagari middleware `can` atau `Gate::authorize()`.
 - File `.env` **TIDAK BOLEH** dicommit ke repository.
@@ -1057,7 +1057,7 @@ public function register(): void
 ### 9.2 Aturan Validation Error
 
 - Validation error di Livewire Volt: gunakan `$this->addError()` atau biarkan Livewire auto-handle dari Form Object `validate()`.
-- **JANGAN** gunakan `session()->flash()` untuk validation error — hanya untuk success/info message.
+- **JANGAN** gunakan `session()->flash()` untuk validation error  -  hanya untuk success/info message.
 - Pesan error **WAJIB** menggunakan Bahasa Indonesia yang jelas dan actionable.
 - Contoh **BENAR:** `"Username hanya boleh berisi huruf, angka, dan tanda hubung."`
 - Contoh **SALAH:** `"The username field is required."` atau `"Error 422."`
@@ -1076,7 +1076,7 @@ $confirmReject = function () {
 };
 ```
 
-> [!info] Pesan Konfirmasi Modal — Soft Delete
+> [!info] Pesan Konfirmasi Modal  -  Soft Delete
 > Seluruh aksi hapus di Creative Universe menggunakan **soft delete**, bukan hard delete permanen. Pesan konfirmasi modal **WAJIB** menggunakan frasa "dipindahkan ke arsip" atau "dihapus sementara", bukan "dihapus permanen". Pengecualian: reject akun pending menggunakan frasa "ditolak dan dihapus dari sistem" karena akun pending belum pernah aktif. Hapus Role menggunakan frasa "dihapus permanen" karena Role tidak mendukung SoftDeletes.
 
 ---
@@ -1105,7 +1105,7 @@ Kolom yang sering digunakan untuk filter, search, atau join **WAJIB** diberikan 
 - Jangan cache data yang bersifat per-user atau real-time (notifikasi, status tiket aktif, status akun pending)
 - Gunakan prefix cache yang mencerminkan Sub-App: `'odds.priorities'`, `'core.roles'`
 
-> [!danger] Spatie Permission Cache — Aturan Wajib
+> [!danger] Spatie Permission Cache  -  Aturan Wajib
 > Spatie Permission menyimpan data Role dan Permission dalam cache untuk performa pengecekan `can()`. Setiap kali Role atau Permission **diubah lewat jalur manapun** (seeder, UI, atau langsung via Eloquent), cache Spatie WAJIB di-reset. Kegagalan melakukan ini menyebabkan perubahan permission tidak berlaku sampai cache kadaluwarsa, yang merupakan security bug.
 >
 > ```php
@@ -1123,11 +1123,11 @@ Kolom yang sering digunakan untuk filter, search, atau join **WAJIB** diberikan 
 
 | Channel               | Penggunaan                                                                          | Mekanisme                         |
 | --------------------- | ----------------------------------------------------------------------------------- | --------------------------------- |
-| **In-App (Lonceng)**  | Semua notifikasi — tersimpan di tabel `notifications` Laravel                       | Real-time via Pusher Broadcasting |
+| **In-App (Lonceng)**  | Semua notifikasi  -  tersimpan di tabel `notifications` Laravel                       | Real-time via Pusher Broadcasting |
 | **WhatsApp (Fonnte)** | Notifikasi urgent: registrasi pending, approval/reject akun, assign tiket, deadline | Fonnte API via queue job          |
-| **Email (opsional)**  | Weekly summary                                                                      | —                                 |
+| **Email (opsional)**  | Weekly summary                                                                      |  -                                  |
 
-#### In-App Bell Notification — Real-Time via Pusher
+#### In-App Bell Notification  -  Real-Time via Pusher
 
 Komponen bell icon diimplementasikan sebagai Livewire Class Component yang **tidak menggunakan polling**. Pembaruan badge notifikasi berjalan secara real-time melalui event yang dikirim Pusher ke browser.
 
@@ -1190,7 +1190,7 @@ class NotificationBell extends Component
         if (typeof window.Echo !== 'undefined') {
             window.Echo.private(`App.Models.Core.User.{{ auth()->id() }}`)
                 .notification(() => {
-                    // Pusher menerima event notifikasi baru —
+                    // Pusher menerima event notifikasi baru  - 
                     // dispatch ke Livewire NotificationBell untuk refresh
                     Livewire.dispatch('notification-received');
                 });
@@ -1205,15 +1205,15 @@ class NotificationBell extends Component
 
 ---
 
-### 11.2 Pusher Broadcasting — Setup & Konfigurasi
+### 11.2 Pusher Broadcasting  -  Setup & Konfigurasi
 
 #### Instalasi Package
 
 ```bash
-# PHP dependency — jalankan di lokal, commit composer.lock
+# PHP dependency  -  jalankan di lokal, commit composer.lock
 composer require pusher/pusher-php-server
 
-# NPM dependencies — jalankan di lokal, compile, commit public/build
+# NPM dependencies  -  jalankan di lokal, compile, commit public/build
 npm install laravel-echo pusher-js
 ```
 
@@ -1257,7 +1257,7 @@ Private channel membutuhkan otorisasi server agar hanya user yang berhak dapat s
 use App\Models\Core\User;
 use Illuminate\Support\Facades\Broadcast;
 
-// Otorisasi private channel per user — hanya user yang bersangkutan yang bisa subscribe
+// Otorisasi private channel per user  -  hanya user yang bersangkutan yang bisa subscribe
 Broadcast::channel('App.Models.Core.User.{id}', function (User $user, int $id): bool {
     return (int) $user->id === $id;
 });
@@ -1287,7 +1287,7 @@ window.Echo = new Echo({
 > Setiap perubahan pada `resources/js/bootstrap.js` atau file JS lainnya **WAJIB** diikuti dengan `npm run build` di lokal sebelum deploy. File `public/build/` yang ter-generate wajib dicommit dan diupload ke production.
 
 > [!info] Route `/broadcasting/auth`
-> Route ini disediakan otomatis oleh Laravel Broadcasting untuk memverifikasi bahwa user yang subscribe ke private channel adalah user yang sah (memanggil callback di `routes/channels.php`). Route ini bekerja dengan session auth standar — tidak perlu konfigurasi tambahan.
+> Route ini disediakan otomatis oleh Laravel Broadcasting untuk memverifikasi bahwa user yang subscribe ke private channel adalah user yang sah (memanggil callback di `routes/channels.php`). Route ini bekerja dengan session auth standar  -  tidak perlu konfigurasi tambahan.
 
 ---
 
@@ -1353,7 +1353,7 @@ class FonnteService
 
 ---
 
-### 11.4 Custom Notification Channel — Fonnte
+### 11.4 Custom Notification Channel  -  Fonnte
 
 ```php
 // app/Notifications/Channels/FonnteChannel.php
@@ -1371,7 +1371,7 @@ class FonnteChannel
         $target = $notifiable->whatsapp_number;
 
         if (!$target) {
-            return; // User tidak punya nomor WA — skip tanpa error
+            return; // User tidak punya nomor WA  -  skip tanpa error
         }
 
         $this->fonnte->send($target, $notification->toFonnte($notifiable));
@@ -1381,13 +1381,13 @@ class FonnteChannel
 
 ---
 
-### 11.5 Notification Classes — Approval Flow
+### 11.5 Notification Classes  -  Approval Flow
 
 Tiga Notification class wajib dibuat untuk mendukung alur registrasi dan approval. Setiap class menggunakan tiga channel: **database** (tersimpan permanen), **broadcast** (real-time via Pusher), dan **FonnteChannel** (WhatsApp).
 
 ```php
 // app/Notifications/Core/UserRegisteredNotification.php
-// Penerima: Superadmin (semua user ber-permission approve-users)
+// Penerima: Root (semua user ber-permission approve-users)
 // Trigger: setelah user baru berhasil mendaftar
 
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -1404,7 +1404,7 @@ class UserRegisteredNotification extends Notification implements ShouldQueue
         return ['database', 'broadcast', FonnteChannel::class];
     }
 
-    // Payload yang dikirim ke Pusher — data minimal untuk performa
+    // Payload yang dikirim ke Pusher  -  data minimal untuk performa
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->toArray($notifiable));
@@ -1433,7 +1433,7 @@ class UserRegisteredNotification extends Notification implements ShouldQueue
 ```php
 // app/Notifications/Core/AccountApprovedNotification.php
 // Penerima: user yang baru diapprove
-// Trigger: setelah Superadmin approve akun
+// Trigger: setelah Root approve akun
 
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
@@ -1471,7 +1471,7 @@ class AccountApprovedNotification extends Notification implements ShouldQueue
 ```php
 // app/Notifications/Core/AccountRejectedNotification.php
 // Penerima: user yang ditolak
-// Trigger: setelah Superadmin reject akun
+// Trigger: setelah Root reject akun
 
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
@@ -1508,7 +1508,7 @@ class AccountRejectedNotification extends Notification implements ShouldQueue
 
 ---
 
-### 11.6 Notification Class — Ticket Assigned
+### 11.6 Notification Class  -  Ticket Assigned
 
 ```php
 // app/Notifications/Odds/TicketAssignedNotification.php
@@ -1554,16 +1554,16 @@ class TicketAssignedNotification extends Notification implements ShouldQueue
 ### 11.7 Queue Worker di cPanel (Tanpa SSH)
 
 ```bash
-# Cron Job di cPanel — queue:work sekali per menit
+# Cron Job di cPanel  -  queue:work sekali per menit
 * * * * * cd /home/[username]/[project-folder] && php artisan queue:work --stop-when-empty --tries=3 >> /dev/null 2>&1
 ```
 
 > [!warning] Pilihan `--stop-when-empty`
-> Worker berhenti otomatis setelah queue kosong — kompatibel dengan Shared Hosting. Cron Job berikutnya menginisiasi worker baru jika ada job masuk. Broadcasting via Pusher (HTTP call ke `api.pusherapp.com`) dilakukan dari dalam queue job ini — tidak ada koneksi WebSocket dari server, hanya HTTP request biasa.
+> Worker berhenti otomatis setelah queue kosong  -  kompatibel dengan Shared Hosting. Cron Job berikutnya menginisiasi worker baru jika ada job masuk. Broadcasting via Pusher (HTTP call ke `api.pusherapp.com`) dilakukan dari dalam queue job ini  -  tidak ada koneksi WebSocket dari server, hanya HTTP request biasa.
 
 ---
 
-### 11.8 Audit Trail — Activity Log
+### 11.8 Audit Trail  -  Activity Log
 
 ```php
 // app/Models/Odds/Ticket.php
@@ -1619,10 +1619,10 @@ protected $listen = [
 
 IP Address dicatat sebagai custom property pada setiap activity log via kolom `properties` (JSON) Spatie. Tidak memerlukan kolom tambahan di tabel `activity_log`.
 
-### 11.11 Log Viewer — Superadmin Only
+### 11.11 Log Viewer  -  Root Only
 
-- Route: `/system/logs` — middleware `auth` + `can:view-logs`
-- Hanya Superadmin (`view-logs`) yang dapat mengakses
+- Route: `/system/logs`  -  middleware `auth` + `can:view-logs`
+- Hanya Root (`view-logs`) yang dapat mengakses
 
 ---
 
@@ -1639,7 +1639,7 @@ IP Address dicatat sebagai custom property pada setiap activity log via kolom `p
 - Nama test **WAJIB** deskriptif dalam Bahasa Inggris.
 - Seluruh test dijalankan secara **manual** sebelum setiap deploy: `php artisan test`.
 
-### 12.2 Wajib Ada — Feature Test Auth Flow
+### 12.2 Wajib Ada  -  Feature Test Auth Flow
 
 ```php
 // tests/Feature/Auth/RegistrationApprovalTest.php
@@ -1657,12 +1657,12 @@ class RegistrationApprovalTest extends TestCase
         $this->actingAs($user)->get('/dashboard')->assertRedirect('/pending');
     }
 
-    public function test_superadmin_can_approve_user(): void
+    public function test_root_can_approve_user(): void
     {
-        $admin   = User::factory()->create(['is_active' => true])->assignRole('Superadmin');
+        $admin   = User::factory()->create(['is_active' => true])->assignRole('Root');
         $pending = User::factory()->create(['is_active' => false]);
 
-        $this->actingAs($admin)->post("/users/{$pending->id}/approve", ['role' => 'Desainer']);
+        $this->actingAs($admin)->post("/users/{$pending->id}/approve", ['role' => 'Designer']);
         $this->assertDatabaseHas('users', ['id' => $pending->id, 'is_active' => true]);
     }
 
@@ -1673,39 +1673,39 @@ class RegistrationApprovalTest extends TestCase
         Notification::assertSentTo($pending, AccountApprovedNotification::class);
     }
 
-    public function test_superadmin_receives_notification_on_new_registration(): void
+    public function test_root_receives_notification_on_new_registration(): void
     {
         Notification::fake();
         $this->post('/register', [...]);
-        Notification::assertSentTo($superadmin, UserRegisteredNotification::class);
+        Notification::assertSentTo($root, UserRegisteredNotification::class);
     }
 }
 ```
 
-### 12.3 Wajib Ada — Feature Test Dynamic Role Management
+### 12.3 Wajib Ada  -  Feature Test Dynamic Role Management
 
 ```php
 // tests/Feature/Core/DynamicRoleManagementTest.php
 class DynamicRoleManagementTest extends TestCase
 {
-    public function test_superadmin_can_create_new_role(): void
+    public function test_root_can_create_new_role(): void
     {
-        $admin = User::factory()->create(['is_active' => true])->assignRole('Superadmin');
+        $admin = User::factory()->create(['is_active' => true])->assignRole('Root');
         $this->actingAs($admin)->post('/roles', ['name' => 'Koordinator', 'permissions' => ['access-core']]);
         $this->assertDatabaseHas('roles', ['name' => 'Koordinator']);
     }
 
     public function test_protected_role_cannot_be_deleted(): void
     {
-        $admin = User::factory()->create(['is_active' => true])->assignRole('Superadmin');
-        $role  = Role::findByName('Superadmin');
+        $admin = User::factory()->create(['is_active' => true])->assignRole('Root');
+        $role  = Role::findByName('Root');
         $this->expectException(\RuntimeException::class);
         (new DeleteRoleAction)->handle($role, $admin);
     }
 
     public function test_role_with_active_users_cannot_be_deleted(): void
     {
-        $admin = User::factory()->create(['is_active' => true])->assignRole('Superadmin');
+        $admin = User::factory()->create(['is_active' => true])->assignRole('Root');
         $role  = Role::firstOrCreate(['name' => 'TestRole']);
         User::factory()->create(['is_active' => true])->assignRole('TestRole');
         $this->expectException(\RuntimeException::class);
@@ -1755,7 +1755,7 @@ class CreateTicketActionTest extends TestCase
 2. Build asset lokal: `npm run build`
 3. Commit folder `public/build` ke repository
 4. Update `.env.example` jika ada perubahan environment variable baru
-5. Buat migration baru — **JANGAN** edit migration lama yang sudah di-run di production
+5. Buat migration baru  -  **JANGAN** edit migration lama yang sudah di-run di production
 6. Upload seluruh file ke cPanel via FTP atau File Manager
 7. Trigger migration: `GET /_cmd/migrate`
 8. Trigger clear cache: `GET /_cmd/clear-cache`
@@ -1767,16 +1767,16 @@ class CreateTicketActionTest extends TestCase
 ### 13.3 cPanel Cron Jobs
 
 ```bash
-# Laravel Scheduler — setiap menit
+# Laravel Scheduler  -  setiap menit
 * * * * * cd /home/[username]/[project-folder] && php artisan schedule:run >> /dev/null 2>&1
 
-# Queue Worker — setiap menit
+# Queue Worker  -  setiap menit
 # Queue worker ini yang bertugas mengirim event ke Pusher API dan Fonnte WA
 * * * * * cd /home/[username]/[project-folder] && php artisan queue:work --stop-when-empty --tries=3 >> /dev/null 2>&1
 ```
 
 > [!info] Asumsi Operasional
-> PHP CLI dan Cron Job diasumsikan tersedia di Shared Hosting. Outbound HTTP request ke `api.pusherapp.com` (port 443/HTTPS) diasumsikan diizinkan oleh server — ini adalah konfigurasi standar di semua Shared Hosting modern. Jika ditemukan keterbatasan, catat sebagai deviasi operasional.
+> PHP CLI dan Cron Job diasumsikan tersedia di Shared Hosting. Outbound HTTP request ke `api.pusherapp.com` (port 443/HTTPS) diasumsikan diizinkan oleh server  -  ini adalah konfigurasi standar di semua Shared Hosting modern. Jika ditemukan keterbatasan, catat sebagai deviasi operasional.
 
 ### 13.4 Branch Strategy
 
@@ -1791,7 +1791,7 @@ class CreateTicketActionTest extends TestCase
 
 ## 14. UI/UX Standards & Loading States
 
-### 14.1 Loading State — Wajib di Semua Form
+### 14.1 Loading State  -  Wajib di Semua Form
 
 > [!danger] Aturan Wajib
 > Setiap form dan tombol aksi yang berinteraksi dengan server **WAJIB** disematkan atribut `wire:loading`.
@@ -1814,9 +1814,9 @@ class CreateTicketActionTest extends TestCase
 
 - Semua label, pesan, dan copy UI menggunakan **Bahasa Indonesia**.
 - Tombol menggunakan kata kerja aktif dan spesifik: `"Daftar Akun"`, `"Setujui Akun"`, `"Tolak Akun"`, `"Buat Role"`.
-- Pesan sukses: `"[Nama entitas] berhasil [aksi]."` — contoh: `"Akun berhasil disetujui."`, `"Role Koordinator berhasil dibuat."`
-- Pesan error: actionable — contoh: `"Email sudah digunakan. Coba email lain."`
-- Empty state harus memberikan instruksi — contoh: `"Tidak ada akun yang menunggu persetujuan."`
+- Pesan sukses: `"[Nama entitas] berhasil [aksi]."`  -  contoh: `"Akun berhasil disetujui."`, `"Role Koordinator berhasil dibuat."`
+- Pesan error: actionable  -  contoh: `"Email sudah digunakan. Coba email lain."`
+- Empty state harus memberikan instruksi  -  contoh: `"Tidak ada akun yang menunggu persetujuan."`
 - Halaman `/pending` menggunakan bahasa yang ramah dan tidak membuat user khawatir.
 
 ---
@@ -1829,13 +1829,13 @@ class CreateTicketActionTest extends TestCase
 | ------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | User daftar tapi tidak bisa login           | Tabel `users` kolom `is_active`                       | Cek status pending di `/users/pending`                                                                                            |
 | Notif approval tidak terkirim               | Tabel `jobs` dan `failed_jobs`                        | Cek `FonnteService`, periksa `FONNTE_TOKEN`                                                                                       |
-| Superadmin tidak terima notif WA            | Tabel `users` kolom `whatsapp_number`                 | Pastikan format `628xxxx`                                                                                                         |
+| Root tidak terima notif WA            | Tabel `users` kolom `whatsapp_number`                 | Pastikan format `628xxxx`                                                                                                         |
 | Bell notifikasi tidak update real-time      | Browser DevTools → Console & Network                  | Pastikan Pusher terkoneksi, cek `VITE_PUSHER_APP_KEY` dan `VITE_PUSHER_APP_CLUSTER` di `.env`, jalankan `npm run build` ulang     |
 | Pusher event tidak diterima server          | Tabel `jobs` dan `failed_jobs`                        | Pastikan queue worker berjalan, cek `PUSHER_APP_SECRET` di `.env`, cek outbound HTTP ke `api.pusherapp.com:443` diizinkan hosting |
 | User approved tapi tidak bisa akses Sub-App | Tabel `model_has_roles`                               | Pastikan Role sudah di-assign saat approval                                                                                       |
 | Perubahan permission tidak berlaku          | Cache Spatie                                          | Pastikan `forgetCachedPermissions()` dipanggil di Action Class, atau jalankan `GET /_cmd/clear-cache`                             |
 | Role baru tidak muncul di dropdown          | Cache aplikasi                                        | Jalankan `GET /_cmd/clear-cache`                                                                                                  |
-| Error 500 / exception tak terduga           | `storage/logs/laravel.log`                            | Log Viewer (Superadmin)                                                                                                           |
+| Error 500 / exception tak terduga           | `storage/logs/laravel.log`                            | Log Viewer (Root)                                                                                                           |
 | Validasi form tidak bekerja                 | `app/Livewire/Forms/[SubApp]/[Name]Form.php`          | Cek method `rules()`                                                                                                              |
 | Query lambat / data salah                   | `app/Models/[SubApp]/[Name].php`                      | Cek Local Scope, tambah index                                                                                                     |
 | Permission denied 403                       | Tabel `roles`, `permissions`, `model_has_permissions` | `php artisan permission:show`                                                                                                     |
@@ -1886,9 +1886,9 @@ Log::warning('[ODDS] SLA approaching for ticket #123');
 User
 ├── Project
 │   ├── Task
-│   │   └── AssetLink (polymorphic — cloud link)
+│   │   └── AssetLink (polymorphic  -  cloud link)
 │   ├── Asset
-│   │   └── AssetLink (polymorphic — cloud link)
+│   │   └── AssetLink (polymorphic  -  cloud link)
 │   ├── Revision
 │   └── Comment
 │
@@ -1898,7 +1898,7 @@ User
 ```
 
 > [!warning] Scope Skema Domain Entity
-> Entitas `Project`, `Task`, `Asset`, `Revision`, dan `Comment` adalah **reserved domain concept** — nama dan hierarkinya dikunci di Master SRD ini. Namun **skema tabel** untuk masing-masing entitas didefinisikan di **SRD masing-masing Sub-App**. Tabel yang shared lintas Sub-App hanya `users` dan `asset_links`.
+> Entitas `Project`, `Task`, `Asset`, `Revision`, dan `Comment` adalah **reserved domain concept**  -  nama dan hierarkinya dikunci di Master SRD ini. Namun **skema tabel** untuk masing-masing entitas didefinisikan di **SRD masing-masing Sub-App**. Tabel yang shared lintas Sub-App hanya `users` dan `asset_links`.
 
 ### 16.2 Aturan Kepemilikan Data
 
@@ -1906,7 +1906,7 @@ Setiap data operasional WAJIB memiliki kolom berikut:
 
 | Kolom        | Tujuan                                                                      |
 | ------------ | --------------------------------------------------------------------------- |
-| `created_by` | User pembuat data (FK → users.id, NOT NULL — kecuali tabel `users` sendiri) |
+| `created_by` | User pembuat data (FK → users.id, NOT NULL  -  kecuali tabel `users` sendiri) |
 | `updated_by` | User terakhir yang mengubah (FK → users.id, Nullable)                       |
 | `deleted_by` | User yang melakukan soft delete (FK → users.id, Nullable)                   |
 | `created_at` | Waktu pembuatan (auto)                                                      |
@@ -1945,12 +1945,12 @@ Format minimum audit (custom properties di kolom `properties` JSON):
 
 | Data                  | Retensi  | Scheduler Command                              |
 | --------------------- | -------- | ---------------------------------------------- |
-| Activity Log          | 24 Bulan | `CleanOldActivityLogCommand` — monthly         |
-| Notifications         | 12 Bulan | `CleanOldNotificationsCommand` — monthly       |
-| Failed Jobs           | 30 Hari  | `CleanFailedJobsCommand` — daily               |
-| Password Reset Tokens | 7 Hari   | Laravel built-in (`auth:clear-resets`) — daily |
-| Temporary Upload      | 7 Hari   | `CleanTempUploadsCommand` — daily              |
-| Soft Deleted Data     | 12 Bulan | `PruneStaleRecordsCommand` — monthly           |
+| Activity Log          | 24 Bulan | `CleanOldActivityLogCommand`  -  monthly         |
+| Notifications         | 12 Bulan | `CleanOldNotificationsCommand`  -  monthly       |
+| Failed Jobs           | 30 Hari  | `CleanFailedJobsCommand`  -  daily               |
+| Password Reset Tokens | 7 Hari   | Laravel built-in (`auth:clear-resets`)  -  daily |
+| Temporary Upload      | 7 Hari   | `CleanTempUploadsCommand`  -  daily              |
+| Soft Deleted Data     | 12 Bulan | `PruneStaleRecordsCommand`  -  monthly           |
 
 ```php
 // routes/console.php

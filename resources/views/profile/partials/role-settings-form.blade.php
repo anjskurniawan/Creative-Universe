@@ -26,7 +26,7 @@
         @csrf
 
         <!-- ========================================== -->
-        <!-- SUPERADMIN SETTINGS PANEL                  -->
+        <!-- ROOT SETTINGS PANEL                        -->
         <!-- ========================================== -->
         @can('run-artisan')
             <div x-data="{ expanded: false }" class="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden transition-all duration-200">
@@ -35,7 +35,7 @@
                     <div>
                         <h3 class="text-sm font-semibold text-cu-ink flex items-center gap-2">
                             <x-material-icon class="text-cu-danger" size="sm" />
-                            Konfigurasi Sistem (Superadmin)
+                            Konfigurasi Sistem (Root)
                         </h3>
                         <p class="text-xs text-cu-muted mt-0.5">Mode pemeliharaan, debug log, dan kunci integrasi API pihak ketiga.</p>
                     </div>
@@ -149,7 +149,7 @@
         @endcan
 
         <!-- ========================================== -->
-        <!-- DESAINER SETTINGS PANEL                    -->
+        <!-- DESIGNER SETTINGS PANEL                    -->
         <!-- ========================================== -->
         @can('access-pricetag')
             <div x-data="{ expanded: false }" class="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden transition-all duration-200">
@@ -157,8 +157,8 @@
                     class="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none">
                     <div>
                         <h3 class="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                            <x-material-icon class="text-cu-success" size="sm" />
-                            Preferensi Studio Pricetag (Desainer)
+                             <x-material-icon class="text-cu-success" size="sm" />
+                            Preferensi Studio Pricetag (Designer)
                         </h3>
                         <p class="text-xs text-cu-muted mt-0.5">Tata letak cetak bawaan, ukuran kertas, dan simpan checklist otomatis.</p>
                     </div>

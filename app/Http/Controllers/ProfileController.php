@@ -127,7 +127,7 @@ class ProfileController extends Controller
             }
         }
 
-        // 3. Desainer specific settings configuration
+        // 3. Designer specific settings configuration
         if ($user->can('access-pricetag')) {
             $allowedKeys = [
                 'default_pricetag_layout',
@@ -157,6 +157,11 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Hanya role Root yang diizinkan untuk menghapus akun
+        if (! $user->hasRole('Root')) {
+            abort(403, 'Hanya pengguna dengan peran Root yang dapat menghapus akun.');
+        }
 
         Auth::logout();
 

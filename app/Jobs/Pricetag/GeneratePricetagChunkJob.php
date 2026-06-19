@@ -112,5 +112,7 @@ class GeneratePricetagChunkJob implements ShouldQueue
             $batch->update(['status' => $newStatus]);
             Log::info("[PRICETAG] Batch ID {$this->batchId} finished processing. Status: {$newStatus}");
         }
+
+        event(new \App\Events\Pricetag\PricetagBatchUpdated($this->batchId));
     }
 }

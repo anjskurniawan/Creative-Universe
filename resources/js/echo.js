@@ -11,6 +11,21 @@ window.Echo = new Echo({
     authEndpoint: '/broadcasting/auth',
 });
 
+// Global Public Channel Listeners for Real-time UI synchronization
+window.Echo.channel('user-updates')
+    .listen('.user.updated', () => {
+        if (window.Livewire?.dispatch) {
+            window.Livewire.dispatch('user-status-updated');
+        }
+    });
+
+window.Echo.channel('pricetag-updates')
+    .listen('.pricetag.updated', (event) => {
+        if (window.Livewire?.dispatch) {
+            window.Livewire.dispatch('pricetag-batch-updated', event);
+        }
+    });
+
 const notificationState = {
     channelName: null,
     isBound: false,

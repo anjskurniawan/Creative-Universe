@@ -14,7 +14,7 @@ use Illuminate\View\View;
  * UserController — SRD v6.2 Seksi 8.2
  *
  * Manajemen user: daftar semua user, pending approval, approve, reject.
- * Akses: hanya Superadmin (manage-users, approve-users).
+ * Akses: hanya Root / Manajer (manage-users, approve-users).
  */
 class UserController extends Controller
 {

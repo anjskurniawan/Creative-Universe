@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notification;
  * AccountApprovedNotification — SRD v6.2 Seksi 11.4
  *
  * Penerima: user yang baru diapprove
- * Trigger: setelah Superadmin approve akun
+ * Trigger: setelah Root/Manajer approve akun
  */
 class AccountApprovedNotification extends Notification implements ShouldQueue
 {

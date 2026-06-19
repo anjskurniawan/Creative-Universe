@@ -63,7 +63,9 @@ class ProfileTest extends TestCase
 
     public function test_user_can_delete_their_account(): void
     {
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
         $user = User::factory()->create();
+        $user->assignRole('Root');
 
         $response = $this
             ->actingAs($user)
@@ -79,9 +81,27 @@ class ProfileTest extends TestCase
         $this->assertSoftDeleted($user);
     }
 
+    public function test_non_root_user_cannot_delete_their_account(): void
+    {
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $user = User::factory()->create();
+        $user->assignRole('Designer'); // Non-root
+
+        $response = $this
+            ->actingAs($user)
+            ->delete('/profile', [
+                'password' => 'password',
+            ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'deleted_at' => null]);
+    }
+
     public function test_correct_password_must_be_provided_to_delete_account(): void
     {
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
         $user = User::factory()->create();
+        $user->assignRole('Root');
 
         $response = $this
             ->actingAs($user)

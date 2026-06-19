@@ -6,12 +6,12 @@ tags:
     - main-app
     - laravel-11
     - architecture
-status: "📐 DRAFT — Pending Review"
+status: "📐 DRAFT  -  Pending Review"
 version: "1.1"
 created: 2026-06-15
 revised: 2026-06-16
 locked: false
-owner: Divisi Creative — PT Doran Sukses Indonesia (JETE)
+owner: Divisi Creative  -  PT Doran Sukses Indonesia (JETE)
 supersedes: "v1.0 (2026-06-15)"
 references: "CreativeUniverse-MainApp_SRD v6.3 (2026-06-16)"
 changelog:
@@ -22,18 +22,18 @@ changelog:
     - "v1.0: Matriks relasi lengkap dengan kardinalitas ditambahkan di Seksi 6"
     - "v1.0: Batas scope Main App vs Sub-App didefinisikan eksplisit di Seksi 10"
     - "v1.0: Checklist integrasi Sub-App dengan Core ERD ditambahkan di Seksi 10.4"
-    - "v1.1: Referensi diupdate ke SRD v6.3 — seluruh link section number disesuaikan"
-    - "v1.1: Seksi 2.1 — prinsip 'RBAC Dynamic-First' ditambahkan: roles/permissions tumbuh di application layer tanpa perubahan skema"
-    - "v1.1: Seksi 3 — keterangan Grup D (Notification System) diperbarui: mencantumkan Pusher Broadcasting sebagai mekanisme delivery real-time"
-    - "v1.1: Seksi 5.2 (roles) — info note diperbarui: role tidak lagi fixed 3, dapat bertambah dinamis via UI; tabel seed diperbarui menjadi 'Initial Default Seed'"
-    - "v1.1: Seksi 5.3 (permissions) — warning diperbarui: dua jalur penambahan permission (seeder untuk batch init, UI untuk perubahan operasional)"
-    - "v1.1: Seksi 5.6 (role_has_permissions) — mapping table di-reframe sebagai initial default state, bukan fixed state"
-    - "v1.1: Seksi 5.8 (notifications) — status note dan tabel Notification Classes diperbarui: channel 'broadcast' (Pusher) ditambahkan ke semua class; Pusher tidak menambahkan tabel baru ke ERD"
-    - "v1.1: Seksi 5.10 (jobs) — lifecycle note diperbarui: mencantumkan bahwa Pusher HTTP call dieksekusi dari dalam queue job"
-    - "v1.1: Seksi 5.11 (failed_jobs) — monitoring warning diperbarui: mencantumkan failed_jobs pada Pusher broadcast sebagai indikator notifikasi real-time gagal"
-    - "v1.1: Seksi 7.3 (activity_log) — contoh baris data diperbarui: tambah baris audit untuk operasi RBAC (create/update/delete role)"
-    - "v1.1: Seksi 10.1 — kolom 'Cara Pengelolaan' tabel roles/permissions diperbarui: mencantumkan UI management via manage-roles permission"
-    - "v1.1: Seksi 10.5 Checklist — item baru ditambahkan: Notification Sub-App wajib menggunakan channel 'broadcast'"
+    - "v1.1: Referensi diupdate ke SRD v6.3  -  seluruh link section number disesuaikan"
+    - "v1.1: Seksi 2.1  -  prinsip 'RBAC Dynamic-First' ditambahkan: roles/permissions tumbuh di application layer tanpa perubahan skema"
+    - "v1.1: Seksi 3  -  keterangan Grup D (Notification System) diperbarui: mencantumkan Pusher Broadcasting sebagai mekanisme delivery real-time"
+    - "v1.1: Seksi 5.2 (roles)  -  info note diperbarui: role tidak lagi fixed 3, dapat bertambah dinamis via UI; tabel seed diperbarui menjadi 'Initial Default Seed'"
+    - "v1.1: Seksi 5.3 (permissions)  -  warning diperbarui: dua jalur penambahan permission (seeder untuk batch init, UI untuk perubahan operasional)"
+    - "v1.1: Seksi 5.6 (role_has_permissions)  -  mapping table di-reframe sebagai initial default state, bukan fixed state"
+    - "v1.1: Seksi 5.8 (notifications)  -  status note dan tabel Notification Classes diperbarui: channel 'broadcast' (Pusher) ditambahkan ke semua class; Pusher tidak menambahkan tabel baru ke ERD"
+    - "v1.1: Seksi 5.10 (jobs)  -  lifecycle note diperbarui: mencantumkan bahwa Pusher HTTP call dieksekusi dari dalam queue job"
+    - "v1.1: Seksi 5.11 (failed_jobs)  -  monitoring warning diperbarui: mencantumkan failed_jobs pada Pusher broadcast sebagai indikator notifikasi real-time gagal"
+    - "v1.1: Seksi 7.3 (activity_log)  -  contoh baris data diperbarui: tambah baris audit untuk operasi RBAC (create/update/delete role)"
+    - "v1.1: Seksi 10.1  -  kolom 'Cara Pengelolaan' tabel roles/permissions diperbarui: mencantumkan UI management via manage-roles permission"
+    - "v1.1: Seksi 10.5 Checklist  -  item baru ditambahkan: Notification Sub-App wajib menggunakan channel 'broadcast'"
 ---
 
 # CreativeUniverse-MainApp_ERD
@@ -57,7 +57,7 @@ changelog:
 7. [[#7. Analisis Polymorphic Relations]]
 8. [[#8. Aturan Kepemilikan Data (Ownership)]]
 9. [[#9. Strategi Indexing Database]]
-10. [[#10. Batas Scope — Main App vs Sub-App]]
+10. [[#10. Batas Scope  -  Main App vs Sub-App]]
 
 ---
 
@@ -85,7 +85,7 @@ ERD ini dirancang sebagai **acuan teknis tunggal** untuk:
 | Tabel `password_reset_tokens`                     |                                                          |
 
 > [!info] Pusher Broadcasting Tidak Menambahkan Tabel
-> Sistem real-time Pusher bekerja sepenuhnya di luar database — server mengirim HTTP request ke Pusher API, dan Pusher mendistribusikan event ke browser via WebSocket. Tidak ada tabel baru di ERD untuk Pusher. Notifikasi tetap tersimpan di tabel `notifications` seperti sebelumnya; Pusher hanya berperan sebagai delivery mechanism real-time.
+> Sistem real-time Pusher bekerja sepenuhnya di luar database  -  server mengirim HTTP request ke Pusher API, dan Pusher mendistribusikan event ke browser via WebSocket. Tidak ada tabel baru di ERD untuk Pusher. Notifikasi tetap tersimpan di tabel `notifications` seperti sebelumnya; Pusher hanya berperan sebagai delivery mechanism real-time.
 
 ---
 
@@ -95,8 +95,8 @@ ERD ini dirancang sebagai **acuan teknis tunggal** untuk:
 
 - **Separation of Concerns** : Tabel Core tidak menanggung beban domain Sub-App. Sub-App yang meng-extend Core, bukan sebaliknya.
 - **Polymorphic First** : Tiga relasi lintas Sub-App (notifikasi, audit trail, cloud link) diselesaikan melalui polymorphic, bukan tabel junction per Sub-App. Ini menjaga Core tetap bersih dan Sub-App baru tidak perlu migrasi Core.
-- **Ownership Universal** : Setiap baris data memiliki jejak lengkap tentang siapa yang membuat, mengubah, dan menghapus — sesuai aturan SRD Seksi 16.2.
-- **RBAC Dynamic-First** : Skema RBAC Spatie tidak memerlukan perubahan tabel untuk menambah Role atau Permission baru. Tabel `roles`, `permissions`, dan tabel pivot Spatie sudah cukup untuk mendukung penambahan role tak terbatas di application layer — baik via seeder untuk batch initialization, maupun via UI untuk perubahan operasional. Prinsip ini memungkinkan RBAC berkembang seiring pertumbuhan organisasi tanpa menyentuh migration.
+- **Ownership Universal** : Setiap baris data memiliki jejak lengkap tentang siapa yang membuat, mengubah, dan menghapus  -  sesuai aturan SRD Seksi 16.2.
+- **RBAC Dynamic-First** : Skema RBAC Spatie tidak memerlukan perubahan tabel untuk menambah Role atau Permission baru. Tabel `roles`, `permissions`, dan tabel pivot Spatie sudah cukup untuk mendukung penambahan role tak terbatas di application layer  -  baik via seeder untuk batch initialization, maupun via UI untuk perubahan operasional. Prinsip ini memungkinkan RBAC berkembang seiring pertumbuhan organisasi tanpa menyentuh migration.
 - **Infrastruktur Transparan** : Tabel queue dan password reset adalah infrastruktur Laravel, disertakan di ERD agar developer sadar eksistensinya namun tidak perlu dimodifikasi secara manual.
 - **No FK pada Polymorphic** : Kolom polymorphic tidak memiliki FK constraint di level database. Konsistensi dijaga sepenuhnya di application layer. Ini desain yang disengaja agar soft-delete pada entitas referensi tidak merusak data polymorphic.
 
@@ -111,7 +111,7 @@ ERD Main App terdiri dari **12 tabel** yang dikelompokkan ke dalam 6 grup fungsi
 | **A** | Auth & User Management | `users`, `password_reset_tokens`                                                           |   2    | Identitas, autentikasi, dan siklus hidup akun                                                                                                            |
 | **B** | RBAC System            | `roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions` |   5    | Dikelola oleh `spatie/laravel-permission`. Skema statis, data role/permission tumbuh dinamis di application layer tanpa perubahan tabel.                 |
 | **C** | Shared Cloud Storage   | `asset_links`                                                                              |   1    | Polymorphic, shared lintas seluruh Sub-App                                                                                                               |
-| **D** | Notification System    | `notifications`                                                                            |   1    | Penyimpanan notifikasi via Laravel built-in database channel. Delivery real-time ke browser menggunakan Pusher Broadcasting — tidak menambah tabel baru. |
+| **D** | Notification System    | `notifications`                                                                            |   1    | Penyimpanan notifikasi via Laravel built-in database channel. Delivery real-time ke browser menggunakan Pusher Broadcasting  -  tidak menambah tabel baru. |
 | **E** | Audit Trail            | `activity_log`                                                                             |   1    | `spatie/laravel-activitylog`, dual polymorphic. Mencatat seluruh aksi termasuk operasi RBAC (create/update/delete role).                                 |
 | **F** | Queue Infrastructure   | `jobs`, `failed_jobs`                                                                      |   2    | Laravel database queue driver. Job Pusher Broadcasting dan Fonnte WA dieksekusi dari sini.                                                               |
 |       | **Total**              |                                                                                            | **12** |                                                                                                                                                          |
@@ -123,7 +123,7 @@ ERD Main App terdiri dari **12 tabel** yang dikelompokkan ke dalam 6 grup fungsi
 ### 4.1 Diagram Relasi Utama
 
 > [!info] Konvensi Diagram
-> Relasi polymorphic digambarkan dengan label `(poly)` untuk membedakannya dari relasi FK biasa. Dalam implementasi, tidak ada FK constraint di level database untuk kolom polymorphic — konsistensi dijaga di application layer. Diagram self-referencing pada tabel `users` disajikan terpisah di Seksi 4.2 agar lebih jelas.
+> Relasi polymorphic digambarkan dengan label `(poly)` untuk membedakannya dari relasi FK biasa. Dalam implementasi, tidak ada FK constraint di level database untuk kolom polymorphic  -  konsistensi dijaga di application layer. Diagram self-referencing pada tabel `users` disajikan terpisah di Seksi 4.2 agar lebih jelas.
 
 ```mermaid
 erDiagram
@@ -291,13 +291,13 @@ erDiagram
 
 | Kolom Self-FK | Nullable | Kapan Terisi                                      | Keterangan                                |
 | ------------- | :------: | ------------------------------------------------- | ----------------------------------------- |
-| `approved_by` |    ✅    | Saat Superadmin klik Approve                      | ID Superadmin yang menyetujui akun ini    |
-| `created_by`  |    ✅    | **Hanya** jika akun dibuat manual oleh Superadmin | Null untuk semua akun self-register       |
+| `approved_by` |    ✅    | Saat Root klik Approve                      | ID Root yang menyetujui akun ini    |
+| `created_by`  |    ✅    | **Hanya** jika akun dibuat manual oleh Root | Null untuk semua akun self-register       |
 | `updated_by`  |    ✅    | Saat data user diubah oleh siapapun               | ID user yang terakhir melakukan perubahan |
 | `deleted_by`  |    ✅    | Saat akun di-reject atau di-soft delete           | ID admin yang menghapus akun              |
 
 > [!info] Pengecualian `created_by` pada `users`
-> Ini adalah satu-satunya pengecualian dari aturan ownership NOT NULL di SRD Seksi 16.2. `users.created_by` Nullable karena user yang self-register tidak memiliki `created_by`. Kolom ini hanya terisi jika akun dibuat langsung oleh Superadmin.
+> Ini adalah satu-satunya pengecualian dari aturan ownership NOT NULL di SRD Seksi 16.2. `users.created_by` Nullable karena user yang self-register tidak memiliki `created_by`. Kolom ini hanya terisi jika akun dibuat langsung oleh Root.
 
 ---
 
@@ -317,8 +317,8 @@ erDiagram
 | `whatsapp_number`   | String(20)  | Nullable                  | Format: `628xxxx` untuk notifikasi Fonnte                   |
 | `password`          | String(255) | NOT NULL                  | Bcrypt hashed. Wajib diisi saat registrasi                  |
 | `is_active`         | Boolean     | Default: `false`, INDEX   | `false` = pending approval. `true` = akun aktif             |
-| `registration_note` | Text        | Nullable                  | Catatan dari pendaftar — membantu admin mengenali identitas |
-| `approved_by`       | BigInt      | Nullable, FK → `users.id` | Superadmin yang menyetujui akun ini                         |
+| `registration_note` | Text        | Nullable                  | Catatan dari pendaftar  -  membantu admin mengenali identitas |
+| `approved_by`       | BigInt      | Nullable, FK → `users.id` | Root yang menyetujui akun ini                         |
 | `approved_at`       | Timestamp   | Nullable                  | Waktu approval diberikan                                    |
 | `avatar_path`       | String(500) | Nullable                  | UUID-based filename, max 2MB                                |
 | `created_by`        | BigInt      | Nullable, FK → `users.id` | Null jika self-register                                     |
@@ -346,14 +346,14 @@ erDiagram
 ### 5.2 Tabel `roles`
 
 > [!info] Status & Skalabilitas
-> Di-generate otomatis oleh `spatie/laravel-permission` via `php artisan vendor:publish`. **Jangan modifikasi skema tabel ini** — Spatie mengelolanya sepenuhnya.
+> Di-generate otomatis oleh `spatie/laravel-permission` via `php artisan vendor:publish`. **Jangan modifikasi skema tabel ini**  -  Spatie mengelolanya sepenuhnya.
 >
-> Role **default** saat inisialisasi: `Superadmin`, `Manajer`, `Desainer`. Ini adalah titik awal, bukan batas. Superadmin dapat menambahkan role baru kapan saja via UI (permission `manage-roles`) tanpa menyentuh migration atau kode. Sistem dirancang untuk mendukung penambahan role tak terbatas — cukup insert baris baru ke tabel ini via Eloquent di Application layer.
+> Role **default** saat inisialisasi: `Root`, `Manajer`, `Designer`. Ini adalah titik awal, bukan batas. Root dapat menambahkan role baru kapan saja via UI (permission `manage-roles`) tanpa menyentuh migration atau kode. Sistem dirancang untuk mendukung penambahan role tak terbatas  -  cukup insert baris baru ke tabel ini via Eloquent di Application layer.
 
 | Kolom        | Tipe        | Constraint                          | Keterangan                       |
 | ------------ | ----------- | ----------------------------------- | -------------------------------- |
 | `id`         | BigInt      | PK, Auto Increment                  | Primary key                      |
-| `name`       | String(255) | NOT NULL, UNIQUE (per `guard_name`) | Nama role — unik per guard       |
+| `name`       | String(255) | NOT NULL, UNIQUE (per `guard_name`) | Nama role  -  unik per guard       |
 | `guard_name` | String(255) | NOT NULL                            | Selalu `web` dalam ekosistem ini |
 | `created_at` | Timestamp   | Auto                                | Laravel timestamp                |
 | `updated_at` | Timestamp   | Auto                                | Laravel timestamp                |
@@ -362,13 +362,13 @@ erDiagram
 
 | id  | name        | guard_name | Keterangan                                                     |
 | --- | ----------- | ---------- | -------------------------------------------------------------- |
-| 1   | Superadmin  | web        | Role inti — dilindungi, tidak dapat dihapus                    |
-| 2   | Manajer     | web        | Role inti — dilindungi, tidak dapat dihapus                    |
-| 3   | Desainer    | web        | Role inti — dilindungi, tidak dapat dihapus                    |
-| 4+  | _(dinamis)_ | web        | Ditambahkan oleh Superadmin via UI sesuai kebutuhan organisasi |
+| 1   | Root  | web        | Role inti  -  dilindungi, tidak dapat dihapus                    |
+| 2   | Manajer     | web        | Role inti  -  dilindungi, tidak dapat dihapus                    |
+| 3   | Designer    | web        | Role inti  -  dilindungi, tidak dapat dihapus                    |
+| 4+  | _(dinamis)_ | web        | Ditambahkan oleh Root via UI sesuai kebutuhan organisasi |
 
 > [!warning] Role Inti vs Role Dinamis
-> Tiga role inti (Superadmin, Manajer, Desainer) memiliki proteksi di level Action Class (`DeleteRoleAction`) — tidak dapat dihapus bahkan oleh Superadmin. Role dinamis yang dibuat via UI dapat dihapus selama tidak ada user aktif yang menggunakannya. Lihat SRD Seksi 6.5 untuk detail aturan dan Action Classes.
+> Tiga role inti (Root, Manajer, Designer) memiliki proteksi di level Action Class (`DeleteRoleAction`)  -  tidak dapat dihapus bahkan oleh Root. Role dinamis yang dibuat via UI dapat dihapus selama tidak ada user aktif yang menggunakannya. Lihat SRD Seksi 6.5 untuk detail aturan dan Action Classes.
 
 ---
 
@@ -397,7 +397,7 @@ erDiagram
 | `view-logs`            | Core         | Akses Log Viewer                           |
 | `run-artisan`          | Core         | Trigger Web Artisan Routes                 |
 | `odds.tickets.create`  | Sub-App ODDS | Buat tiket baru                            |
-| `odds.tickets.assign`  | Sub-App ODDS | Assign tiket ke desainer                   |
+| `odds.tickets.assign`  | Sub-App ODDS | Assign tiket ke designer                   |
 | `odds.tickets.approve` | Sub-App ODDS | Approve / reject output                    |
 | `odds.tickets.delete`  | Sub-App ODDS | Hapus tiket (soft delete)                  |
 | `odds.reports.view`    | Sub-App ODDS | Lihat laporan & analytics                  |
@@ -405,16 +405,16 @@ erDiagram
 > [!warning] Dua Jalur Penambahan Permission Baru
 > Permission baru dapat ditambahkan melalui dua jalur yang berbeda tergantung konteks:
 >
-> **Jalur 1 — Seeder (untuk batch initialization Sub-App baru):** Permission baru WAJIB ditambahkan ke array `$corePermissions` di `RolePermissionSeeder` DAN didokumentasikan di SRD Sub-App. Seeder kemudian dijalankan ulang via `GET /_cmd/seed-permissions`.
+> **Jalur 1  -  Seeder (untuk batch initialization Sub-App baru):** Permission baru WAJIB ditambahkan ke array `$corePermissions` di `RolePermissionSeeder` DAN didokumentasikan di SRD Sub-App. Seeder kemudian dijalankan ulang via `GET /_cmd/seed-permissions`.
 >
-> **Jalur 2 — UI (untuk kebutuhan operasional):** Superadmin dapat menambah permission ad-hoc via antarmuka `manage-roles`. Permission yang dibuat via UI tidak terdokumentasi di SRD secara otomatis — developer wajib menambahkannya secara manual jika permission tersebut akan menjadi bagian dari seed permanen.
+> **Jalur 2  -  UI (untuk kebutuhan operasional):** Root dapat menambah permission ad-hoc via antarmuka `manage-roles`. Permission yang dibuat via UI tidak terdokumentasi di SRD secara otomatis  -  developer wajib menambahkannya secara manual jika permission tersebut akan menjadi bagian dari seed permanen.
 
 ---
 
 ### 5.4 Tabel `model_has_roles`
 
 > [!info] Status
-> Pivot M:N antara Model dan Role. Di-generate oleh Spatie. Composite PK: (`role_id`, `model_id`, `model_type`). Saat Superadmin menambahkan role baru via UI dan mengassign-nya ke user, row baru masuk ke tabel ini secara otomatis via `$user->assignRole($role)`.
+> Pivot M:N antara Model dan Role. Di-generate oleh Spatie. Composite PK: (`role_id`, `model_id`, `model_type`). Saat Root menambahkan role baru via UI dan mengassign-nya ke user, row baru masuk ke tabel ini secara otomatis via `$user->assignRole($role)`.
 
 | Kolom        | Tipe        | Constraint                       | Keterangan                                         |
 | ------------ | ----------- | -------------------------------- | -------------------------------------------------- |
@@ -430,7 +430,7 @@ erDiagram
 ### 5.5 Tabel `model_has_permissions`
 
 > [!info] Status
-> Pivot untuk direct permission pada Model. Dalam praktik Creative Universe, **direct permission pada user jarang digunakan** — permission umumnya dikelola melalui Role. Composite PK: (`permission_id`, `model_id`, `model_type`).
+> Pivot untuk direct permission pada Model. Dalam praktik Creative Universe, **direct permission pada user jarang digunakan**  -  permission umumnya dikelola melalui Role. Composite PK: (`permission_id`, `model_id`, `model_type`).
 
 | Kolom           | Tipe        | Constraint                             | Keterangan                          |
 | --------------- | ----------- | -------------------------------------- | ----------------------------------- |
@@ -450,17 +450,17 @@ erDiagram
 | `permission_id` | BigInt | NOT NULL, FK → `permissions.id` | Permission yang diberikan ke role |
 | `role_id`       | BigInt | NOT NULL, FK → `roles.id`       | Role penerima permission          |
 
-**Mapping Role → Permission — Initial Default State** (sesuai SRD Seksi 6.3):
+**Mapping Role → Permission  -  Initial Default State** (sesuai SRD Seksi 6.3):
 
 > [!note] Initial State, Bukan Fixed State
-> Tabel di bawah adalah kondisi yang dihasilkan oleh `RolePermissionSeeder` saat inisialisasi pertama. Di production, mapping aktual dapat berbeda karena Superadmin telah mengelola permission via UI. Role dinamis yang dibuat via UI akan memiliki mapping yang tidak terdokumentasi di sini.
+> Tabel di bawah adalah kondisi yang dihasilkan oleh `RolePermissionSeeder` saat inisialisasi pertama. Di production, mapping aktual dapat berbeda karena Root telah mengelola permission via UI. Role dinamis yang dibuat via UI akan memiliki mapping yang tidak terdokumentasi di sini.
 
 | Role        | Permission Default yang Dimiliki                                                                                        |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Superadmin  | Semua permission (full access)                                                                                          |
+| Root  | Semua permission (full access)                                                                                          |
 | Manajer     | `access-core`, `access-odds`, `odds.tickets.create`, `odds.tickets.assign`, `odds.tickets.approve`, `odds.reports.view` |
-| Desainer    | `access-core`, `access-odds`, `odds.tickets.create`                                                                     |
-| _(dinamis)_ | Ditentukan oleh Superadmin saat membuat role via UI                                                                     |
+| Designer    | `access-core`, `access-odds`, `odds.tickets.create`                                                                     |
+| _(dinamis)_ | Ditentukan oleh Root saat membuat role via UI                                                                     |
 
 ---
 
@@ -476,7 +476,7 @@ erDiagram
 | `linkable_id`   | BigInt      | NOT NULL, INDEX           | ID entitas pemilik                                                 |
 | `provider`      | Enum        | NOT NULL                  | `google_drive`, `dropbox`, `onedrive`, `youtube`, `other`          |
 | `label`         | String(255) | NOT NULL                  | Nama tampilan link: mis. `"File Revisi Final v3"`                  |
-| `url`           | Text        | NOT NULL                  | URL lengkap ke resource cloud — wajib divalidasi dengan rule `url` |
+| `url`           | Text        | NOT NULL                  | URL lengkap ke resource cloud  -  wajib divalidasi dengan rule `url` |
 | `created_by`    | BigInt      | NOT NULL, FK → `users.id` | User yang menambahkan link ini                                     |
 | `updated_by`    | BigInt      | Nullable, FK → `users.id` | User yang terakhir mengubah                                        |
 | `deleted_by`    | BigInt      | Nullable, FK → `users.id` | User yang menghapus                                                |
@@ -484,7 +484,7 @@ erDiagram
 | `created_at`    | Timestamp   | Auto                      | Laravel timestamp                                                  |
 | `updated_at`    | Timestamp   | Auto                      | Laravel timestamp                                                  |
 
-**Index:** Composite INDEX pada (`linkable_type`, `linkable_id`) — wajib untuk performa polymorphic lookup.
+**Index:** Composite INDEX pada (`linkable_type`, `linkable_id`)  -  wajib untuk performa polymorphic lookup.
 
 > [!danger] Aturan `created_by` pada `asset_links`
 > Berbeda dengan `users.created_by`, kolom `asset_links.created_by` bersifat **NOT NULL**. Setiap cloud link WAJIB memiliki pemilik yang jelas.
@@ -493,7 +493,7 @@ erDiagram
 > Sub-App yang membutuhkan cloud link cukup menambahkan satu relasi di Model-nya. Tidak perlu migration baru atau tabel baru.
 >
 > ```php
-> // Di Model Sub-App — CUKUP INI SAJA
+> // Di Model Sub-App  -  CUKUP INI SAJA
 > public function assetLinks(): MorphMany
 > {
 >     return $this->morphMany(\App\Models\Core\AssetLink::class, 'linkable');
@@ -509,8 +509,8 @@ erDiagram
 >
 > **Mekanisme delivery notifikasi** menggunakan tiga channel:
 >
-> - **`database`**: Menyimpan notifikasi ke tabel ini secara permanen — digunakan untuk bell icon dan history.
-> - **`broadcast`**: Mengirim event ke Pusher API saat notifikasi tersimpan ke database — memicu pembaruan bell icon secara real-time di browser. Pusher **tidak menambahkan tabel baru** ke ERD ini.
+> - **`database`**: Menyimpan notifikasi ke tabel ini secara permanen  -  digunakan untuk bell icon dan history.
+> - **`broadcast`**: Mengirim event ke Pusher API saat notifikasi tersimpan ke database  -  memicu pembaruan bell icon secara real-time di browser. Pusher **tidak menambahkan tabel baru** ke ERD ini.
 > - **`FonnteChannel`**: Mengirim pesan WhatsApp via Fonnte API untuk notifikasi urgent.
 
 | Kolom             | Tipe        | Constraint      | Keterangan                                            |
@@ -524,18 +524,18 @@ erDiagram
 | `created_at`      | Timestamp   | Auto            | Laravel timestamp                                     |
 | `updated_at`      | Timestamp   | Auto            | Laravel timestamp                                     |
 
-**Composite Index:** (`notifiable_type`, `notifiable_id`) — untuk fetch notifikasi per user dan untuk query bell icon Livewire.
+**Composite Index:** (`notifiable_type`, `notifiable_id`)  -  untuk fetch notifikasi per user dan untuk query bell icon Livewire.
 
 **Notification Classes yang terdaftar di Main App:**
 
 | Class                              | Trigger                      | Penerima                                  | Channel                                  |
 | ---------------------------------- | ---------------------------- | ----------------------------------------- | ---------------------------------------- |
 | `Core\UserRegisteredNotification`  | User baru berhasil mendaftar | Semua user ber-permission `approve-users` | `database`, `broadcast`, `FonnteChannel` |
-| `Core\AccountApprovedNotification` | Superadmin approve akun      | User yang baru diapprove                  | `database`, `broadcast`, `FonnteChannel` |
-| `Core\AccountRejectedNotification` | Superadmin reject akun       | User yang ditolak                         | `database`, `broadcast`, `FonnteChannel` |
+| `Core\AccountApprovedNotification` | Root approve akun      | User yang baru diapprove                  | `database`, `broadcast`, `FonnteChannel` |
+| `Core\AccountRejectedNotification` | Root reject akun       | User yang ditolak                         | `database`, `broadcast`, `FonnteChannel` |
 
 > [!warning] Standar Tiga Channel untuk Semua Notification Class
-> Setiap Notification class baru — baik di Core maupun Sub-App — WAJIB menggunakan tiga channel: `database`, `broadcast`, dan `FonnteChannel`. Ini memastikan setiap notifikasi: (1) tersimpan permanen, (2) muncul real-time di bell icon via Pusher, dan (3) dikirim ke WhatsApp jika user punya nomor terdaftar.
+> Setiap Notification class baru  -  baik di Core maupun Sub-App  -  WAJIB menggunakan tiga channel: `database`, `broadcast`, dan `FonnteChannel`. Ini memastikan setiap notifikasi: (1) tersimpan permanen, (2) muncul real-time di bell icon via Pusher, dan (3) dikirim ke WhatsApp jika user punya nomor terdaftar.
 
 > [!info] Retensi Data
 > Notifikasi dihapus otomatis setelah **12 bulan** via `CleanOldNotificationsCommand` yang berjalan monthly (SRD Seksi 17.1).
@@ -555,9 +555,9 @@ erDiagram
 | `subject_type` | String(255)     | Nullable, INDEX    | Class entitas yang menjadi subject audit         |
 | `subject_id`   | BigInt          | Nullable, INDEX    | ID entitas yang menjadi subject                  |
 | `event`        | String(255)     | Nullable           | Event: `created`, `updated`, `deleted`           |
-| `causer_type`  | String(255)     | Nullable           | `App\Models\Core\User` — selalu User             |
+| `causer_type`  | String(255)     | Nullable           | `App\Models\Core\User`  -  selalu User             |
 | `causer_id`    | BigInt          | Nullable, INDEX    | ID user pelaku aksi                              |
-| `properties`   | JSON (longtext) | Nullable           | Payload custom — lihat format minimum di bawah   |
+| `properties`   | JSON (longtext) | Nullable           | Payload custom  -  lihat format minimum di bawah   |
 | `batch_uuid`   | Char(36)        | Nullable           | Grouping audit dalam satu operasi                |
 | `created_at`   | Timestamp       | Auto               | Waktu kejadian (tidak ada `updated_at`)          |
 
@@ -597,7 +597,7 @@ erDiagram
 > [!info] Lifecycle Job & Kaitannya dengan Pusher
 > Data di tabel `jobs` hilang otomatis setelah job berhasil diproses. Job yang gagal dipindahkan ke `failed_jobs`. Worker dijalankan via Cron Job cPanel setiap menit (SRD Seksi 11.7).
 >
-> Saat sebuah Notification class diproses oleh queue worker, dua operasi eksternal terjadi berurutan: (1) HTTP POST ke Pusher API untuk mengirim broadcast event ke browser user, dan (2) HTTP POST ke Fonnte API untuk mengirim WhatsApp. Keduanya adalah outbound HTTP call — tidak memerlukan proses server tambahan.
+> Saat sebuah Notification class diproses oleh queue worker, dua operasi eksternal terjadi berurutan: (1) HTTP POST ke Pusher API untuk mengirim broadcast event ke browser user, dan (2) HTTP POST ke Fonnte API untuk mengirim WhatsApp. Keduanya adalah outbound HTTP call  -  tidak memerlukan proses server tambahan.
 
 ---
 
@@ -609,18 +609,18 @@ erDiagram
 | Kolom        | Tipe        | Constraint                             | Keterangan                                    |
 | ------------ | ----------- | -------------------------------------- | --------------------------------------------- |
 | `id`         | BigInt      | PK, Auto Increment                     | Primary key                                   |
-| `uuid`       | String(255) | UNIQUE, NOT NULL                       | UUID job — untuk identifikasi unik saat retry |
+| `uuid`       | String(255) | UNIQUE, NOT NULL                       | UUID job  -  untuk identifikasi unik saat retry |
 | `connection` | Text        | NOT NULL                               | Nama queue connection                         |
 | `queue`      | Text        | NOT NULL                               | Nama queue tempat job berasal                 |
 | `payload`    | LongText    | NOT NULL                               | Serialized job data                           |
 | `exception`  | LongText    | NOT NULL                               | Full stack trace error                        |
 | `failed_at`  | Timestamp   | NOT NULL, Default: `CURRENT_TIMESTAMP` | Waktu kegagalan                               |
 
-> [!warning] Monitoring Wajib — Cakupan Diperluas
-> Pantau tabel ini secara rutin via Log Viewer (akses Superadmin). Terdapat dua jenis failed job yang perlu diperhatikan:
+> [!warning] Monitoring Wajib  -  Cakupan Diperluas
+> Pantau tabel ini secara rutin via Log Viewer (akses Root). Terdapat dua jenis failed job yang perlu diperhatikan:
 >
 > - **Failed `FonnteChannel`**: Notifikasi WhatsApp tidak terkirim ke user.
-> - **Failed Pusher broadcast**: Notifikasi real-time tidak muncul di bell icon browser. Cek kolom `exception` — umumnya disebabkan oleh konfigurasi `PUSHER_APP_SECRET` yang salah atau koneksi outbound ke `api.pusherapp.com` yang diblokir hosting.
+> - **Failed Pusher broadcast**: Notifikasi real-time tidak muncul di bell icon browser. Cek kolom `exception`  -  umumnya disebabkan oleh konfigurasi `PUSHER_APP_SECRET` yang salah atau koneksi outbound ke `api.pusherapp.com` yang diblokir hosting.
 >
 > Retensi data: **30 hari** via `CleanFailedJobsCommand` (SRD Seksi 17.1).
 
@@ -634,8 +634,8 @@ erDiagram
 | Kolom        | Tipe        | Constraint | Keterangan                                        |
 | ------------ | ----------- | ---------- | ------------------------------------------------- |
 | `email`      | String(255) | PK         | Email user yang request reset password            |
-| `token`      | String(255) | NOT NULL   | Hashed token (bcrypt) — bukan plaintext           |
-| `created_at` | Timestamp   | Nullable   | Waktu request dibuat — digunakan untuk cek expiry |
+| `token`      | String(255) | NOT NULL   | Hashed token (bcrypt)  -  bukan plaintext           |
+| `created_at` | Timestamp   | Nullable   | Waktu request dibuat  -  digunakan untuk cek expiry |
 
 > [!info] Catatan Retensi
 > Token reset password kadaluarsa dalam 60 menit dan dibersihkan secara batch setiap hari via cron `auth:clear-resets`. Satu email hanya bisa memiliki satu token aktif pada satu waktu (email sebagai PK).
@@ -647,8 +647,8 @@ erDiagram
 | Dari Entitas      | Relasi             | Ke Entitas      | Kardinalitas | Via / Kolom                         | Catatan                                                            |
 | ----------------- | ------------------ | --------------- | ------------ | ----------------------------------- | ------------------------------------------------------------------ |
 | `users`           | `belongsToMany`    | `roles`         | M:N          | `model_has_roles`                   | Satu user bisa memiliki banyak role (termasuk role dinamis)        |
-| `users`           | `belongsToMany`    | `permissions`   | M:N          | `model_has_permissions`             | Direct permission — jarang digunakan                               |
-| `roles`           | `belongsToMany`    | `permissions`   | M:N          | `role_has_permissions`              | Satu role memiliki banyak permission — dikelola via UI atau seeder |
+| `users`           | `belongsToMany`    | `permissions`   | M:N          | `model_has_permissions`             | Direct permission  -  jarang digunakan                               |
+| `roles`           | `belongsToMany`    | `permissions`   | M:N          | `role_has_permissions`              | Satu role memiliki banyak permission  -  dikelola via UI atau seeder |
 | `users`           | `morphMany` (poly) | `notifications` | 1:N          | `notifiable_type` + `notifiable_id` | User menerima banyak notifikasi; delivery real-time via Pusher     |
 | `users`           | `hasMany` (causer) | `activity_log`  | 1:N          | `causer_id`                         | User menjadi pelaku banyak aksi tercatat (termasuk operasi RBAC)   |
 | `[any_model]`     | `morphMany` (poly) | `activity_log`  | 1:N          | `subject_type` + `subject_id`       | Entitas apapun bisa menjadi subject audit                          |
@@ -665,7 +665,7 @@ erDiagram
 
 Tiga tabel di Main App menggunakan relasi polymorphic. Memahami bagaimana ketiganya bekerja adalah kunci untuk menulis Sub-App yang benar.
 
-### 7.1 `asset_links` — Polymorphic Linkable
+### 7.1 `asset_links`  -  Polymorphic Linkable
 
 **Prinsip:** Satu tabel untuk semua cloud link dari semua entitas di semua Sub-App.
 
@@ -681,7 +681,7 @@ asset_links.linkable_id    →  primary key entitas pemilik
 | 1   | `App\Models\Odds\Ticket` | 42          | `google_drive` | Revisi Final Banner  |
 | 2   | `App\Models\Odds\Ticket` | 42          | `youtube`      | Video Motion Preview |
 
-**Cara Sub-App menggunakan tabel ini** — cukup satu deklarasi relasi:
+**Cara Sub-App menggunakan tabel ini**  -  cukup satu deklarasi relasi:
 
 ```php
 // Di Model Sub-App (contoh: app/Models/Odds/Ticket.php)
@@ -697,9 +697,9 @@ $ticket->assetLinks()->where('provider', 'google_drive')->get();
 
 ---
 
-### 7.2 `notifications` — Polymorphic Notifiable
+### 7.2 `notifications`  -  Polymorphic Notifiable
 
-**Prinsip:** Satu tabel untuk semua notifikasi semua user. Polymorphic ada karena ini adalah standar Laravel, bukan kebutuhan multi-model. Data tersimpan di sini melalui channel `database`. Delivery real-time ke browser dihandle oleh Pusher melalui channel `broadcast` — **tanpa tabel tambahan**.
+**Prinsip:** Satu tabel untuk semua notifikasi semua user. Polymorphic ada karena ini adalah standar Laravel, bukan kebutuhan multi-model. Data tersimpan di sini melalui channel `database`. Delivery real-time ke browser dihandle oleh Pusher melalui channel `broadcast`  -  **tanpa tabel tambahan**.
 
 ```
 notifications.notifiable_type  →  selalu "App\Models\Core\User" dalam Creative Universe
@@ -711,9 +711,9 @@ notifications.notifiable_id    →  users.id
 
 ---
 
-### 7.3 `activity_log` — Dual Polymorphic (Causer + Subject)
+### 7.3 `activity_log`  -  Dual Polymorphic (Causer + Subject)
 
-**Prinsip:** Satu tabel untuk seluruh audit trail sistem — siapapun pelakunya, apapun entitas yang diaudit. Per SRD v6.3, cakupan diperluas untuk mencakup operasi RBAC dengan `log_name = 'rbac'`.
+**Prinsip:** Satu tabel untuk seluruh audit trail sistem  -  siapapun pelakunya, apapun entitas yang diaudit. Per SRD v6.3, cakupan diperluas untuk mencakup operasi RBAC dengan `log_name = 'rbac'`.
 
 ```
 Siapa yang melakukan (CAUSER):
@@ -762,13 +762,13 @@ Sesuai SRD Seksi 16.2, setiap tabel data operasional WAJIB memiliki kolom owners
 
 | Kolom         | Waktu Pengisian                             | Pengisi                                     |
 | ------------- | ------------------------------------------- | ------------------------------------------- |
-| `created_by`  | Saat INSERT                                 | `auth()->id()` — user yang sedang login     |
-| `updated_by`  | Saat UPDATE                                 | `auth()->id()` — user yang sedang login     |
-| `deleted_by`  | Bersamaan dengan `deleted_at` (soft delete) | `auth()->id()` — user yang melakukan delete |
-| `approved_by` | Saat Superadmin approve akun                | ID Superadmin yang login                    |
+| `created_by`  | Saat INSERT                                 | `auth()->id()`  -  user yang sedang login     |
+| `updated_by`  | Saat UPDATE                                 | `auth()->id()`  -  user yang sedang login     |
+| `deleted_by`  | Bersamaan dengan `deleted_at` (soft delete) | `auth()->id()`  -  user yang melakukan delete |
+| `approved_by` | Saat Root approve akun                | ID Root yang login                    |
 
 > [!danger] Aturan Wajib untuk Semua Tabel Sub-App
-> Semua tabel di Sub-App yang dibuat di masa depan WAJIB mengikuti aturan ownership ini: `created_by` NOT NULL, `updated_by` dan `deleted_by` Nullable. Ini bukan opsional — ini adalah standar ekosistem Creative Universe sesuai SRD Seksi 16.2.
+> Semua tabel di Sub-App yang dibuat di masa depan WAJIB mengikuti aturan ownership ini: `created_by` NOT NULL, `updated_by` dan `deleted_by` Nullable. Ini bukan opsional  -  ini adalah standar ekosistem Creative Universe sesuai SRD Seksi 16.2.
 
 ---
 
@@ -780,7 +780,7 @@ Sesuai SRD Seksi 10.1, index wajib diterapkan pada kolom yang sering digunakan u
 
 | Kolom         | Jenis Index  | Alasan Teknis                                   |
 | ------------- | ------------ | ----------------------------------------------- |
-| `username`    | UNIQUE INDEX | Login lookup — query paling sering              |
+| `username`    | UNIQUE INDEX | Login lookup  -  query paling sering              |
 | `email`       | UNIQUE INDEX | Login lookup dan validasi duplikasi             |
 | `is_active`   | INDEX        | Filter akun pending (`false`) vs aktif (`true`) |
 | `approved_by` | INDEX        | Lookup history approval per admin               |
@@ -791,7 +791,7 @@ Sesuai SRD Seksi 10.1, index wajib diterapkan pada kolom yang sering digunakan u
 
 | Kolom                          | Jenis Index     | Alasan Teknis                                |
 | ------------------------------ | --------------- | -------------------------------------------- |
-| `linkable_type`, `linkable_id` | COMPOSITE INDEX | Polymorphic lookup performance — query utama |
+| `linkable_type`, `linkable_id` | COMPOSITE INDEX | Polymorphic lookup performance  -  query utama |
 | `created_by`                   | INDEX           | Filter cloud link per user                   |
 | `deleted_at`                   | INDEX           | SoftDeletes query performance                |
 
@@ -807,19 +807,19 @@ Sesuai SRD Seksi 10.1, index wajib diterapkan pada kolom yang sering digunakan u
 
 | Kolom                              | Jenis Index     | Alasan Teknis                                              |
 | ---------------------------------- | --------------- | ---------------------------------------------------------- |
-| `notifiable_type`, `notifiable_id` | COMPOSITE INDEX | Fetch notifikasi per user — query utama bell icon Livewire |
+| `notifiable_type`, `notifiable_id` | COMPOSITE INDEX | Fetch notifikasi per user  -  query utama bell icon Livewire |
 | `read_at`                          | INDEX           | Filter unread notifications (`read_at IS NULL`)            |
 
 ### 9.5 Tabel `jobs`
 
 | Kolom         | Jenis Index | Alasan Teknis                                    |
 | ------------- | ----------- | ------------------------------------------------ |
-| `queue`       | INDEX       | Queue worker — mengambil job per nama queue      |
-| `reserved_at` | INDEX       | Queue worker — mengambil job yang belum diproses |
+| `queue`       | INDEX       | Queue worker  -  mengambil job per nama queue      |
+| `reserved_at` | INDEX       | Queue worker  -  mengambil job yang belum diproses |
 
 ---
 
-## 10. Batas Scope — Main App vs Sub-App
+## 10. Batas Scope  -  Main App vs Sub-App
 
 ### 10.1 Tabel Milik Eksklusif Main App (Core)
 
@@ -857,7 +857,7 @@ Sesuai SRD Seksi 16.1, nama entitas berikut telah dikunci di Master SRD sebagai 
 | `Asset`              | SRD Sub-App yang menggunakannya | Belum ada Sub-App                 |
 | `Revision`           | SRD Sub-App yang menggunakannya | Belum ada Sub-App                 |
 | `Comment`            | SRD Sub-App yang menggunakannya | Belum ada Sub-App                 |
-| `Ticket`             | SRD Sub-App ODDS                | Aktif — didefinisikan di SRD ODDS |
+| `Ticket`             | SRD Sub-App ODDS                | Aktif  -  didefinisikan di SRD ODDS |
 
 ### 10.4 Aturan Tambahan Data Terkait User di Sub-App
 
@@ -867,7 +867,7 @@ Sesuai SRD Seksi 16.1, nama entitas berikut telah dikunci di Master SRD sebagai 
 **Pola yang benar:**
 
 ```php
-// BENAR — buat tabel baru di Sub-App, bukan modifikasi tabel users
+// BENAR  -  buat tabel baru di Sub-App, bukan modifikasi tabel users
 // Migration: create_odds_user_preferences_table
 Schema::create('odds_user_preferences', function (Blueprint $table) {
     $table->id();
@@ -877,7 +877,7 @@ Schema::create('odds_user_preferences', function (Blueprint $table) {
     $table->timestamps();
 });
 
-// SALAH — jangan lakukan ini
+// SALAH  -  jangan lakukan ini
 Schema::table('users', function (Blueprint $table) {
     $table->string('odds_default_view')->nullable(); // ❌ DILARANG
 });
@@ -891,7 +891,7 @@ Setiap Sub-App baru yang dibuat WAJIB memverifikasi checklist berikut sebelum de
 - [ ] Semua tabel Sub-App memiliki kolom ownership lengkap (`created_by` NOT NULL, `updated_by` dan `deleted_by` Nullable)
 - [ ] Semua tabel Sub-App yang memiliki data yang bisa dihapus sudah menggunakan `SoftDeletes` dengan kolom `deleted_at`
 - [ ] Permission baru Sub-App sudah ditambahkan ke `$corePermissions` di `RolePermissionSeeder` DAN didokumentasikan di SRD Sub-App
-- [ ] Relasi ke `users` menggunakan FK kolom ownership atau `user_id` — bukan modifikasi tabel `users`
+- [ ] Relasi ke `users` menggunakan FK kolom ownership atau `user_id`  -  bukan modifikasi tabel `users`
 - [ ] Audit trail Sub-App menggunakan `LogsActivity` trait atau manual `activity()->log()` di Action Class
 - [ ] Semua Notification class Sub-App menggunakan tiga channel: `database`, `broadcast`, dan `FonnteChannel` (lihat SRD Seksi 11.5 untuk pola)
 - [ ] Log Sub-App menggunakan prefix `[NAMA-APP]` di setiap log entry

@@ -34,32 +34,32 @@ class AppServiceProvider extends ServiceProvider
             [LogAuthActivity::class, 'handleLogout']
         );
 
-        // Dynamically override configurations from Superadmin settings at runtime
+        // Dynamically override configurations from Root settings at runtime
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('users')) {
-                // Fetch first Superadmin's preferences
-                $superadmin = \App\Models\Core\User::role('Superadmin')->first();
-                if ($superadmin) {
-                    if ($scriptUrl = $superadmin->getSetting('google_apps_script_url')) {
+                // Fetch first Root's preferences
+                $root = \App\Models\Core\User::role('Root')->first();
+                if ($root) {
+                    if ($scriptUrl = $root->getSetting('google_apps_script_url')) {
                         config(['services.google.apps_script_pricetag_url' => $scriptUrl]);
                     }
-                    if ($pusherId = $superadmin->getSetting('pusher_app_id')) {
+                    if ($pusherId = $root->getSetting('pusher_app_id')) {
                         config(['broadcasting.connections.pusher.app_id' => $pusherId]);
                     }
-                    if ($pusherKey = $superadmin->getSetting('pusher_app_key')) {
+                    if ($pusherKey = $root->getSetting('pusher_app_key')) {
                         config(['broadcasting.connections.pusher.key' => $pusherKey]);
                     }
-                    if ($pusherSecret = $superadmin->getSetting('pusher_app_secret')) {
+                    if ($pusherSecret = $root->getSetting('pusher_app_secret')) {
                         config(['broadcasting.connections.pusher.secret' => $pusherSecret]);
                     }
-                    if ($pusherCluster = $superadmin->getSetting('pusher_app_cluster')) {
+                    if ($pusherCluster = $root->getSetting('pusher_app_cluster')) {
                         config(['broadcasting.connections.pusher.options.cluster' => $pusherCluster]);
                         config(['broadcasting.connections.pusher.options.host' => 'api-'.$pusherCluster.'.pusher.com']);
                     }
-                    if ($fonnteToken = $superadmin->getSetting('fonnte_token')) {
+                    if ($fonnteToken = $root->getSetting('fonnte_token')) {
                         config(['services.fonnte.token' => $fonnteToken]);
                     }
-                    if ($fonnteSender = $superadmin->getSetting('fonnte_sender')) {
+                    if ($fonnteSender = $root->getSetting('fonnte_sender')) {
                         config(['services.fonnte.sender' => $fonnteSender]);
                     }
                 }

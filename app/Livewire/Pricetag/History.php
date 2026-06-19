@@ -6,6 +6,7 @@ use App\Models\Pricetag\PricetagBatch;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -98,6 +99,12 @@ class History extends Component
         } else {
             session()->flash('error', 'Gagal membuat file ZIP di server.');
         }
+    }
+
+    #[On('pricetag-batch-updated')]
+    public function refreshBatches(): void
+    {
+        // Re-render batches list
     }
 
     public function render()

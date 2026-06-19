@@ -1,4 +1,4 @@
-<div @if($hasActiveBatches) wire:poll.3s @endif>
+<div>
     <!-- Page Header -->
     <div class="mb-6 flex items-center justify-between">
         <div>

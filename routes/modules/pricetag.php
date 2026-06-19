@@ -37,7 +37,7 @@ Route::prefix('pricetag')
             return view('pages.pricetag.history');
         })->name('history');
 
-        // Halaman Manajemen Database (Hanya Superadmin / permission: pricetag.manage)
+        // Halaman Manajemen Database (Hanya Root / permission: pricetag.manage)
         Route::get('/database', function () {
             return view('pages.pricetag.database');
         })->middleware('can:pricetag.manage')->name('database');

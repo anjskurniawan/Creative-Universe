@@ -11,7 +11,7 @@ use Spatie\Permission\PermissionRegistrar;
  * RolePermissionSeeder — SRD v6.2 Seksi 6.4
  *
  * Seeder idempotent — aman dijalankan berulang kali.
- * Core-only: tidak termasuk permission Sub-App ODDS.
+ * Menghasilkan 7 role inti sistem.
  */
 class RolePermissionSeeder extends Seeder
 {
@@ -37,22 +37,52 @@ class RolePermissionSeeder extends Seeder
         }
 
         // ─── Roles ────────────────────────────────────────
-        $superadmin = Role::firstOrCreate(['name' => 'Superadmin']);
+        $root = Role::firstOrCreate(['name' => 'Root']);
         $manajer = Role::firstOrCreate(['name' => 'Manajer']);
-        $desainer = Role::firstOrCreate(['name' => 'Desainer']);
+        $supervisor = Role::firstOrCreate(['name' => 'Supervisor']);
+        $designer = Role::firstOrCreate(['name' => 'Designer']);
+        $client = Role::firstOrCreate(['name' => 'Client']);
+        $retailAdmin = Role::firstOrCreate(['name' => 'Retail Admin']);
+        $retailStaff = Role::firstOrCreate(['name' => 'Retail Staff']);
 
         // ─── Sync Permissions to Roles ────────────────────
-        // Superadmin mendapat semua permission
-        $superadmin->syncPermissions($permissions);
+        // Root mendapat semua permission
+        $root->syncPermissions($permissions);
 
-        // Manajer: akses core & pricetag
+        // Manajer: akses core, pricetag, user management & approval
         $manajer->syncPermissions([
+            'access-core',
+            'access-pricetag',
+            'pricetag.manage',
+            'approve-users',
+            'manage-users',
+        ]);
+
+        // Supervisor: akses core & pricetag
+        $supervisor->syncPermissions([
             'access-core',
             'access-pricetag',
         ]);
 
-        // Desainer: akses core & pricetag
-        $desainer->syncPermissions([
+        // Designer: akses core & pricetag
+        $designer->syncPermissions([
+            'access-core',
+            'access-pricetag',
+        ]);
+
+        // Client: hanya akses core dasar
+        $client->syncPermissions([
+            'access-core',
+        ]);
+
+        // Retail Admin: akses core & pricetag
+        $retailAdmin->syncPermissions([
+            'access-core',
+            'access-pricetag',
+        ]);
+
+        // Retail Staff: akses core & pricetag
+        $retailStaff->syncPermissions([
             'access-core',
             'access-pricetag',
         ]);

@@ -16,9 +16,9 @@ class DynamicRoleManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_superadmin_can_open_role_manager_page(): void
+    public function test_root_can_open_role_manager_page(): void
     {
-        $admin = $this->makeSuperadmin();
+        $admin = $this->makeRoot();
 
         $this->actingAs($admin)
             ->get('/roles')
@@ -26,9 +26,9 @@ class DynamicRoleManagementTest extends TestCase
             ->assertSee('Kelola Role');
     }
 
-    public function test_superadmin_can_create_new_role_with_permissions(): void
+    public function test_root_can_create_new_role_with_permissions(): void
     {
-        $admin = $this->makeSuperadmin();
+        $admin = $this->makeRoot();
 
         Livewire::actingAs($admin)
             ->test(RoleManager::class)
@@ -45,8 +45,8 @@ class DynamicRoleManagementTest extends TestCase
 
     public function test_protected_role_cannot_be_deleted(): void
     {
-        $admin = $this->makeSuperadmin();
-        $role = Role::findByName('Superadmin');
+        $admin = $this->makeRoot();
+        $role = Role::findByName('Root');
 
         $this->expectException(RuntimeException::class);
 
@@ -55,7 +55,7 @@ class DynamicRoleManagementTest extends TestCase
 
     public function test_role_with_active_users_cannot_be_deleted(): void
     {
-        $admin = $this->makeSuperadmin();
+        $admin = $this->makeRoot();
         $role = Role::create(['name' => 'TestRole', 'guard_name' => 'web']);
 
         User::factory()
@@ -67,12 +67,12 @@ class DynamicRoleManagementTest extends TestCase
         app(DeleteRoleAction::class)->handle($role, $admin);
     }
 
-    private function makeSuperadmin(): User
+    private function makeRoot(): User
     {
         $this->seed(RolePermissionSeeder::class);
 
         $admin = User::factory()->create(['is_active' => true]);
-        $admin->assignRole('Superadmin');
+        $admin->assignRole('Root');
 
         return $admin;
     }

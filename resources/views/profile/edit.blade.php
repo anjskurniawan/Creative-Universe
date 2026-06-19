@@ -136,30 +136,32 @@
                 </div>
 
                 <!-- Collapsible: Danger Zone (Default: Collapsed) -->
-                @php
-                    $hasDeleteError = $errors->hasBag('userDeletion');
-                @endphp
-                <div x-data="{ expanded: {{ $hasDeleteError ? 'true' : 'false' }} }" class="rounded-xl border border-red-500/20 bg-red-500/5 shadow-sm overflow-hidden transition-all duration-200">
-                    <button type="button" @click="expanded = !expanded" 
-                        class="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-red-500/10 transition focus:outline-none">
-                        <div>
-                            <h3 class="text-sm font-semibold text-red-600 flex items-center gap-2">
-                                <x-material-icon class="text-red-500/70" size="sm" />
-                                Hapus Akun (Danger Zone)
-                            </h3>
-                            <p class="text-xs text-red-600/75 mt-0.5">Tindakan permanen untuk menonaktifkan dan menghapus seluruh data akun.</p>
-                        </div>
-                        <x-material-icon class="transition-transform duration-200" 
-                            ::class="expanded ? 'rotate-180' : ''" 
-                            class="cu-icon-expand-more" size="sm" />
-                    </button>
-                    
-                    <div x-show="expanded" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="px-5 pb-5 pt-3 border-t border-red-500/10">
-                        <div class="max-w-xl">
-                            @include('profile.partials.delete-user-form')
+                @if(auth()->user()->hasRole('Root'))
+                    @php
+                        $hasDeleteError = $errors->hasBag('userDeletion');
+                    @endphp
+                    <div x-data="{ expanded: {{ $hasDeleteError ? 'true' : 'false' }} }" class="rounded-xl border border-red-500/20 bg-red-500/5 shadow-sm overflow-hidden transition-all duration-200">
+                        <button type="button" @click="expanded = !expanded" 
+                            class="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-red-500/10 transition focus:outline-none">
+                            <div>
+                                <h3 class="text-sm font-semibold text-red-600 flex items-center gap-2">
+                                    <x-material-icon class="text-red-500/70" size="sm" />
+                                    Hapus Akun (Danger Zone)
+                                </h3>
+                                <p class="text-xs text-red-600/75 mt-0.5">Tindakan permanen untuk menonaktifkan dan menghapus seluruh data akun.</p>
+                            </div>
+                            <x-material-icon class="transition-transform duration-200" 
+                                ::class="expanded ? 'rotate-180' : ''" 
+                                class="cu-icon-expand-more" size="sm" />
+                        </button>
+                        
+                        <div x-show="expanded" x-cloak x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" class="px-5 pb-5 pt-3 border-t border-red-500/10">
+                            <div class="max-w-xl">
+                                @include('profile.partials.delete-user-form')
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
             </div>
 
             <!-- Panel: Role-Based Configs -->

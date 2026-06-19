@@ -61,7 +61,7 @@
         <div class="rounded-lg border border-cu-line bg-cu-panel p-5 shadow-sm">
             <h2 class="text-lg font-semibold text-cu-ink">Role Chips</h2>
             <div class="mt-4 flex flex-wrap gap-2">
-                <span class="rounded-full border border-cu-danger/20 bg-cu-danger-soft px-3 py-1 text-xs font-medium text-cu-danger">Superadmin</span>
+                <span class="rounded-full border border-cu-danger/20 bg-cu-danger-soft px-3 py-1 text-xs font-medium text-cu-danger">Root</span>
                 <span class="rounded-full border border-cu-info/20 bg-cu-info-soft px-3 py-1 text-xs font-medium text-cu-info">Manager</span>
                 <span class="rounded-full border border-cu-success/20 bg-cu-success-soft px-3 py-1 text-xs font-medium text-cu-success">Designer</span>
             </div>

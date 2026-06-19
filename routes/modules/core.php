@@ -51,7 +51,7 @@ Route::middleware(['auth', 'verified-active'])->group(function () {
     Route::post('/profile/role-settings', [ProfileController::class, 'updateRoleSettings'])->name('profile.role-settings.update');
 });
 
-// ─── Route Superadmin: User Management ────────────────────
+// ─── Route Root/Manager: User Management ────────────────────
 Route::middleware(['auth', 'verified-active'])
     ->prefix('users')
     ->name('core.users.')
@@ -78,7 +78,7 @@ Route::get('/roles', fn () => view('pages.core.roles.index'))
     ->middleware(['auth', 'verified-active', 'can:manage-roles'])
     ->name('core.roles.index');
 
-// Superadmin Developer & Maintenance Panel
+// Root Developer & Maintenance Panel
 Route::get('/maintenance', \App\Livewire\Core\MaintenancePanel::class)
     ->middleware(['auth', 'verified-active', 'can:run-artisan'])
     ->name('core.maintenance');

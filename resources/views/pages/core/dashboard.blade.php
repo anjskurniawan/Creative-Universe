@@ -12,7 +12,7 @@
     <!-- Quick Actions -->
     <x-app-panel padding="lg">
         <h2 class="mb-4 text-lg font-semibold text-cu-ink">Aksi Cepat</h2>
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             <a href="{{ route('profile.edit') }}" wire:navigate
                 class="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft">
                 <x-material-icon size="sm" class="cu-icon-person text-cu-muted" />
@@ -32,6 +32,22 @@
                 class="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft">
                 <x-material-icon size="sm" class="cu-icon-how-to-reg text-cu-muted" />
                 <span class="text-sm font-medium text-cu-ink">Persetujuan Akun</span>
+            </a>
+            @endcan
+
+            @can('manage-roles')
+            <a href="{{ route('core.roles.index') }}" wire:navigate
+                class="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft">
+                <x-material-icon size="sm" class="cu-icon-admin-panel-settings text-cu-muted" />
+                <span class="text-sm font-medium text-cu-ink">Kelola Role</span>
+            </a>
+            @endcan
+
+            @can('run-artisan')
+            <a href="{{ route('core.maintenance') }}" wire:navigate
+                class="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft">
+                <x-material-icon size="sm" class="cu-icon-build text-cu-muted" />
+                <span class="text-sm font-medium text-cu-ink">Panel Pemeliharaan</span>
             </a>
             @endcan
         </div>

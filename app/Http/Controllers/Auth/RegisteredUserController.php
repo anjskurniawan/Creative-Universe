@@ -75,6 +75,8 @@ class RegisteredUserController extends Controller
             ->withProperties(['ip' => request()->ip()])
             ->log('[CORE] New user registered — pending approval: '.$user->email);
 
+        event(new \App\Events\Core\UserStatusUpdated());
+
         // Login user but they'll be redirected to /pending by EnsureUserIsActive middleware
         Auth::login($user);
 

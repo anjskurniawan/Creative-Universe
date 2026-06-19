@@ -1,4 +1,4 @@
-<div wire:poll.10s>
+<div>
     @if (session()->has('success'))
         <x-app-alert type="success" class="mb-4">
             {{ session('success') }}

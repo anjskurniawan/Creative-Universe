@@ -40,6 +40,8 @@ class RegisterUserAction
 
         Log::info('[CORE] New registration: '.$user->email);
 
+        event(new \App\Events\Core\UserStatusUpdated());
+
         return $user;
     }
 }

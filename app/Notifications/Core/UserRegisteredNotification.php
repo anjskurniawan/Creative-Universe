@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notification;
 /**
  * UserRegisteredNotification — SRD v6.2 Seksi 11.4
  *
- * Penerima: Superadmin (semua user ber-permission approve-users)
+ * Penerima: Root/Manajer (semua user ber-permission approve-users)
  * Trigger: setelah user baru berhasil mendaftar
  */
 class UserRegisteredNotification extends Notification implements ShouldQueue
