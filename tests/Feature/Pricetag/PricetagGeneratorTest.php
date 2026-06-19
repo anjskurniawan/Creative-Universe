@@ -224,7 +224,9 @@ class PricetagGeneratorTest extends TestCase
             ->call('selectWizardProduct', $product->name)
             ->set('wizardDiscountPrice', 180000)
             ->call('generateSingleWizard')
-            ->call('processSingleGeneration');
+            ->call('processSingleGeneration')
+            ->assertDispatched('generation-finished', success: true)
+            ->call('finishGeneration', true);
 
         $this->assertDatabaseHas('pricetag_batches', [
             'batch_name' => 'Single: JETE TWS T10 Black',
@@ -291,4 +293,88 @@ class PricetagGeneratorTest extends TestCase
         $response->assertStatus(200);
         $this->assertNotNull($response->effects['download'] ?? null);
     }
+
+    public function test_search_displays_categories_initially()
+    {
+        $this->actingAs($this->designer);
+
+        $category1 = PricetagCategory::create(['name' => 'Audio', 'created_by' => $this->admin->id]);
+        $category2 = PricetagCategory::create(['name' => 'Powerbank', 'created_by' => $this->admin->id]);
+
+        Livewire::test(\App\Livewire\Pricetag\Search::class)
+            ->assertSee('Audio')
+            ->assertSee('Powerbank')
+            ->assertSet('selectedCategoryId', null);
+    }
+
+    public function test_search_can_select_category_and_display_products()
+    {
+        $this->actingAs($this->designer);
+
+        $category = PricetagCategory::create(['name' => 'Audio', 'created_by' => $this->admin->id]);
+        $product = PricetagProduct::create([
+            'category_id' => $category->id,
+            'name' => 'JETE TWS T10 Black',
+            'normal_price' => 399000,
+            'discount_price' => 199000,
+            'created_by' => $this->admin->id,
+            'variant_name' => 'Default',
+        ]);
+
+        Livewire::test(\App\Livewire\Pricetag\Search::class)
+            ->call('selectCategory', $category->id)
+            ->assertSet('selectedCategoryId', $category->id)
+            ->assertSee('JETE TWS T10 Black');
+    }
+
+    public function test_search_shows_all_products_even_without_asset_links()
+    {
+        $this->actingAs($this->designer);
+
+        $category = PricetagCategory::create(['name' => 'Audio', 'created_by' => $this->admin->id]);
+        
+        // This product does not have any asset links, but should still be displayed
+        $product = PricetagProduct::create([
+            'category_id' => $category->id,
+            'name' => 'Unprepared Product',
+            'normal_price' => 399000,
+            'discount_price' => 199000,
+            'created_by' => $this->admin->id,
+            'variant_name' => 'Default',
+        ]);
+
+        Livewire::test(\App\Livewire\Pricetag\Search::class)
+            ->call('selectCategory', $category->id)
+            ->assertSee('Unprepared Product');
+    }
+
+    public function test_generator_mount_with_product_id_parameter()
+    {
+        $this->actingAs($this->designer);
+
+        $category = PricetagCategory::create(['name' => 'Audio', 'created_by' => $this->admin->id]);
+        $product = PricetagProduct::create([
+            'category_id' => $category->id,
+            'name' => 'Deep Link Product',
+            'normal_price' => 399000,
+            'discount_price' => 199000,
+            'created_by' => $this->admin->id,
+            'variant_name' => 'Blue',
+        ]);
+
+        // Simulate GET request to generator with ?product_id=X
+        $this->get(route('pricetag.generator', ['product_id' => $product->id]))
+            ->assertStatus(200);
+
+        // Test Livewire mount directly via query string injection
+        Livewire::withQueryParams(['product_id' => $product->id])
+            ->test(Generator::class)
+            ->assertSet('activeTab', 'single')
+            ->assertSet('wizardCategoryId', $category->id)
+            ->assertSet('wizardProductName', 'Deep Link Product')
+            ->assertSet('wizardProductId', $product->id)
+            ->assertSet('wizardDiscountPrice', 199000)
+            ->assertSet('wizardStep', 4);
+    }
 }
+

@@ -87,22 +87,24 @@
                         placeholder="Cari kategori...">
                 </div>
 
-                <!-- Category List -->
-                <div class="divide-y divide-cu-line/60 border border-cu-line rounded-2xl overflow-hidden bg-cu-surface shadow-sm">
-                    @forelse ($wizardCategoriesList as $cat)
-                        <button type="button" wire:click="selectWizardCategory({{ $cat->id }})"
-                            class="w-full flex items-center justify-between p-4 hover:bg-cu-panel-soft/50 transition text-left group">
-                            <span class="text-sm font-semibold text-cu-ink group-hover:text-cu-focus transition-colors">{{ $cat->name }}</span>
-                            <div class="text-cu-muted group-hover:text-cu-ink transition">
-                                <x-material-icon class="cu-icon-chevron-right" size="sm" />
+                <!-- Category List (Only show when query search is typed) -->
+                @if (trim($wizardCategorySearch) !== '')
+                    <div class="divide-y divide-cu-line/60 border border-cu-line rounded-2xl overflow-hidden bg-cu-surface shadow-sm mt-4">
+                        @forelse ($wizardCategoriesList as $cat)
+                            <button type="button" wire:click="selectWizardCategory({{ $cat->id }})"
+                                class="w-full flex items-center justify-between p-4 hover:bg-cu-panel-soft/50 transition text-left group">
+                                <span class="text-sm font-semibold text-cu-ink group-hover:text-cu-focus transition-colors">{{ $cat->name }}</span>
+                                <div class="text-cu-muted group-hover:text-cu-ink transition">
+                                    <x-material-icon class="cu-icon-chevron-right" size="sm" />
+                                </div>
+                            </button>
+                        @empty
+                            <div class="p-8 text-center text-xs text-cu-muted">
+                                Tidak menemukan kategori "{{ $wizardCategorySearch }}"
                             </div>
-                        </button>
-                    @empty
-                        <div class="p-8 text-center text-xs text-cu-muted">
-                            Tidak menemukan kategori "{{ $wizardCategorySearch }}"
-                        </div>
-                    @endforelse
-                </div>
+                        @endforelse
+                    </div>
+                @endif
             </x-app-panel>
         @endif
 
@@ -253,7 +255,34 @@
         <!-- Step 5: Loading Bar -->
         @if ($wizardStep === 5)
             <x-app-panel padding="lg" class="shadow-sm max-w-xl mx-auto text-center py-12" wire:init="processSingleGeneration">
-                <div class="flex flex-col items-center justify-center space-y-6">
+                <div x-data="{
+                    progress: 0,
+                    intervalId: null,
+                    startProgress() {
+                        this.progress = 0;
+                        let duration = 3500; // 3.5 seconds simulation duration
+                        let stepTime = 50;
+                        let increment = (90 / (duration / stepTime));
+                        this.intervalId = setInterval(() => {
+                            if (this.progress < 90) {
+                                let speedFactor = (95 - this.progress) / 95;
+                                this.progress += increment * speedFactor;
+                                if (this.progress > 90) this.progress = 90;
+                            }
+                        }, stepTime);
+                    },
+                    completeProgress(success) {
+                        clearInterval(this.intervalId);
+                        this.progress = 100;
+                        setTimeout(() => {
+                            $wire.finishGeneration(success);
+                        }, 500);
+                    }
+                }"
+                x-init="startProgress()"
+                @generation-finished.window="completeProgress($event.detail.success)"
+                class="flex flex-col items-center justify-center space-y-6">
+                    
                     <!-- Custom Spinner/Pulse ring -->
                     <div class="relative flex items-center justify-center">
                         <span class="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-info opacity-20"></span>
@@ -267,9 +296,16 @@
                         <p class="text-xs text-cu-muted">Sistem Creative Universe sedang menyusun layout promo dan menghasilkan gambar. Harap tunggu...</p>
                     </div>
 
+                    <!-- Numerical gradual progress indicator -->
+                    <div class="flex items-center gap-1.5 text-cu-info">
+                        <span class="text-xs font-extrabold tracking-wider uppercase">Proses:</span>
+                        <span class="text-xs font-black tracking-normal" x-text="Math.round(progress) + '%'">0%</span>
+                    </div>
+
                     <div class="w-full space-y-2">
                         <div class="cu-loading-bar">
-                            <div class="cu-loading-bar-value"></div>
+                            <!-- Gradual Progress bar element -->
+                            <div :style="'width: ' + progress + '%'" class="h-full bg-cu-info rounded-full transition-all duration-150 ease-out"></div>
                         </div>
                     </div>
                 </div>
@@ -280,8 +316,11 @@
         @if ($wizardStep === 6)
             <x-app-panel padding="lg" class="shadow-sm max-w-xl mx-auto text-center py-12">
                 <div class="flex flex-col items-center justify-center space-y-5">
-                    <div class="size-16 rounded-full bg-cu-success-soft text-cu-success flex items-center justify-center shadow-sm">
-                        <x-material-icon class="cu-icon-check-circle" size="lg" />
+                    <div class="relative flex items-center justify-center">
+                        <span class="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-success opacity-20"></span>
+                        <div class="size-16 rounded-full bg-cu-success-soft text-cu-success flex items-center justify-center shadow-sm relative z-10">
+                            <x-material-icon class="cu-icon-check-circle animate-pulse" size="lg" />
+                        </div>
                     </div>
 
                     <div class="space-y-1">

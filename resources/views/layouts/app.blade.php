@@ -7,9 +7,17 @@
         @auth
             <meta name="creative-universe-user-id" content="{{ auth()->id() }}">
         @endauth
-        <meta name="description" content="Creative Universe — Hub aplikasi internal divisi Creative PT. Doran Sukses Indonesia">
+        <meta name="description" content="Creative Universe - Hub aplikasi internal divisi Creative PT. Doran Sukses Indonesia">
 
-        <title>{{ config('app.name', 'Creative Universe') }} — @yield('title', 'Dashboard')</title>
+        <!-- Favicon Pack -->
+        <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png?v=1.0" sizes="96x96" />
+        <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg?v=1.0" />
+        <link rel="shortcut icon" href="/favicons/favicon.ico?v=1.0" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png?v=1.0" />
+        <meta name="apple-mobile-web-app-title" content="Creative" />
+        <link rel="manifest" href="/favicons/site.webmanifest?v=1.0" />
+
+        <title>{{ config('app.name', 'Creative Universe') }} - @yield('title', 'Dashboard')</title>
 
         <!-- Fonts: Google Sans Flex -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

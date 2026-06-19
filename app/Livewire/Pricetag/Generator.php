@@ -43,6 +43,8 @@ class Generator extends Component
 
     public ?string $generatedDownloadUrl = null;
 
+    public bool $generationSuccess = false;
+
     // Tab state: 'single', 'checklist', or 'bulk'
     public string $activeTab = 'single';
 
@@ -62,7 +64,19 @@ class Generator extends Component
 
     public function mount(): void
     {
-        //
+        $productId = request()->query('product_id');
+        if ($productId) {
+            $product = PricetagProduct::with('category')->find($productId);
+            if ($product) {
+                $this->activeTab = 'single';
+                $this->wizardCategoryId = $product->category_id;
+                $this->wizardProductName = $product->name;
+                $this->wizardProductId = $product->id;
+                $this->selectedProductModel = $product;
+                $this->wizardDiscountPrice = $product->discount_price ?: 0;
+                $this->wizardStep = 4;
+            }
+        }
     }
 
     public function updatingChecklistSearch(): void
@@ -195,10 +209,21 @@ class Generator extends Component
             $this->generatedViewUrl = $viewLink ? $viewLink->url : null;
             $this->generatedDownloadUrl = $downloadLink ? $downloadLink->url : ($viewLink ? $viewLink->url : null);
 
-            $this->wizardStep = 6; // Go to Result step
-            session()->flash('success_single', "Label harga untuk produk {$product->name} berhasil dibuat!");
+            $this->generationSuccess = true;
+            $this->dispatch('generation-finished', success: true);
         } else {
-            $this->wizardStep = 4; // Return to Input Price step on failure
+            $this->generationSuccess = false;
+            $this->dispatch('generation-finished', success: false);
+        }
+    }
+
+    public function finishGeneration(bool $success): void
+    {
+        if ($success) {
+            $this->wizardStep = 6;
+            session()->flash('success_single', "Label harga untuk produk {$this->selectedProductModel->name} berhasil dibuat!");
+        } else {
+            $this->wizardStep = 4;
             session()->flash('error_single', 'Gagal membuat gambar label promo. Silakan coba beberapa saat lagi.');
         }
     }
@@ -452,12 +477,14 @@ class Generator extends Component
 
         if ($this->activeTab === 'single') {
             if ($this->wizardStep === 1) {
-                $wizardCategoriesList = PricetagCategory::query()
-                    ->when($this->wizardCategorySearch, function ($q) {
-                        $q->where('name', 'like', '%'.$this->wizardCategorySearch.'%');
-                    })
-                    ->orderBy('name')
-                    ->get();
+                $wizardCategoriesList = [];
+                $searchTrimmed = trim($this->wizardCategorySearch);
+                if ($searchTrimmed !== '') {
+                    $wizardCategoriesList = PricetagCategory::query()
+                        ->where('name', 'like', '%'.$searchTrimmed.'%')
+                        ->orderBy('name')
+                        ->get();
+                }
             } elseif ($this->wizardStep === 2) {
                 $wizardProductsList = PricetagProduct::where('category_id', $this->wizardCategoryId)
                     ->when($this->wizardProductSearch, function ($q) {

@@ -5,9 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Creative Universe — Login ke aplikasi internal divisi Creative">
+    <meta name="description" content="Creative Universe - Login ke aplikasi internal divisi Creative">
 
-    <title>{{ config('app.name', 'Creative Universe') }} — @yield('title', 'Login')</title>
+    <!-- Favicon Pack -->
+    <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png?v=1.0" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg?v=1.0" />
+    <link rel="shortcut icon" href="/favicons/favicon.ico?v=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png?v=1.0" />
+    <meta name="apple-mobile-web-app-title" content="Creative" />
+    <link rel="manifest" href="/favicons/site.webmanifest?v=1.0" />
+
+    <title>{{ config('app.name', 'Creative Universe') }} - @yield('title', 'Login')</title>
 
     <!-- Fonts: Google Sans Flex -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
