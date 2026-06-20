@@ -7,10 +7,11 @@ import { MaterialIcon } from "./material-icon";
 import { NotificationBell } from "./notification-bell";
 
 interface NavbarProps {
-  variant?: "light" | "dark";
+  variant?: "light" | "dark" | "transparent";
+  sticky?: boolean;
 }
 
-export function Navbar({ variant = "light" }: NavbarProps) {
+export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
   const { user, isAuthenticated, logout, hasPermission } = useAuth();
   const [appsOpen, setAppsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -43,32 +44,37 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   }, []);
 
   const navClass = {
-    light: "bg-cu-surface/75 text-cu-ink backdrop-blur-xl",
-    dark: "bg-[#0a0a0a]/75 text-white backdrop-blur-xl",
+    light: "bg-cu-surface/75 text-cu-ink backdrop-blur-xl border-b border-cu-line",
+    dark: "bg-[#0a0a0a]/75 text-white backdrop-blur-xl border-b border-white/10",
+    transparent: "bg-transparent text-white",
   }[variant];
 
   const iconButtonClass = {
     light: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full text-cu-ink transition-colors hover:bg-cu-panel-soft focus:outline-none focus:ring-2 focus:ring-cu-focus/25 cursor-pointer",
     dark: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer",
+    transparent: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer",
   }[variant];
 
   const popupPanelClass = {
     light: "border-cu-line bg-cu-surface text-cu-ink shadow-xl",
     dark: "border-white/10 bg-[#0d0d0d]/95 text-white shadow-2xl backdrop-blur-xl",
+    transparent: "border-white/10 bg-[#0d0d0d]/95 text-white shadow-2xl backdrop-blur-xl",
   }[variant];
 
   const popupMenuLinkClass = {
     light: "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-focus/30",
     dark: "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+    transparent: "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
   }[variant];
 
   const popupMenuIconClass = {
     light: "text-cu-muted transition-colors group-hover:text-cu-ink",
     dark: "text-white/50 transition-colors group-hover:text-white",
+    transparent: "text-white/50 transition-colors group-hover:text-white",
   }[variant];
 
-  const popupDividerClass = variant === "dark" ? "border-white/10" : "border-cu-line";
-  const popupMutedClass = variant === "dark" ? "text-white/50" : "text-cu-muted";
+  const popupDividerClass = variant === "light" ? "border-cu-line" : "border-white/10";
+  const popupMutedClass = variant === "light" ? "text-cu-muted" : "text-white/50";
 
   const profileAdminItems = [
     hasPermission("manage-users")
@@ -95,7 +101,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
     : "AK";
 
   return (
-    <nav className={`sticky top-0 z-50 ${navClass}`}>
+    <nav className={`${sticky ? "sticky top-0" : "relative"} z-50 ${navClass}`}>
       <div className="flex w-full items-center justify-between px-6 md:px-16 py-4">
         {/* Brand Logo */}
         <Link href="/" className="inline-flex items-center">
@@ -137,7 +143,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
           ) : (
             <>
               {/* Notification Bell */}
-              {user && <NotificationBell userId={user.id} variant={variant} />}
+              {user && <NotificationBell userId={user.id} variant={variant === 'transparent' ? 'dark' : variant} />}
 
               {/* Apps Menu Dropdown */}
               <div className="relative" ref={appsRef}>

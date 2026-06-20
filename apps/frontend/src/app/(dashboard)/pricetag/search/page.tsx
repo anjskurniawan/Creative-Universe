@@ -197,19 +197,21 @@ export default function PricetagSearchPage() {
           </div>
         )
       ) : categories.length === 0 ? <Empty title="Kategori Tidak Ditemukan" /> : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
           {categories.map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => selectCategory(item)}
-              className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-cu-line bg-cu-surface p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="group flex aspect-square min-w-0 flex-col items-center justify-center gap-1.5 rounded-xl border border-cu-line bg-cu-surface p-1.5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:aspect-auto sm:gap-3 sm:rounded-2xl sm:p-4"
             >
               <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-cu-panel-soft text-cu-muted group-hover:text-cu-ink">
-                <MaterialIcon name="category" size="sm" />
+                <MaterialIcon name="category" size="md" className="sm:text-xl" />
               </span>
               <span className="w-full min-w-0">
-                <span className="block truncate text-sm font-bold text-cu-ink">{item.name}</span>
+                <span className="block whitespace-normal break-words text-[11px] font-bold leading-tight text-cu-ink [overflow-wrap:anywhere] sm:truncate sm:text-sm">
+                  {item.name}
+                </span>
               </span>
             </button>
           ))}

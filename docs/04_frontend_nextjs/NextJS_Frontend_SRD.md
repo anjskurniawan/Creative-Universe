@@ -75,9 +75,15 @@ Frontend memakai `laravel-echo` 2.3.7 dan `pusher-js` 8.5.0 dengan cluster dari 
 - Semua aksi server memiliki loading, disabled, success, error, dan retry state.
 - Aksi destruktif memiliki modal konfirmasi.
 - Wizard Pricetag mempertahankan enam langkah dan deep link `?product_id={id}`.
-- Seluruh feedback sukses/gagal pada sub-app Pricetag dikirim ke panel `Pemberitahuan` dan tidak ditampilkan lagi sebagai alert inline di halaman modul.
+- Seluruh feedback operasional sukses/gagal pada semua route sub-app Pricetag dikirim ke panel `Pemberitahuan` dan tidak ditampilkan sebagai alert inline. Pesan validasi yang melekat pada field atau data CSV tetap ditampilkan di konteks inputnya.
 - Pencarian kategori pada wizard `/pricetag/generator` memakai filter API kategori berbasis query `name` agar hasil list kategori tetap akurat dan konsisten dengan kontrak backend.
 - Status sukses/gagal pada flow `Buat Label Satuan` tidak lagi memakai alert di bagian atas halaman; feedback dikirim ke menu `Pemberitahuan` agar area wizard tetap bersih.
+- Pada viewport mobile, submenu generator ditampilkan sebagai tiga kolom tanpa horizontal scroll, tombol `Buat Gambar Label` memenuhi lebar kontainer, dan keterangan setiap langkah wizard tetap terlihat di bawah indikator dengan posisi terpusat. Tampilan desktop tetap menggunakan tata letak pill ringkas.
+- Pada tab mobile `Buat Label Sekaligus`, grup ringkasan dan aksi produk terpilih ditampilkan lebih dahulu, lalu kolom pencarian berada di posisi paling bawah pada area kontrol. Urutan desktop tetap pencarian di kiri dan aksi di kanan.
+- Hasil pencarian tab mobile `Buat Label Sekaligus` menggunakan kartu collapse/expand murni hingga breakpoint desktop `lg`; tabel tidak dirender secara visual pada mobile dan tablet. Kartu tertutup menampilkan nama dan status pilihan; saat dibuka, kategori, varian, harga normal, input harga diskon, dan aksi pilih ditampilkan vertikal. Pencarian bereaksi langsung saat input berubah tanpa menunggu tombol Enter.
+- Toolbar `Pilih Semua (Hal Ini)` dan `Bersihkan Pilihan` hanya tersedia pada tabel desktop. Pada mobile/tablet, setiap hasil ditampilkan sebagai kartu individual dengan border, sudut membulat, dan jarak antarkartu; pemilihan dilakukan dari kartu yang diperluas.
+- Pagination hasil pencarian `Buat Label Sekaligus` disembunyikan pada mobile/tablet. Client mengambil seluruh halaman hasil pencarian API (maksimum 100 item per request) lalu menggabungkannya menjadi daftar kartu; desktop tetap memakai pagination 10 item per halaman.
+- Navbar pada seluruh route sub-app `/pricetag/*` mengikuti alur dokumen dan tidak menggunakan posisi sticky. Navbar pada route dashboard lain tetap sticky.
 - Search Pricetag mempertahankan alur kategori lalu produk/varian.
 - Checklist generator `/pricetag/generator` menampilkan katalog awal maksimal 10 item per halaman tanpa mewajibkan pencarian, dan pagination angka dibatasi 3 nomor bergeser (`1 2 3`, lalu `2 3 4`, dan seterusnya).
 - Batch name otomatis untuk `Buat Label Sekaligus` mengikuti format `Pricetag Label (dd/mm/yyyy) #n`, dengan `n` diambil dari batch terakhir milik user lalu ditambah 1.
@@ -91,6 +97,7 @@ Frontend memakai `laravel-echo` 2.3.7 dan `pusher-js` 8.5.0 dengan cluster dari 
 - Popup avatar, menu aplikasi, dan notifikasi memakai struktur visual bersama: panel rounded dengan padding internal, header ringkas, divider inset, serta item menu rounded. Ketiganya mengikuti varian navbar; surface/teks light digunakan pada navbar light dan surface gelap/teks putih digunakan pada navbar dark. Popup dapat ditutup melalui klik di luar atau tombol `Escape`.
 - Popup notifikasi dark memakai warna judul putih eksplisit, metadata putih semi-transparan dengan kontras yang cukup, dan highlight unread biru transparan. Area daftar notifikasi menggunakan scrollbar custom tipis dengan thumb yang menyesuaikan varian light/dark, bukan tampilan scrollbar bawaan browser.
 - Popup avatar menyediakan item aktif `Pengaturan` menuju `/profile`. Item `Profil Saya` tetap ditampilkan sebagai placeholder nonaktif berlabel `Segera` sampai route profil publik tersedia, sehingga tidak membuat tautan rusak atau menduplikasi tujuan pengaturan.
+- Grid kategori pada `/pricetag/search` khusus mobile memakai tiga kolom dengan kartu rasio `1:1`. Glyph kategori diperbesar dan nama kategori dibungkus ke beberapa baris tanpa ellipsis; breakpoint `sm` ke atas mempertahankan layout responsif sebelumnya.
 
 ## 7. Deployment tanpa terminal production
 

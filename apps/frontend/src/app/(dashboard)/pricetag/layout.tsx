@@ -51,14 +51,6 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
       },
       onComplete: () => {
         textTarget.textContent = titleText;
-        gsap.delayedCall(1.5, () => {
-          blink.kill();
-          gsap.to(cursor, {
-            opacity: 0,
-            duration: 0.25,
-            ease: "power1.out",
-          });
-        });
       },
     });
 
@@ -128,7 +120,7 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
       </nav>
 
       {/* Main Content Card Panel */}
-      <main className="w-full bg-white text-cu-ink rounded-[2.5rem] p-6 md:p-8 shadow-2xl border border-white/5 min-h-fit animate-fade-in">
+      <main className="w-full bg-white text-cu-ink rounded-2xl p-6 md:p-8 shadow-2xl border border-white/5 min-h-fit animate-fade-in">
         {children}
       </main>
     </div>
