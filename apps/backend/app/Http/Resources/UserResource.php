@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+
+class UserResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        $safeSettings = Arr::only($this->settings ?? [], [
+            'theme',
+            'navbar_variant',
+            'redirect_to',
+            'notify_new_registration',
+            'default_pricetag_expiry_days',
+            'max_prints_per_batch',
+            'default_pricetag_layout',
+            'default_pricetag_paper_size',
+            'auto_save_checklist',
+        ]);
+
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'username' => $this->username,
+            'email' => $this->email,
+            'whatsapp_number' => $this->whatsapp_number,
+            'avatar_url' => $this->avatar_path
+                ? Storage::disk('public')->url($this->avatar_path)
+                : null,
+            'is_active' => (bool) $this->is_active,
+            'registration_note' => $this->registration_note,
+            'approved_by' => $this->approved_by,
+            'approved_by_name' => $this->approvedBy?->name,
+            'approved_at' => $this->approved_at?->toIso8601String(),
+            'created_at' => $this->created_at?->toIso8601String(),
+            'roles' => $this->getRoleNames()->values()->all(),
+            'permissions' => $this->relationLoaded('permissions')
+                ? $this->permissions->pluck('name')->values()->all()
+                : $this->permissions()->pluck('name')->values()->all(),
+            'all_permissions' => $this->getAllPermissions()->pluck('name')->values()->all(),
+            'settings' => $safeSettings,
+        ];
+    }
+}

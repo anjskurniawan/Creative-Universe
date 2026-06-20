@@ -2,11 +2,11 @@
 
 # 📄 SRD Sub-App: Pricetag Generator
 
-**Status:** 🔒 APPROVED — Ready for Development
+**Status:** ACTIVE — Headless Migration
 
-**Versi:** 1.0
+**Versi:** 1.1
 
-**Induk Dokumen:** CreativeUniverse-MainApp_SRD v6.2 & ERD v1.0
+**Induk Dokumen:** CreativeUniverse-MainApp_SRD v7.0 & ERD v1.2
 
 ## 1. Deskripsi & Ruang Lingkup
 
@@ -25,11 +25,11 @@ _(Catatan: Statistik total data dan jumlah generate akan disematkan sebagai widg
 |**Cari Pricetag**|Pencarian cepat _link_ gambar pricetag yang sudah ada.|Semua _User_ Sub-App|
 |**Generator Pricetag**|Form tunggal berjenjang & Form unggah CSV.|Semua _User_ Sub-App|
 |**Riwayat Generate**|Monitor status antrean CSV, _Progress Bar_, dan _link download_.|Semua _User_ (Data difilter per `created_by`), Root (Semua data)|
-|**Manajemen Database**|CRUD data master (Kategori, Produk, Varian) & Unggah CSV untuk _Update_ Harga.|`role:root` atau _Permission_ `pricetag.manage`|
+|**Manajemen Database**|CRUD data master (Kategori, Produk, Varian) & Unggah CSV untuk _Update_ Harga.|Permission `pricetag.manage` (dimiliki Root dan Manajer pada baseline)|
 
 ## 3. Arsitektur Database (Ekstensi ERD)
 
-Semua tabel di bawah ini **WAJIB** mematuhi **ERD Seksi 10.5** (memiliki kolom `created_by`, `updated_by`, `deleted_by`, dan `deleted_at` untuk _SoftDeletes_).
+Tabel master dan header batch mematuhi ownership (`created_by`, `updated_by`, `deleted_by`) serta `SoftDeletes`. `pricetag_batch_items` adalah detail proses yang lifecycle-nya dimiliki batch, sehingga pada migration aktual hanya memakai foreign key dan timestamps.
 
 ### 3.1. Tabel Entitas Inti
 
@@ -55,15 +55,23 @@ Semua tabel di bawah ini **WAJIB** mematuhi **ERD Seksi 10.5** (memiliki kolom `
     - `status` (_Enum: pending, processing, completed, failed_)
         
     - `total_items`, `processed_items` (Integer)
+
+- `pricetag_batch_items` (Hasil per item)
+
+    - `id`, `batch_id`, `product_id`
+
+    - `status` (_pending, success, failed_), `error_message`
+
+    - `created_at`, `updated_at`
         
 
 ### 3.3. Penyimpanan Link (_Polymorphic_)
 
-Sesuai **ERD Seksi 2.1**, _link download_ dari Google Drive TIDAK disimpan di tabel `pricetag_variants`, melainkan di- _insert_ ke tabel `asset_links` milik _Core Main App_ dengan relasi:
+Sesuai **ERD Seksi 2.1**, _link download_ dari Google Drive TIDAK disimpan di tabel `pricetag_products`, melainkan di tabel `asset_links` milik Core dengan relasi:
 
-- `assetable_type` = `App\Models\Pricetag\PricetagProduct`
+- `linkable_type` = `App\Models\Pricetag\PricetagProduct`
     
-- `assetable_id` = ID Produk
+- `linkable_id` = ID Produk
     
 
 ## 4. Alur Kerja (Workflows) & Performa
@@ -93,20 +101,17 @@ Mengacu pada **SRD Seksi 2** (Batas _Shared Hosting_) dan batas waktu eksekusi s
     
 5. Sistem mendistribusikan _chunk_ ke _Laravel Database Queue_ (`GeneratePricetagChunkJob`).
     
-6. Antarmuka Livewire Volt menggunakan `wire:poll` untuk memperbarui _Progress Bar_ (membaca kolom `processed_items`).
+6. Legacy Livewire menerima event broadcasting lalu me-refresh progress batch. Target Next.js berlangganan private batch channel dan melakukan refetch `GET /api/v1/pricetag/batches/{batch}`. Polling boleh menjadi fallback dengan interval terkontrol.
     
 
 ## 5. Standar Integrasi Eksternal (GAS)
 
-Sesuai **SRD Seksi 18.4**, komunikasi dengan Web App Google Apps Script **DILARANG** dilakukan secara langsung dari Controller atau Volt SFC.
+Sesuai **SRD Seksi 18.4**, komunikasi dengan Web App Google Apps Script **DILARANG** dilakukan langsung dari Controller, frontend Next.js, atau komponen UI legacy.
 
-Seluruh pemanggilan API harus dibungkus dalam _Service Class_: `app/Services/GoogleAppScript/PricetagGeneratorService.php`.
+Seluruh pemanggilan API harus dibungkus dalam Service Class. Lokasi legacy adalah `app/Services/GoogleAppScript/PricetagGeneratorService.php`; lokasi target adalah `apps/backend/app/Services/GoogleAppScript/PricetagGeneratorService.php`.
 
 ## 6. Audit Trail & Keamanan
 
 1. Perubahan "Harga Diskon" (baik via CRUD tunggal maupun CSV _Bulk Update_) WAJIB dicatat menggunakan _trait_ `LogsActivity`.
-    
-2. Format _prefix_ _log_ untuk Sub-App ini adalah: `[PRICETAG]`. Sesuai aturan, riwayat ini bisa dilacak ke `users.id` yang bersangkutan.
-    
 
-Silakan simpan dokumen di atas sebagai panduan tertulis kita. Apabila Anda sudah siap, silakan instruksikan saya untuk mulai membuat kode _Database Migration_ dan _Model_ berdasarkan struktur SRD di atas.
+2. Format _prefix_ _log_ untuk Sub-App ini adalah: `[PRICETAG]`. Sesuai aturan, riwayat ini bisa dilacak ke `users.id` yang bersangkutan.

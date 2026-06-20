@@ -6,14 +6,19 @@ tags:
     - livewire-3
     - architecture
     - enterprise
-status: "🔒 LOCKED"
-version: "6.3 (Real-Time Notifications & Dynamic RBAC)"
+status: "ACTIVE - Headless Migration"
+version: "7.0 (Laravel REST API + Next.js Transition)"
 created: 2026-06-14
-revised: 2026-06-16
-locked: 2026-06-16
+revised: 2026-06-19
+locked: false
 owner: Divisi Creative  -  PT Doran Sukses Indonesia (JETE)
-supersedes: "v6.2 (2026-06-15)"
+supersedes: "v6.3 (2026-06-16)"
 changelog:
+    - "v7.0: Arsitektur target diubah menjadi monorepo headless: Laravel 11 REST API + Next.js/React"
+    - "v7.0: Node.js diperbolehkan; production tidak boleh bergantung pada terminal interaktif"
+    - "v7.0: Route legacy diaudit terhadap `php artisan route:list --json`"
+    - "v7.0: Baseline RBAC diselaraskan dengan tujuh role inti dan permission Pricetag aktual"
+    - "v7.0: Istilah polymorphic asset dinormalisasi menjadi linkable_type/linkable_id"
     - "v6.1: Auth package ditetapkan → Laravel Breeze + Laravel Socialite (SSO Google)"
     - "v6.1: WhatsApp API ditetapkan → Fonnte (api.fonnte.com)"
     - "v6.1: Livewire pin versi → ^3.6 (Volt SFC tersedia di v3.x)"
@@ -68,6 +73,9 @@ changelog:
 > [!info] Sifat Dokumen
 > Dokumen ini adalah **Master Technical Blueprint** yang mengatur standar arsitektur global, keamanan, struktur database inti, dan aturan penulisan kode _(Best Practices)_. Seluruh aturan di sini **WAJIB** dipatuhi oleh semua developer dan Sub-App yang bernaung di bawah ekosistem Creative Universe.
 
+> [!important] Status Transisi v7.0
+> Requirement bisnis, database, RBAC, audit, queue, dan integrasi di dokumen ini tetap berlaku. Bagian yang khusus membahas Blade, Livewire, Volt, Alpine, dan Vite Laravel merupakan **baseline legacy** selama migrasi. Arsitektur target dan kontrak baru ditetapkan di `docs/00_architecture/Headless_Architecture.md`, `docs/03_backend_api/Laravel_REST_API_SRD.md`, dan `docs/04_frontend_nextjs/NextJS_Frontend_SRD.md`.
+
 Creative Universe adalah aplikasi hub berbasis website (Desktop & Mobile Responsive) yang menjadi rumah utama _(Super-App)_ bagi seluruh sub-aplikasi internal divisi Creative PT. Doran Sukses Indonesia (JETE).
 
 ---
@@ -76,7 +84,7 @@ Creative Universe adalah aplikasi hub berbasis website (Desktop & Mobile Respons
 
 1. [[#1. Tujuan & Filosofi Dokumen]]
 2. [[#2. Tech Stack & Spesifikasi Server]]
-3. [[#3. Arsitektur Monolith & Struktur Sub-App]]
+3. [[#3. Arsitektur Legacy dan Target Headless]]
 4. [[#4. Konvensi Kode & Naming Standards]]
 5. [[#5. Standar Arsitektur Kode (Livewire Volt)]]
 6. [[#6. Database Inti, RBAC & Role-Permission Matrix]]
@@ -102,40 +110,41 @@ Creative Universe adalah aplikasi hub berbasis website (Desktop & Mobile Respons
 - **Consistency over cleverness** : Satu cara melakukan sesuatu, dipakai di seluruh codebase.
 - **Explicit over implicit** : Tidak ada _magic_ yang tidak terdokumentasi.
 - **Debuggability first** : Setiap keputusan arsitektural mempertimbangkan kemudahan debugging.
-- **Shared Hosting constraint-aware** : Setiap solusi teknis harus bisa berjalan tanpa SSH/Terminal.
+- **No-terminal production operations** : Runtime yang diperlukan diperbolehkan, tetapi deployment dan operasi production tidak boleh bergantung pada terminal interaktif.
 - **Security by default** : Setiap celah yang ditemukan diselesaikan sebelum development berlanjut.
 
 ---
 
 ## 2. Tech Stack & Spesifikasi Server
 
-Aplikasi dibangun di atas ekosistem modern TALL Stack dengan batasan _environment_ Shared Hosting.
+Target aplikasi menggunakan Laravel REST API dan Next.js, dengan legacy Livewire dipertahankan hanya selama migrasi.
 
 | Komponen               | Spesifikasi                                                |
 | ---------------------- | ---------------------------------------------------------- |
 | Bahasa Pemrograman     | PHP 8.2                                                    |
-| Framework Utama        | Laravel 11                                                 |
-| Frontend Engine        | Livewire `^3.6`  -  Volt SFC Architecture                    |
-| Styling                | Tailwind CSS v4, dikompilasi via Vite (lokal)              |
+| Backend                | Laravel 11 REST API (`apps/backend`)                        |
+| Frontend               | Next.js + React (`apps/frontend`)                           |
+| Legacy UI              | Laravel Livewire `^3.6` di `legacy/laravel-livewire`       |
+| Styling                | Tailwind CSS pada frontend Next.js                          |
 | Database               | MySQL 8.0+                                                 |
-| Package Auth           | Laravel Breeze (Blade stack)                               |
+| Package Auth           | Laravel Sanctum stateful cookie (target); Breeze pada legacy |
 | Package RBAC           | `spatie/laravel-permission`                                |
 | Package Activity Log   | `spatie/laravel-activitylog`                               |
 | Package Log Viewer     | `opcodesio/log-viewer`                                     |
 | WhatsApp API           | Fonnte (`api.fonnte.com`)                                  |
 | Broadcasting Driver    | Pusher (`api.pusherapp.com`)  -  `pusher/pusher-php-server`  |
-| NPM Dependencies       | `laravel-echo`, `pusher-js`  -  dikompilasi via Vite (lokal) |
+| Frontend Runtime       | Static export; Node.js hanya untuk build lokal atau CI     |
 | Queue Driver           | Database (cPanel compatible)                               |
-| Environment Production | Shared Hosting cPanel  -  **TANPA akses SSH/Terminal**       |
+| Environment Production | Satu cPanel: Laravel API + static export Next.js pada `creative.doran.id` |
 
-> [!danger] LARANGAN KERAS
-> Jangan menggunakan Node.js, Redis, atau fitur apapun yang membutuhkan akses terminal di production. Seluruh kompilasi asset (`npm run build`) **hanya** dilakukan di environment lokal sebelum di-upload.
+> [!warning] Constraint Operasional Production
+> Production hanya memakai satu shared hosting dan satu hostname. Next.js wajib menggunakan static export; SSR, ISR runtime, Server Actions, Route Handlers/API Routes, dan middleware Next.js tidak digunakan. Node.js hanya diperlukan untuk build lokal/CI. Web Artisan Laravel tidak digunakan untuk membangun frontend.
 
 > [!info] Pusher Kompatibel dengan Shared Hosting
 > Pusher adalah layanan WebSocket **cloud SaaS**  -  bukan server yang harus dijalankan sendiri. Kompatibilitasnya dengan Shared Hosting terjamin karena:
 >
 > - **Server-side**: `pusher/pusher-php-server` hanya membuat HTTP POST ke `api.pusherapp.com` dari dalam PHP process (queue job). Tidak ada persistent process, tidak butuh SSH.
-> - **Client-side**: `pusher-js` dan `laravel-echo` dikompilasi oleh Vite di lokal, lalu di-upload sebagai file statis ke `public/build/`. Browser user yang terhubung ke `ws.pusherapp.com`  -  tidak ada keterlibatan server production dalam koneksi WebSocket ini.
+> - **Client-side**: `pusher-js` dan `laravel-echo` dikompilasi dalam static build Next.js di lokal/CI. Browser user yang terhubung ke `ws.pusherapp.com`  -  tidak ada process Node.js production dalam koneksi WebSocket ini.
 
 > [!danger] SSO Google Dihapus Permanen
 > `laravel/socialite` dan `socialiteproviders/google` **TIDAK** masuk ke dalam project ini dalam bentuk apapun. Jangan install, jangan referensikan, jangan rencanakan penggunaannya tanpa membuka versi SRD baru dengan audit keamanan terlebih dahulu. Keputusan ini final per v6.2.
@@ -148,63 +157,40 @@ Aplikasi dibangun di atas ekosistem modern TALL Stack dengan batasan _environmen
 
 ---
 
-## 3. Arsitektur Monolith & Struktur Sub-App
+## 3. Arsitektur Legacy dan Target Headless
 
-Seluruh Sub-App berjalan dalam **SATU codebase Laravel yang sama**. Pemisahan dilakukan secara struktural dan sistematis menggunakan PHP Namespace dan folder hierarchy, bukan multi-repo atau microservice.
+Pada baseline legacy, seluruh Sub-App berjalan dalam satu codebase Laravel. Target v7.0 tetap satu repository, tetapi runtime dipisahkan menjadi `apps/backend`, `apps/frontend`, dan snapshot read-only `legacy/laravel-livewire`.
 
 > [!info] Keputusan Arsitektural
-> Monolith dengan pemisahan namespace adalah pilihan yang tepat untuk tim kecil dengan constraint cPanel. Seluruh Sub-App share satu database, satu auth system, dan satu deployment pipeline.
+> Backend tetap modular monolith dan menjadi pemilik tunggal database serta business rule. Frontend adalah consumer REST API. Pemisahan ini bukan microservice dan tidak menggandakan database atau auth system.
 
 ### 3.1 Struktur Folder Sub-App
 
-Setiap Sub-App memiliki namespace dan folder tersendiri, terisolasi penuh dari Sub-App lain.
+Target repository memisahkan runtime, sementara backend tetap memisahkan namespace per Sub-App.
 
 ```
-app/
-├── Http/
-│   └── Controllers/
-│       ├── Core/              # Controller milik Master App
-│       ├── Odds/              # Controller milik Sub-App ODDS
-│       └── [SubAppName]/      # Controller milik Sub-App lain
-├── Livewire/
-│   ├── Core/
-│   ├── Odds/
-│   └── [SubAppName]/
-├── Actions/
-│   ├── Core/
-│   ├── Odds/
-│   └── [SubAppName]/
-├── Services/                  # Service Class untuk integrasi eksternal
-│   ├── Fonnte/
-│   └── [IntegrationName]/
-└── Models/
-    ├── Core/                  # Model shared (User, Role, AssetLink)
-    ├── Odds/                  # Model spesifik ODDS
-    └── [SubAppName]/
-
-resources/views/
-├── components/                # Blade Components shared
-├── livewire/
-│   ├── core/
-│   ├── odds/
-│   └── [sub-app-name]/
-└── pages/
-    ├── core/
-    ├── odds/
-    └── [sub-app-name]/
-
-routes/
-├── web.php                    # Entry point, load semua route file
-├── web_artisan.php            # Remote artisan commands
-├── channels.php               # Pusher private channel authorization
-└── modules/
-    ├── core.php               # Route Master App
-    ├── odds.php               # Route Sub-App ODDS
-    └── [sub-app].php          # Route Sub-App lain
+creativeuniverse/
+├── apps/
+│   ├── backend/
+│   │   ├── app/
+│   │   │   ├── Actions/{Core,Pricetag}/
+│   │   │   ├── Http/Controllers/Api/V1/{Core,Pricetag}/
+│   │   │   ├── Http/Requests/{Core,Pricetag}/
+│   │   │   ├── Http/Resources/{Core,Pricetag}/
+│   │   │   ├── Models/{Core,Pricetag}/
+│   │   │   └── Services/{Fonnte,GoogleAppScript}/
+│   │   └── routes/{api,web_artisan,channels}.php
+│   └── frontend/
+│       ├── app/
+│       ├── components/
+│       ├── features/{auth,core,pricetag}/
+│       └── lib/
+├── legacy/laravel-livewire/
+└── docs/
 ```
 
 > [!info] Folder `Services/`
-> Folder `app/Services/` digunakan **khusus** untuk integrasi layanan eksternal (Fonnte WhatsApp API, dll.). Jangan tempatkan logika bisnis domain di sini  -  itu milik `app/Actions/`. Lihat [[#18. Environment, API & Future Integration Standards|Seksi 18.4]] untuk aturan lengkap.
+> Folder `apps/backend/app/Services/` digunakan **khusus** untuk integrasi eksternal. Logika bisnis domain tetap berada di `Actions` atau domain layer yang disetujui.
 
 ### 3.2 Aturan Route per Sub-App
 
@@ -213,17 +199,21 @@ Setiap Sub-App memiliki route prefix dan middleware group tersendiri. File `web.
 ```php
 // routes/web.php
 require __DIR__.'/modules/core.php';
-require __DIR__.'/modules/odds.php';
+require __DIR__.'/modules/pricetag.php';
 // tambahkan baris baru per Sub-App baru
 ```
 
 ```php
-// routes/modules/odds.php
-Route::prefix('odds')
-    ->middleware(['auth', 'verified-active', 'app:odds'])
-    ->name('odds.')
+// routes/modules/pricetag.php (baseline legacy)
+Route::prefix('pricetag')
+    ->middleware(['auth', 'verified-active', 'app:pricetag'])
+    ->name('pricetag.')
     ->group(function () {
-        Route::resource('tickets', Odds\TicketController::class);
+        Route::view('/search', 'pages.pricetag.search')->name('search');
+        Route::view('/generator', 'pages.pricetag.generator')->name('generator');
+        Route::view('/history', 'pages.pricetag.history')->name('history');
+        Route::view('/database', 'pages.pricetag.database')
+            ->middleware('can:pricetag.manage')->name('database');
     });
 ```
 
@@ -292,7 +282,7 @@ Konsistensi naming adalah fondasi codebase yang bisa dibaca dan di-debug dengan 
 | Form Object        | `PascalCase` + `Form`    | `TicketForm.php`            | `TicketFormClass.php`   |
 | Model              | `PascalCase Singular`    | `Ticket.php`                | `Tickets.php`           |
 | Kolom DB           | `snake_case`             | `assigned_to`, `created_by` | `assignedTo`, `usr_id`  |
-| Route Name         | `modul.resource.action`  | `odds.tickets.store`        | `store_ticket`          |
+| Route Name         | `modul.resource.action`  | `pricetag.search`           | `search_pricetag`       |
 | Livewire Event     | `kebab-case`             | `ticket-approved`           | `ticketApproved`        |
 | CSS Class          | Tailwind utility only    | `class="flex items-center"` | `class="myCustomClass"` |
 | JS Function        | `camelCase`              | `handleSubmit()`            | `handle_submit()`       |
@@ -307,6 +297,9 @@ Konsistensi naming adalah fondasi codebase yang bisa dibaca dan di-debug dengan 
 ---
 
 ## 5. Standar Arsitektur Kode (Livewire Volt)
+
+> [!note] Contoh Historis
+> Contoh ODDS/Ticket pada bagian ini bersifat ilustratif dan tidak memiliki route aktif pada baseline saat ini. Pola target backend/frontend ditetapkan oleh SRD API dan Next.js; jangan menyalin namespace atau route ODDS ke implementasi baru.
 
 ### 5.1 Manajemen Input & Validasi  -  Form Objects
 
@@ -451,10 +444,10 @@ Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permi
 > [!success] Prinsip Role Universal & Scalable
 > Role bersifat **universal dan tidak di-scope per Sub-App**. Satu Role berlaku di seluruh ekosistem Creative Universe. Pembatasan akses per Sub-App dikendalikan oleh **Permission** (bukan Role), menggunakan konvensi prefix `access-[app-slug]` dan `[app].[resource].[action]`.
 >
-> Sistem RBAC dirancang **scalable**  -  tiga role default (Root, Manajer, Designer) adalah titik awal, bukan batas. Root dapat membuat role baru dan mengelola permission-nya sepenuhnya via UI tanpa menyentuh seeder atau kode. Skema tabel Spatie tidak berubah saat role baru ditambahkan  -  semua operasi dilakukan di application layer.
+> Sistem RBAC dirancang **scalable**. Baseline aktual memiliki tujuh role inti: Root, Manajer, Supervisor, Designer, Client, Retail Admin, dan Retail Staff. Root dapat membuat role tambahan dan mengelola permission-nya melalui UI/API tanpa perubahan skema.
 
 > [!info] Akun Pending dan Role
-> User yang baru mendaftar (is_active = false / pending) **tidak memiliki Role apapun**. Role diberikan oleh Root bersamaan dengan atau setelah proses approval. Sebelum Role diberikan, user hanya bisa mengakses halaman `/pending` dan `/profile`.
+> User yang baru mendaftar (`is_active = false`) **tidak memiliki Role apapun**. Pada route legacy aktual, user pending dapat membuka `/pending` dan route auth yang tidak memakai middleware akun aktif; `/profile` mensyaratkan akun aktif. Target Next.js mempertahankan perilaku ini sampai ada keputusan bisnis baru.
 
 > [!warning] Cache Spatie  -  Aturan Kritis
 > Spatie Permission menggunakan cache internal untuk menyimpan data Role dan Permission demi performa. Setiap kali Role atau Permission diubah  -  baik via seeder maupun via UI  -  cache **WAJIB** di-reset secara eksplisit. Lihat [[#6.5 Dynamic Role Management|Seksi 6.5]] untuk detail.
@@ -467,20 +460,16 @@ Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permi
 > [!note] Single Source of Truth untuk Seed Awal
 > Tabel ini adalah acuan untuk `RolePermissionSeeder`. Setiap permission inti yang ditambahkan via seeder **WAJIB** didokumentasikan di sini. Permission dari Sub-App baru juga wajib ditambahkan ke sini sebelum di-deploy.
 
-| Permission Slug        | Root | Manajer | Designer | Keterangan                                 |
-| ---------------------- | :--------: | :-----: | :------: | ------------------------------------------ |
-| `access-core`          |     ✅     |   ✅    |    ✅    | Akses ke Master App (dashboard)            |
-| `access-odds`          |     ✅     |   ✅    |    ✅    | Akses ke Sub-App ODDS                      |
-| `manage-users`         |     ✅     |   ❌    |    ❌    | CRUD user & assign role                    |
-| `manage-roles`         |     ✅     |   ❌    |    ❌    | Buat, edit, & hapus Role/Permission via UI |
-| `approve-users`        |     ✅     |   ❌    |    ❌    | Approve / reject akun pending              |
-| `odds.tickets.create`  |     ✅     |   ✅    |    ✅    | Buat tiket baru di ODDS                    |
-| `odds.tickets.assign`  |     ✅     |   ✅    |    ❌    | Assign tiket ke designer                   |
-| `odds.tickets.approve` |     ✅     |   ✅    |    ❌    | Approve / reject output                    |
-| `odds.tickets.delete`  |     ✅     |   ❌    |    ❌    | Hapus tiket (soft delete)                  |
-| `odds.reports.view`    |     ✅     |   ✅    |    ❌    | Lihat laporan & analytics                  |
-| `view-logs`            |     ✅     |   ❌    |    ❌    | Akses Log Viewer                           |
-| `run-artisan`          |     ✅     |   ❌    |    ❌    | Trigger Web Artisan Routes                 |
+| Permission Slug | Root | Manajer | Supervisor | Designer | Client | Retail Admin | Retail Staff |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `access-core` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `manage-users` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `manage-roles` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `approve-users` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `view-logs` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `run-artisan` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `access-pricetag` | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| `pricetag.manage` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 > [!info] Aturan Permission Naming
 > Format slug: `[app-prefix].[resource].[action]` untuk permission spesifik Sub-App. Permission lintas app menggunakan format tanpa prefix: `manage-users`, `approve-users`, `view-logs`.
@@ -491,7 +480,7 @@ Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permi
 > Seeder yang dijalankan di production **WAJIB** menggunakan `RolePermissionSeeder` yang terpisah dari `DatabaseSeeder`. Seeder ini harus bersifat **idempotent**  -  aman dijalankan berulang kali tanpa menduplikasi data.
 
 > [!warning] Seeder vs UI Management
-> `RolePermissionSeeder` hanya bertanggung jawab untuk **tiga role inti** (Root, Manajer, Designer) dan seluruh permission default. Role tambahan yang dibuat Root via UI **tidak tersentuh** oleh seeder. Menjalankan seeder ulang akan me-reset permission tiga role inti ke default-nya, namun tidak akan menghapus role dinamis maupun permission yang sudah ada di database.
+> `RolePermissionSeeder` bertanggung jawab untuk **tujuh role inti** dan delapan permission baseline pada tabel di atas. Role tambahan yang dibuat Root tidak dihapus oleh seeder. Menjalankan seeder ulang me-reset assignment tujuh role inti sesuai baseline aktual.
 
 ```php
 // database/seeders/RolePermissionSeeder.php
@@ -506,11 +495,8 @@ class RolePermissionSeeder extends Seeder
     // Daftar permission inti yang dikelola seeder.
     // Permission Sub-App baru WAJIB ditambahkan ke sini saat Sub-App baru di-deploy.
     private array $corePermissions = [
-        'access-core', 'access-odds',
-        'manage-users', 'manage-roles', 'approve-users',
-        'odds.tickets.create', 'odds.tickets.assign',
-        'odds.tickets.approve', 'odds.tickets.delete',
-        'odds.reports.view', 'view-logs', 'run-artisan',
+        'access-core', 'manage-users', 'manage-roles', 'approve-users',
+        'view-logs', 'run-artisan', 'access-pricetag', 'pricetag.manage',
     ];
 
     public function run(): void
@@ -524,24 +510,28 @@ class RolePermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Step 2: Buat tiga role inti  -  firstOrCreate menjamin idempotent.
+        // Step 2: Buat tujuh role inti  -  firstOrCreate menjamin idempotent.
         $root = Role::firstOrCreate(['name' => 'Root']);
-        $manajer    = Role::firstOrCreate(['name' => 'Manajer']);
-        $designer   = Role::firstOrCreate(['name' => 'Designer']);
+        $manajer = Role::firstOrCreate(['name' => 'Manajer']);
+        $supervisor = Role::firstOrCreate(['name' => 'Supervisor']);
+        $designer = Role::firstOrCreate(['name' => 'Designer']);
+        $client = Role::firstOrCreate(['name' => 'Client']);
+        $retailAdmin = Role::firstOrCreate(['name' => 'Retail Admin']);
+        $retailStaff = Role::firstOrCreate(['name' => 'Retail Staff']);
 
-        // Step 3: Sync permission ke tiga role inti.
+        // Step 3: Sync permission ke tujuh role inti.
         // CATATAN: syncPermissions menimpa assignment permission yang ada pada role-role ini.
-        // Role dinamis yang dibuat via UI tidak disentuh  -  seeder hanya mengelola tiga role di bawah.
+        // Role dinamis yang dibuat via UI tidak disentuh.
         $root->syncPermissions($this->corePermissions);
         $manajer->syncPermissions([
-            'access-core', 'access-odds',
-            'odds.tickets.create', 'odds.tickets.assign',
-            'odds.tickets.approve', 'odds.reports.view',
+            'access-core', 'access-pricetag', 'pricetag.manage',
+            'approve-users', 'manage-users',
         ]);
-        $designer->syncPermissions([
-            'access-core', 'access-odds',
-            'odds.tickets.create',
-        ]);
+        $supervisor->syncPermissions(['access-core', 'access-pricetag']);
+        $designer->syncPermissions(['access-core', 'access-pricetag']);
+        $client->syncPermissions(['access-core']);
+        $retailAdmin->syncPermissions(['access-core', 'access-pricetag']);
+        $retailStaff->syncPermissions(['access-core', 'access-pricetag']);
 
         // Reset cache Spatie setelah operasi selesai
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -576,11 +566,11 @@ class RolePermissionSeeder extends Seeder
 
 #### Role yang Dilindungi (Protected Roles)
 
-Tiga role inti di bawah **tidak boleh dihapus** dalam kondisi apapun. Proteksi ini diberlakukan di level Action Class, bukan level database.
+Tujuh role inti di bawah **tidak boleh dihapus** dalam kondisi apapun. Proteksi ini diberlakukan di level Action Class, bukan level database.
 
 ```php
 // Daftar protected roles  -  tidak boleh dihapus via UI
-const PROTECTED_ROLES = ['Root', 'Manajer', 'Designer'];
+const PROTECTED_ROLES = ['Root', 'Manajer', 'Supervisor', 'Designer', 'Client', 'Retail Admin', 'Retail Staff'];
 ```
 
 #### Cache Invalidation  -  WAJIB di Setiap Perubahan Role/Permission
@@ -668,7 +658,7 @@ use App\Models\Core\User;
 
 class DeleteRoleAction
 {
-    private const PROTECTED_ROLES = ['Root', 'Manajer', 'Designer'];
+    private const PROTECTED_ROLES = ['Root', 'Manajer', 'Supervisor', 'Designer', 'Client', 'Retail Admin', 'Retail Staff'];
 
     public function handle(Role $role, User $admin): void
     {
@@ -787,13 +777,18 @@ public function handle(Request $request, Closure $next): Response
 ```php
 // routes/web_artisan.php
 Route::middleware(['artisan-token'])->prefix('_cmd')->group(function () {
-    Route::get('/migrate',          fn() => Artisan::call('migrate --force'));
-    Route::get('/storage-link',     fn() => Artisan::call('storage:link'));
-    Route::get('/clear-cache',      fn() => Artisan::call('optimize:clear'));
-    Route::get('/seed-permissions', fn() => Artisan::call('db:seed --class=RolePermissionSeeder --force'));
-    Route::get('/queue-restart',    fn() => Artisan::call('queue:restart'));
+    Route::get('/migrate', ...);
+    Route::get('/migrate-fresh', ...); // Ada pada legacy; dilarang di production
+    Route::get('/storage-link', ...);
+    Route::get('/clear-cache', ...);
+    Route::get('/seed-permissions', ...);
+    Route::get('/seed', ...);          // Ada pada legacy; dilarang di production
+    Route::get('/queue-restart', ...);
+    Route::get('/queue-work', ...);
 });
 ```
+
+Daftar route legacy yang telah diverifikasi tersedia di `docs/05_migration/Legacy_Route_Baseline.md`. Backend baru wajib menolak `migrate-fresh` dan seeding penuh ketika `APP_ENV=production`.
 
 ### 8.2 Alur Registrasi & Approval Akun
 
@@ -817,7 +812,7 @@ Route::middleware(['artisan-token'])->prefix('_cmd')->group(function () {
 
 [3] User landing di /pending
     → Halaman statis: "Akunmu sedang menunggu persetujuan admin."
-    → Tidak bisa mengakses halaman lain selain /pending dan /profile
+    → Tidak bisa mengakses halaman yang memakai middleware akun aktif, termasuk /profile
     → Bisa logout
 
 [4] Root buka /users/pending
@@ -1020,14 +1015,18 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 
 ### 8.5 Rate Limiting
 
-- **Login endpoint:** `throttle:5,1`  -  5 percobaan per menit, kunci 1 menit
-- **Register endpoint:** `throttle:3,10`  -  3 percobaan per 10 menit per IP
-- **Web Artisan Routes:** `throttle:3,60`  -  3 eksekusi per jam
-- **File upload endpoint:** `throttle:10,1`  -  10 upload per menit per user
+Baseline route aktual:
+
+- login membatasi 5 percobaan melalui `LoginRequest`/`RateLimiter`;
+- verifikasi email memakai `throttle:6,1`;
+- upload internal Livewire memakai `throttle:60,1`;
+- register dan Web Artisan belum memiliki middleware throttle khusus.
+
+Target backend wajib menambahkan rate limit eksplisit untuk register, OTP request/verify, upload, broadcasting auth, dan seluruh Web Artisan endpoint. Nilai awal yang direkomendasikan adalah register `3/10 menit`, OTP `5/15 menit`, upload `10/menit`, dan Web Artisan `3/jam`, lalu disesuaikan melalui pengujian operasional.
 
 ### 8.6 Proteksi Data Umum
 
-- Seluruh input user **WAJIB** melewati Form Object validation sebelum menyentuh database.
+- Seluruh input user **WAJIB** divalidasi sebelum menyentuh database. Legacy memakai Livewire Form Object; target API memakai Laravel Form Request.
 - Gunakan Eloquent ORM untuk semua query  -  hindari raw SQL kecuali sangat diperlukan.
 - Jika raw SQL diperlukan, **WAJIB** menggunakan parameter binding: `DB::select('SELECT * FROM x WHERE id = ?', [$id])`
 - Semua aksi destruktif (delete, reject, revoke) **WAJIB** dipagari middleware `can` atau `Gate::authorize()`.
@@ -1206,6 +1205,19 @@ class NotificationBell extends Component
 ---
 
 ### 11.2 Pusher Broadcasting  -  Setup & Konfigurasi
+
+#### Baseline Headless Aktif (M6)
+
+| Komponen | Konfigurasi aktif |
+|---|---|
+| Backend SDK | `pusher/pusher-php-server` 7.2.8 |
+| Frontend SDK | `pusher-js` 8.5.0 dan `laravel-echo` 2.3.7 |
+| Driver | `BROADCAST_CONNECTION=pusher`; `BROADCAST_DRIVER=pusher` dipertahankan sebagai alias kompatibilitas |
+| Cluster | `ap1`, melalui `PUSHER_APP_CLUSTER` dan `NEXT_PUBLIC_PUSHER_CLUSTER` |
+| Notifikasi user | `private-App.Models.Core.User.{id}` |
+| Antrean approval | `private-admin.notifications`, event `.PendingUserRegistered` |
+
+Pada target Next.js, akun aktif dengan permission `approve-users` dapat mengotorisasi channel `admin.notifications`. Event registrasi hanya mengirim `user_id` dan waktu registrasi, lalu frontend mengambil ulang `GET /api/v1/users/pending`. Halaman ini tidak memakai polling periodik. `PUSHER_APP_SECRET` hanya berada di Laravel; frontend hanya menerima public app key dan cluster saat build static export.
 
 #### Instalasi Package
 
@@ -1508,7 +1520,9 @@ class AccountRejectedNotification extends Notification implements ShouldQueue
 
 ---
 
-### 11.6 Notification Class  -  Ticket Assigned
+### 11.6 Reserved Notification Pattern - Ticket Assigned
+
+Contoh berikut belum menjadi route atau fitur aktif pada baseline saat ini. Ia dipertahankan hanya sebagai pola untuk Sub-App tiket di masa depan dan tidak boleh dianggap sebagai kontrak route.
 
 ```php
 // app/Notifications/Odds/TicketAssignedNotification.php
@@ -1540,7 +1554,7 @@ class TicketAssignedNotification extends Notification implements ShouldQueue
     {
         return [
             'message' => 'Tiket baru di-assign kepadamu.',
-            'url'     => route('odds.tickets.show', $this->ticket->id),
+            'url'     => null, // Tetapkan setelah Sub-App dan route terkait benar-benar tersedia
         ];
     }
 }
@@ -1621,7 +1635,7 @@ IP Address dicatat sebagai custom property pada setiap activity log via kolom `p
 
 ### 11.11 Log Viewer  -  Root Only
 
-- Route: `/system/logs`  -  middleware `auth` + `can:view-logs`
+- Route legacy aktual: `/log-viewer/{view?}` melalui authorization milik package Log Viewer.
 - Hanya Root (`view-logs`) yang dapat mengakses
 
 ---
@@ -1691,7 +1705,12 @@ class DynamicRoleManagementTest extends TestCase
     public function test_root_can_create_new_role(): void
     {
         $admin = User::factory()->create(['is_active' => true])->assignRole('Root');
-        $this->actingAs($admin)->post('/roles', ['name' => 'Koordinator', 'permissions' => ['access-core']]);
+        Livewire::actingAs($admin)
+            ->test(RoleManager::class)
+            ->set('form.name', 'Koordinator')
+            ->set('form.permissions', ['access-core'])
+            ->call('createRole')
+            ->assertHasNoErrors();
         $this->assertDatabaseHas('roles', ['name' => 'Koordinator']);
     }
 
@@ -1744,6 +1763,8 @@ class CreateTicketActionTest extends TestCase
 | **Local**      | Development harian dan UAT sebelum deploy                              |
 | **Production** | Sistem aktif perusahaan di Shared Hosting cPanel (`creative.doran.id`) |
 
+Frontend static Next.js dan Laravel API ditempatkan pada satu hosting serta hostname `creative.doran.id`. API tersedia pada `/api/v1`.
+
 > [!danger] LARANGAN
 > Testing fitur baru **DILARANG** dilakukan langsung di Production. Semua pengujian dilakukan di environment Local.
 
@@ -1751,18 +1772,16 @@ class CreateTicketActionTest extends TestCase
 
 > [!danger] Wajib dijalankan setiap kali deploy ke production
 
-1. Pastikan semua test lulus: `php artisan test`
-2. Build asset lokal: `npm run build`
-3. Commit folder `public/build` ke repository
-4. Update `.env.example` jika ada perubahan environment variable baru
-5. Buat migration baru  -  **JANGAN** edit migration lama yang sudah di-run di production
-6. Upload seluruh file ke cPanel via FTP atau File Manager
-7. Trigger migration: `GET /_cmd/migrate`
-8. Trigger clear cache: `GET /_cmd/clear-cache`
-9. Trigger queue restart: `GET /_cmd/queue-restart`
-10. Verifikasi storage symlink: `GET /_cmd/storage-link` (hanya jika pertama kali atau symlink hilang)
-11. Jika ada perubahan Role/Permission inti: `GET /_cmd/seed-permissions`
-12. Verifikasi Pusher berfungsi: buka dua tab browser berbeda, login sebagai user berbeda, pastikan notifikasi muncul real-time
+1. Jalankan test backend dari `apps/backend` serta test/build frontend dari `apps/frontend` di lokal atau CI.
+2. Update file environment example jika ada variable baru; secret production hanya diisi melalui UI hosting.
+3. Buat migration baru - jangan mengubah migration yang sudah pernah berjalan di production.
+4. Deploy backend ke cPanel melalui pipeline, Git deployment, atau artifact upload yang tersedia.
+5. Jalankan `/_cmd/migrate`, `/_cmd/clear-cache`, dan `/_cmd/queue-restart` dengan header token.
+6. Jalankan `/_cmd/storage-link` hanya saat inisialisasi atau symlink hilang.
+7. Jalankan `/_cmd/seed-permissions` hanya ketika baseline permission berubah.
+8. Salin static artifact frontend ke public artifact Laravel tanpa menimpa file backend yang wajib dipertahankan.
+9. Verifikasi auth cookie/CSRF same-origin, Pusher, queue, Fonnte, GAS, dan route penting.
+10. Jangan menjalankan `/_cmd/migrate-fresh` atau `/_cmd/seed` pada production.
 
 ### 13.3 cPanel Cron Jobs
 
@@ -1776,7 +1795,7 @@ class CreateTicketActionTest extends TestCase
 ```
 
 > [!info] Asumsi Operasional
-> PHP CLI dan Cron Job diasumsikan tersedia di Shared Hosting. Outbound HTTP request ke `api.pusherapp.com` (port 443/HTTPS) diasumsikan diizinkan oleh server  -  ini adalah konfigurasi standar di semua Shared Hosting modern. Jika ditemukan keterbatasan, catat sebagai deviasi operasional.
+> Cron Job backend dikonfigurasi melalui UI cPanel dan tidak memerlukan terminal interaktif. PHP CLI dan outbound HTTPS wajib tersedia. Next.js tidak memiliki process production karena hasil build berupa file statis.
 
 ### 13.4 Branch Strategy
 

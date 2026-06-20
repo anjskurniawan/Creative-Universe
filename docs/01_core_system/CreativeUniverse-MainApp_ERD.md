@@ -6,15 +6,18 @@ tags:
     - main-app
     - laravel-11
     - architecture
-status: "📐 DRAFT  -  Pending Review"
-version: "1.1"
+status: "APPROVED - Database Baseline"
+version: "1.2"
 created: 2026-06-15
-revised: 2026-06-16
+revised: 2026-06-19
 locked: false
 owner: Divisi Creative  -  PT Doran Sukses Indonesia (JETE)
-supersedes: "v1.0 (2026-06-15)"
-references: "CreativeUniverse-MainApp_SRD v6.3 (2026-06-16)"
+supersedes: "v1.1 (2026-06-16)"
+references: "CreativeUniverse-MainApp_SRD v7.0 (2026-06-19)"
 changelog:
+    - "v1.2: Baseline role dan permission diselaraskan dengan RolePermissionSeeder aktual"
+    - "v1.2: Status ODDS dikoreksi menjadi belum diimplementasikan"
+    - "v1.2: ERD dinyatakan tetap berlaku pada arsitektur Laravel REST API + Next.js"
     - "v1.0: Dokumen ERD Main App dibuat berdasarkan SRD v6.2"
     - "v1.0: 12 entitas diidentifikasi dan diklasifikasikan ke dalam 6 grup fungsional"
     - "v1.0: Self-referencing pada tabel users (4 kolom FK) didefinisikan eksplisit"
@@ -42,7 +45,7 @@ changelog:
 > Dokumen ini adalah **Entity Relationship Document (ERD)** yang mendefinisikan seluruh entitas dan relasi database yang menjadi tanggung jawab **Main App (Core)** Creative Universe. Skema entitas domain spesifik Sub-App (Project, Task, Ticket, dan sebagainya) **tidak termasuk** dalam scope dokumen ini dan didefinisikan di SRD masing-masing Sub-App.
 
 > [!warning] Referensi Wajib
-> Seluruh skema di dokumen ini **WAJIB** konsisten dengan **CreativeUniverse-MainApp_SRD v6.3**. Jika terdapat konflik antara dokumen ini dan SRD, **SRD adalah sumber kebenaran**. Perubahan skema apapun harus diupdate di kedua dokumen secara bersamaan.
+> Seluruh skema di dokumen ini **WAJIB** konsisten dengan **CreativeUniverse-MainApp_SRD v7.0**. Pemisahan Laravel REST API dan Next.js tidak mengubah kepemilikan database: seluruh skema tetap dimiliki backend.
 
 ---
 
@@ -348,7 +351,7 @@ erDiagram
 > [!info] Status & Skalabilitas
 > Di-generate otomatis oleh `spatie/laravel-permission` via `php artisan vendor:publish`. **Jangan modifikasi skema tabel ini**  -  Spatie mengelolanya sepenuhnya.
 >
-> Role **default** saat inisialisasi: `Root`, `Manajer`, `Designer`. Ini adalah titik awal, bukan batas. Root dapat menambahkan role baru kapan saja via UI (permission `manage-roles`) tanpa menyentuh migration atau kode. Sistem dirancang untuk mendukung penambahan role tak terbatas  -  cukup insert baris baru ke tabel ini via Eloquent di Application layer.
+> Role inti saat inisialisasi: `Root`, `Manajer`, `Supervisor`, `Designer`, `Client`, `Retail Admin`, dan `Retail Staff`. Root dapat menambahkan role baru melalui UI/API dengan permission `manage-roles` tanpa mengubah migration.
 
 | Kolom        | Tipe        | Constraint                          | Keterangan                       |
 | ------------ | ----------- | ----------------------------------- | -------------------------------- |
@@ -364,11 +367,15 @@ erDiagram
 | --- | ----------- | ---------- | -------------------------------------------------------------- |
 | 1   | Root  | web        | Role inti  -  dilindungi, tidak dapat dihapus                    |
 | 2   | Manajer     | web        | Role inti  -  dilindungi, tidak dapat dihapus                    |
-| 3   | Designer    | web        | Role inti  -  dilindungi, tidak dapat dihapus                    |
-| 4+  | _(dinamis)_ | web        | Ditambahkan oleh Root via UI sesuai kebutuhan organisasi |
+| 3   | Supervisor  | web        | Role inti - dilindungi, tidak dapat dihapus                     |
+| 4   | Designer    | web        | Role inti - dilindungi, tidak dapat dihapus                     |
+| 5   | Client      | web        | Role inti - dilindungi, tidak dapat dihapus                     |
+| 6   | Retail Admin | web       | Role inti - dilindungi, tidak dapat dihapus                     |
+| 7   | Retail Staff | web       | Role inti - dilindungi, tidak dapat dihapus                     |
+| 8+  | _(dinamis)_ | web        | Ditambahkan oleh Root sesuai kebutuhan organisasi              |
 
 > [!warning] Role Inti vs Role Dinamis
-> Tiga role inti (Root, Manajer, Designer) memiliki proteksi di level Action Class (`DeleteRoleAction`)  -  tidak dapat dihapus bahkan oleh Root. Role dinamis yang dibuat via UI dapat dihapus selama tidak ada user aktif yang menggunakannya. Lihat SRD Seksi 6.5 untuk detail aturan dan Action Classes.
+> Ketujuh role inti memiliki proteksi di `DeleteRoleAction` dan tidak dapat dihapus. Role dinamis dapat dihapus selama tidak memiliki user aktif.
 
 ---
 
@@ -390,17 +397,13 @@ erDiagram
 | Slug Permission        | Scope        | Keterangan                                 |
 | ---------------------- | ------------ | ------------------------------------------ |
 | `access-core`          | Core         | Akses ke Main App (dashboard)              |
-| `access-odds`          | Sub-App ODDS | Akses ke Sub-App ODDS                      |
 | `manage-users`         | Core         | CRUD user & assign role                    |
 | `manage-roles`         | Core         | Buat, edit, & hapus Role/Permission via UI |
 | `approve-users`        | Core         | Approve / reject akun pending              |
 | `view-logs`            | Core         | Akses Log Viewer                           |
 | `run-artisan`          | Core         | Trigger Web Artisan Routes                 |
-| `odds.tickets.create`  | Sub-App ODDS | Buat tiket baru                            |
-| `odds.tickets.assign`  | Sub-App ODDS | Assign tiket ke designer                   |
-| `odds.tickets.approve` | Sub-App ODDS | Approve / reject output                    |
-| `odds.tickets.delete`  | Sub-App ODDS | Hapus tiket (soft delete)                  |
-| `odds.reports.view`    | Sub-App ODDS | Lihat laporan & analytics                  |
+| `access-pricetag`      | Pricetag     | Akses ke Sub-App Pricetag                  |
+| `pricetag.manage`      | Pricetag     | CRUD dan import database Pricetag          |
 
 > [!warning] Dua Jalur Penambahan Permission Baru
 > Permission baru dapat ditambahkan melalui dua jalur yang berbeda tergantung konteks:
@@ -455,12 +458,16 @@ erDiagram
 > [!note] Initial State, Bukan Fixed State
 > Tabel di bawah adalah kondisi yang dihasilkan oleh `RolePermissionSeeder` saat inisialisasi pertama. Di production, mapping aktual dapat berbeda karena Root telah mengelola permission via UI. Role dinamis yang dibuat via UI akan memiliki mapping yang tidak terdokumentasi di sini.
 
-| Role        | Permission Default yang Dimiliki                                                                                        |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Root  | Semua permission (full access)                                                                                          |
-| Manajer     | `access-core`, `access-odds`, `odds.tickets.create`, `odds.tickets.assign`, `odds.tickets.approve`, `odds.reports.view` |
-| Designer    | `access-core`, `access-odds`, `odds.tickets.create`                                                                     |
-| _(dinamis)_ | Ditentukan oleh Root saat membuat role via UI                                                                     |
+| Role | Permission Default yang Dimiliki |
+|---|---|
+| Root | Semua permission baseline |
+| Manajer | `access-core`, `access-pricetag`, `pricetag.manage`, `approve-users`, `manage-users` |
+| Supervisor | `access-core`, `access-pricetag` |
+| Designer | `access-core`, `access-pricetag` |
+| Client | `access-core` |
+| Retail Admin | `access-core`, `access-pricetag` |
+| Retail Staff | `access-core`, `access-pricetag` |
+| _(dinamis)_ | Ditentukan oleh Root |
 
 ---
 
@@ -665,6 +672,8 @@ erDiagram
 
 Tiga tabel di Main App menggunakan relasi polymorphic. Memahami bagaimana ketiganya bekerja adalah kunci untuk menulis Sub-App yang benar.
 
+Contoh `Odds/Ticket` pada bagian ini hanya ilustrasi polymorphic historis; Sub-App tersebut belum diimplementasikan pada baseline aktual.
+
 ### 7.1 `asset_links`  -  Polymorphic Linkable
 
 **Prinsip:** Satu tabel untuk semua cloud link dari semua entitas di semua Sub-App.
@@ -827,7 +836,7 @@ Tabel-tabel berikut adalah milik eksklusif Main App. Sub-App boleh membaca data 
 
 | Tabel                   | Owner | Cara Pengelolaan                                                                                          |
 | ----------------------- | ----- | --------------------------------------------------------------------------------------------------------- |
-| `users`                 | Core  | Manual migration + SRD v6.x                                                                               |
+| `users`                 | Core  | Manual migration + SRD v7.x                                                                               |
 | `roles`                 | Core  | `spatie/laravel-permission` + `RolePermissionSeeder` (initial seed) + UI via `manage-roles` (operasional) |
 | `permissions`           | Core  | `spatie/laravel-permission` + `RolePermissionSeeder` (initial seed) + UI via `manage-roles` (operasional) |
 | `model_has_roles`       | Core  | Dikelola otomatis oleh Spatie saat `$user->assignRole()` / `$user->removeRole()`                          |
@@ -857,7 +866,7 @@ Sesuai SRD Seksi 16.1, nama entitas berikut telah dikunci di Master SRD sebagai 
 | `Asset`              | SRD Sub-App yang menggunakannya | Belum ada Sub-App                 |
 | `Revision`           | SRD Sub-App yang menggunakannya | Belum ada Sub-App                 |
 | `Comment`            | SRD Sub-App yang menggunakannya | Belum ada Sub-App                 |
-| `Ticket`             | SRD Sub-App ODDS                | Aktif  -  didefinisikan di SRD ODDS |
+| `Ticket`             | SRD Sub-App yang menggunakannya | Belum diimplementasikan             |
 
 ### 10.4 Aturan Tambahan Data Terkait User di Sub-App
 

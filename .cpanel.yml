@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/creativedoran/creative.doran.id
-    - /bin/rsync -a --exclude='.git' --exclude='node_modules' --exclude='tests' $cpanel_source_dir/ $DEPLOYPATH
+    - /bin/rsync -a --exclude='.git' --exclude='node_modules' --exclude='tests' $cpanel_source_dir/apps/backend/ $DEPLOYPATH

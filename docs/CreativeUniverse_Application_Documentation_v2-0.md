@@ -1,4 +1,4 @@
-# Dokumentasi Teknis Master: Creative Universe v1.8
+# Dokumentasi Teknis Master: Creative Universe v2.0
 
 Dokumen ini merupakan panduan arsitektur, teknis, dan cetak biru kode utama untuk sistem **Creative Universe**, sebuah aplikasi hub berbasis web (Super-App) yang dikembangkan untuk divisi Creative PT. Doran Sukses Indonesia (JETE). Dokumen ini berfungsi sebagai referensi serah terima (handover) tingkat tinggi yang memetakan seluruh komponen sistem, logika bisnis, keamanan, alur kerja sub-aplikasi, kode file, detail fungsi, parameter, serta panduan pengembangan secara mandiri.
 
@@ -6,21 +6,33 @@ Dokumen ini merupakan panduan arsitektur, teknis, dan cetak biru kode utama untu
 
 ## 1. Arsitektur Global & Standardisasi Sistem
 
-Creative Universe dirancang dengan arsitektur monolitik modular yang bersih. Sistem ini memisahkan logika bisnis inti (Core) dengan sub-aplikasi operasional secara struktural, namun tetap berbagi basis data dan sistem otentikasi yang sama.
+Creative Universe menggunakan arsitektur headless dalam satu monorepo. Backend Laravel tetap berupa modular monolith yang memiliki database dan seluruh business rule. Frontend Next.js menjadi consumer REST API. Aplikasi Laravel Livewire lama disimpan sebagai snapshot read-only selama migrasi.
 
 ### 1.1 Stack Teknologi Inti
-Sistem dibangun di atas ekosistem Laravel modern dengan komponen sebagai berikut:
-* **Framework Backend**: Laravel 11.x (PHP 8.2+)
-* **Engine Frontend**: Livewire 3.x (termasuk Volt Single File Component untuk interaksi reaktif)
-* **CSS Framework**: Tailwind CSS (dikompilasi secara lokal melalui Vite)
-* **Interaktivitas Client**: AlpineJS (terintegrasi dengan Livewire)
+Sistem dibangun dengan komponen sebagai berikut:
+* **Backend**: Laravel 11.x REST API (PHP 8.2+)
+* **Frontend**: Next.js + React dengan static export; Node.js hanya untuk build lokal/CI
+* **Legacy Reference**: Laravel Livewire 3.x, Blade, dan AlpineJS
+* **CSS Framework**: Tailwind CSS pada frontend Next.js
+* **Authentication Target**: Laravel Sanctum stateful cookie
 * **Database**: MySQL 8.x atau MariaDB 10.x
 * **Layanan Pihak Ketiga**: Pusher (Real-time Broadcasting) dan Fonnte (WhatsApp Gateway)
 
 ### 1.2 Struktur Folder dan Manajemen File
-Demi menjaga kerapihan dan memudahkan pemeliharaan jangka panjang (arsip tingkat tinggi), struktur folder diatur secara modular:
-* **Routing Modular**: Rute aplikasi tidak menumpuk di file `web.php` bawaan, melainkan dipisahkan ke dalam folder `routes/modules/`. File `web.php` hanya bertugas mengimpor rute-rute modul tersebut (misalnya `core.php` dan `pricetag.php`).
-* **Namespace Terpisah**: Kode backend diorganisasikan di dalam namespace `App\Http\Controllers\Core` untuk sistem utama dan namespace terpisah seperti `App\Models\Pricetag` dan `App\Livewire\Pricetag` untuk sub-aplikasi.
+Demi menjaga pemisahan runtime dan mempertahankan referensi implementasi lama, struktur repository ditetapkan sebagai berikut:
+
+```text
+creativeuniverse/
+├── apps/backend/                 Laravel 11 REST API
+├── apps/frontend/                Next.js + React
+├── legacy/laravel-livewire/      Snapshot read-only
+├── docs/
+└── README.md
+```
+
+* **Routing Backend**: REST API memakai prefix `/api/v1`; endpoint Web Artisan tetap terpisah dari API publik.
+* **Routing Frontend**: Halaman dikelola Next.js App Router.
+* **Namespace Backend**: Core dan setiap Sub-App tetap dipisahkan dalam Controllers, Models, Actions, Services, Resources, dan Requests.
 * **Standardisasi Penamaan Database**: Setiap tabel yang dibuat oleh sub-aplikasi wajib menggunakan prefix unik (contoh: `pricetag_categories`, `pricetag_products`). Penamaan kolom audit kepemilikan (`created_by`, `updated_by`, `deleted_by`) dan kolom timestamps (`created_at`, `updated_at`, `deleted_at`) diseragamkan di seluruh tabel database.
 * **Folder Favicon Terstruktur**: Seluruh berkas pendukung ikon web (favicon pack) disentralisasi di dalam direktori `public/favicons/` untuk menjaga kerapihan direktori root public. Berkas manifest `site.webmanifest` dikonfigurasi untuk membaca ikon di folder ini.
 
@@ -63,7 +75,7 @@ Sub-aplikasi ini memisahkan alur pencarian (Cari Pricetag) dan alur pembuatan (G
    * **Tiga Tombol Aksi (Expanded)**: Setiap kartu produk memiliki area detail yang jika di-expand menampilkan nama kategori, status, detail harga (normal & promo), waktu update terakhir, serta tombol **Download** (Google Drive download link, dinonaktifkan jika belum ready), **Preview** (Google Drive view link, dinonaktifkan jika belum ready), dan **Edit** (mengarahkan pengguna langsung ke tab Single Generator untuk produk tersebut).
 2. **Single Generate (Pembuatan Tunggal)**:
    * **Langkah 1 (Kategori)**: Daftar kategori bawaan sengaja disembunyikan. Hanya kotak pencarian (search bar) kategori saja yang terlihat secara default. Daftar kategori baru akan muncul apabila operator telah mengetik kata kunci pencarian.
-   * **Langkah 5 (Memproses)**: Animasi progress bar berjalan secara gradual dan realistis (0% naik perlahan ke 90% menggunakan durasi simulasi Alpine.js, kemudian terisi penuh ke 100% setelah respon server diperoleh, barulah berpindah ke Langkah 6).
+   * **Langkah 5 (Memproses)**: Animasi progress bar berjalan gradual dari 0% menuju 90%, lalu menjadi 100% setelah backend menyelesaikan request. Implementasi target menggunakan state React; perilaku legacy menggunakan Alpine.js.
    * **Langkah 6 (Selesai)**: Menampilkan hasil pembuatan label promo dengan opsi pratinjau dan unduh langsung. Ikon sukses di langkah ini dilengkapi animasi pulse & ping yang dinamis untuk visualisasi interaktif.
    * Pengguna memilih kategori produk, nama produk, dan varian secara berjenjang (dropdown dinamis), atau diarahkan langsung dari menu pencarian via tautan edit.
    * Nilai harga normal ditampilkan sebagai kolom readonly, sedangkan harga diskon diinput secara manual pada Langkah 4.
@@ -88,15 +100,15 @@ Pengelolaan database kategori dan produk untuk sub-app.
 
 ## 4. Cetak Biru Kode (Code Blueprint) & Detail Fungsi
 
-Bagian ini menyajikan dokumentasi teknis mendalam untuk setiap kelas kode utama, middleware, model, aksi bisnis, dan komponen Livewire dalam ekosistem Creative Universe. Dokumentasi ini disusun untuk memudahkan pemahaman fungsi individual secara mandiri.
+Bagian ini mencatat blueprint legacy sebagai referensi migrasi. Implementasi aktif yang baru mengikuti SRD Laravel REST API dan SRD Next.js.
 
 ### 4.1 Aksi Bisnis Utama (`app/Actions/Core`)
 Aksi bisnis inti diatur secara terpusat untuk menjaga konsistensi logika aplikasi.
 
-### 4.5 Komponen Livewire Utama (`app/Livewire`)
+### 4.5 Komponen Livewire Legacy (`legacy/laravel-livewire/app/Livewire`)
 
 #### 4.5.1 `Generator` (Pricetag Sub-App)
-* **Lokasi File**: `app/Livewire/Pricetag/Generator.php`
+* **Lokasi Target Snapshot**: `legacy/laravel-livewire/app/Livewire/Pricetag/Generator.php`
 * **Tujuan**: Menyediakan mesin antar-muka pembuatan gambar pricetag secara interaktif.
 * **Fungsi Utama**:
   * `mount()`: Mendeteksi parameter query `product_id` di URL. Jika ditemukan, sistem memuat data produk secara otomatis, mengatur tab aktif ke `'single'`, dan menetapkan `$wizardStep` langsung ke `4` (Langkah Form Input Harga Promo) sehingga operator dapat langsung mengganti harga diskon tanpa melalui langkah pemilihan dari awal.
@@ -111,8 +123,11 @@ Komponen Livewire untuk pencarian dan pemantauan status pricetag.
 
 ---
 
-## 5. Standar Keamanan & Deployment (Shared Hosting cPanel)
-Sistem dikonfigurasi untuk bekerja secara aman pada lingkungan shared hosting.
+## 5. Standar Keamanan & Deployment
+
+Laravel API dan hasil static export Next.js berjalan pada satu shared hosting cPanel di `creative.doran.id`. API memakai prefix `/api/v1`. Build Next.js dilakukan di lokal atau CI; production tidak menjalankan process Node.js dan tidak bergantung pada terminal interaktif.
+
+Web Artisan hanya mengelola Laravel. Static artifact Next.js dipublikasikan bersama public artifact Laravel dan tidak dibangun melalui Web Artisan.
 
 ---
 
@@ -124,5 +139,9 @@ Sistem dikonfigurasi untuk bekerja secara aman pada lingkungan shared hosting.
 * **Desain Basis Data Generator Pricetag**: [[docs/02_pricetag_generator/CreativeUniverse-SubApp_PricetagGenerator_ERD.md|ERD Pricetag Generator]]
 * **Dokumentasi API Google Apps Script**: [[docs/02_pricetag_generator/PricetagGenerator_GoogleAppScript.md|GAS Integration Guide]]
 * **Panduan Operasional Generator Pricetag**: [[docs/02_pricetag_generator/pricetag_generator_V1_5_Documentation.md|Operational Guide v1.5]]
+* **Arsitektur Headless**: [[docs/00_architecture/Headless_Architecture.md|Headless Architecture]]
+* **SRD Laravel REST API**: [[docs/03_backend_api/Laravel_REST_API_SRD.md|Backend API SRD]]
+* **SRD Next.js**: [[docs/04_frontend_nextjs/NextJS_Frontend_SRD.md|Frontend SRD]]
+* **Baseline Route Legacy**: [[docs/05_migration/Legacy_Route_Baseline.md|Legacy Route Baseline]]
 
 Dokumen master ini akan terus diperbarui seiring dengan penambahan fitur baru, perbaikan bug, maupun perubahan kebijakan teknis dalam ekosistem Creative Universe.

@@ -1,3 +1,11 @@
+# Kontrak Google Apps Script Pricetag Generator
+
+**Status:** Legacy-compatible integration contract
+**Caller:** Hanya `PricetagGeneratorService` pada backend Laravel. Frontend tidak boleh memanggil Web App GAS secara langsung.
+
+ID template dan folder di bawah adalah konfigurasi deployment. Pada revisi berikutnya, pindahkan keduanya ke Script Properties agar dokumen dan repository tidak menjadi tempat penyimpanan konfigurasi environment.
+
+```javascript
 // ================= KONFIGURASI UTAMA =================
 const TEMPLATE_SLIDE_ID = "1X8W88EABhlDxMOHhpUqKr_YWgyiIXxSgJxAJXwAs3R0";
 const FOLDER_OUTPUT_ID = "1_hDgm1HggN9ub0pI3yZ4llDmRYpiOnQ5";
@@ -98,17 +106,6 @@ const data = JSON.parse(e.postData.contents);
       throw new Error("Gagal mengekspor gambar setelah 3x percobaan.");
     }
 
-    // 8. Hapus file template sementara
-    fileCopy.setTrashed(true);
-
-    // 9. Kembalikan Response ke Laravel
-    if (isExportSuccess) {
-      return ContentService.createTextOutput(JSON.stringify({ status: 'success', file_url: finalLink }))
-                           .setMimeType(ContentService.MimeType.JSON);
-    } else {
-      throw new Error("Gagal mengekspor gambar setelah 3x percobaan.");
-    }
-
 } catch (error) {
 return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: error.toString() }))
 .setMimeType(ContentService.MimeType.JSON);
@@ -116,7 +113,7 @@ return ContentService.createTextOutput(JSON.stringify({ status: 'error', message
 }
 
 function getOrCreateFolder(parentFolder, folderName) {
-const safeFolderName = folderName.replace(/[\\/:*?"<>|]/g, "\_");
+const safeFolderName = folderName.replace(/[\\/:*?"<>|]/g, "_");
 const folders = parentFolder.getFoldersByName(safeFolderName);
 if (folders.hasNext()) {
 return folders.next();
@@ -124,3 +121,41 @@ return folders.next();
 return parentFolder.createFolder(safeFolderName);
 }
 }
+```
+
+## Request backend ke GAS
+
+```json
+{
+  "user": "Nama User",
+  "category": "Audio",
+  "produk": "JETE TWS T10",
+  "varian": "Black",
+  "hargaNormal": 399000,
+  "hargaPotongan": 199000,
+  "fileName": "jete-tws-t10-black.jpg"
+}
+```
+
+## Response
+
+Berhasil:
+
+```json
+{
+  "status": "success",
+  "file_url": "https://drive.google.com/...",
+  "download_url": "https://drive.google.com/..."
+}
+```
+
+Gagal:
+
+```json
+{
+  "status": "error",
+  "message": "Pesan error"
+}
+```
+
+Backend wajib memberlakukan timeout, logging tanpa credential, validasi bentuk response, dan retry yang terkontrol. URL GAS hanya berada pada environment/config backend.

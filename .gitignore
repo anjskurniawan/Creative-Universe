@@ -1,23 +1,53 @@
-/.phpunit.cache
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
+# Monorepo Root gitignore
+
+# System & IDE files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Dependencies (Global & Local)
+node_modules/
+**/node_modules/
+vendor/
+**/vendor/
+
+# Environment files
 .env
-.env.backup
 .env.production
-.phpactor.json
+.env.staging
+.env.development
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+**/.env.production
+**/.env.staging
+**/.env.development
+
+# Build & Cache
 .phpunit.result.cache
-Homestead.json
-Homestead.yaml
-npm-debug.log
+**/.phpunit.result.cache
+.next/
+**/out/
+**/dist/
 yarn-error.log
-/auth.json
-/.fleet
-/.idea
-/.nova
-/.vscode
-/.zed
+npm-debug.log*
+
+# Laravel specific (ignored from apps/backend and legacy)
+apps/backend/storage/logs/*
+apps/backend/storage/framework/cache/data/*
+apps/backend/storage/framework/sessions/*
+apps/backend/storage/framework/views/*
+apps/backend/storage/framework/testing/*
+apps/backend/bootstrap/cache/*
+
+# Backup & Migration databases
+tmp/migration-backups/*
+/tmp/migration-backups/
+!**/tmp/migration-backups/.gitignore

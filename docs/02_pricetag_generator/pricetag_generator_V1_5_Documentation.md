@@ -1,5 +1,8 @@
 # Pricetag Generator Sub-App V1.5 Documentation
 
+> **Status:** Legacy UI Reference
+> Dokumen ini menjelaskan implementasi Laravel Livewire yang menjadi baseline migrasi. Requirement bisnis dan UX tetap berlaku; target teknis baru berada di `docs/03_backend_api/Laravel_REST_API_SRD.md` dan `docs/04_frontend_nextjs/NextJS_Frontend_SRD.md`.
+
 Welcome to the official documentation for the **Pricetag Generator** sub-app within the *Creative Universe* project. This document serves as a complete technical guide, detailing the system architecture, database structure, Google Apps Script integration, key features, local setup, and testing procedures.
 
 ---
@@ -23,7 +26,7 @@ This sub-app automates price tag creation via Google Slides and Google Apps Scri
 
 ## 2. Architecture & Components
 
-The sub-app follows Laravel's standard MVC architecture, powered by **Livewire v3** for rich, reactive UI interfaces.
+Implementasi legacy mengikuti Laravel MVC dan Livewire v3. Pada target headless, Action, Service, Model, Job, dan database dipertahankan di backend, sedangkan komponen Livewire digantikan oleh React feature components yang mengonsumsi REST API.
 
 ```
 [ Laravel Dashboard ] --(Dispatch Job)--> [ Queued Jobs ]
@@ -41,7 +44,7 @@ The sub-app follows Laravel's standard MVC architecture, powered by **Livewire v
 
 ### Key Components
 
-#### 1. Livewire Components
+#### 1. Livewire Components (Legacy Mapping)
 * **`App\Livewire\Pricetag\Search`**: Mengelola alur pencarian katalog dua tingkat: menyaring kategori terlebih dahulu dengan grid compact (ikon di kiri sejajar dengan grup teks nama kategori & total produk di kanan), lalu menyaring produk/varian dengan grid collapse/expand (`items-start` alignment) yang menampilkan semua data secara universal lintas user.
 * **`App\Livewire\Pricetag\Generator`**: The core operational interface containing:
   * **Generate Tunggal**: Synchronous single pricetag generator. Terintegrasi dengan parameter query `product_id` untuk langsung melompat ke form input harga. Dilengkapi alur pencarian kategori interaktif (menyembunyikan daftar kategori secara default sebelum pencarian dilakukan) dan visualisasi pemrosesan gradual 0% -> 90% -> 100%.
@@ -104,6 +107,8 @@ Untuk meningkatkan kerapian visual dan keramahan pengguna (user-friendliness), p
 
 ## 6. Installation & Configuration
 Configuration requires setting up GAS web app credentials in the environment setup.
+
+Pada target baru, dependency backend dan frontend di-build dari folder masing-masing. Build production dilakukan di lokal/CI; runtime production tidak boleh bergantung pada terminal interaktif.
 
 ---
 
