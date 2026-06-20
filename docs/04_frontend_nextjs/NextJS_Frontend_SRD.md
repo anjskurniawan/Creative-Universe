@@ -75,8 +75,22 @@ Frontend memakai `laravel-echo` 2.3.7 dan `pusher-js` 8.5.0 dengan cluster dari 
 - Semua aksi server memiliki loading, disabled, success, error, dan retry state.
 - Aksi destruktif memiliki modal konfirmasi.
 - Wizard Pricetag mempertahankan enam langkah dan deep link `?product_id={id}`.
+- Seluruh feedback sukses/gagal pada sub-app Pricetag dikirim ke panel `Pemberitahuan` dan tidak ditampilkan lagi sebagai alert inline di halaman modul.
+- Pencarian kategori pada wizard `/pricetag/generator` memakai filter API kategori berbasis query `name` agar hasil list kategori tetap akurat dan konsisten dengan kontrak backend.
+- Status sukses/gagal pada flow `Buat Label Satuan` tidak lagi memakai alert di bagian atas halaman; feedback dikirim ke menu `Pemberitahuan` agar area wizard tetap bersih.
 - Search Pricetag mempertahankan alur kategori lalu produk/varian.
+- Checklist generator `/pricetag/generator` menampilkan katalog awal maksimal 10 item per halaman tanpa mewajibkan pencarian, dan pagination angka dibatasi 3 nomor bergeser (`1 2 3`, lalu `2 3 4`, dan seterusnya).
+- Batch name otomatis untuk `Buat Label Sekaligus` mengikuti format `Pricetag Label (dd/mm/yyyy) #n`, dengan `n` diambil dari batch terakhir milik user lalu ditambah 1.
+- Generator CSV memakai template kolom `kategori | produk | variant | harga normal | harga diskon`; backend menerima header tersebut secara langsung, tombol unduh template ditempatkan di kanan header box, dan nama batch diisi otomatis dengan format `Pricetag CSV (dd/mm/yyyy) #n`.
+- Halaman database Pricetag membuka import CSV lewat tombol header dan modal khusus, menyediakan template CSV kosong, menampilkan nama file terpilih di dalam dropzone, serta menjaga tabel kategori/produk pada maksimum 10 item per halaman sebelum pagination. Parser impor menerima header template `kategori | produk | variant | harga normal | harga diskon` maupun alias underscore versi lama.
 - Accessibility keyboard, focus, label, dan contrast menjadi acceptance criteria.
+- Ikon UI memakai Google Material Symbols Rounded melalui komponen bersama `MaterialIcon`. Renderer memakai ligature font resmi dengan `FILL=1` sebagai default, optical size mengikuti ukuran komponen, dan weight kontekstual 300 untuk ikon kecil, 400 untuk navigasi, 500 untuk aksi/status, serta 600 untuk emphasis besar. Logo brand dan indikator loading bukan Material Symbol.
+- Font Material Symbols dimuat dari stylesheet resmi Google Fonts di root layout dan kompatibel dengan static export; nama ikon tidak lagi dibatasi oleh sprite SVG lokal. Implementasi mengacu pada dokumentasi resmi: https://developers.google.com/fonts/docs/material_symbols.
+- Dropdown avatar memakai panel light terstruktur: ringkasan avatar/username/nama, grup navigasi akun, grup administrasi berbasis permission, dan aksi keluar yang dipisahkan divider. Dropdown dapat ditutup lewat klik di luar, tombol `Escape`, atau setelah memilih menu; membuka dropdown avatar juga menutup dropdown aplikasi dan sebaliknya.
+- Navbar hanya memiliki varian `light` dan `dark` yang dipilih oleh layout berdasarkan background halaman: landing/dashboard umum memakai `light`, sedangkan route `/pricetag/*` memakai `dark`. Surface navbar mengikuti warna background dengan transparansi dan `backdrop-blur`, tanpa shadow maupun border bawah; warna logo dan kontrol selalu dibuat kontras terhadap background. Preferensi `navbar_variant` milik user tidak mengoverride keputusan layout ini.
+- Popup avatar, menu aplikasi, dan notifikasi memakai struktur visual bersama: panel rounded dengan padding internal, header ringkas, divider inset, serta item menu rounded. Ketiganya mengikuti varian navbar; surface/teks light digunakan pada navbar light dan surface gelap/teks putih digunakan pada navbar dark. Popup dapat ditutup melalui klik di luar atau tombol `Escape`.
+- Popup notifikasi dark memakai warna judul putih eksplisit, metadata putih semi-transparan dengan kontras yang cukup, dan highlight unread biru transparan. Area daftar notifikasi menggunakan scrollbar custom tipis dengan thumb yang menyesuaikan varian light/dark, bukan tampilan scrollbar bawaan browser.
+- Popup avatar menyediakan item aktif `Pengaturan` menuju `/profile`. Item `Profil Saya` tetap ditampilkan sebagai placeholder nonaktif berlabel `Segera` sampai route profil publik tersedia, sehingga tidak membuat tautan rusak atau menduplikasi tujuan pengaturan.
 
 ## 7. Deployment tanpa terminal production
 

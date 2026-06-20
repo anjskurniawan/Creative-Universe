@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 import { apiFetch } from "@/lib/api";
+import { pushLocalNotification } from "@/lib/local-notifications";
 import {
   formatRupiah,
   PricetagCategory,
@@ -25,18 +26,16 @@ export default function PricetagSearchPage() {
   const [total, setTotal] = useState(0);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const loadCatalog = useCallback(async () => {
     if (!hasPermission("access-pricetag")) return;
     setIsLoading(true);
-    setError(null);
 
     const params = new URLSearchParams({ page: String(page), per_page: "12" });
     if (appliedSearch) {
       params.set(category ? "search" : "name", appliedSearch);
     } else if (!category) {
-      params.set("per_page", "4");
+      params.set("per_page", "12");
       params.set("sort_by", "products_count");
       params.set("sort_order", "desc");
     }
@@ -61,7 +60,7 @@ export default function PricetagSearchPage() {
         setTotal(result.meta.total);
       }
     } catch (requestError) {
-      setError(pricetagError(requestError));
+      pushLocalNotification(pricetagError(requestError), "/pricetag/search");
     } finally {
       setIsLoading(false);
     }
@@ -146,9 +145,6 @@ export default function PricetagSearchPage() {
           />
         </form>
       </header>
-
-      {error && <Alert message={error} onClose={() => setError(null)} />}
-
       {isLoading ? (
         <Loading />
       ) : category ? (
@@ -201,20 +197,19 @@ export default function PricetagSearchPage() {
           </div>
         )
       ) : categories.length === 0 ? <Empty title="Kategori Tidak Ditemukan" /> : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {categories.map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => selectCategory(item)}
-              className="group flex items-center gap-3 rounded-2xl border border-cu-line bg-cu-surface p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="group flex flex-col items-center justify-center gap-3 rounded-2xl border border-cu-line bg-cu-surface p-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-muted group-hover:text-cu-ink">
-                <MaterialIcon name="category" size="xs" />
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-cu-panel-soft text-cu-muted group-hover:text-cu-ink">
+                <MaterialIcon name="category" size="sm" />
               </span>
-              <span className="min-w-0">
-                <span className="block text-[10px] font-bold uppercase tracking-wide text-cu-muted">{item.products_count} Produk</span>
-                <span className="block truncate text-sm font-extrabold text-cu-ink">{item.name}</span>
+              <span className="w-full min-w-0">
+                <span className="block truncate text-sm font-bold text-cu-ink">{item.name}</span>
               </span>
             </button>
           ))}
@@ -240,5 +235,4 @@ function Pagination({ page, lastPage, onPage }: { page: number; lastPage: number
 
 function Loading() { return <div className="rounded-2xl border border-cu-line bg-cu-surface p-12 text-center text-sm text-cu-muted">Memuat katalog pricetag...</div>; }
 function Empty({ title }: { title: string }) { return <div className="rounded-2xl border border-dashed border-cu-line bg-cu-surface p-12 text-center"><MaterialIcon name="search_off" size="lg" className="mx-auto text-cu-soft" /><h2 className="mt-3 text-sm font-semibold text-cu-ink">{title}</h2></div>; }
-function Alert({ message, onClose }: { message: string; onClose: () => void }) { return <div className="flex justify-between rounded-xl border border-cu-danger/20 bg-cu-danger-soft px-4 py-3 text-sm text-cu-danger"><span>{message}</span><button type="button" onClick={onClose} aria-label="Tutup"><MaterialIcon name="close" size="xs" /></button></div>; }
 function AccessDenied() { return <div className="rounded-2xl border border-cu-danger/20 bg-cu-danger-soft p-8 text-center"><MaterialIcon name="lock" size="lg" className="mx-auto text-cu-danger" /><h1 className="mt-3 text-lg font-semibold">Akses ditolak</h1><p className="mt-1 text-sm text-cu-muted">Anda tidak memiliki permission access-pricetag.</p></div>; }

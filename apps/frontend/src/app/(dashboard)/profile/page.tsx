@@ -1,9 +1,11 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { apiFetch, ApiError, ValidationError } from "@/lib/api";
 import { User, useAuth } from "@/providers/auth-provider";
 import { MaterialIcon } from "@/components/material-icon";
+import { SettingsLayout } from "@/components/settings-layout";
 
 interface UserSession {
   id: string;
@@ -39,8 +41,11 @@ function settingValue(user: User, key: string, fallback: string): string {
 export default function ProfilePage() {
   const { user, refreshUser, hasPermission } = useAuth();
   
-  // Tab State
-  const [activeTab, setActiveTab] = useState<"profile" | "security" | "role_settings" | "activity_log">("profile");
+  // Tab from URL search params (driven by SettingsLayout sidebar)
+  const searchParams = useSearchParams();
+  const activeTab = (searchParams.get("tab") || "profile") as
+    "profile" | "security" | "role_settings" | "activity_log" |
+    "billing_overview" | "billing_usage" | "billing_ai" | "billing_budgets";
 
   // Profile forms state
   const [name, setName] = useState("");
@@ -48,7 +53,6 @@ export default function ProfilePage() {
   const [email, setEmail] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [theme, setTheme] = useState("system");
-  const [navbarVariant, setNavbarVariant] = useState("solid");
   
   const [profileStatus, setProfileStatus] = useState<string | null>(null);
   const [profileError, setProfileError] = useState<string | null>(null);
@@ -103,19 +107,6 @@ export default function ProfilePage() {
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
   const [activitiesError, setActivitiesError] = useState<string | null>(null);
 
-  // Collapsible accordion states
-  const [dataDiriOpen, setDataDiriOpen] = useState(true);
-  const [avatarOpen, setAvatarOpen] = useState(false);
-  const [themeOpen, setThemeOpen] = useState(false);
-
-  const [changePasswordOpen, setChangePasswordOpen] = useState(true);
-  const [activeSessionsOpen, setActiveSessionsOpen] = useState(false);
-  const [dangerZoneOpen, setDangerZoneOpen] = useState(false);
-
-  const [rootSettingsOpen, setRootSettingsOpen] = useState(true);
-  const [managerSettingsOpen, setManagerSettingsOpen] = useState(false);
-  const [designerSettingsOpen, setDesignerSettingsOpen] = useState(false);
-
   // Load user data into state
   useEffect(() => {
     let active = true;
@@ -126,7 +117,6 @@ export default function ProfilePage() {
       setEmail(user.email);
       setWhatsappNumber(user.whatsapp_number || "");
       setTheme(settingValue(user, "theme", "system"));
-      setNavbarVariant(settingValue(user, "navbar_variant", "solid"));
       setAvatarPreview(user.avatar_url);
 
       // Root settings
@@ -278,7 +268,6 @@ export default function ProfilePage() {
           whatsapp_number: whatsappNumber || null,
           settings: {
             theme,
-            navbar_variant: navbarVariant,
           },
         }),
       });
@@ -419,314 +408,154 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full">
-      {/* Header */}
-      <div className="border-b border-cu-line bg-cu-surface -mx-4 -mt-6 mb-6 px-4 py-5 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold tracking-tight text-cu-ink md:text-3xl">Pengaturan Akun</h1>
-          <p className="mt-1 text-sm text-cu-muted">
-            Kelola profil, preferensi peran, sesi perangkat aktif, dan jejak aktivitas Anda.
-          </p>
-        </div>
-      </div>
+    <SettingsLayout>
+      <div className="animate-fade-in">
+        {/* TAB 1: Profile & Displays */}
+        {activeTab === "profile" && (
+          <div className="space-y-6">
+            <div className="border-b border-cu-line pb-3 mb-6">
+              <h2 className="text-2xl font-semibold text-cu-ink">Profil Publik</h2>
+            </div>
 
-      <div className="mt-2 flex flex-col gap-6 lg:flex-row items-start">
-        {/* Left Tab Menu */}
-        <div className="w-full shrink-0 lg:w-64">
-          <nav className="flex w-full gap-1 overflow-x-auto pb-3 scrollbar-none lg:flex-col lg:gap-1.5 lg:pb-0 border-b border-cu-line lg:border-b-0 lg:border-r lg:border-cu-line/60 pr-0 lg:pr-4">
-            <button
-              onClick={() => setActiveTab("profile")}
-              type="button"
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap w-auto lg:w-full border-b-2 lg:border-b-0 lg:border-l-2 cursor-pointer ${
-                activeTab === "profile"
-                  ? "border-cu-focus text-cu-ink bg-cu-panel-soft lg:bg-cu-panel-soft/80 font-bold"
-                  : "border-transparent text-cu-muted hover:text-cu-focus hover:bg-cu-panel-soft/30"
-              }`}
-            >
-              <MaterialIcon name="person" size="sm" />
-              Profil & Tampilan
-            </button>
-
-            <button
-              onClick={() => setActiveTab("security")}
-              type="button"
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap w-auto lg:w-full border-b-2 lg:border-b-0 lg:border-l-2 cursor-pointer ${
-                activeTab === "security"
-                  ? "border-cu-focus text-cu-ink bg-cu-panel-soft lg:bg-cu-panel-soft/80 font-bold"
-                  : "border-transparent text-cu-muted hover:text-cu-focus hover:bg-cu-panel-soft/30"
-              }`}
-            >
-              <MaterialIcon name="security" size="sm" />
-              Keamanan & Perangkat
-            </button>
-
-            {hasRoleSettings && (
-              <button
-                onClick={() => setActiveTab("role_settings")}
-                type="button"
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap w-auto lg:w-full border-b-2 lg:border-b-0 lg:border-l-2 cursor-pointer ${
-                  activeTab === "role_settings"
-                    ? "border-cu-focus text-cu-ink bg-cu-panel-soft lg:bg-cu-panel-soft/80 font-bold"
-                    : "border-transparent text-cu-muted hover:text-cu-focus hover:bg-cu-panel-soft/30"
-                }`}
-              >
-                <MaterialIcon name="admin_panel_settings" size="sm" />
-                Pengaturan Peran
-              </button>
+            {profileStatus && (
+              <div className="rounded-lg border border-cu-success/20 bg-cu-success-soft p-4 text-sm text-cu-success">
+                {profileStatus}
+              </div>
             )}
 
-            <button
-              onClick={() => setActiveTab("activity_log")}
-              type="button"
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-semibold uppercase tracking-wider transition-all whitespace-nowrap w-auto lg:w-full border-b-2 lg:border-b-0 lg:border-l-2 cursor-pointer ${
-                activeTab === "activity_log"
-                  ? "border-cu-focus text-cu-ink bg-cu-panel-soft lg:bg-cu-panel-soft/80 font-bold"
-                  : "border-transparent text-cu-muted hover:text-cu-focus hover:bg-cu-panel-soft/30"
-              }`}
-            >
-              <MaterialIcon name="history" size="sm" />
-              Jejak Aktivitas
-            </button>
-          </nav>
-        </div>
-
-        {/* Right Settings Panels */}
-        <div className="flex-1 w-full space-y-6">
-          {/* TAB 1: Profile & Displays */}
-          {activeTab === "profile" && (
-            <div className="space-y-6 animate-fade-in">
-              <div>
-                <h2 className="text-lg font-semibold text-cu-ink">Informasi Profil & Tampilan</h2>
-                <p className="mt-1 text-sm text-cu-muted">
-                  Perbarui data diri, nomor WhatsApp, foto profil, dan preferensi tampilan akun Anda.
-                </p>
+            {profileError && (
+              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-sm text-cu-danger">
+                {profileError}
               </div>
+            )}
 
-              {profileStatus && (
-                <div className="rounded-lg border border-cu-success/20 bg-cu-success-soft p-4 text-sm text-cu-success">
-                  {profileStatus}
+            <form onSubmit={submitProfile} className="flex flex-col-reverse lg:flex-row gap-8 items-start">
+              {/* Kolom Kiri: Form Data stacked vertically */}
+              <div className="flex-1 w-full space-y-4 max-w-xl">
+                <div>
+                  <label className="block text-sm font-semibold text-cu-ink" htmlFor="profile-name">
+                    Nama Lengkap
+                  </label>
+                  <input
+                    id="profile-name"
+                    className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
                 </div>
-              )}
-
-              {profileError && (
-                <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-sm text-cu-danger">
-                  {profileError}
-                </div>
-              )}
-
-              <form onSubmit={submitProfile} className="space-y-4">
-                {/* 1. Data Diri */}
-                <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setDataDiriOpen(!dataDiriOpen)}
-                    className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none cursor-pointer"
-                  >
-                    <div>
-                      <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                        <MaterialIcon name="person" size="sm" className="text-cu-muted" />
-                        Data Diri & Kontak
-                      </h3>
-                      <p className="text-xs text-cu-muted mt-0.5">
-                        Nama lengkap, alamat email, username, dan nomor kontak WhatsApp Anda.
-                      </p>
-                    </div>
-                    <MaterialIcon
-                      name="expand_more"
-                      size="sm"
-                      className={`transition-transform duration-200 ${dataDiriOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
-
-                  {dataDiriOpen && (
-                    <div className="px-5 pb-5 pt-3 border-t border-cu-line/30 space-y-4">
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="profile-name">
-                            Nama Lengkap
-                          </label>
-                          <input
-                            id="profile-name"
-                            className="block w-full mt-1 rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="profile-username">
-                            Username
-                          </label>
-                          <input
-                            id="profile-username"
-                            className="block w-full mt-1 rounded-lg border border-cu-border bg-cu-panel-soft px-3 py-2 text-sm text-cu-muted cursor-not-allowed"
-                            type="text"
-                            value={username}
-                            readOnly
-                          />
-                          <p className="mt-1 text-[10px] text-cu-muted">
-                            Username tidak dapat diubah demi keamanan akun.
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="profile-email">
-                            Email
-                          </label>
-                          <input
-                            id="profile-email"
-                            className="block w-full mt-1 rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="profile-whatsapp">
-                            Nomor WhatsApp
-                          </label>
-                          <input
-                            id="profile-whatsapp"
-                            className="block w-full mt-1 rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
-                            type="text"
-                            value={whatsappNumber}
-                            onChange={(e) => setWhatsappNumber(e.target.value.replace(/\D/g, ""))}
-                            placeholder="Contoh: 628123456789"
-                          />
-                          <p className="mt-1 text-[10px] text-cu-muted">
-                            Diawali kode negara 62 (tanpa + atau spasi). Digunakan untuk notifikasi/OTP WhatsApp.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                <div>
+                  <label className="block text-sm font-semibold text-cu-ink" htmlFor="profile-username">
+                    Username
+                  </label>
+                  <input
+                    id="profile-username"
+                    className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-panel-soft px-3 py-2 text-sm text-cu-muted cursor-not-allowed"
+                    type="text"
+                    value={username}
+                    readOnly
+                  />
+                  <p className="mt-1.5 text-[10px] text-cu-muted">
+                    Username tidak dapat diubah demi keamanan akun.
+                  </p>
                 </div>
 
-                {/* 2. Foto Profil */}
-                <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setAvatarOpen(!avatarOpen)}
-                    className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none cursor-pointer"
-                  >
-                    <div>
-                      <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                        <MaterialIcon name="image" size="sm" className="text-cu-muted" />
-                        Foto Profil (Avatar)
-                      </h3>
-                      <p className="text-xs text-cu-muted mt-0.5">Unggah atau ganti foto profil akun Anda.</p>
-                    </div>
-                    <MaterialIcon
-                      name="expand_more"
-                      size="sm"
-                      className={`transition-transform duration-200 ${avatarOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
-
-                  {avatarOpen && (
-                    <div className="px-5 pb-5 pt-3 border-t border-cu-line/30">
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                        <div className={`relative size-16 shrink-0 overflow-hidden rounded-full border border-cu-line flex items-center justify-center ${avatarPreview ? "bg-white" : "bg-cu-panel-soft"}`}>
-                          {avatarPreview ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={avatarPreview} className="size-full object-cover" alt="Avatar" />
-                          ) : (
-                            <span className="text-xl font-bold uppercase text-cu-muted">{initials}</span>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="avatar-file">
-                            Berkas Gambar
-                          </label>
-                          <input
-                            id="avatar-file"
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={handleAvatarChange}
-                            className="mt-1 block w-full text-xs text-cu-muted file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-cu-ink file:text-cu-surface hover:file:bg-cu-ink-hover cursor-pointer"
-                            disabled={isSavingAvatar}
-                          />
-                          <p className="mt-1 text-xs text-cu-muted">Maksimal 2MB. Format: JPEG, PNG, JPG, WEBP.</p>
-                          {avatarError && <p className="mt-2 text-sm text-cu-danger">{avatarError}</p>}
-                          {avatarStatus && <p className="mt-2 text-sm text-cu-success">{avatarStatus}</p>}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                <div>
+                  <label className="block text-sm font-semibold text-cu-ink" htmlFor="profile-email">
+                    Alamat Email
+                  </label>
+                  <input
+                    id="profile-email"
+                    className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-cu-ink" htmlFor="profile-whatsapp">
+                    Nomor WhatsApp
+                  </label>
+                  <input
+                    id="profile-whatsapp"
+                    className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                    type="text"
+                    value={whatsappNumber}
+                    onChange={(e) => setWhatsappNumber(e.target.value.replace(/\D/g, ""))}
+                    placeholder="Contoh: 628123456789"
+                  />
+                  <p className="mt-1.5 text-[10px] text-cu-muted">
+                    Diawali kode negara 62 (tanpa + atau spasi). Digunakan untuk notifikasi/OTP WhatsApp.
+                  </p>
                 </div>
 
-                {/* 3. Preferensi Tampilan */}
-                <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setThemeOpen(!themeOpen)}
-                    className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none cursor-pointer"
-                  >
-                    <div>
-                      <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                        <MaterialIcon name="palette" size="sm" className="text-cu-muted" />
-                        Preferensi Tema & Tampilan
-                      </h3>
-                      <p className="text-xs text-cu-muted mt-0.5">Atur tema gelap/terang dan gaya bilah navigasi (navbar).</p>
-                    </div>
-                    <MaterialIcon
-                      name="expand_more"
-                      size="sm"
-                      className={`transition-transform duration-200 ${themeOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
+                {/* Preferensi Tampilan */}
+                <div className="pt-4 border-t border-cu-line/60 space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-cu-ink" htmlFor="theme-select">
+                      Tema Tampilan
+                    </label>
+                    <select
+                      id="theme-select"
+                      value={theme}
+                      onChange={(e) => setTheme(e.target.value)}
+                      className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-1 focus:ring-cu-focus focus:outline-none"
+                    >
+                      <option value="system">Sistem (Default)</option>
+                      <option value="light">Mode Terang</option>
+                      <option value="dark">Mode Gelap</option>
+                    </select>
+                  </div>
 
-                  {themeOpen && (
-                    <div className="px-5 pb-5 pt-3 border-t border-cu-line/30">
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="theme-select">
-                            Tema Tampilan
-                          </label>
-                          <select
-                            id="theme-select"
-                            value={theme}
-                            onChange={(e) => setTheme(e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink shadow-sm focus:border-cu-focus focus:ring-1 focus:ring-cu-focus focus:outline-none"
-                          >
-                            <option value="system">Sistem (Default)</option>
-                            <option value="light">Mode Terang</option>
-                            <option value="dark">Mode Gelap</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="navbar-select">
-                            Tampilan Navbar
-                          </label>
-                          <select
-                            id="navbar-select"
-                            value={navbarVariant}
-                            onChange={(e) => setNavbarVariant(e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink shadow-sm focus:border-cu-focus focus:ring-1 focus:ring-cu-focus focus:outline-none"
-                          >
-                            <option value="solid">Solid</option>
-                            <option value="glass">Glassmorphism</option>
-                            <option value="dark-glass">Dark Glassmorphism</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  <p className="text-xs leading-relaxed text-cu-muted">
+                    Warna navbar menyesuaikan background setiap halaman secara otomatis agar ikon dan navigasi tetap kontras.
+                  </p>
                 </div>
 
-                <div className="flex items-center gap-4 pt-2">
+                <div className="pt-4">
                   <button
                     type="submit"
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-5 text-sm font-medium leading-none text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                     disabled={isSavingProfile}
                   >
-                    {isSavingProfile ? "Menyimpan..." : "Simpan Profil"}
+                    {isSavingProfile ? "Menyimpan..." : "Update Profil"}
                   </button>
+                </div>
+                </div>
+
+                {/* Kolom Kanan: Foto Profil (GitHub Style Picture Block) */}
+                <div className="w-full lg:w-64 shrink-0 flex flex-col items-center lg:items-start space-y-4">
+                  <span className="block text-sm font-semibold text-cu-ink">Foto Profil</span>
+                  <div className="relative group">
+                    <div className={`size-40 overflow-hidden rounded-full border border-cu-line flex items-center justify-center ${avatarPreview ? "bg-white" : "bg-cu-panel-soft"}`}>
+                      {avatarPreview ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={avatarPreview} className="size-full object-cover" alt="Avatar" />
+                      ) : (
+                        <span className="text-4xl font-bold uppercase text-cu-muted">{initials}</span>
+                      )}
+                    </div>
+                    
+                    {/* File Input Overlay / Edit Button */}
+                    <label className="absolute bottom-1 right-1 size-10 rounded-full bg-cu-ink text-cu-surface flex items-center justify-center cursor-pointer hover:bg-cu-ink-hover transition-colors">
+                      <MaterialIcon name="edit" size="sm" />
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={handleAvatarChange}
+                        className="hidden"
+                        disabled={isSavingAvatar}
+                      />
+                    </label>
+                  </div>
+                  <div className="text-center lg:text-left text-[11px] text-cu-muted space-y-1">
+                    <p>Format: JPEG, PNG, JPG, WEBP.</p>
+                    <p>Maksimal file 2MB.</p>
+                  </div>
+                  {avatarError && <p className="text-xs text-cu-danger font-medium">{avatarError}</p>}
+                  {avatarStatus && <p className="text-xs text-cu-success font-medium">{avatarStatus}</p>}
                 </div>
               </form>
             </div>
@@ -734,56 +563,38 @@ export default function ProfilePage() {
 
           {/* TAB 2: Security & Devices */}
           {activeTab === "security" && (
-            <div className="space-y-4 animate-fade-in">
-              <div>
-                <h2 className="text-lg font-semibold text-cu-ink">Keamanan & Perangkat</h2>
-                <p className="mt-1 text-sm text-cu-muted">
-                  Kelola sandi akun Anda dan pantau sesi perangkat yang aktif.
-                </p>
+            <div className="space-y-6 animate-fade-in">
+              <div className="border-b border-cu-line pb-3 mb-6">
+                <h2 className="text-2xl font-semibold text-cu-ink">Sandi & Keamanan Perangkat</h2>
               </div>
 
-              {/* Collapsible 1: Change Password */}
-              <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setChangePasswordOpen(!changePasswordOpen)}
-                  className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none cursor-pointer"
-                >
-                  <div>
-                    <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
+              <div className="flex flex-col lg:flex-row gap-8 items-start">
+                {/* Kolom Kiri: Ubah Sandi & Danger Zone */}
+                <div className="flex-1 w-full space-y-8 max-w-xl">
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2 border-b border-cu-line pb-2">
                       <MaterialIcon name="key" size="sm" className="text-cu-muted" />
                       Ubah Kata Sandi
                     </h3>
-                    <p className="text-xs text-cu-muted mt-0.5">Perbarui kata sandi akun Anda secara berkala.</p>
-                  </div>
-                  <MaterialIcon
-                    name="expand_more"
-                    size="sm"
-                    className={`transition-transform duration-200 ${changePasswordOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {changePasswordOpen && (
-                  <div className="px-5 pb-5 pt-3 border-t border-cu-line/30">
                     {passwordStatus && (
-                      <div className="mb-4 rounded-lg border border-cu-success/20 bg-cu-success-soft p-4 text-xs text-cu-success animate-fade-in">
+                      <div className="rounded-lg border border-cu-success/20 bg-cu-success-soft p-4 text-xs text-cu-success">
                         {passwordStatus}
                       </div>
                     )}
                     {passwordError && (
-                      <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-xs text-cu-danger animate-fade-in">
+                      <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-xs text-cu-danger">
                         {passwordError}
                       </div>
                     )}
 
-                    <form onSubmit={submitPassword} className="space-y-4 max-w-xl">
+                    <form onSubmit={submitPassword} className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-cu-ink" htmlFor="current-pw">
+                        <label className="block text-sm font-semibold text-cu-ink" htmlFor="current-pw">
                           Password Saat Ini
                         </label>
                         <input
                           id="current-pw"
-                          className="block w-full mt-1 rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                          className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
                           type="password"
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
@@ -792,12 +603,12 @@ export default function ProfilePage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-cu-ink" htmlFor="new-pw">
+                        <label className="block text-sm font-semibold text-cu-ink" htmlFor="new-pw">
                           Password Baru
                         </label>
                         <input
                           id="new-pw"
-                          className="block w-full mt-1 rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                          className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
                           type="password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -806,12 +617,12 @@ export default function ProfilePage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-cu-ink" htmlFor="confirm-pw">
+                        <label className="block text-sm font-semibold text-cu-ink" htmlFor="confirm-pw">
                           Konfirmasi Password Baru
                         </label>
                         <input
                           id="confirm-pw"
-                          className="block w-full mt-1 rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                          className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
                           type="password"
                           value={passwordConfirmation}
                           onChange={(e) => setPasswordConfirmation(e.target.value)}
@@ -829,123 +640,89 @@ export default function ProfilePage() {
                       </button>
                     </form>
                   </div>
-                )}
-              </div>
 
-              {/* Collapsible 2: Device Sessions */}
-              <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setActiveSessionsOpen(!activeSessionsOpen)}
-                  className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none cursor-pointer"
-                >
-                  <div>
-                    <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                      <MaterialIcon name="devices" size="sm" className="text-cu-muted" />
-                      Sesi & Perangkat Aktif
-                    </h3>
-                    <p className="text-xs text-cu-muted mt-0.5">Daftar browser dan perangkat yang saat ini mengakses akun Anda.</p>
-                  </div>
-                  <MaterialIcon
-                    name="expand_more"
-                    size="sm"
-                    className={`transition-transform duration-200 ${activeSessionsOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {activeSessionsOpen && (
-                  <div className="px-5 pb-5 pt-3 border-t border-cu-line/30">
-                    <p className="text-xs text-cu-muted mb-4">Cabut sesi perangkat yang tidak lagi Anda gunakan.</p>
-                    
-                    {sessionStatus && (
-                      <div className="mb-4 rounded-lg border border-cu-success/20 bg-cu-success-soft p-4 text-xs text-cu-success animate-fade-in">
-                        {sessionStatus}
+                  {/* Danger Zone */}
+                  {hasPermission("run-artisan") && (
+                    <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
+                      <h3 className="text-sm font-bold text-red-600 flex items-center gap-2">
+                        <MaterialIcon name="warning" size="sm" className="text-red-500" />
+                        Danger Zone
+                      </h3>
+                      <p className="text-xs text-red-600/80 mt-1">Hapus Akun secara permanen.</p>
+                      <div className="mt-4 border-t border-red-500/10 pt-4">
+                        <p className="text-xs text-red-600">
+                          Penghapusan akun langsung secara mandiri saat ini dinonaktifkan. Silakan hubungi admin utama PT Doran Sukses Indonesia.
+                        </p>
                       </div>
-                    )}
-                    {sessionError && (
-                      <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-xs text-cu-danger animate-fade-in">
-                        {sessionError}
-                      </div>
-                    )}
+                    </div>
+                  )}
+                </div>
 
-                    {isLoadingSessions ? (
-                      <p className="text-xs text-cu-muted">Memuat sesi...</p>
-                    ) : sessions.length === 0 ? (
-                      <p className="text-xs text-cu-muted italic">Tidak ada sesi yang tercatat.</p>
-                    ) : (
-                      <div className="flex flex-col gap-3">
-                        {sessions.map((session) => (
-                          <div
-                            key={session.id}
-                            className="flex items-center justify-between gap-4 p-4 border border-cu-line rounded-lg"
-                          >
-                            <div className="min-w-0 flex-1">
-                              <strong className="block text-sm text-cu-ink truncate">{session.user_agent || "Perangkat tidak dikenal"}</strong>
-                              <p className="text-xs text-cu-muted mt-1 font-mono">
-                                {session.ip_address || "IP tidak tersedia"} · {getRelativeTime(session.last_activity)}
-                              </p>
-                            </div>
+                {/* Kolom Kanan: Sesi & Perangkat Aktif */}
+                <div className="w-full lg:w-80 shrink-0 space-y-4">
+                  <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2 border-b border-cu-line pb-2">
+                    <MaterialIcon name="devices" size="sm" className="text-cu-muted" />
+                    Sesi & Perangkat Aktif
+                  </h3>
+                  <p className="text-xs text-cu-muted">Berikut adalah daftar browser dan perangkat yang saat ini mengakses akun Anda.</p>
+                  
+                  {sessionStatus && (
+                    <div className="rounded-lg border border-cu-success/20 bg-cu-success-soft p-4 text-xs text-cu-success">
+                      {sessionStatus}
+                    </div>
+                  )}
+                  {sessionError && (
+                    <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-xs text-cu-danger">
+                      {sessionError}
+                    </div>
+                  )}
+
+                  {isLoadingSessions ? (
+                    <p className="text-xs text-cu-muted">Memuat sesi...</p>
+                  ) : sessions.length === 0 ? (
+                    <p className="text-xs text-cu-muted italic">Tidak ada sesi yang tercatat.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {sessions.map((session) => (
+                        <div
+                          key={session.id}
+                          className="flex flex-col gap-2 p-4 border border-cu-line rounded-xl bg-cu-surface"
+                        >
+                          <div className="min-w-0">
+                            <strong className="block text-xs text-cu-ink truncate" title={session.user_agent || ""}>
+                              {session.user_agent || "Perangkat tidak dikenal"}
+                            </strong>
+                            <p className="text-[10px] text-cu-muted mt-1 font-mono">
+                              {session.ip_address || "IP tidak tersedia"} • {getRelativeTime(session.last_activity)}
+                            </p>
+                          </div>
+                          <div className="pt-2 border-t border-cu-line/40 flex justify-end">
                             {session.is_current ? (
-                              <span className="badge badge-success shrink-0">Sesi ini</span>
+                              <span className="badge bg-cu-success-soft text-cu-success text-[10px] px-2.5 py-1 rounded-full font-bold">Sesi ini</span>
                             ) : (
                               <button
                                 type="button"
-                                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full border border-cu-danger bg-transparent px-3 text-xs font-semibold text-cu-danger transition duration-200 hover:bg-cu-danger-soft cursor-pointer shrink-0"
+                                className="inline-flex h-7 items-center justify-center gap-1.5 rounded-full border border-cu-danger bg-transparent px-3 text-[10px] font-semibold text-cu-danger transition duration-200 hover:bg-cu-danger-soft cursor-pointer shrink-0"
                                 onClick={() => void revokeSession(session.id)}
                               >
                                 Cabut Sesi
                               </button>
                             )}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Collapsible 3: Danger Zone */}
-              {hasPermission("run-artisan") && (
-                <div className="rounded-xl border border-red-500/20 bg-red-500/5 shadow-sm overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setDangerZoneOpen(!dangerZoneOpen)}
-                    className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-red-500/10 transition focus:outline-none cursor-pointer"
-                  >
-                    <div>
-                      <h3 className="text-sm font-semibold text-red-600 flex items-center gap-2">
-                        <MaterialIcon name="warning" size="sm" className="text-red-500/70" />
-                        Hapus Akun (Danger Zone)
-                      </h3>
-                      <p className="text-xs text-red-600/75 mt-0.5">Tindakan permanen untuk menonaktifkan akun.</p>
-                    </div>
-                    <MaterialIcon
-                      name="expand_more"
-                      size="sm"
-                      className={`transition-transform duration-200 ${dangerZoneOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
-
-                  {dangerZoneOpen && (
-                    <div className="px-5 pb-5 pt-3 border-t border-red-500/10">
-                      <p className="text-xs text-red-600">
-                        Penghapusan akun langsung secara mandiri saat ini dinonaktifkan. Silakan hubungi admin utama PT Doran Sukses Indonesia.
-                      </p>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
           {/* TAB 3: Role Settings */}
           {activeTab === "role_settings" && hasRoleSettings && (
-            <div className="space-y-4 animate-fade-in">
-              <div>
-                <h2 className="text-lg font-semibold text-cu-ink">Pengaturan Khusus Peran</h2>
-                <p className="mt-1 text-sm text-cu-muted">
-                  Konfigurasi opsi spesifik berdasarkan hak akses akun Anda di sistem.
-                </p>
+            <div className="space-y-8 animate-fade-in">
+              <div className="border-b border-cu-line pb-3 mb-6">
+                <h2 className="text-2xl font-semibold text-cu-ink">Pengaturan Khusus Peran</h2>
               </div>
 
               {roleSettingsStatus && (
@@ -960,316 +737,283 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              <form onSubmit={submitRoleSettings} className="space-y-4">
-                {/* 1. Root Settings */}
-                {hasPermission("run-artisan") && (
-                  <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setRootSettingsOpen(!rootSettingsOpen)}
-                      className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none cursor-pointer"
-                    >
+              <div className="flex flex-col lg:flex-row gap-8 items-start">
+                {/* Kolom Kiri: Form Configs */}
+                <form onSubmit={submitRoleSettings} className="flex-1 w-full space-y-8 max-w-xl">
+                  {/* 1. Root Settings */}
+                  {hasPermission("run-artisan") && (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2 border-b border-cu-line pb-2">
+                        <MaterialIcon name="admin_panel_settings" size="sm" className="text-cu-danger" />
+                        Konfigurasi Sistem (Root)
+                      </h3>
+                      
                       <div>
-                        <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                          <MaterialIcon name="admin_panel_settings" size="sm" className="text-cu-danger" />
-                          Konfigurasi Sistem (Root)
-                        </h3>
-                        <p className="text-xs text-cu-muted mt-0.5">Mode pemeliharaan, debug log, dan kunci integrasi API.</p>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="m-mode">Mode Pemeliharaan (Maintenance)</label>
+                        <select
+                          id="m-mode"
+                          value={maintenanceMode}
+                          onChange={(e) => setMaintenanceMode(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
+                        >
+                          <option value="0">Nonaktif (Aktif Normal)</option>
+                          <option value="1">Aktif (Pemeliharaan)</option>
+                        </select>
                       </div>
-                      <MaterialIcon
-                        name="expand_more"
-                        size="sm"
-                        className={`transition-transform duration-200 ${rootSettingsOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
-
-                    {rootSettingsOpen && (
-                      <div className="px-5 pb-5 pt-3 border-t border-cu-line/30 space-y-4">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                          <div>
-                            <label className="block text-sm font-medium text-cu-ink" htmlFor="m-mode">Mode Pemeliharaan (Maintenance)</label>
-                            <select
-                              id="m-mode"
-                              value={maintenanceMode}
-                              onChange={(e) => setMaintenanceMode(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
-                            >
-                              <option value="0">Nonaktif (Aktif Normal)</option>
-                              <option value="1">Aktif (Pemeliharaan)</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-cu-ink" htmlFor="d-mode">Pemberitahuan Debug</label>
-                            <select
-                              id="d-mode"
-                              value={globalDebugMode}
-                              onChange={(e) => setGlobalDebugMode(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
-                            >
-                              <option value="0">Matikan Peringatan Debug</option>
-                              <option value="1">Tampilkan Peringatan Debug</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="gas-url">Google Apps Script Pricetag URL</label>
-                          <input
-                            id="gas-url"
-                            type="text"
-                            value={googleScriptUrl}
-                            onChange={(e) => setGoogleScriptUrl(e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-xs text-cu-ink"
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                          <div>
-                            <label className="block text-sm font-medium text-cu-ink" htmlFor="f-token">Fonnte API Token (WA)</label>
-                            <input
-                              id="f-token"
-                              type="password"
-                              value={fonnteToken}
-                              onChange={(e) => setFonnteToken(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-xs text-cu-ink"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-cu-ink" htmlFor="f-sender">Fonnte Sender (Nomor WA)</label>
-                            <input
-                              id="f-sender"
-                              type="text"
-                              value={fonnteSender}
-                              onChange={(e) => setFonnteSender(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-xs text-cu-ink"
-                              placeholder="628..."
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                          <div>
-                            <label className="block text-[10px] font-bold text-cu-muted uppercase" htmlFor="p-id">Pusher App ID</label>
-                            <input
-                              id="p-id"
-                              type="text"
-                              value={pusherAppId}
-                              onChange={(e) => setPusherAppId(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-xs text-cu-ink font-mono"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-bold text-cu-muted uppercase" htmlFor="p-key">Pusher App Key</label>
-                            <input
-                              id="p-key"
-                              type="text"
-                              value={pusherAppKey}
-                              onChange={(e) => setPusherAppKey(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-xs text-cu-ink font-mono"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-bold text-cu-muted uppercase" htmlFor="p-secret">Pusher Secret</label>
-                            <input
-                              id="p-secret"
-                              type="password"
-                              value={pusherAppSecret}
-                              onChange={(e) => setPusherAppSecret(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-xs text-cu-ink font-mono"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-bold text-cu-muted uppercase" htmlFor="p-cluster">Pusher Cluster</label>
-                            <input
-                              id="p-cluster"
-                              type="text"
-                              value={pusherAppCluster}
-                              onChange={(e) => setPusherAppCluster(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-xs text-cu-ink font-mono"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* 2. Manager Settings */}
-                {hasPermission("approve-users") && (
-                  <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setManagerSettingsOpen(!managerSettingsOpen)}
-                      className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none cursor-pointer"
-                    >
                       <div>
-                        <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                          <MaterialIcon name="groups" size="sm" className="text-cu-info" />
-                          Manajemen Alur Kerja (Manajer)
-                        </h3>
-                        <p className="text-xs text-cu-muted mt-0.5">Notifikasi pendaftaran baru dan limit cetak pricetag divisi.</p>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="d-mode">Pemberitahuan Debug</label>
+                        <select
+                          id="d-mode"
+                          value={globalDebugMode}
+                          onChange={(e) => setGlobalDebugMode(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
+                        >
+                          <option value="0">Matikan Peringatan Debug</option>
+                          <option value="1">Tampilkan Peringatan Debug</option>
+                        </select>
                       </div>
-                      <MaterialIcon
-                        name="expand_more"
-                        size="sm"
-                        className={`transition-transform duration-200 ${managerSettingsOpen ? "rotate-180" : ""}`}
-                      />
-                    </button>
 
-                    {managerSettingsOpen && (
-                      <div className="px-5 pb-5 pt-3 border-t border-cu-line/30 space-y-4">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                          <div>
-                            <label className="block text-sm font-medium text-cu-ink" htmlFor="wa-reg">Notifikasi Pendaftaran Baru</label>
-                            <select
-                              id="wa-reg"
-                              value={notifyNewRegistration}
-                              onChange={(e) => setNotifyNewRegistration(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
-                            >
-                              <option value="1">Kirim WA ketika user mendaftar</option>
-                              <option value="0">Jangan kirim notifikasi</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-cu-ink" htmlFor="exp-days">Default Kadaluarsa Batch (Hari)</label>
-                            <input
-                              id="exp-days"
-                              type="number"
-                              value={defaultExpiryDays}
-                              onChange={(e) => setDefaultExpiryDays(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-sm text-cu-ink"
-                              min="1"
-                              max="365"
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-cu-ink" htmlFor="max-pr">Maksimum Baris per Batch Cetak</label>
-                          <input
-                            id="max-pr"
-                            type="number"
-                            value={maxPrintsPerBatch}
-                            onChange={(e) => setMaxPrintsPerBatch(e.target.value)}
-                            className="mt-1 block w-full rounded-lg border border-cu-border bg-cu-surface px-3 py-2 text-sm text-cu-ink"
-                            min="10"
-                            max="1000"
-                          />
-                          <p className="mt-1 text-[10px] text-cu-muted">Mencegah server timeout ketika mencetak terlalu banyak daftar pricetag sekaligus.</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* 3. Designer Settings */}
-                {hasPermission("access-pricetag") && (
-                  <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setDesignerSettingsOpen(!designerSettingsOpen)}
-                      className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-cu-panel-soft/30 transition focus:outline-none cursor-pointer"
-                    >
                       <div>
-                        <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                          <MaterialIcon name="verified" size="sm" className="text-cu-success" />
-                          Preferensi Studio Pricetag (Designer)
-                        </h3>
-                        <p className="text-xs text-cu-muted mt-0.5">Tata letak cetak bawaan, ukuran kertas, dan simpan checklist otomatis.</p>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="gas-url">Google Apps Script Pricetag URL</label>
+                        <input
+                          id="gas-url"
+                          type="text"
+                          value={googleScriptUrl}
+                          onChange={(e) => setGoogleScriptUrl(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink font-mono"
+                        />
                       </div>
-                      <MaterialIcon
-                        name="expand_more"
-                        size="sm"
-                        className={`transition-transform duration-200 ${designerSettingsOpen ? "rotate-180" : ""}`}
-                      />
+
+                      <div>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="f-token">Fonnte API Token (WA)</label>
+                        <input
+                          id="f-token"
+                          type="password"
+                          value={fonnteToken}
+                          onChange={(e) => setFonnteToken(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="f-sender">Fonnte Sender (Nomor WA)</label>
+                        <input
+                          id="f-sender"
+                          type="text"
+                          value={fonnteSender}
+                          onChange={(e) => setFonnteSender(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
+                          placeholder="628..."
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-cu-muted uppercase" htmlFor="p-id">Pusher App ID</label>
+                        <input
+                          id="p-id"
+                          type="text"
+                          value={pusherAppId}
+                          onChange={(e) => setPusherAppId(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-cu-muted uppercase" htmlFor="p-key">Pusher App Key</label>
+                        <input
+                          id="p-key"
+                          type="text"
+                          value={pusherAppKey}
+                          onChange={(e) => setPusherAppKey(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-cu-muted uppercase" htmlFor="p-secret">Pusher Secret</label>
+                        <input
+                          id="p-secret"
+                          type="password"
+                          value={pusherAppSecret}
+                          onChange={(e) => setPusherAppSecret(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink font-mono"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-cu-muted uppercase" htmlFor="p-cluster">Pusher Cluster</label>
+                        <input
+                          id="p-cluster"
+                          type="text"
+                          value={pusherAppCluster}
+                          onChange={(e) => setPusherAppCluster(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink font-mono"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. Manager Settings */}
+                  {hasPermission("approve-users") && (
+                    <div className="space-y-4 pt-6 border-t border-cu-line/60">
+                      <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2 border-b border-cu-line pb-2">
+                        <MaterialIcon name="groups" size="sm" className="text-cu-info" />
+                        Manajemen Alur Kerja (Manajer)
+                      </h3>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="wa-reg">Notifikasi Pendaftaran Baru</label>
+                        <select
+                          id="wa-reg"
+                          value={notifyNewRegistration}
+                          onChange={(e) => setNotifyNewRegistration(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
+                        >
+                          <option value="1">Kirim WA ketika user mendaftar</option>
+                          <option value="0">Jangan kirim notifikasi</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="exp-days">Default Kadaluarsa Batch (Hari)</label>
+                        <input
+                          id="exp-days"
+                          type="number"
+                          value={defaultExpiryDays}
+                          onChange={(e) => setDefaultExpiryDays(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
+                          min="1"
+                          max="365"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="max-pr">Maksimum Baris per Batch Cetak</label>
+                        <input
+                          id="max-pr"
+                          type="number"
+                          value={maxPrintsPerBatch}
+                          onChange={(e) => setMaxPrintsPerBatch(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
+                          min="10"
+                          max="1000"
+                        />
+                        <p className="mt-1.5 text-[10px] text-cu-muted">Mencegah server timeout ketika mencetak terlalu banyak daftar pricetag sekaligus.</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 3. Designer Settings */}
+                  {hasPermission("access-pricetag") && (
+                    <div className="space-y-4 pt-6 border-t border-cu-line/60">
+                      <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2 border-b border-cu-line pb-2">
+                        <MaterialIcon name="verified" size="sm" className="text-cu-success" />
+                        Preferensi Studio Pricetag (Designer)
+                      </h3>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="lay-default">Layout Desain Bawaan</label>
+                        <select
+                          id="lay-default"
+                          value={defaultLayout}
+                          onChange={(e) => setDefaultLayout(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
+                        >
+                          <option value="classic">Classic Grid (Default)</option>
+                          <option value="modern">Modern Compact</option>
+                          <option value="minimalist">Minimalist Text</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-cu-ink" htmlFor="p-default">Ukuran Kertas Bawaan</label>
+                        <select
+                          id="p-default"
+                          value={defaultPaperSize}
+                          onChange={(e) => setDefaultPaperSize(e.target.value)}
+                          className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
+                        >
+                          <option value="A4">A4 Standard (Grid)</option>
+                          <option value="A3">A3 Large Layout</option>
+                          <option value="thermal_80mm">Thermal 80mm</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-2 pt-2">
+                        <input
+                          id="chk-default"
+                          type="checkbox"
+                          checked={autoSaveChecklist}
+                          onChange={(e) => setAutoSaveChecklist(e.target.checked)}
+                          className="size-4 rounded border-cu-line text-cu-ink focus:ring-cu-ink"
+                        />
+                        <label className="text-sm font-medium text-cu-ink select-none cursor-pointer" htmlFor="chk-default">
+                          Simpan otomatis status checklist pencarian
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-6 border-t border-cu-line/60">
+                    <button
+                      type="submit"
+                      className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-5 text-sm font-medium leading-none text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                      disabled={isSavingRoleSettings}
+                    >
+                      {isSavingRoleSettings ? "Menyimpan..." : "Simpan Pengaturan"}
                     </button>
-
-                    {designerSettingsOpen && (
-                      <div className="px-5 pb-5 pt-3 border-t border-cu-line/30 space-y-4">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                          <div>
-                            <label className="block text-sm font-medium text-cu-ink" htmlFor="lay-default">Layout Desain Bawaan</label>
-                            <select
-                              id="lay-default"
-                              value={defaultLayout}
-                              onChange={(e) => setDefaultLayout(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
-                            >
-                              <option value="classic">Classic Grid (Default)</option>
-                              <option value="modern">Modern Compact</option>
-                              <option value="minimalist">Minimalist Text</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-cu-ink" htmlFor="p-default">Ukuran Kertas Bawaan</label>
-                            <select
-                              id="p-default"
-                              value={defaultPaperSize}
-                              onChange={(e) => setDefaultPaperSize(e.target.value)}
-                              className="mt-1 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink"
-                            >
-                              <option value="A4">A4 Standard (Grid)</option>
-                              <option value="A3">A3 Large Layout</option>
-                              <option value="thermal_80mm">Direct Thermal 80mm</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 pt-2">
-                          <input
-                            id="chk-default"
-                            type="checkbox"
-                            checked={autoSaveChecklist}
-                            onChange={(e) => setAutoSaveChecklist(e.target.checked)}
-                            className="size-4 rounded border-cu-border text-cu-ink focus:ring-cu-ink"
-                          />
-                          <label className="text-sm font-medium text-cu-ink select-none cursor-pointer" htmlFor="chk-default">
-                            Simpan otomatis status checklist pencarian
-                          </label>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                )}
+                </form>
 
-                <div className="flex items-center gap-4 pt-2">
-                  <button
-                    type="submit"
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-5 text-sm font-medium leading-none text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
-                    disabled={isSavingRoleSettings}
-                  >
-                    {isSavingRoleSettings ? "Menyimpan..." : "Simpan Pengaturan Peran"}
-                  </button>
+                {/* Kolom Kanan: Hak Akses Aktif */}
+                <div className="w-full lg:w-80 shrink-0 space-y-4">
+                  <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2 border-b border-cu-line pb-2">
+                    <MaterialIcon name="badge" size="sm" className="text-cu-muted" />
+                    Hak Akses Anda
+                  </h3>
+                  <p className="text-xs text-cu-muted">Berikut adalah daftar peran (roles) dan izin langsung (direct permissions) yang saat ini melekat pada akun Anda.</p>
+                  
+                  <div className="p-4 border border-cu-line rounded-xl bg-cu-surface space-y-4">
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase tracking-wide text-cu-muted">Peran Anda (Roles)</span>
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {user.roles && user.roles.length > 0 ? (
+                          user.roles.map((role) => (
+                            <span key={role} className="inline-flex rounded-full border border-cu-line bg-cu-panel-soft text-cu-ink px-2.5 py-0.5 text-[10px] font-bold">
+                              {role}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-cu-muted italic">Tidak ada peran</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-cu-line/60">
+                      <span className="block text-[10px] font-bold uppercase tracking-wide text-cu-muted">Izin Langsung (Permissions)</span>
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        {user.permissions && user.permissions.length > 0 ? (
+                          user.permissions.map((perm) => (
+                            <span key={perm} className="inline-flex rounded-full border border-cu-line/60 bg-cu-surface text-cu-muted px-2.5 py-0.5 text-[10px] font-medium">
+                              +{perm}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-cu-muted italic">Tidak ada izin langsung</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </form>
+              </div>
             </div>
           )}
 
           {/* TAB 4: Activity Log */}
           {activeTab === "activity_log" && (
             <div className="space-y-6 animate-fade-in">
-              <div>
-                <h2 className="text-lg font-semibold text-cu-ink font-sans">Riwayat Aktivitas Keamanan</h2>
-                <p className="mt-1 text-sm text-cu-muted">
-                  Jejak audit dari 10 aktivitas login dan pembaruan terakhir pada akun Anda.
-                </p>
+              <div className="border-b border-cu-line pb-3 mb-6">
+                <h2 className="text-2xl font-semibold text-cu-ink">Riwayat Aktivitas Keamanan</h2>
               </div>
 
-              {/* Timeline Accordion */}
-              <div className="rounded-xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
-                <div className="w-full flex items-center justify-between px-5 py-3.5 text-left border-b border-cu-line/30 bg-cu-panel-soft/10">
-                  <div>
-                    <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2">
-                      <MaterialIcon name="history" size="sm" className="text-cu-muted" />
-                      Riwayat Log Keamanan
-                    </h3>
-                    <p className="text-xs text-cu-muted mt-0.5">Jejak audit riwayat login dan aktivitas akun terakhir Anda.</p>
-                  </div>
-                </div>
-
-                <div className="px-6 py-6 space-y-6 relative">
+              <div className="flex flex-col lg:flex-row gap-8 items-start">
+                {/* Kolom Kiri: Timeline */}
+                <div className="flex-1 w-full space-y-6 max-w-xl relative bg-transparent py-4">
                   {/* Vertical Line Connector */}
                   {activities.length > 1 && (
-                    <span className="absolute left-[35px] top-9 bottom-9 w-0.5 bg-cu-line" aria-hidden="true"></span>
+                    <span className="absolute left-[11px] top-6 bottom-6 w-0.5 bg-cu-line" aria-hidden="true"></span>
                   )}
 
                   {isLoadingActivities ? (
@@ -1286,9 +1030,9 @@ export default function ProfilePage() {
                       const logLabel = getLogLabel(act.log_name);
 
                       return (
-                        <div key={act.id} className="relative pl-8 pb-1 flex items-start gap-4">
+                        <div key={act.id} className="relative pl-9 pb-1 flex items-start gap-4">
                           {/* Circle Node Icon */}
-                          <span className={`absolute left-[-29px] top-0.5 size-6 rounded-full border flex items-center justify-center shrink-0 ${nodeColorClass}`}>
+                          <span className={`absolute left-0 top-0.5 size-6 rounded-full border flex items-center justify-center shrink-0 ${nodeColorClass}`}>
                             <MaterialIcon name={iconName} size="xs" />
                           </span>
                           <div className="min-w-0">
@@ -1305,11 +1049,51 @@ export default function ProfilePage() {
                     })
                   )}
                 </div>
+
+                {/* Kolom Kanan: Info Audit */}
+                <div className="w-full lg:w-80 shrink-0 space-y-4">
+                  <h3 className="text-sm font-semibold text-cu-ink flex items-center gap-2 border-b border-cu-line pb-2">
+                    <MaterialIcon name="verified_user" size="sm" className="text-cu-muted" />
+                    Jejak Audit Keamanan
+                  </h3>
+                  <p className="text-xs text-cu-muted">Sistem mencatat aktivitas penting demi keamanan akun Anda.</p>
+                  
+                  <div className="p-4 border border-cu-line rounded-xl bg-cu-surface space-y-3 text-xs leading-relaxed text-cu-muted">
+                    <div className="flex gap-2">
+                      <MaterialIcon name="info" size="xs" className="text-cu-info shrink-0 mt-0.5" />
+                      <p>Mencatat riwayat login, perubahan profil, modifikasi password, dan pengaturan peran secara otomatis.</p>
+                    </div>
+                    <div className="flex gap-2 pt-2.5 border-t border-cu-line/60">
+                      <MaterialIcon name="shield" size="xs" className="text-cu-success shrink-0 mt-0.5" />
+                      <p>Dilengkapi pencatatan alamat IP perangkat untuk mendeteksi anomali akses mencurigakan.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
-        </div>
+
+          {/* TAB 5: Billing & Licensing Demo views */}
+          {activeTab.startsWith("billing_") && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="border-b border-cu-line pb-3 mb-6">
+                <h2 className="text-2xl font-semibold text-cu-ink">
+                  {activeTab === "billing_overview" && "Billing Overview"}
+                  {activeTab === "billing_usage" && "Billing Usage"}
+                  {activeTab === "billing_ai" && "AI Usage Settings"}
+                  {activeTab === "billing_budgets" && "Budgets and Alerts"}
+                </h2>
+              </div>
+              <div className="rounded-xl border border-dashed border-cu-line bg-cu-surface p-12 text-center">
+                <MaterialIcon name="credit_card" size="lg" className="mx-auto text-cu-soft animate-pulse" />
+                <h3 className="mt-3 text-sm font-semibold text-cu-ink">Halaman Demo Template</h3>
+                <p className="mt-1 text-xs text-cu-muted max-w-xs mx-auto">
+                  Ini adalah konten halaman demo untuk menu bertingkat (nested menu) &quot;Billing and licensing&quot;.
+                </p>
+              </div>
+            </div>
+          )}
       </div>
-    </div>
+    </SettingsLayout>
   );
-}
+};

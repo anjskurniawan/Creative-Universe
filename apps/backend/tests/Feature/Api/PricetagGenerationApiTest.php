@@ -199,8 +199,8 @@ class PricetagGenerationApiTest extends TestCase
         Queue::fake();
 
         // Create CSV content matching our product
-        $csvContent = "produk,varian,harga_diskon\n";
-        $csvContent .= "{$this->product->name},{$this->product->variant_name},145000\n";
+        $csvContent = "kategori,produk,variant,harga normal,harga diskon\n";
+        $csvContent .= "{$this->category->name},{$this->product->name},{$this->product->variant_name},{$this->product->normal_price},145000\n";
 
         $file = UploadedFile::fake()->createWithContent('pricetags.csv', $csvContent);
 
@@ -221,8 +221,8 @@ class PricetagGenerationApiTest extends TestCase
     {
         $this->actingAs($this->designer1);
 
-        $csvContent = "produk,varian,harga_diskon\n";
-        $csvContent .= "Unknown Product,Default,145000\n";
+        $csvContent = "kategori,produk,variant,harga normal,harga diskon\n";
+        $csvContent .= "Audio,Unknown Product,Default,199000,145000\n";
 
         $file = UploadedFile::fake()->createWithContent('pricetags.csv', $csvContent);
 

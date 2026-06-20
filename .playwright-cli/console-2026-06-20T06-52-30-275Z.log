@@ -1,0 +1,1665 @@
+[     331ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[     452ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[     884ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[    1092ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[  247201ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[  247214ms] [LOG] [Fast Refresh] done in 117ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[  549574ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[  549732ms] [LOG] [Fast Refresh] done in 250ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[  549838ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[  550119ms] [LOG] [Fast Refresh] done in 383ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[  585070ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[  593655ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  597006ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  600322ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  603666ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  607009ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  614342ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  621705ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  629049ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  636427ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  643825ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  651245ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[  658660ms] [ERROR] WebSocket connection to 'ws://localhost:3000/_next/webpack-hmr?id=OcZLq-NUbMPJ6h0o87zlQ' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13430
+[ 1669321ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[ 1669396ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[ 1669680ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[ 1669798ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[20009668ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20009892ms] [LOG] [Fast Refresh] done in 181ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20016152ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20016284ms] [LOG] [Fast Refresh] done in 78ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20346668ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20346896ms] [LOG] [Fast Refresh] done in 125ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20396956ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20397494ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:845:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  843 |     </div>
+  844 |   );
+> 845 | }
+      | ^
+  846 |
+  847 | // ----------------------------------------------------
+  848 | // UI Helpers
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[20397655ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20398094ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:845:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  843 |     </div>
+  844 |   );
+> 845 | }
+      | ^
+  846 |
+  847 | // ----------------------------------------------------
+  848 | // UI Helpers
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[20398095ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[20398154ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[20398179ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[20398309ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0kla17-._.js:15305
+[20398387ms] Error: ./src/app/(dashboard)/pricetag/generator/page.tsx:845:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  843 |     </div>
+  844 |   );
+> 845 | }
+      | ^
+  846 |
+  847 | // ----------------------------------------------------
+  848 | // UI Helpers
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/(dashboard)/pricetag/generator/page.tsx:845:1)
+    at Object.getCompilationErrors (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1186:59)
+    at DevBundlerService.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:720:42)
+    at DevServer.findPageComponents (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:690:43)
+    at async DevServer.renderErrorToResponseImpl (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\base-server.js:1753:26)
+[20398386ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[20398392ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:845:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  843 |     </div>
+  844 |   );
+> 845 | }
+      | ^
+  846 |
+  847 | // ----------------------------------------------------
+  848 | // UI Helpers
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[20398448ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:845:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  843 |     </div>
+  844 |   );
+> 845 | }
+      | ^
+  846 |
+  847 | // ----------------------------------------------------
+  848 | // UI Helpers
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[20398474ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:845:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  843 |     </div>
+  844 |   );
+> 845 | }
+      | ^
+  846 |
+  847 | // ----------------------------------------------------
+  848 | // UI Helpers
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[20398565ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[20414272ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[20414318ms] [LOG] [Fast Refresh] done in 106ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[20414452ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[20414510ms] [LOG] [Fast Refresh] done in 164ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[20414834ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20414873ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20415305ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[20415422ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[20420768ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20421051ms] [LOG] [Fast Refresh] done in 94ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20436115ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20436138ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20436243ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20436275ms] [LOG] [Fast Refresh] done in 136ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20436382ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20436389ms] [LOG] [Fast Refresh] done in 110ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20545377ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20545607ms] [LOG] [Fast Refresh] done in 92ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20559892ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20560115ms] [LOG] [Fast Refresh] done in 87ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20999915ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[20999948ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:15
+Expression expected
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |               ^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[20999948ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:833:16
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  831 |                 <div className="cu-loading-bar">
+  832 |                   <div className="cu-loading-bar-value"></div>
+> 833 |               )}
+      |                ^
+  834 |
+  835 |               <form onSubmit={handleChecklistGenerate} className="spa...
+  836 |                 <div className="flex flex-col gap-4 sm:flex-row sm:it...
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[20999949ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:16
+Unterminated regexp literal
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |                ^^^^^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[21000019ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:15
+Expression expected
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |               ^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[21000019ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:833:16
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  831 |                 <div className="cu-loading-bar">
+  832 |                   <div className="cu-loading-bar-value"></div>
+> 833 |               )}
+      |                ^
+  834 |
+  835 |               <form onSubmit={handleChecklistGenerate} className="spa...
+  836 |                 <div className="flex flex-col gap-4 sm:flex-row sm:it...
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[21000019ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:16
+Unterminated regexp literal
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |                ^^^^^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[21000020ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[21000052ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[21000090ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[21000150ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0kla17-._.js:15305
+[21000164ms] Error: ./src/app/(dashboard)/pricetag/generator/page.tsx:857:15
+Expression expected
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |               ^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/(dashboard)/pricetag/generator/page.tsx:857:15)
+    at Object.getCompilationErrors (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1186:59)
+    at DevBundlerService.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:720:42)
+    at DevServer.findPageComponents (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:690:43)
+    at async DevServer.renderErrorToResponseImpl (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\base-server.js:1753:26)
+[21000166ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[21000168ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:15
+Expression expected
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |               ^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000169ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:833:16
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  831 |                 <div className="cu-loading-bar">
+  832 |                   <div className="cu-loading-bar-value"></div>
+> 833 |               )}
+      |                ^
+  834 |
+  835 |               <form onSubmit={handleChecklistGenerate} className="spa...
+  836 |                 <div className="flex flex-col gap-4 sm:flex-row sm:it...
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000169ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:16
+Unterminated regexp literal
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |                ^^^^^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000212ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:15
+Expression expected
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |               ^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000212ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:833:16
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  831 |                 <div className="cu-loading-bar">
+  832 |                   <div className="cu-loading-bar-value"></div>
+> 833 |               )}
+      |                ^
+  834 |
+  835 |               <form onSubmit={handleChecklistGenerate} className="spa...
+  836 |                 <div className="flex flex-col gap-4 sm:flex-row sm:it...
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000212ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:16
+Unterminated regexp literal
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |                ^^^^^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000320ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:15
+Expression expected
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |               ^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000320ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:833:16
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  831 |                 <div className="cu-loading-bar">
+  832 |                   <div className="cu-loading-bar-value"></div>
+> 833 |               )}
+      |                ^
+  834 |
+  835 |               <form onSubmit={handleChecklistGenerate} className="spa...
+  836 |                 <div className="flex flex-col gap-4 sm:flex-row sm:it...
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000320ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:857:16
+Unterminated regexp literal
+  855 |                             setChecklistAppliedSearch(checklistSearch);
+  856 |                           }
+> 857 |               </div>
+      |                ^^^^^
+  858 |
+  859 |             </form>
+  860 |           </div>
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[21000381ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[22936138ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[22936338ms] [LOG] [Fast Refresh] done in 93ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[22936603ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[22936631ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[22937084ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[22937207ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[22940219ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[22940424ms] [LOG] [Fast Refresh] done in 138ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[22949138ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[22949347ms] [LOG] [Fast Refresh] done in 119ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23093824ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23093967ms] [LOG] [Fast Refresh] done in 92ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23125809ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23125846ms] [LOG] [Fast Refresh] done in 135ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23125950ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23125965ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23126073ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23126092ms] [LOG] [Fast Refresh] done in 126ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23149820ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23149845ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:5
+Expression expected
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |     ^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[23149846ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:6
+Unterminated regexp literal
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |      ^^^^^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[23149898ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[23149901ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:5
+Expression expected
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |     ^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[23149901ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:6
+Unterminated regexp literal
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |      ^^^^^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[23149935ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[23149962ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[23150012ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0kla17-._.js:15305
+[23150024ms] Error: ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:5
+Expression expected
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |     ^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:5)
+    at Object.getCompilationErrors (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1186:59)
+    at DevBundlerService.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:720:42)
+    at DevServer.findPageComponents (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:690:43)
+    at async DevServer.renderErrorToResponseImpl (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\base-server.js:1753:26)
+[23150025ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23150038ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:5
+Expression expected
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |     ^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23150038ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:6
+Unterminated regexp literal
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |      ^^^^^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23150066ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:5
+Expression expected
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |     ^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23150066ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:6
+Unterminated regexp literal
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |      ^^^^^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23150143ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:5
+Expression expected
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |     ^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23150143ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:6
+Unterminated regexp literal
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |      ^^^^^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23150202ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23224898ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:5
+Expression expected
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |     ^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23224898ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1177:6
+Unterminated regexp literal
+  1175 |         </div>
+  1176 |       )}
+> 1177 |     </div>
+       |      ^^^^^
+  1178 |   );
+  1179 | }
+  1180 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23224959ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23226969ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23226994ms] [LOG] [Fast Refresh] done in 115ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23227119ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23227235ms] [LOG] [Fast Refresh] done in 218ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23227519ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23227550ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23227941ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[23228059ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[23247559ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23247657ms] [LOG] [Fast Refresh] done in 79ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23265958ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23266161ms] [LOG] [Fast Refresh] done in 82ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23281481ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23281572ms] [LOG] [Fast Refresh] done in 79ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23661496ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23661679ms] [LOG] [Fast Refresh] done in 88ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23665594ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23665726ms] [LOG] [Fast Refresh] done in 82ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23689330ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23689390ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[23689425ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[23689453ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[23689502ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0kla17-._.js:15305
+[23689514ms] Error: ./src/app/(dashboard)/pricetag/generator/page.tsx:1358:10
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1356 |           )}
+  1357 |         </div>
+> 1358 |       )})}
+       |          ^
+  1359 |     </div>
+  1360 |   );
+  1361 | }
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/(dashboard)/pricetag/generator/page.tsx:1358:10)
+    at Object.getCompilationErrors (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1186:59)
+    at DevBundlerService.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:720:42)
+    at DevServer.findPageComponents (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:690:43)
+    at async DevServer.renderErrorToResponseImpl (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\base-server.js:1753:26)
+[23689514ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23689526ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1358:10
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1356 |           )}
+  1357 |         </div>
+> 1358 |       )})}
+       |          ^
+  1359 |     </div>
+  1360 |   );
+  1361 | }
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23689554ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1358:10
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1356 |           )}
+  1357 |         </div>
+> 1358 |       )})}
+       |          ^
+  1359 |     </div>
+  1360 |   );
+  1361 | }
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23689632ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1358:10
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1356 |           )}
+  1357 |         </div>
+> 1358 |       )})}
+       |          ^
+  1359 |     </div>
+  1360 |   );
+  1361 | }
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23689695ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23769676ms] [ERROR] ./src/app/(dashboard)/pricetag/generator/page.tsx:1358:10
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  1356 |           )}
+  1357 |         </div>
+> 1358 |       )})}
+       |          ^
+  1359 |     </div>
+  1360 |   );
+  1361 | }
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/pricetag/generator/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[23769736ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23779010ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23779045ms] [LOG] [Fast Refresh] done in 95ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23779166ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23779211ms] [LOG] [Fast Refresh] done in 152ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[23779441ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23779459ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23779797ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[23779919ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[23902894ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23902990ms] [LOG] [Fast Refresh] done in 82ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23911230ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23911404ms] [LOG] [Fast Refresh] done in 85ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23922065ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[23922239ms] [LOG] [Fast Refresh] done in 88ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[24428599ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[24428760ms] [LOG] [Fast Refresh] done in 133ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[24514717ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[24514925ms] [LOG] [Fast Refresh] done in 87ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25140416ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25140599ms] [LOG] [Fast Refresh] done in 131ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25515607ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25515609ms] [LOG] [Fast Refresh] done in 103ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25541411ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25541598ms] [LOG] [Fast Refresh] done in 158ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25633040ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25633145ms] [LOG] [Fast Refresh] done in 78ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25638180ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25638312ms] [LOG] [Fast Refresh] done in 81ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25844759ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25844867ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25850148ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[25850319ms] [LOG] [Fast Refresh] done in 70ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26083511ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26083594ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[26083631ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[26083697ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[26083786ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0kla17-._.js:15305
+[26083863ms] Error: ./src/app/(dashboard)/profile/page.tsx:629:19
+Expected '</', got 'jsx text'
+  627 |                 </div>
+  628 |               )}
+> 629 |             </div>
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 630 |           </div>
+      | ^^^^^^^^^^
+  631 |         </div>
+  632 |
+  633 |         {/* Right Settings Panels */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/(dashboard)/profile/page.tsx:629:19)
+    at Object.getCompilationErrors (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1186:59)
+    at DevBundlerService.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:720:42)
+    at DevServer.findPageComponents (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:690:43)
+    at async DevServer.renderErrorToResponseImpl (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\base-server.js:1753:26)
+[26083864ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[26083868ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:629:19
+Expected '</', got 'jsx text'
+  627 |                 </div>
+  628 |               )}
+> 629 |             </div>
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 630 |           </div>
+      | ^^^^^^^^^^
+  631 |         </div>
+  632 |
+  633 |         {/* Right Settings Panels */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[26083938ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:629:19
+Expected '</', got 'jsx text'
+  627 |                 </div>
+  628 |               )}
+> 629 |             </div>
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 630 |           </div>
+      | ^^^^^^^^^^
+  631 |         </div>
+  632 |
+  633 |         {/* Right Settings Panels */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[26104344ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:629:19
+Expected '</', got 'jsx text'
+  627 |                 </div>
+  628 |               )}
+> 629 |             </div>
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 630 |           </div>
+      | ^^^^^^^^^^
+  631 |         </div>
+  632 |
+  633 |         {/* Right Settings Panels */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[26104404ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[26116453ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[26116491ms] [LOG] [Fast Refresh] done in 83ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[26116613ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[26116642ms] [LOG] [Fast Refresh] done in 132ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[26116842ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26116922ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26117282ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[26117403ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[26579078ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26579373ms] [LOG] [Fast Refresh] done in 379ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26579477ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26579612ms] [LOG] [Fast Refresh] done in 238ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26579817ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26579829ms] [LOG] [Fast Refresh] done in 114ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26581264ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[26581387ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[26581476ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26581655ms] [LOG] [Fast Refresh] done in 280ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26581663ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[26633581ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26633874ms] [LOG] [Fast Refresh] done in 208ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26634168ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26634215ms] [LOG] [Fast Refresh] done in 147ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26635104ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[26635228ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[26635265ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26635435ms] [LOG] [Fast Refresh] done in 274ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26635526ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[26656010ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26656423ms] [LOG] [Fast Refresh] done in 528ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26674445ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26674523ms] [LOG] [Fast Refresh] done in 141ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26747859ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26748230ms] [LOG] [Fast Refresh] done in 196ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26748556ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26748590ms] [LOG] [Fast Refresh] done in 136ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26748696ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26748742ms] [LOG] [Fast Refresh] done in 151ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26749031ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26749097ms] [LOG] [Fast Refresh] done in 169ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26749212ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26749223ms] [LOG] [Fast Refresh] done in 113ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26749910ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[26750032ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[26750086ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26750288ms] [LOG] [Fast Refresh] done in 311ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[26750315ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[27111127ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27111191ms] [LOG] [Fast Refresh] done in 165ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27111295ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27111411ms] [LOG] [Fast Refresh] done in 217ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27132948ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27133110ms] [LOG] [Fast Refresh] done in 99ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27150778ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27150815ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27164761ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27164793ms] [LOG] [Fast Refresh] done in 129ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27164905ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27165010ms] [LOG] [Fast Refresh] done in 212ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27165127ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27165145ms] [LOG] [Fast Refresh] done in 125ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27558944ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27559125ms] [LOG] [Fast Refresh] done in 294ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27559234ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27559358ms] [LOG] [Fast Refresh] done in 228ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27581552ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27581693ms] [LOG] [Fast Refresh] done in 90ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27600176ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27600330ms] [LOG] [Fast Refresh] done in 261ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27944428ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27944505ms] [LOG] [Fast Refresh] done in 190ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27944614ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27944779ms] [LOG] [Fast Refresh] done in 267ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27944903ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27944952ms] [LOG] [Fast Refresh] done in 155ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27980221ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27980543ms] [LOG] [Fast Refresh] done in 421ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27980656ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27980715ms] [LOG] [Fast Refresh] done in 167ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27980874ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27980951ms] [LOG] [Fast Refresh] done in 177ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27981058ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[27981186ms] [LOG] [Fast Refresh] done in 231ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28009637ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28009638ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28220871ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28221188ms] [LOG] [Fast Refresh] done in 254ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28337433ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28337575ms] [LOG] [Fast Refresh] done in 244ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28337685ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28337780ms] [LOG] [Fast Refresh] done in 202ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28785351ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28785581ms] [LOG] [Fast Refresh] done in 195ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28785754ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28785771ms] [LOG] [Fast Refresh] done in 119ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28785877ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28785893ms] [LOG] [Fast Refresh] done in 117ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28786096ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28786121ms] [LOG] [Fast Refresh] done in 133ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28786266ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28786310ms] [LOG] [Fast Refresh] done in 148ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28786417ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28786440ms] [LOG] [Fast Refresh] done in 122ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28786553ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28786736ms] [LOG] [Fast Refresh] done in 286ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28787006ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28787012ms] [LOG] [Fast Refresh] done in 109ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28787735ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28787827ms] [LOG] [Fast Refresh] done in 195ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28793205ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28793390ms] [LOG] [Fast Refresh] done in 167ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28793572ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28793613ms] [LOG] [Fast Refresh] done in 142ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28793816ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28793850ms] [LOG] [Fast Refresh] done in 139ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28794143ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28794150ms] [LOG] [Fast Refresh] done in 113ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28794696ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28794708ms] [LOG] [Fast Refresh] done in 117ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28795287ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28795321ms] [LOG] [Fast Refresh] done in 134ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28795745ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28795833ms] [LOG] [Fast Refresh] done in 189ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28795933ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28795991ms] [LOG] [Fast Refresh] done in 159ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28800508ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28800579ms] [LOG] [Fast Refresh] done in 156ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28800692ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28800701ms] [LOG] [Fast Refresh] done in 121ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28800832ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28800838ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28800946ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28800960ms] [LOG] [Fast Refresh] done in 114ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28801065ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28801212ms] [LOG] [Fast Refresh] done in 247ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28801405ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28801452ms] [LOG] [Fast Refresh] done in 149ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28801962ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28801972ms] [LOG] [Fast Refresh] done in 112ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28802235ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28802268ms] [LOG] [Fast Refresh] done in 139ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28802369ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28802396ms] [LOG] [Fast Refresh] done in 127ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28802702ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28802958ms] [LOG] [Fast Refresh] done in 362ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28807833ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28807860ms] [LOG] [Fast Refresh] done in 103ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28807969ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[28808039ms] [LOG] [Fast Refresh] done in 178ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29027205ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29236246ms] [LOG] [Fast Refresh] done in 201914ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29236354ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29236538ms] [LOG] [Fast Refresh] done in 286ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29236752ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29243987ms] [LOG] [Fast Refresh] done in 7337ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29244096ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29258380ms] [LOG] [Fast Refresh] done in 14391ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29258481ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29259664ms] [LOG] [Fast Refresh] done in 1283ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29260004ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29260204ms] [LOG] [Fast Refresh] done in 304ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29260309ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29260518ms] [LOG] [Fast Refresh] done in 314ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29260626ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29375056ms] [LOG] [Fast Refresh] done in 112104ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29375149ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29390572ms] [LOG] [Fast Refresh] done in 8680ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29390676ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29437100ms] [LOG] [Fast Refresh] done in 475ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29437205ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29458902ms] [LOG] [Fast Refresh] done in 4526ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29459005ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29491395ms] [LOG] [Fast Refresh] done in 32492ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29491497ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29491763ms] [LOG] [Fast Refresh] done in 367ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29491867ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29494767ms] [LOG] [Fast Refresh] done in 3004ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29494873ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29506102ms] [LOG] [Fast Refresh] done in 11333ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29506205ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29507197ms] [LOG] [Fast Refresh] done in 1095ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29507306ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29507611ms] [LOG] [Fast Refresh] done in 414ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29507725ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29547012ms] [LOG] [Fast Refresh] done in 39400ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29547156ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29548669ms] [LOG] [Fast Refresh] done in 1621ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29548776ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29553998ms] [LOG] [Fast Refresh] done in 5329ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29554106ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29563414ms] [LOG] [Fast Refresh] done in 9414ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29563518ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29564926ms] [LOG] [Fast Refresh] done in 1512ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29565030ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29565706ms] [LOG] [Fast Refresh] done in 779ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29565816ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29638907ms] [LOG] [Fast Refresh] done in 73200ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29638954ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29643442ms] [LOG] [Fast Refresh] done in 53ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29643479ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29648549ms] [LOG] [Fast Refresh] done in 54ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29648606ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29652307ms] [LOG] [Fast Refresh] done in 83ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29652348ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29659044ms] [LOG] [Fast Refresh] done in 46ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29659158ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29673837ms] [LOG] [Fast Refresh] done in 14785ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29673946ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29675457ms] [LOG] [Fast Refresh] done in 1619ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29675564ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29677030ms] [LOG] [Fast Refresh] done in 1572ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29677135ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29859791ms] [LOG] [Fast Refresh] done in 176827ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29859895ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29865384ms] [LOG] [Fast Refresh] done in 5591ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29865485ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29873724ms] [LOG] [Fast Refresh] done in 8340ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29873835ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29876132ms] [LOG] [Fast Refresh] done in 2407ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29876235ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29985450ms] [LOG] [Fast Refresh] done in 109316ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29985555ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29991737ms] [LOG] [Fast Refresh] done in 159ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29991843ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29993473ms] [LOG] [Fast Refresh] done in 1736ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29993576ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29998075ms] [LOG] [Fast Refresh] done in 4600ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[29998185ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30006094ms] [LOG] [Fast Refresh] done in 8018ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30006205ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30007281ms] [LOG] [Fast Refresh] done in 1186ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30007386ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30084006ms] [LOG] [Fast Refresh] done in 71970ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30084116ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30084772ms] [LOG] [Fast Refresh] done in 766ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30084876ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30089192ms] [LOG] [Fast Refresh] done in 4419ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30089295ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30096377ms] [LOG] [Fast Refresh] done in 7184ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30096485ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30097289ms] [LOG] [Fast Refresh] done in 912ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30097395ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30098257ms] [LOG] [Fast Refresh] done in 966ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30098362ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30098831ms] [LOG] [Fast Refresh] done in 574ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30098936ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30625091ms] [LOG] [Fast Refresh] done in 526259ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30625194ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30644233ms] [LOG] [Fast Refresh] done in 19141ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30644344ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30650860ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[30652075ms] network error
+[30652067ms] [ERROR] WebSocket is already in CLOSING or CLOSED state. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2836
+[30655008ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30656910ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30656992ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30657542ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[30657664ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[30814643ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30817620ms] [LOG] [Fast Refresh] done in 3079ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30817724ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30824054ms] [LOG] [Fast Refresh] done in 6434ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30824156ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30827302ms] [LOG] [Fast Refresh] done in 3246ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[30827405ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31292987ms] [LOG] [Fast Refresh] done in 465685ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31293053ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31420012ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:667:12
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  665 |               </form>
+  666 |             </div>
+> 667 |           )}
+      |            ^
+  668 |
+  669 |           {/* TAB 2: Security & Devices */}
+  670 |           {activeTab === "security" && (
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[31420155ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31437605ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:667:12
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  665 |               </form>
+  666 |             </div>
+> 667 |           )}
+      |            ^
+  668 |
+  669 |           {/* TAB 2: Security & Devices */}
+  670 |           {activeTab === "security" && (
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[31437720ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31448536ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[31476687ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[31487311ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:667:12
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  665 |               </form>
+  666 |             </div>
+> 667 |           )}
+      |            ^
+  668 |
+  669 |           {/* TAB 2: Security & Devices */}
+  670 |           {activeTab === "security" && (
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[31487425ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31513147ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:559:22
+Expected '</', got 'jsx text'
+  557 |                   {avatarStatus && <p className="text-xs text-cu-succ...
+  558 |                 </div>
+> 559 |               </form>
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 560 |             </div>
+      | ^^^^^^^^^^^^
+  561 |           )}
+  562 |
+  563 |           {/* TAB 2: Security & Devices */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[31513154ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:559:22
+Expected '</', got 'jsx text'
+  557 |                   {avatarStatus && <p className="text-xs text-cu-succ...
+  558 |                 </div>
+> 559 |               </form>
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 560 |             </div>
+      | ^^^^^^^^^^^^
+  561 |           )}
+  562 |
+  563 |           {/* TAB 2: Security & Devices */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[31513155ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:559:22
+Expected '</', got 'jsx text'
+  557 |                   {avatarStatus && <p className="text-xs text-cu-succ...
+  558 |                 </div>
+> 559 |               </form>
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 560 |             </div>
+      | ^^^^^^^^^^^^
+  561 |           )}
+  562 |
+  563 |           {/* TAB 2: Security & Devices */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[31513156ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:559:22
+Expected '</', got 'jsx text'
+  557 |                   {avatarStatus && <p className="text-xs text-cu-succ...
+  558 |                 </div>
+> 559 |               </form>
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 560 |             </div>
+      | ^^^^^^^^^^^^
+  561 |           )}
+  562 |
+  563 |           {/* TAB 2: Security & Devices */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[31513156ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:559:22
+Expected '</', got 'jsx text'
+  557 |                   {avatarStatus && <p className="text-xs text-cu-succ...
+  558 |                 </div>
+> 559 |               </form>
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 560 |             </div>
+      | ^^^^^^^^^^^^
+  561 |           )}
+  562 |
+  563 |           {/* TAB 2: Security & Devices */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:3318
+[31513261ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31593657ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[31802243ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0kla17-._.js:15305
+[31802328ms] Error: ./src/app/(dashboard)/profile/page.tsx:559:22
+Expected '</', got 'jsx text'
+  557 |                   {avatarStatus && <p className="text-xs text-cu-succ...
+  558 |                 </div>
+> 559 |               </form>
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 560 |             </div>
+      | ^^^^^^^^^^^^
+  561 |           )}
+  562 |
+  563 |           {/* TAB 2: Security & Devices */}
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component Browser]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/(dashboard)/profile/page.tsx [Client Component SSR]
+    ./src/app/(dashboard)/profile/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/(dashboard)/profile/page.tsx:559:22)
+    at Object.getCompilationErrors (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1186:59)
+    at DevBundlerService.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:720:42)
+    at DevServer.findPageComponents (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:690:43)
+    at async DevServer.renderErrorToResponseImpl (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\base-server.js:1753:26)
+[31804708ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[31953169ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[31954570ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31954668ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[31955061ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[31955183ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[32023624ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32023912ms] [LOG] [Fast Refresh] done in 399ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32024023ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32024929ms] [LOG] [Fast Refresh] done in 1014ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32025034ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32028202ms] [LOG] [Fast Refresh] done in 3272ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32028303ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32028389ms] [LOG] [Fast Refresh] done in 187ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32028494ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32039367ms] [LOG] [Fast Refresh] done in 10977ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32039473ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32787046ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[32788146ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase&_rsc=zVi2KcWMsldmuQGY:0
+[32788221ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[32788837ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0kla17-._.js:15305
+[32788909ms] Error: ./src/app/(dashboard)/profile/page.tsx:719:13
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  717 |               </div>
+  718 |             </div>
+> 719 |           )}}
+      |             ^
+  720 |
+  721 |           {/* TAB 3: Role Settings */}
+  722 |           {activeTab === "role_settings" && hasRoleSettings && (
+
+Parsing ecmascript source code failed
+
+
+    at <unknown> (Error: ./src/app/(dashboard)/profile/page.tsx:719:13)
+    at Object.getCompilationErrors (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\hot-reloader-turbopack.js:1186:59)
+    at DevBundlerService.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\lib\dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:720:42)
+    at DevServer.findPageComponents (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\dev\next-dev-server.js:690:43)
+    at async DevServer.renderErrorToResponseImpl (file://C:\laragon\www\creativeuniverse\apps\frontend\node_modules\next\dist\server\base-server.js:1753:26)
+[32788953ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[32789043ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:719:13
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  717 |               </div>
+  718 |             </div>
+> 719 |           )}}
+      |             ^
+  720 |
+  721 |           {/* TAB 3: Role Settings */}
+  722 |           {activeTab === "role_settings" && hasRoleSettings && (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[32851871ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:719:13
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  717 |               </div>
+  718 |             </div>
+> 719 |           )}}
+      |             ^
+  720 |
+  721 |           {/* TAB 3: Role Settings */}
+  722 |           {activeTab === "role_settings" && hasRoleSettings && (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[32851873ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:719:13
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  717 |               </div>
+  718 |             </div>
+> 719 |           )}}
+      |             ^
+  720 |
+  721 |           {/* TAB 3: Role Settings */}
+  722 |           {activeTab === "role_settings" && hasRoleSettings && (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[32851874ms] [ERROR] ./src/app/(dashboard)/profile/page.tsx:719:13
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  717 |               </div>
+  718 |             </div>
+> 719 |           )}}
+      |             ^
+  720 |
+  721 |           {/* TAB 3: Role Settings */}
+  722 |           {activeTab === "role_settings" && hasRoleSettings && (
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:2099
+[32851981ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_20ud_8w._.js:1380
+[32865934ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32866037ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32866559ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/v1/auth/me/:0
+[32866679ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/login/?redirect=%2Fpricetag%2Fdatabase:0
+[32872224ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32872276ms] [LOG] [Fast Refresh] done in 154ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32872378ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32872513ms] [LOG] [Fast Refresh] done in 237ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32872624ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32873570ms] [LOG] [Fast Refresh] done in 1055ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32873671ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32876946ms] [LOG] [Fast Refresh] done in 3375ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32877053ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32883305ms] [LOG] [Fast Refresh] done in 6358ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32883413ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32884379ms] [LOG] [Fast Refresh] done in 1073ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477
+[32884576ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js:2477

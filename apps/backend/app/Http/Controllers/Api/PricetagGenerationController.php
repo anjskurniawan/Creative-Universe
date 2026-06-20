@@ -182,6 +182,9 @@ class PricetagGenerationController extends BaseApiController
         if ($varIdx === false) {
             $varIdx = array_search('nama_varian', $header);
         }
+        if ($varIdx === false) {
+            $varIdx = array_search('variant', $header);
+        }
 
         $discountIdx = array_search('discount_price', $header);
         if ($discountIdx === false) {
@@ -190,11 +193,14 @@ class PricetagGenerationController extends BaseApiController
         if ($discountIdx === false) {
             $discountIdx = array_search('harga_promo', $header);
         }
+        if ($discountIdx === false) {
+            $discountIdx = array_search('harga diskon', $header);
+        }
 
         if ($prodIdx === false || $discountIdx === false) {
             fclose($file);
-            return $this->sendError('File CSV harus memiliki kolom "produk" dan "harga_diskon".', [
-                'file' => ['File CSV harus memiliki kolom "produk" dan "harga_diskon".']
+            return $this->sendError('File CSV harus memiliki kolom "produk" dan "harga diskon".', [
+                'file' => ['File CSV harus memiliki kolom "produk" dan "harga diskon".']
             ], 422);
         }
 

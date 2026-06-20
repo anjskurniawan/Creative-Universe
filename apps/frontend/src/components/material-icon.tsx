@@ -1,72 +1,80 @@
-"use client";
-
 import React from "react";
 
-interface MaterialIconProps extends React.SVGProps<SVGSVGElement> {
+type MaterialIconSize = "auto" | "xs" | "sm" | "md" | "lg" | "xl";
+type MaterialIconWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700;
+
+interface MaterialIconProps extends React.HTMLAttributes<HTMLSpanElement> {
   name?: string;
-  size?: "auto" | "xs" | "sm" | "md" | "lg" | "xl";
-  weight?: "normal" | "light";
+  size?: MaterialIconSize;
+  /** Material Symbols weight axis. Defaults are selected from the rendered size. */
+  weight?: MaterialIconWeight;
+  /** Material Symbols fill axis. Product UI icons are filled by default. */
+  filled?: boolean;
+  grade?: -50 | 0 | 200;
 }
+
+const SIZE_CLASSES: Record<MaterialIconSize, string> = {
+  auto: "cu-material-icon-auto",
+  xs: "text-base",
+  sm: "text-xl",
+  md: "text-2xl",
+  lg: "text-3xl",
+  xl: "text-4xl",
+};
+
+const DEFAULT_WEIGHTS: Record<MaterialIconSize, MaterialIconWeight> = {
+  auto: 400,
+  xs: 300,
+  sm: 400,
+  md: 500,
+  lg: 500,
+  xl: 600,
+};
+
+const OPTICAL_SIZES: Record<MaterialIconSize, number> = {
+  auto: 24,
+  xs: 20,
+  sm: 20,
+  md: 24,
+  lg: 40,
+  xl: 48,
+};
 
 export function MaterialIcon({
   name,
   size = "auto",
   weight,
+  filled = true,
+  grade = 0,
   className = "",
+  style,
   ...props
 }: MaterialIconProps) {
-  const sizeClasses = {
-    auto: "cu-material-icon-auto",
-    xs: "size-4",
-    sm: "size-5",
-    md: "size-6",
-    lg: "size-8",
-    xl: "size-10",
-  };
+  let resolvedName = name ?? "";
 
-  // Resolve icon name from class name if name prop is omitted (mimics legacy blade logic)
-  let resolvedName = name || "";
-  if (!resolvedName && className) {
-    const iconClass = className.split(/\s+/).find((c) => c.startsWith("cu-icon-"));
-    if (iconClass) {
-      resolvedName = iconClass.substring(8).replace(/-/g, "_");
-    }
+  if (!resolvedName) {
+    const iconClass = className.split(/\s+/).find((candidate) => candidate.startsWith("cu-icon-"));
+    resolvedName = iconClass?.slice(8).replace(/-/g, "_") ?? "info";
   }
 
-  // Clean the icon name and replace any dashes with underscores
   resolvedName = resolvedName.replace(/-/g, "_").replace(/[^a-z0-9_]/g, "") || "info";
 
-  // Check if we should render the light variant
-  const isLight =
-    weight === "light" ||
-    (weight === undefined && ["auto", "xs", "sm"].includes(size));
-  const symbolSuffix = isLight ? "-light" : "";
-  const weightClass = isLight ? "cu-material-icon-light" : "";
-
-  // Map back underscores to dashes for css class mapping
-  const resolvedIconClass = `cu-icon-${resolvedName.replace(/_/g, "-")}`;
-  const generatedIconClass = className.includes("cu-icon-") ? "" : resolvedIconClass;
-
-  const classes = `cu-material-icon inline-block shrink-0 ${generatedIconClass} ${
-    sizeClasses[size] || sizeClasses.auto
-  } ${weightClass} ${className}`.trim();
-
-  // The ID in the sprite sheet has underscores, match the legacy format (e.g. #material-icon-person_add)
-  const idSuffix = resolvedName.replace(/_/g, "_");
+  const resolvedWeight = weight ?? DEFAULT_WEIGHTS[size];
+  const variationSettings = [
+    `'FILL' ${filled ? 1 : 0}`,
+    `'wght' ${resolvedWeight}`,
+    `'GRAD' ${grade}`,
+    `'opsz' ${OPTICAL_SIZES[size]}`,
+  ].join(", ");
 
   return (
-    <svg
+    <span
       aria-hidden="true"
-      focusable="false"
-      viewBox="0 -960 960 960"
-      className={classes}
+      className={`material-symbols-rounded cu-material-icon ${SIZE_CLASSES[size]} ${className}`.trim()}
+      style={{ fontVariationSettings: variationSettings, ...style }}
       {...props}
     >
-      <use
-        href={`/images/icons/material-symbols.svg#material-icon-${idSuffix}${symbolSuffix}`}
-        width="100%"
-        height="100%"
-      />
-    </svg>
+      {resolvedName}
+    </span>
   );
 }

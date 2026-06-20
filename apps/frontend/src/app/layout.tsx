@@ -3,6 +3,8 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { RouteGuard } from "@/components/route-guard";
 import "./globals.css";
 
+/* eslint-disable @next/next/no-page-custom-font -- App Router root layout owns this global icon font. */
+
 export const metadata: Metadata = {
   title: "Creative Universe - Portal Generator Pricetag & Admin",
   description: "Aplikasi internal PT Doran Sukses Indonesia (JETE) untuk manajemen pricetag dan administrasi sistem.",
@@ -15,6 +17,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" data-theme="light">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        />
+      </head>
       <body>
         <AuthProvider>
           <RouteGuard>

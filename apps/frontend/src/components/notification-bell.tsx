@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { apiFetch } from "@/lib/api";
 import { getEchoClient } from "@/lib/echo";
+import {
+  LOCAL_NOTIFICATIONS_UPDATED_EVENT,
+  markAllLocalNotificationsRead,
+  markLocalNotificationRead,
+  readLocalNotifications,
+} from "@/lib/local-notifications";
 import { MaterialIcon } from "./material-icon";
 
 interface NotificationItem {
@@ -30,6 +36,15 @@ async function requestNotifications(): Promise<NotificationPayload> {
   return apiFetch<NotificationPayload>("/notifications");
 }
 
+function mergeNotifications(serverItems: NotificationItem[]): NotificationItem[] {
+  const localItems = readLocalNotifications();
+  return [...localItems, ...serverItems].sort((left, right) => {
+    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
+    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
+    return rightTime - leftTime;
+  });
+}
+
 export function NotificationBell({ userId, variant = "light" }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,8 +55,9 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
   const containerRef = useRef<HTMLDivElement>(null);
 
   const applyPayload = (payload: NotificationPayload) => {
-    setNotifications(payload.notifications);
-    setUnreadCount(payload.unread_count);
+    const mergedNotifications = mergeNotifications(payload.notifications);
+    setNotifications(mergedNotifications);
+    setUnreadCount(mergedNotifications.filter((item) => !item.is_read).length);
   };
 
   useEffect(() => {
@@ -82,6 +98,25 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     };
   }, [userId]);
 
+  useEffect(() => {
+    const refreshLocalNotifications = async () => {
+      try {
+        const payload = await requestNotifications();
+        applyPayload(payload);
+      } catch {
+        const mergedNotifications = mergeNotifications([]);
+        setNotifications(mergedNotifications);
+        setUnreadCount(mergedNotifications.filter((item) => !item.is_read).length);
+      }
+    };
+
+    window.addEventListener(LOCAL_NOTIFICATIONS_UPDATED_EVENT, refreshLocalNotifications);
+
+    return () => {
+      window.removeEventListener(LOCAL_NOTIFICATIONS_UPDATED_EVENT, refreshLocalNotifications);
+    };
+  }, []);
+
   // Click outside to close
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -89,14 +124,30 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
         setIsOpen(false);
       }
     }
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsOpen(false);
+    }
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
   const markAsRead = async (notification: NotificationItem) => {
     if (notification.is_read) return;
+
+    if (notification.type === "local") {
+      const updated = markLocalNotificationRead(notification.id);
+      if (!updated) return;
+
+      setNotifications((items) =>
+        items.map((item) => (item.id === updated.id ? updated : item))
+      );
+      setUnreadCount((count) => Math.max(0, count - 1));
+      return;
+    }
 
     try {
       const updated = await apiFetch<NotificationItem>(
@@ -113,14 +164,33 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
   };
 
   const markAllAsRead = async () => {
+    const hasLocalUnread = notifications.some(
+      (item) => item.type === "local" && !item.is_read
+    );
+
+    if (hasLocalUnread) {
+      markAllLocalNotificationsRead();
+    }
+
     try {
       await apiFetch("/notifications/read-all", { method: "PATCH" });
-      setNotifications((items) =>
-        items.map((item) => ({ ...item, is_read: true }))
-      );
+      setNotifications((items) => items.map((item) => ({
+        ...item,
+        is_read: true,
+        read_at: item.read_at ?? new Date().toISOString(),
+      })));
       setUnreadCount(0);
     } catch {
-      setError("Semua notifikasi belum dapat ditandai sudah dibaca.");
+      if (notifications.some((item) => item.type !== "local")) {
+        setError("Semua notifikasi belum dapat ditandai sudah dibaca.");
+      } else {
+        setNotifications((items) => items.map((item) => ({
+          ...item,
+          is_read: true,
+          read_at: item.read_at ?? new Date().toISOString(),
+        })));
+        setUnreadCount(0);
+      }
     }
   };
 
@@ -145,32 +215,34 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
 
   const buttonClass =
     variant === "dark"
-      ? "text-white hover:border-white/20 hover:bg-white/10 focus:ring-white/30"
-      : "text-cu-ink hover:border-cu-border hover:bg-cu-panel-soft focus:ring-cu-border-hover";
+      ? "text-white hover:bg-white/10 focus:ring-white/30"
+      : "text-cu-ink hover:bg-cu-panel-soft focus:ring-cu-focus/25";
 
   const badgeBorderClass = variant === "dark" ? "border-[#0a0a0a]" : "border-cu-surface";
 
   const dropdownClass =
     variant === "dark"
-      ? "border-white/10 bg-[#0d0d0d]/90 backdrop-blur-md shadow-2xl text-white"
-      : "border-cu-line bg-cu-panel shadow-xl text-cu-ink";
+      ? "border-white/15 bg-[#111214]/98 backdrop-blur-xl shadow-2xl text-white"
+      : "border-cu-line bg-cu-surface shadow-xl text-cu-ink";
 
-  const headerClass =
-    variant === "dark"
-      ? "border-white/10 bg-black/40 text-white"
-      : "border-cu-line bg-cu-panel-soft";
+  const dividerClass = variant === "dark" ? "border-white/10" : "border-cu-line";
+  const titleClass = variant === "dark" ? "text-white" : "text-cu-ink";
+  const mutedClass = variant === "dark" ? "text-white/65" : "text-cu-muted";
+  const scrollbarClass = variant === "dark" ? "cu-popup-scrollbar-dark" : "cu-popup-scrollbar-light";
 
   const itemHoverClass = variant === "dark" ? "hover:bg-white/5" : "hover:bg-cu-panel-soft";
 
   const unreadItemClass =
-    variant === "dark" ? "bg-blue-500/10" : "bg-cu-info-soft";
+    variant === "dark" ? "bg-blue-400/15" : "bg-cu-info-soft";
 
   return (
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         type="button"
-        className={`relative inline-flex size-9 sm:size-10 items-center justify-center rounded-full border border-transparent transition-colors focus:outline-none focus:ring-1 cursor-pointer ${buttonClass}`}
+        className={`relative inline-flex size-9 sm:size-10 items-center justify-center rounded-full transition-colors focus:outline-none focus:ring-2 cursor-pointer ${buttonClass}`}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
         <span className="sr-only">Lihat notifikasi</span>
         <MaterialIcon name="notifications" size="md" />
@@ -188,37 +260,47 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
 
       {isOpen && (
         <div
-          className={`absolute right-[-80px] sm:right-0 z-50 mt-2 w-[calc(100vw-2rem)] sm:w-80 overflow-hidden rounded-xl border ${dropdownClass} animate-slide-up`}
+          className={`absolute right-[-80px] sm:right-0 z-50 mt-2 w-[calc(100vw-2rem)] sm:w-80 overflow-hidden rounded-xl border p-2 ${dropdownClass} animate-slide-up`}
         >
           {/* Header */}
-          <div className={`flex items-center justify-between border-b px-4 py-3 ${headerClass}`}>
-            <h3 className="text-sm font-semibold">Notifikasi</h3>
+          <div className="flex items-center justify-between gap-3 px-2 py-2.5">
+            <div className="flex min-w-0 items-center gap-3">
+              <MaterialIcon name="notifications" size="sm" className={mutedClass} />
+              <div className="min-w-0">
+                <h3 className={`text-sm font-semibold ${titleClass}`}>Notifikasi</h3>
+                <p className={`mt-0.5 truncate text-xs ${mutedClass}`}>
+                  {unreadCount > 0 ? `${unreadCount} belum dibaca` : "Semua sudah dibaca"}
+                </p>
+              </div>
+            </div>
             {unreadCount > 0 && (
               <button
                 type="button"
                 onClick={markAllAsRead}
-                className="text-xs font-medium text-cu-info transition-colors hover:text-cu-info-hover border-0 bg-transparent cursor-pointer"
+                className={`shrink-0 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors cursor-pointer ${variant === "dark" ? "text-blue-300 hover:bg-white/10 hover:text-blue-200" : "text-cu-info hover:bg-cu-panel-soft hover:text-cu-info-hover"}`}
               >
-                Tandai semua dibaca
+                Tandai semua
               </button>
             )}
           </div>
 
+          <div className={`mx-2 border-t ${dividerClass}`} />
+
           {/* List content */}
-          <div className="max-h-80 divide-y divide-cu-line overflow-y-auto">
+          <div role="menu" aria-label="Daftar notifikasi" className={`max-h-80 space-y-0.5 overflow-y-scroll p-2 ${scrollbarClass}`}>
             {error && <div className="p-3 text-xs text-cu-danger text-center">{error}</div>}
             
             {isLoading ? (
-              <div className="px-4 py-8 text-center text-xs text-cu-muted">
+              <div className={`px-4 py-8 text-center text-xs ${mutedClass}`}>
                 Memuat notifikasi...
               </div>
             ) : notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <MaterialIcon
                   size="lg"
-                  className="cu-icon-notifications-off mx-auto mb-2 text-cu-soft"
+                  className={`cu-icon-notifications-off mx-auto mb-2 ${variant === "dark" ? "text-white/35" : "text-cu-soft"}`}
                 />
-                <p className={`text-sm ${variant === "dark" ? "text-white/40" : "text-cu-muted"}`}>
+                <p className={`text-sm ${mutedClass}`}>
                   Belum ada notifikasi
                 </p>
               </div>
@@ -239,7 +321,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
                       </p>
                       <p
                         className={`mt-1 text-xs text-left ${
-                          variant === "dark" ? "text-white/40" : "text-cu-muted"
+                          variant === "dark" ? "text-white/60" : "text-cu-muted"
                         }`}
                       >
                         {relativeTime}
@@ -263,9 +345,10 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
                         void markAsRead(notification);
                         setIsOpen(false);
                       }}
-                      className={`block px-4 py-3 transition-colors ${itemHoverClass} ${
+                      className={`block rounded-lg px-3 py-2.5 transition-colors focus:outline-none ${itemHoverClass} ${
                         isUnread ? unreadItemClass : ""
                       }`}
+                      role="menuitem"
                     >
                       {content}
                     </Link>
@@ -276,9 +359,10 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
                       key={notification.id}
                       type="button"
                       onClick={() => void markAsRead(notification)}
-                      className={`w-full block px-4 py-3 transition-colors text-left border-0 bg-transparent cursor-pointer ${itemHoverClass} ${
+                      className={`block w-full rounded-lg border-0 bg-transparent px-3 py-2.5 text-left transition-colors cursor-pointer focus:outline-none ${itemHoverClass} ${
                         isUnread ? unreadItemClass : ""
                       }`}
+                      role="menuitem"
                     >
                       {content}
                     </button>

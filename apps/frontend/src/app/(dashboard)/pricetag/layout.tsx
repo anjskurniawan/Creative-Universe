@@ -106,7 +106,7 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
       </div>
 
       {/* Pill Navigation Switcher */}
-      <nav className="flex items-center p-1 rounded-full border border-white/10 bg-[#0d0d0d]/60 backdrop-blur-md relative z-10 gap-1 md:gap-1.5 shadow-xl transition-all duration-300 max-w-full overflow-x-auto scrollbar-none flex-nowrap mx-4 sm:mx-0">
+      <nav className="flex items-center p-1 rounded-full border border-white/10 bg-[#0d0d0d]/60 backdrop-blur-md gap-1 md:gap-1.5 shadow-xl transition-all duration-300 max-w-full overflow-x-auto scrollbar-none flex-nowrap mx-4 sm:mx-0">
         {tabs
           .filter((tab) => hasPermission(tab.permission))
           .map((tab) => {

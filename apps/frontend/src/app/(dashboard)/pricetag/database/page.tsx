@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 import { apiFetch } from "@/lib/api";
+import { pushLocalNotification } from "@/lib/local-notifications";
 import {
   emptyProductForm,
   formatRupiah,
@@ -29,21 +30,23 @@ export default function PricetagDatabasePage() {
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
 
   const [categoryModal, setCategoryModal] = useState<PricetagCategory | "new" | null>(null);
   const [categoryName, setCategoryName] = useState("");
   const [productModal, setProductModal] = useState<PricetagProduct | "new" | null>(null);
   const [productForm, setProductForm] = useState<PricetagProductForm>(emptyProductForm);
   const [isSaving, setIsSaving] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+
+  const notify = (message: string) => {
+    pushLocalNotification(message, "/pricetag/database");
+  };
 
   const loadData = useCallback(async () => {
     if (!hasPermission("pricetag.manage")) return;
     setIsLoading(true);
-    setError(null);
     const params = new URLSearchParams({ page: String(page), per_page: "10" });
     if (appliedSearch) params.set(tab === "categories" ? "name" : "search", appliedSearch);
 
@@ -64,7 +67,7 @@ export default function PricetagDatabasePage() {
         setTotal(result.meta.total);
       }
     } catch (requestError) {
-      setError(pricetagError(requestError));
+      notify(pricetagError(requestError));
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +82,6 @@ export default function PricetagDatabasePage() {
     setSearch("");
     setAppliedSearch("");
     setPage(1);
-    setError(null);
   };
 
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
@@ -91,14 +93,12 @@ export default function PricetagDatabasePage() {
   const openCategory = (category: PricetagCategory | "new") => {
     setCategoryModal(category);
     setCategoryName(category === "new" ? "" : category.name);
-    setError(null);
   };
 
   const saveCategory = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!categoryModal) return;
     setIsSaving(true);
-    setError(null);
     try {
       const editing = categoryModal !== "new";
       await apiFetch(editing ? `/pricetag/categories/${categoryModal.id}` : "/pricetag/categories", {
@@ -106,21 +106,20 @@ export default function PricetagDatabasePage() {
         body: JSON.stringify({ name: categoryName }),
       });
       setCategoryModal(null);
-      setNotice(editing ? "Kategori berhasil diperbarui." : "Kategori berhasil dibuat.");
+      notify(editing ? "Kategori berhasil diperbarui." : "Kategori berhasil dibuat.");
       await loadData();
     } catch (requestError) {
-      setError(pricetagError(requestError));
+      notify(pricetagError(requestError));
     } finally { setIsSaving(false); }
   };
 
   const deleteCategory = async (category: PricetagCategory) => {
     if (!window.confirm(`Hapus kategori ${category.name}?`)) return;
-    setError(null);
     try {
       await apiFetch(`/pricetag/categories/${category.id}`, { method: "DELETE" });
-      setNotice(`Kategori ${category.name} berhasil dihapus.`);
+      notify(`Kategori ${category.name} berhasil dihapus.`);
       await loadData();
-    } catch (requestError) { setError(pricetagError(requestError)); }
+    } catch (requestError) { notify(pricetagError(requestError)); }
   };
 
   const openProduct = (product: PricetagProduct | "new") => {
@@ -132,14 +131,12 @@ export default function PricetagDatabasePage() {
       normal_price: String(product.normal_price),
       discount_price: String(product.discount_price ?? 0),
     });
-    setError(null);
   };
 
   const saveProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!productModal) return;
     setIsSaving(true);
-    setError(null);
     try {
       const editing = productModal !== "new";
       await apiFetch(editing ? `/pricetag/products/${productModal.id}` : "/pricetag/products", {
@@ -153,37 +150,37 @@ export default function PricetagDatabasePage() {
         }),
       });
       setProductModal(null);
-      setNotice(editing ? "Produk berhasil diperbarui." : "Produk berhasil dibuat.");
+      notify(editing ? "Produk berhasil diperbarui." : "Produk berhasil dibuat.");
       await loadData();
-    } catch (requestError) { setError(pricetagError(requestError)); }
+    } catch (requestError) { notify(pricetagError(requestError)); }
     finally { setIsSaving(false); }
   };
 
   const deleteProduct = async (product: PricetagProduct) => {
     if (!window.confirm(`Hapus ${product.name} (${product.variant_name})?`)) return;
-    setError(null);
     try {
       await apiFetch(`/pricetag/products/${product.id}`, { method: "DELETE" });
-      setNotice(`Produk ${product.name} berhasil dihapus.`);
+      notify(`Produk ${product.name} berhasil dihapus.`);
       await loadData();
-    } catch (requestError) { setError(pricetagError(requestError)); }
+    } catch (requestError) { notify(pricetagError(requestError)); }
   };
 
   const importCatalog = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!importFile) { setError("Pilih file CSV terlebih dahulu."); return; }
+    if (!importFile) { notify("Pilih file CSV terlebih dahulu."); return; }
     setIsImporting(true);
-    setError(null);
+    notify(`Import CSV dimulai untuk file ${importFile.name}.`);
     const formData = new FormData();
     formData.append("file", importFile);
     try {
       const summary = await apiFetch<PricetagImportSummary>("/pricetag/imports/products", { method: "POST", body: formData });
-      setNotice(`Import ${summary.total} baris selesai: ${summary.created} baru, ${summary.updated} diperbarui, ${summary.restored} dipulihkan.`);
+      notify(`Import ${summary.total} baris selesai: ${summary.created} baru, ${summary.updated} diperbarui, ${summary.restored} dipulihkan.`);
       setImportFile(null);
+      setIsImportModalOpen(false);
       const input = document.getElementById("catalog-csv") as HTMLInputElement | null;
       if (input) input.value = "";
       await loadData();
-    } catch (requestError) { setError(pricetagError(requestError)); }
+    } catch (requestError) { notify(pricetagError(requestError)); }
     finally { setIsImporting(false); }
   };
 
@@ -195,23 +192,15 @@ export default function PricetagDatabasePage() {
           <h1 className="mt-1 text-2xl font-semibold text-cu-ink">Manajemen Katalog</h1>
           <p className="mt-1 text-sm text-cu-muted">{total} data pada tab {tab === "categories" ? "kategori" : "produk"}.</p>
         </div>
-        <button type="button" onClick={() => tab === "categories" ? openCategory("new") : openProduct("new")} className="btn bg-cu-ink text-white hover:bg-cu-ink-hover">
-          <MaterialIcon name="add" size="sm" /> Tambah {tab === "categories" ? "Kategori" : "Produk"}
-        </button>
-      </header>
-
-      {notice && <Alert tone="success" message={notice} onClose={() => setNotice(null)} />}
-      {error && <Alert tone="error" message={error} onClose={() => setError(null)} />}
-
-      <form onSubmit={importCatalog} className="rounded-2xl border border-cu-line bg-cu-surface p-4 shadow-sm">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end">
-          <label className="min-w-0 flex-1 text-sm font-medium text-cu-ink">Import/update CSV
-            <input id="catalog-csv" type="file" accept=".csv,.txt,text/csv" onChange={(event) => setImportFile(event.target.files?.[0] ?? null)} className="mt-1 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm" />
-          </label>
-          <button type="submit" disabled={isImporting} className="btn btn-secondary"><MaterialIcon name="upload_file" size="sm" />{isImporting ? "Mengimpor..." : "Import CSV"}</button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="button" onClick={() => setIsImportModalOpen(true)} className="btn btn-secondary">
+            <MaterialIcon name="upload_file" size="sm" /> Import CSV
+          </button>
+          <button type="button" onClick={() => tab === "categories" ? openCategory("new") : openProduct("new")} className="btn bg-cu-ink text-white hover:bg-cu-ink-hover">
+            <MaterialIcon name="add" size="sm" /> Tambah {tab === "categories" ? "Kategori" : "Produk"}
+          </button>
         </div>
-        <p className="mt-2 text-xs text-cu-muted">CSV/TXT maksimal 2 MB. Mendukung separator koma atau titik koma.</p>
-      </form>
+      </header>
 
       <div className="flex border-b border-cu-line">
         <TabButton active={tab === "categories"} onClick={() => changeTab("categories")} icon="category" label="Kategori" />
@@ -234,6 +223,7 @@ export default function PricetagDatabasePage() {
 
       {categoryModal && <CategoryModal name={categoryName} setName={setCategoryName} editing={categoryModal !== "new"} saving={isSaving} onSubmit={saveCategory} onClose={() => setCategoryModal(null)} />}
       {productModal && <ProductModal form={productForm} setForm={setProductForm} categories={categoryOptions} editing={productModal !== "new"} saving={isSaving} onSubmit={saveProduct} onClose={() => setProductModal(null)} />}
+      {isImportModalOpen && <ImportCsvModal importFile={importFile} setImportFile={setImportFile} isImporting={isImporting} onSubmit={importCatalog} onClose={() => setIsImportModalOpen(false)} />}
     </div>
   );
 }
@@ -255,11 +245,27 @@ function ProductModal({ form, setForm, categories, editing, saving, onSubmit, on
   return <Modal title={editing ? "Edit Produk" : "Tambah Produk"} onClose={onClose}><form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2"><label className="sm:col-span-2 text-sm font-medium">Kategori<select value={form.category_id} onChange={(event) => field("category_id", Number(event.target.value) || "")} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3"><option value="">Pilih kategori</option>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label className="text-sm font-medium">Nama produk<input value={form.name} onChange={(event) => field("name", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Varian<input value={form.variant_name} onChange={(event) => field("variant_name", event.target.value)} placeholder="Default" className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Harga normal<input type="number" min="0" value={form.normal_price} onChange={(event) => field("normal_price", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Harga diskon<input type="number" min="0" value={form.discount_price} onChange={(event) => field("discount_price", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><div className="sm:col-span-2"><ModalActions saving={saving} onClose={onClose} /></div></form></Modal>;
 }
 
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) { return <div className="fixed inset-0 z-[70] flex items-center justify-center bg-cu-overlay/60 p-4"><div role="dialog" aria-modal="true" className="w-full max-w-xl rounded-2xl bg-cu-surface p-5 shadow-xl"><div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-semibold">{title}</h2><button type="button" onClick={onClose} aria-label="Tutup"><MaterialIcon name="close" size="sm" /></button></div>{children}</div></div>; }
-function ModalActions({ saving, onClose }: { saving: boolean; onClose: () => void }) { return <div className="flex justify-end gap-2"><button type="button" onClick={onClose} className="btn btn-secondary">Batal</button><button type="submit" disabled={saving} className="btn bg-cu-ink text-white">{saving ? "Menyimpan..." : "Simpan"}</button></div>; }
+function ImportCsvModal({ importFile, setImportFile, isImporting, onSubmit, onClose }: { importFile: File | null; setImportFile: (file: File | null) => void; isImporting: boolean; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onClose: () => void }) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const downloadTemplate = () => {
+    const csvContent = "data:text/csv;charset=utf-8,kategori,produk,variant,harga normal,harga diskon\n";
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "pricetag_database_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return <Modal title="Import / Update CSV" onClose={onClose}><form onSubmit={onSubmit} className="space-y-4"><div className="flex items-center justify-between gap-3 rounded-xl border border-cu-line bg-cu-surface-soft px-4 py-3"><div><p className="text-sm font-semibold text-cu-ink">Template CSV Kosong</p><p className="text-xs text-cu-muted">Format header sudah disiapkan tanpa isi data.</p></div><button type="button" onClick={downloadTemplate} className="btn btn-secondary"><MaterialIcon name="download_for_offline" size="sm" />Unduh Template</button></div><div><p className="mb-1 text-sm font-medium text-cu-ink">File CSV / TXT</p><div className={`flex min-h-40 w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition hover:bg-cu-panel-soft ${importFile ? "border-cu-info/40 bg-cu-info-soft" : "border-cu-line bg-cu-surface"}`} onClick={() => fileInputRef.current?.click()} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); setImportFile(event.dataTransfer.files?.[0] ?? null); }}><MaterialIcon name={importFile ? "description" : "cloud_upload"} size="lg" className={`mb-3 ${importFile ? "text-cu-info" : "text-cu-soft"}`} />{importFile ? <><p className="max-w-full break-all text-sm font-semibold text-cu-info">{importFile.name}</p><p className="mt-1 text-xs text-cu-muted">Klik atau jatuhkan file lain untuk mengganti.</p></> : <><p className="text-sm text-cu-ink"><span className="font-semibold">Klik untuk memilih file</span> atau jatuhkan file di sini</p><p className="mt-1 text-xs text-cu-muted">Maksimal 2 MB. Format CSV atau TXT.</p></>}<input id="catalog-csv" ref={fileInputRef} type="file" accept=".csv,.txt,text/csv" onChange={(event) => setImportFile(event.target.files?.[0] ?? null)} className="hidden" /></div></div><p className="text-xs text-cu-muted">Mendukung separator koma atau titik koma. Tabel katalog tetap menampilkan maksimal 10 item per halaman.</p><ModalActions saving={isImporting} onClose={onClose} submitLabel={isImporting ? "Mengimpor..." : "Import CSV"} /></form></Modal>;
+}
+
+function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) { return <div className="fixed inset-0 z-[120] flex items-center justify-center bg-cu-overlay/70 p-4"><div role="dialog" aria-modal="true" className="relative z-[121] w-full max-w-xl rounded-2xl bg-cu-surface p-5 shadow-xl"><div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-semibold">{title}</h2><button type="button" onClick={onClose} aria-label="Tutup"><MaterialIcon name="close" size="sm" /></button></div>{children}</div></div>; }
+function ModalActions({ saving, onClose, submitLabel }: { saving: boolean; onClose: () => void; submitLabel?: string }) { return <div className="flex justify-end gap-2"><button type="button" onClick={onClose} className="btn btn-secondary">Batal</button><button type="submit" disabled={saving} className="btn bg-cu-ink text-white">{submitLabel ?? (saving ? "Menyimpan..." : "Simpan")}</button></div>; }
 function Action({ icon, label, onClick, danger = false }: { icon: string; label: string; onClick: () => void; danger?: boolean }) { return <button type="button" onClick={onClick} aria-label={label} className={`inline-flex size-8 items-center justify-center rounded-lg border ${danger ? "border-cu-danger/20 bg-cu-danger-soft text-cu-danger" : "border-cu-line bg-cu-surface text-cu-ink"}`}><MaterialIcon name={icon} size="xs" /></button>; }
 function TabButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: string; label: string }) { return <button type="button" onClick={onClick} className={`inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold ${active ? "border-cu-ink text-cu-ink" : "border-transparent text-cu-muted"}`}><MaterialIcon name={icon} size="sm" />{label}</button>; }
 function Pagination({ page, lastPage, onPage }: { page: number; lastPage: number; onPage: (page: number) => void }) { if (lastPage <= 1) return null; return <div className="flex items-center justify-between text-xs text-cu-muted"><span>Halaman {page} dari {lastPage}</span><div className="flex gap-2"><button type="button" disabled={page <= 1} onClick={() => onPage(page - 1)} className="btn btn-secondary">Sebelumnya</button><button type="button" disabled={page >= lastPage} onClick={() => onPage(page + 1)} className="btn btn-secondary">Berikutnya</button></div></div>; }
-function Alert({ tone, message, onClose }: { tone: "success" | "error"; message: string; onClose: () => void }) { return <div className={`flex justify-between rounded-xl border px-4 py-3 text-sm ${tone === "success" ? "border-cu-success/20 bg-cu-success-soft text-cu-success" : "border-cu-danger/20 bg-cu-danger-soft text-cu-danger"}`}><span>{message}</span><button type="button" onClick={onClose} aria-label="Tutup"><MaterialIcon name="close" size="xs" /></button></div>; }
 function Loading() { return <div className="rounded-2xl border border-cu-line bg-cu-surface p-12 text-center text-sm text-cu-muted">Memuat database katalog...</div>; }
 function AccessDenied() { return <div className="rounded-2xl border border-cu-danger/20 bg-cu-danger-soft p-8 text-center"><MaterialIcon name="lock" size="lg" className="mx-auto text-cu-danger" /><h1 className="mt-3 text-lg font-semibold">Akses ditolak</h1><p className="mt-1 text-sm text-cu-muted">Anda tidak memiliki permission pricetag.manage.</p></div>; }

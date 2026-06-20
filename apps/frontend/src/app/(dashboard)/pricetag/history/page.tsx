@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 import { apiFetch } from "@/lib/api";
 import { getEchoClient } from "@/lib/echo";
+import { pushLocalNotification } from "@/lib/local-notifications";
 import {
   formatRupiah,
   pricetagError,
@@ -22,12 +23,28 @@ export default function PricetagHistoryPage() {
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Detail Modal State
   const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null);
   const [detailBatch, setDetailBatch] = useState<PricetagBatch | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+
+  const notify = (message: string) => {
+    pushLocalNotification(message, "/pricetag/history");
+  };
+
+  const loadBatchDetail = async (id: number, silent = false) => {
+    if (!silent) setIsLoadingDetail(true);
+    try {
+      const res = await apiFetch<PricetagBatch>(`/pricetag/batches/${id}`);
+      setDetailBatch(res);
+    } catch (err) {
+      if (!silent) notify(pricetagError(err));
+      setSelectedBatchId(null);
+    } finally {
+      if (!silent) setIsLoadingDetail(false);
+    }
+  };
 
   // ----------------------------------------------------
   // Load History Batches
@@ -44,7 +61,7 @@ export default function PricetagHistoryPage() {
       setLastPage(res.meta.last_page);
       setTotal(res.meta.total);
     } catch (err) {
-      if (!silent) setError(pricetagError(err));
+      if (!silent) notify(pricetagError(err));
     } finally {
       if (!silent) setIsLoading(false);
     }
@@ -108,22 +125,6 @@ export default function PricetagHistoryPage() {
     return () => clearInterval(interval);
   }, [batches, loadBatches, selectedBatchId]);
 
-  // ----------------------------------------------------
-  // Load Batch Detail Modal
-  // ----------------------------------------------------
-  const loadBatchDetail = async (id: number, silent = false) => {
-    if (!silent) setIsLoadingDetail(true);
-    try {
-      const res = await apiFetch<PricetagBatch>(`/pricetag/batches/${id}`);
-      setDetailBatch(res);
-    } catch (err) {
-      if (!silent) setError(pricetagError(err));
-      setSelectedBatchId(null);
-    } finally {
-      if (!silent) setIsLoadingDetail(false);
-    }
-  };
-
   const openDetail = (id: number) => {
     setSelectedBatchId(id);
     setDetailBatch(null);
@@ -150,9 +151,6 @@ export default function PricetagHistoryPage() {
           </p>
         </div>
       </header>
-
-      {error && <Alert message={error} onClose={() => setError(null)} />}
-
       {isLoading ? (
         <Loading />
       ) : batches.length === 0 ? (
@@ -437,17 +435,6 @@ function Empty() {
       <p className="mt-1 text-xs text-cu-muted max-w-xs mx-auto">
         Anda belum pernah membuat label harga promo secara kelompok (Checklist/CSV) atau single.
       </p>
-    </div>
-  );
-}
-
-function Alert({ message, onClose }: { message: string; onClose: () => void }) {
-  return (
-    <div className="flex justify-between rounded-xl border border-cu-danger/20 bg-cu-danger-soft px-4 py-3 text-sm text-cu-danger">
-      <span>{message}</span>
-      <button type="button" onClick={onClose} aria-label="Tutup" className="ml-3 self-start shrink-0">
-        <MaterialIcon name="close" size="xs" />
-      </button>
     </div>
   );
 }

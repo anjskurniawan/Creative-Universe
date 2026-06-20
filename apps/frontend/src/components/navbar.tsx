@@ -7,10 +7,10 @@ import { MaterialIcon } from "./material-icon";
 import { NotificationBell } from "./notification-bell";
 
 interface NavbarProps {
-  variant?: "solid" | "glass" | "dark-glass";
+  variant?: "light" | "dark";
 }
 
-export function Navbar({ variant = "solid" }: NavbarProps) {
+export function Navbar({ variant = "light" }: NavbarProps) {
   const { user, isAuthenticated, logout, hasPermission } = useAuth();
   const [appsOpen, setAppsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -28,74 +28,62 @@ export function Navbar({ variant = "solid" }: NavbarProps) {
         setProfileOpen(false);
       }
     }
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setAppsOpen(false);
+        setProfileOpen(false);
+      }
+    }
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
-  // Determine user-defined variant if settings are available
-  let resolvedVariant = variant;
-  if (user && user.settings) {
-    const preferredVariant = user.settings.navbar_variant as string;
-    if (preferredVariant === "solid" || preferredVariant === "glass" || preferredVariant === "dark-glass") {
-      resolvedVariant = preferredVariant as "solid" | "glass" | "dark-glass";
-    }
-  }
-
   const navClass = {
-    solid: "border-b border-cu-line bg-cu-surface/95 backdrop-blur-md text-cu-ink",
-    glass: "border-b border-cu-line/70 bg-cu-surface/80 backdrop-blur-md text-cu-ink",
-    "dark-glass": "border-b border-white/10 bg-black/20 backdrop-blur-md text-white",
-  }[resolvedVariant];
-
-  const menuLinkClass = {
-    solid: "flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft",
-    glass: "flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft",
-    "dark-glass": "flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white",
-  }[resolvedVariant];
+    light: "bg-cu-surface/75 text-cu-ink backdrop-blur-xl",
+    dark: "bg-[#0a0a0a]/75 text-white backdrop-blur-xl",
+  }[variant];
 
   const iconButtonClass = {
-    solid: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full border border-transparent text-cu-ink transition-colors hover:border-cu-border hover:bg-cu-panel-soft focus:outline-none focus:ring-1 focus:ring-cu-border-hover cursor-pointer",
-    glass: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full border border-transparent text-cu-ink transition-colors hover:border-cu-border hover:bg-cu-panel-soft focus:outline-none focus:ring-1 focus:ring-cu-border-hover cursor-pointer",
-    "dark-glass": "inline-flex size-9 sm:size-10 items-center justify-center rounded-full border border-transparent text-white/90 transition-colors hover:border-white/20 hover:bg-white/10 focus:outline-none focus:ring-1 focus:ring-white/30 cursor-pointer",
-  }[resolvedVariant];
+    light: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full text-cu-ink transition-colors hover:bg-cu-panel-soft focus:outline-none focus:ring-2 focus:ring-cu-focus/25 cursor-pointer",
+    dark: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer",
+  }[variant];
 
-  const dropdownPanelClass = {
-    solid: "absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-cu-line bg-cu-panel shadow-lg text-cu-ink animate-slide-up",
-    glass: "absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-cu-line bg-cu-panel shadow-lg text-cu-ink animate-slide-up",
-    "dark-glass": "absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-[#0d0d0d]/90 backdrop-blur-md shadow-2xl text-white animate-slide-up",
-  }[resolvedVariant];
+  const popupPanelClass = {
+    light: "border-cu-line bg-cu-surface text-cu-ink shadow-xl",
+    dark: "border-white/10 bg-[#0d0d0d]/95 text-white shadow-2xl backdrop-blur-xl",
+  }[variant];
 
-  const dropdownHeaderClass = {
-    solid: "border-b border-cu-line px-4 py-3",
-    glass: "border-b border-cu-line px-4 py-3",
-    "dark-glass": "border-b border-white/10 px-4 py-3",
-  }[resolvedVariant];
+  const popupMenuLinkClass = {
+    light: "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-focus/30",
+    dark: "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+  }[variant];
 
-  const dropdownTitleClass = {
-    solid: "block text-xs font-semibold uppercase tracking-wider text-cu-muted",
-    glass: "block text-xs font-semibold uppercase tracking-wider text-cu-muted",
-    "dark-glass": "block text-xs font-semibold uppercase tracking-wider text-white/50",
-  }[resolvedVariant];
+  const popupMenuIconClass = {
+    light: "text-cu-muted transition-colors group-hover:text-cu-ink",
+    dark: "text-white/50 transition-colors group-hover:text-white",
+  }[variant];
 
-  const dropdownUserEmailClass = {
-    solid: "block truncate text-xs text-cu-muted",
-    glass: "block truncate text-xs text-cu-muted",
-    "dark-glass": "block truncate text-xs text-white/50",
-  }[resolvedVariant];
+  const popupDividerClass = variant === "dark" ? "border-white/10" : "border-cu-line";
+  const popupMutedClass = variant === "dark" ? "text-white/50" : "text-cu-muted";
 
-  const dropdownUserTitleClass = {
-    solid: "block truncate text-sm font-semibold text-cu-ink",
-    glass: "block truncate text-sm font-semibold text-cu-ink",
-    "dark-glass": "block truncate text-sm font-semibold text-white",
-  }[resolvedVariant];
-
-  const logoutButtonClass = {
-    solid: "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-cu-danger transition-colors hover:bg-cu-danger-soft cursor-pointer border-0 bg-transparent",
-    glass: "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-cu-danger transition-colors hover:bg-cu-danger-soft cursor-pointer border-0 bg-transparent",
-    "dark-glass": "flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-cu-danger transition-colors hover:bg-red-500/10 cursor-pointer border-0 bg-transparent",
-  }[resolvedVariant];
+  const profileAdminItems = [
+    hasPermission("manage-users")
+      ? { href: "/users", icon: "group", label: "Kelola User" }
+      : null,
+    hasPermission("manage-roles")
+      ? { href: "/roles", icon: "admin_panel_settings", label: "Kelola Role" }
+      : null,
+    hasPermission("approve-users")
+      ? { href: "/users/pending", icon: "pending_actions", label: "Akun Pending" }
+      : null,
+    hasPermission("run-artisan")
+      ? { href: "/maintenance", icon: "settings", label: "Maintenance Panel" }
+      : null,
+  ].filter((item): item is { href: string; icon: string; label: string } => item !== null);
 
   const initials = user
     ? user.name
@@ -149,95 +137,81 @@ export function Navbar({ variant = "solid" }: NavbarProps) {
           ) : (
             <>
               {/* Notification Bell */}
-              {user && <NotificationBell userId={user.id} variant={resolvedVariant === "dark-glass" ? "dark" : "light"} />}
+              {user && <NotificationBell userId={user.id} variant={variant} />}
 
               {/* Apps Menu Dropdown */}
               <div className="relative" ref={appsRef}>
                 <button
-                  onClick={() => setAppsOpen(!appsOpen)}
+                  onClick={() => {
+                    setAppsOpen((open) => !open);
+                    setProfileOpen(false);
+                  }}
                   type="button"
                   className={iconButtonClass}
+                  aria-expanded={appsOpen}
+                  aria-haspopup="menu"
                 >
                   <span className="sr-only">Buka menu aplikasi</span>
                   <MaterialIcon name="apps" size="md" />
                 </button>
 
                 {appsOpen && (
-                  <div className={dropdownPanelClass}>
-                    <div className={dropdownHeaderClass}>
-                      <span className={dropdownTitleClass}>Menu</span>
+                  <div className={`absolute right-0 z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-xl border p-2 animate-slide-up ${popupPanelClass}`}>
+                    <div className="flex items-center gap-3 px-2 py-2.5">
+                      <MaterialIcon name="apps" size="sm" className={popupMutedClass} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold">Menu Aplikasi</p>
+                        <p className={`mt-0.5 text-xs ${popupMutedClass}`}>Pilih area kerja Creative Universe</p>
+                      </div>
                     </div>
-                    <ul className="py-1 list-none m-0 p-0">
+
+                    <div className={`mx-2 border-t ${popupDividerClass}`} />
+
+                    <ul role="menu" aria-label="Menu aplikasi" className="m-0 list-none space-y-0.5 p-2">
                       <li>
                         <Link
-                          href="/dashboard"
+                          href="/pricetag/search"
                           onClick={() => setAppsOpen(false)}
-                          className={menuLinkClass}
+                          className={popupMenuLinkClass}
+                          role="menuitem"
                         >
-                          <MaterialIcon name="dashboard" size="sm" />
-                          Dashboard
+                          <MaterialIcon name="label" size="sm" className={popupMenuIconClass} />
+                          Pricetag Generator
                         </Link>
                       </li>
-                      {hasPermission("access-pricetag") && (
-                        <li>
-                          <Link
-                            href="/pricetag/search"
-                            onClick={() => setAppsOpen(false)}
-                            className={menuLinkClass}
-                          >
-                            <MaterialIcon name="label" size="sm" />
-                            Pricetag Studio
-                          </Link>
-                        </li>
-                      )}
-                      {hasPermission("manage-users") && (
-                        <li>
-                          <Link
-                            href="/users"
-                            onClick={() => setAppsOpen(false)}
-                            className={menuLinkClass}
-                          >
-                            <MaterialIcon name="group" size="sm" />
-                            Kelola User
-                          </Link>
-                        </li>
-                      )}
-                      {hasPermission("manage-roles") && (
-                        <li>
-                          <Link
-                            href="/roles"
-                            onClick={() => setAppsOpen(false)}
-                            className={menuLinkClass}
-                          >
-                            <MaterialIcon name="admin_panel_settings" size="sm" />
-                            Kelola Role
-                          </Link>
-                        </li>
-                      )}
-                      {hasPermission("approve-users") && (
-                        <li>
-                          <Link
-                            href="/users/pending"
-                            onClick={() => setAppsOpen(false)}
-                            className={menuLinkClass}
-                          >
-                            <MaterialIcon name="pending_actions" size="sm" />
-                            Akun Pending
-                          </Link>
-                        </li>
-                      )}
-                      {hasPermission("run-artisan") && (
-                        <li>
-                          <Link
-                            href="/maintenance"
-                            onClick={() => setAppsOpen(false)}
-                            className={menuLinkClass}
-                          >
-                            <MaterialIcon name="settings" size="sm" />
-                            Maintenance Panel
-                          </Link>
-                        </li>
-                      )}
+                      <li>
+                        <Link
+                          href="/odds"
+                          onClick={() => setAppsOpen(false)}
+                          className={popupMenuLinkClass}
+                          role="menuitem"
+                        >
+                          <MaterialIcon name="architecture" size="sm" className={popupMenuIconClass} />
+                          ODDS (One Dashboard Design System)
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/ai-agent"
+                          onClick={() => setAppsOpen(false)}
+                          className={popupMenuLinkClass}
+                          role="menuitem"
+                        >
+                          <MaterialIcon name="smart_toy" size="sm" className={popupMenuIconClass} />
+                          AI Agent
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/assets-design"
+                          onClick={() => setAppsOpen(false)}
+                          className={popupMenuLinkClass}
+                          role="menuitem"
+                        >
+                          <MaterialIcon name="brush" size="sm" className={popupMenuIconClass} />
+                          Assets Design
+                        </Link>
+                      </li>
                     </ul>
                   </div>
                 )}
@@ -246,9 +220,15 @@ export function Navbar({ variant = "solid" }: NavbarProps) {
               {/* User Dropdown */}
               <div className="relative" ref={profileRef}>
                 <button
-                  onClick={() => setProfileOpen(!profileOpen)}
+                  onClick={() => {
+                    setProfileOpen((open) => !open);
+                    setAppsOpen(false);
+                  }}
                   type="button"
                   className={`focus:outline-none cursor-pointer flex items-center justify-center shrink-0 size-9 sm:size-10 overflow-hidden rounded-full border border-cu-line ${user?.avatar_url ? "bg-white" : "bg-cu-danger text-white"}`}
+                  aria-label="Buka menu akun"
+                  aria-expanded={profileOpen}
+                  aria-haspopup="menu"
                 >
                   {user?.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -263,46 +243,109 @@ export function Navbar({ variant = "solid" }: NavbarProps) {
                 </button>
 
                 {profileOpen && (
-                  <div className={dropdownPanelClass}>
-                    <div className={dropdownHeaderClass}>
-                      <span className={dropdownUserTitleClass}>{user?.name}</span>
-                      <span className={dropdownUserEmailClass}>{user?.email}</span>
+                  <div className={`absolute right-0 z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-xl border p-2 animate-slide-up ${popupPanelClass}`}>
+                    <div className="flex items-center gap-3 px-2 py-2.5">
+                      <div className={`flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cu-line ${user?.avatar_url ? "bg-white" : "bg-cu-danger text-white"}`}>
+                        {user?.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            className="size-full object-cover"
+                            src={user.avatar_url}
+                            alt=""
+                          />
+                        ) : (
+                          <span className="text-sm font-semibold">{initials}</span>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1 leading-tight">
+                        <p className="truncate text-sm font-semibold">
+                          @{user?.username}
+                        </p>
+                        <p className={`mt-0.5 truncate text-xs ${popupMutedClass}`}>{user?.name}</p>
+                      </div>
+                      <MaterialIcon name="manage_accounts" size="sm" className={popupMutedClass} />
                     </div>
-                    <ul className="py-1 list-none m-0 p-0">
+
+                    <div className={`mx-2 border-t ${popupDividerClass}`} />
+
+                    <ul role="menu" aria-label="Navigasi akun" className="m-0 list-none space-y-0.5 p-2">
                       <li>
                         <Link
                           href="/dashboard"
                           onClick={() => setProfileOpen(false)}
-                          className={menuLinkClass}
+                          className={popupMenuLinkClass}
+                          role="menuitem"
                         >
-                          <MaterialIcon name="dashboard" size="sm" />
+                          <MaterialIcon name="dashboard" size="sm" className={popupMenuIconClass} />
                           Dashboard
                         </Link>
+                      </li>
+                      <li>
+                        <div
+                          className={`flex min-h-10 cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium opacity-60 ${variant === "dark" ? "text-white/70" : "text-cu-muted"}`}
+                          aria-disabled="true"
+                          title="Profil publik akan tersedia pada pengembangan berikutnya"
+                        >
+                          <MaterialIcon name="person" size="sm" className={popupMenuIconClass} />
+                          <span className="flex-1">Profil Saya</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${variant === "dark" ? "bg-white/10 text-white/60" : "bg-cu-panel-soft text-cu-muted"}`}>
+                            Segera
+                          </span>
+                        </div>
                       </li>
                       <li>
                         <Link
                           href="/profile"
                           onClick={() => setProfileOpen(false)}
-                          className={menuLinkClass}
+                          className={popupMenuLinkClass}
+                          role="menuitem"
                         >
-                          <MaterialIcon name="person" size="sm" />
-                          Profil Saya
+                          <MaterialIcon name="settings" size="sm" className={popupMenuIconClass} />
+                          Pengaturan
                         </Link>
                       </li>
-                      <li>
+                    </ul>
+
+                    {profileAdminItems.length > 0 && (
+                      <>
+                        <div className={`mx-2 border-t ${popupDividerClass}`} />
+                        <div className={`px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider ${popupMutedClass}`}>
+                          Administrasi
+                        </div>
+                        <ul role="menu" aria-label="Navigasi administrasi" className="m-0 list-none space-y-0.5 px-2 pb-2">
+                          {profileAdminItems.map((item) => (
+                            <li key={item.href}>
+                              <Link
+                                href={item.href}
+                                onClick={() => setProfileOpen(false)}
+                                className={popupMenuLinkClass}
+                                role="menuitem"
+                              >
+                                <MaterialIcon name={item.icon} size="sm" className={popupMenuIconClass} />
+                                {item.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+
+                    <div className={`mx-2 border-t ${popupDividerClass}`} />
+
+                    <div role="menu" aria-label="Sesi akun" className="p-2">
                         <button
                           type="button"
                           onClick={() => {
                             setProfileOpen(false);
                             void logout();
                           }}
-                          className={logoutButtonClass}
+                          className={`group flex min-h-10 w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium text-cu-danger transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-danger/30 ${variant === "dark" ? "hover:bg-red-500/10" : "hover:bg-cu-danger-soft"}`}
+                          role="menuitem"
                         >
                           <MaterialIcon name="logout" size="sm" />
                           Keluar
                         </button>
-                      </li>
-                    </ul>
+                    </div>
                   </div>
                 )}
               </div>

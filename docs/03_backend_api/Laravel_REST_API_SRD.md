@@ -127,7 +127,7 @@ Semua endpoint memerlukan akun aktif dan `access-pricetag`. Endpoint mutasi data
 
 Per 2026-06-20, endpoint baca `GET /pricetag/categories`, `GET /pricetag/categories/{category}`, `GET /pricetag/products`, dan `GET /pricetag/products/{product}` sudah aktif. Endpoint produk mendukung `category_id`, `search`, `status=ready|not_ready`, sorting, dan pagination. CRUD kategori dan produk juga aktif dengan `pricetag.manage`, ownership otomatis, soft delete, validasi kombinasi produk/varian, serta audit perubahan harga. Kategori yang masih memiliki produk aktif tidak dapat dihapus. Alias lama `/pricetag-categories` hanya dipertahankan sementara untuk kompatibilitas dan bukan kontrak frontend baru.
 
-Import database `POST /pricetag/imports/products` aktif dengan multipart field `file`, permission `pricetag.manage`, ukuran maksimal 2 MB, separator koma/titik koma, dan alias header Indonesia/Inggris. Import bersifat atomic: duplicate atau baris invalid mengembalikan 422 beserta nomor baris tanpa partial write. Record aktif diperbarui dan record soft-deleted yang cocok dipulihkan.
+Import database `POST /pricetag/imports/products` aktif dengan multipart field `file`, permission `pricetag.manage`, ukuran maksimal 2 MB, separator koma/titik koma, dan alias header Indonesia/Inggris. Format template kanonis adalah `kategori,produk,variant,harga normal,harga diskon`; alias lama dengan underscore tetap diterima. Import bersifat atomic: duplicate atau baris invalid mengembalikan 422 beserta nomor baris tanpa partial write. Record aktif diperbarui dan record soft-deleted yang cocok dipulihkan.
 
 ## 4. Web Artisan
 

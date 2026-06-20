@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { MaterialIcon } from "@/components/material-icon";
+import { SettingsLayout } from "@/components/settings-layout";
 import {
   errorMessage,
   formatDate,
@@ -138,19 +139,20 @@ export default function PendingUsersPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <header>
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-cu-muted">Administrasi Core</p>
-        <div className="mt-1 flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold text-cu-ink">Persetujuan Registrasi</h1>
-          {total > 0 && (
-            <span className="rounded-full border border-cu-warning/20 bg-cu-warning-soft px-2.5 py-1 text-xs font-bold text-cu-warning">
-              {total} menunggu
-            </span>
-          )}
+    <SettingsLayout>
+      <div className="space-y-6 animate-fade-in">
+        <div className="border-b border-cu-line pb-3 mb-6">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-cu-muted">Administrasi Core</p>
+          <div className="mt-1 flex flex-wrap items-center gap-3">
+            <h2 className="text-2xl font-semibold text-cu-ink">Persetujuan Registrasi</h2>
+            {total > 0 && (
+              <span className="rounded-full border border-cu-warning/20 bg-cu-warning-soft px-2.5 py-1 text-xs font-bold text-cu-warning">
+                {total} menunggu
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-sm text-cu-muted">Daftar diperbarui real-time melalui Pusher.</p>
         </div>
-        <p className="mt-1 text-sm text-cu-muted">Daftar diperbarui real-time melalui Pusher.</p>
-      </header>
 
       {notice && <Alert tone="success" message={notice} onClose={() => setNotice(null)} />}
       {error && <Alert tone="error" message={error} onClose={() => setError(null)} />}
@@ -226,8 +228,9 @@ export default function PendingUsersPage() {
             <button type="button" disabled={page >= lastPage} onClick={() => setPage(page + 1)} className="btn btn-secondary">Berikutnya</button>
           </div>
         </div>
-      )}
-    </div>
+        )}
+      </div>
+    </SettingsLayout>
   );
 }
 

@@ -30,7 +30,7 @@ class PricetagCatalogImportApiTest extends TestCase
     {
         $file = UploadedFile::fake()->createWithContent(
             'catalog.csv',
-            "kategori,produk,varian,harga_normal,harga_diskon\nAudio,Headset Pro,Hitam,1.500.000,1.250.000\n"
+            "kategori,produk,variant,harga normal,harga diskon\nAudio,Headset Pro,Hitam,1.500.000,1.250.000\n"
         );
 
         $response = $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
@@ -154,7 +154,7 @@ class PricetagCatalogImportApiTest extends TestCase
             'file' => $missingHeader,
         ], ['Accept' => 'application/json'])
             ->assertUnprocessable()
-            ->assertJsonPath('message', 'Header CSV wajib memuat kategori, produk, dan harga_normal.');
+            ->assertJsonPath('message', 'Header CSV wajib memuat kategori, produk, dan harga normal.');
 
         $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
             'file' => $empty,

@@ -17,8 +17,8 @@ class PricetagCatalogImportService
         'category' => ['category', 'category_name', 'kategori'],
         'product' => ['product', 'product_name', 'produk'],
         'variant' => ['variant_name', 'variant', 'varian', 'nama_varian'],
-        'normal_price' => ['normal_price', 'harga_normal'],
-        'discount_price' => ['discount_price', 'harga_diskon'],
+        'normal_price' => ['normal_price', 'harga_normal', 'harga normal'],
+        'discount_price' => ['discount_price', 'harga_diskon', 'harga diskon'],
     ];
 
     /** @return array{total: int, created: int, updated: int, restored: int, categories_created: int, categories_restored: int} */
@@ -126,7 +126,7 @@ class PricetagCatalogImportService
             $indexes = $this->headerIndexes($header);
 
             if ($indexes['category'] === null || $indexes['product'] === null || $indexes['normal_price'] === null) {
-                throw new InvalidPricetagImportException([], 'Header CSV wajib memuat kategori, produk, dan harga_normal.');
+                throw new InvalidPricetagImportException([], 'Header CSV wajib memuat kategori, produk, dan harga normal.');
             }
 
             $rows = [];

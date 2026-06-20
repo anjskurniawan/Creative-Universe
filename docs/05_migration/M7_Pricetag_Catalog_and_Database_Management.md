@@ -103,7 +103,7 @@ Kontrak import:
 
 - file `.csv` atau `.txt`, maksimal 2 MB;
 - separator koma dan titik koma dideteksi otomatis;
-- menerima alias header Indonesia/Inggris untuk kategori, produk, varian, harga normal, dan harga diskon;
+- menerima format template `kategori,produk,variant,harga normal,harga diskon` serta alias header Indonesia/Inggris dengan underscore;
 - header minimum: kategori, produk, dan harga normal;
 - varian kosong dinormalisasi menjadi `Default`, harga diskon kosong menjadi `0`;
 - harga menerima integer polos atau format pemisah ribuan Indonesia/internasional;

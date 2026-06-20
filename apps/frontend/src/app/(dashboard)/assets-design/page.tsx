@@ -4,37 +4,27 @@ import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import * as THREE from "three";
 import { gsap } from "gsap";
-import { useAuth } from "@/providers/auth-provider";
-import { Navbar } from "@/components/navbar";
 import { MaterialIcon } from "@/components/material-icon";
 
 const CAMERA_Z = 8;
 const PARTICLE_OPACITY = 0.78;
 
-export default function HomePage() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+export default function AssetsDesignPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const textTargetRef = useRef<HTMLSpanElement>(null);
   const cursorRef = useRef<HTMLSpanElement>(null);
   const actionsRef = useRef<HTMLDivElement>(null);
 
-  // Typewriter Text
-  const typewriterText = user
-    ? `Hi, ${user.name}`
-    : "Creative Universe is under maintenance";
+  const typewriterText = "Assets Design akan segera hadir";
 
   useEffect(() => {
-    // Prevent animation running during authentication loading
-    if (isLoading) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const hero = canvas.closest("[data-interactive-hero]") as HTMLElement;
     if (!hero) return;
 
-    // Prefers Reduced Motion Check
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
       canvas.style.display = "none";
@@ -44,7 +34,6 @@ export default function HomePage() {
       return;
     }
 
-    // 1. TYPEWRITER ANIMATION (GSAP)
     const textTarget = textTargetRef.current;
     const cursor = cursorRef.current;
     const actions = actionsRef.current;
@@ -52,7 +41,6 @@ export default function HomePage() {
     const tweens = new Set<gsap.core.Tween | gsap.core.Timeline>();
 
     if (textTarget && cursor) {
-      // Split characters helper for Indonesian Segmenter support
       const splitCharacters = (text: string) => {
         if ("Segmenter" in Intl) {
           const segmenter = new Intl.Segmenter("id", { granularity: "grapheme" });
@@ -86,7 +74,7 @@ export default function HomePage() {
 
       const typewriterTween = gsap.to(progress, {
         count: characters.length,
-        duration: Math.max(2.8, characters.length * 0.075),
+        duration: Math.max(2.0, characters.length * 0.08),
         ease: "none",
         onUpdate: () => {
           textTarget.textContent = characters.slice(0, Math.round(progress.count)).join("");
@@ -99,13 +87,13 @@ export default function HomePage() {
               opacity: 1,
               filter: "blur(0px)",
               y: 0,
-              duration: 1.5,
+              duration: 1.2,
               ease: "power2.out",
             });
             tweens.add(actionsFade);
           }
 
-          const cursorFadeDelay = gsap.delayedCall(2, () => {
+          const cursorFadeDelay = gsap.delayedCall(1.5, () => {
             blink.kill();
             gsap.to(cursor, {
               opacity: 0,
@@ -119,10 +107,9 @@ export default function HomePage() {
       tweens.add(typewriterTween);
     }
 
-    // 2. THREE.JS PARTICLE BACKGROUND
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
     const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
-    const particleCount = isMobile ? 140 : 360;
+    const particleCount = isMobile ? 120 : 300;
 
     const createParticlePosition = () => {
       const zone = Math.random();
@@ -140,7 +127,6 @@ export default function HomePage() {
         normalizedY = 0.04 + Math.pow(Math.random(), 1.25) * 0.91;
       }
 
-      // Keep particles away from the central text content area for readability
       const isInsideReadingArea =
         Math.abs(normalizedX - 0.5) < 0.27 && Math.abs(normalizedY - 0.49) < 0.24;
 
@@ -204,7 +190,6 @@ export default function HomePage() {
     particles.frustumCulled = false;
     scene.add(particles);
 
-    // Color Palette mapping to globals.css color tokens
     const getCssColor = (prop: string, fallback: string) => {
       if (typeof window === "undefined") return fallback;
       return getComputedStyle(document.documentElement).getPropertyValue(prop).trim() || fallback;
@@ -322,7 +307,6 @@ export default function HomePage() {
     window.addEventListener("blur", handlePointerLeave);
     gsap.ticker.add(renderParticles);
 
-    // Fade in animation for particles
     const opTween = gsap.to(material, {
       opacity: PARTICLE_OPACITY,
       duration: 1.8,
@@ -344,7 +328,6 @@ export default function HomePage() {
     });
     tweens.add(camTween);
 
-    // CLEANUP ACTIONS
     return () => {
       tweens.forEach((t) => t.kill());
       gsap.ticker.remove(renderParticles);
@@ -357,29 +340,18 @@ export default function HomePage() {
       material.dispose();
       renderer.dispose();
     };
-  }, [typewriterText, isLoading]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-cu-surface flex flex-col items-center justify-center font-sans text-cu-ink antialiased">
-        <div className="w-8 h-8 border-2 border-cu-ink/30 border-t-cu-ink rounded-full animate-spin"></div>
-        <p className="mt-3 text-sm text-cu-muted">Memuat sesi...</p>
-      </div>
-    );
-  }
+  }, []);
 
   const baseBtnClass =
     "inline-flex h-11 items-center justify-center rounded-full px-5 text-base font-medium leading-none transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cu-focus disabled:cursor-not-allowed disabled:opacity-60 sm:h-14 sm:px-7 sm:text-lg";
 
   const btnBlackClass = `${baseBtnClass} border border-cu-ink bg-cu-ink text-cu-surface hover:border-cu-ink-hover hover:bg-cu-ink-hover`;
-  const btnGrayClass = `${baseBtnClass} border border-cu-border bg-cu-surface text-cu-ink hover:border-cu-border-hover hover:bg-cu-surface-soft`;
 
   return (
     <div
       data-interactive-hero
-      className="relative isolate flex min-h-screen flex-col overflow-hidden bg-cu-surface font-sans text-cu-ink antialiased"
+      className="relative isolate flex flex-1 flex-col overflow-hidden w-full h-full min-h-[70vh]"
     >
-      {/* Particle Canvas */}
       <canvas
         ref={canvasRef}
         data-particle-canvas
@@ -387,27 +359,20 @@ export default function HomePage() {
         className="pointer-events-none absolute inset-0 z-0 size-full"
       />
 
-      {/* Aesthetic readability masks */}
       <div aria-hidden="true" className="cu-landing-readability pointer-events-none absolute inset-0 z-10" />
       <div aria-hidden="true" className="cu-landing-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40" />
 
-      {/* Top Navbar */}
-      <div className="relative z-30">
-        <Navbar variant="light" />
-      </div>
-
-      {/* Main Content Area */}
-      <main className="relative z-20 flex flex-1 items-center justify-center px-10 py-10 sm:px-10 lg:px-16">
+      <main className="relative z-20 flex flex-1 items-center justify-center px-10 py-10">
         <section
-          aria-labelledby="landing-title"
+          aria-labelledby="subapp-title"
           className="mx-auto w-full max-w-6xl text-center lg:-translate-y-3"
         >
           <h1
             ref={titleRef}
-            id="landing-title"
+            id="subapp-title"
             aria-label={typewriterText}
             data-typewriter={typewriterText}
-            className="text-center text-3xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-[7.5rem] font-medium leading-none tracking-tight w-full max-w-full block break-words"
+            className="text-center text-3xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-[6.5rem] font-medium leading-none tracking-tight w-full max-w-full block break-words text-cu-ink"
           >
             <span ref={textTargetRef} data-typewriter-text>
               {typewriterText}
@@ -426,46 +391,14 @@ export default function HomePage() {
             data-typewriter-actions
             className="mt-10 flex flex-col items-center justify-center gap-3 sm:mt-12 sm:flex-row"
           >
-            {isAuthenticated ? (
-              <>
-                <Link href="/dashboard" className={btnBlackClass}>
-                  <span className="flex h-full items-center justify-center gap-2">
-                    <MaterialIcon name="dashboard" size="auto" />
-                    <span className="flex h-full items-center justify-center whitespace-nowrap leading-none">
-                      Dashboard
-                    </span>
-                  </span>
-                </Link>
-
-                <Link href="/profile" className={btnGrayClass}>
-                  <span className="flex h-full items-center justify-center gap-2">
-                    <MaterialIcon name="person" size="auto" />
-                    <span className="flex h-full items-center justify-center whitespace-nowrap leading-none">
-                      Profil Saya
-                    </span>
-                  </span>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className={btnBlackClass}>
-                  <span className="flex h-full items-center justify-center gap-2">
-                    <MaterialIcon name="login" size="auto" />
-                    <span className="flex h-full items-center justify-center whitespace-nowrap leading-none">
-                      Masuk atau Daftar
-                    </span>
-                  </span>
-                </Link>
-
-                <Link href="/register" className={btnGrayClass}>
-                  <span className="flex h-full items-center justify-center gap-2">
-                    <span className="flex h-full items-center justify-center whitespace-nowrap leading-none">
-                      Daftar Akun
-                    </span>
-                  </span>
-                </Link>
-              </>
-            )}
+            <Link href="/dashboard" className={btnBlackClass}>
+              <span className="flex h-full items-center justify-center gap-2">
+                <MaterialIcon name="dashboard" size="auto" />
+                <span className="flex h-full items-center justify-center whitespace-nowrap leading-none">
+                  Kembali ke Dashboard
+                </span>
+              </span>
+            </Link>
           </div>
         </section>
       </main>

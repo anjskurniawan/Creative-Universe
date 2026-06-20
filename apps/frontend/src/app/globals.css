@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -651,11 +651,24 @@
 }
 
 .cu-material-icon {
+  display: inline-block;
+  flex-shrink: 0;
   width: 1em;
   height: 1em;
-  overflow: visible;
-  fill: currentColor;
+  overflow: hidden;
+  font-family: "Material Symbols Rounded";
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
   vertical-align: -0.125em;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
 }
 
 .cu-material-icon-auto {
@@ -664,8 +677,60 @@
   font-size: 1em;
 }
 
-.cu-material-icon-light {
-  stroke-width: 0;
+.cu-popup-scrollbar-light,
+.cu-popup-scrollbar-dark {
+  scrollbar-gutter: stable;
+}
+
+@supports (-moz-appearance: none) {
+  .cu-popup-scrollbar-light {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-cu-border-hover) var(--color-cu-panel-soft);
+  }
+
+  .cu-popup-scrollbar-dark {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.45) rgb(255 255 255 / 0.08);
+  }
+}
+
+.cu-popup-scrollbar-light::-webkit-scrollbar,
+.cu-popup-scrollbar-dark::-webkit-scrollbar {
+  width: 10px;
+}
+
+.cu-popup-scrollbar-light::-webkit-scrollbar-track {
+  background: var(--color-cu-panel-soft);
+  border-radius: 9999px;
+}
+
+.cu-popup-scrollbar-dark::-webkit-scrollbar-track {
+  background: rgb(255 255 255 / 0.08);
+  border-radius: 9999px;
+}
+
+.cu-popup-scrollbar-light::-webkit-scrollbar-thumb {
+  min-height: 36px;
+  background: var(--color-cu-border-hover);
+  border: 2px solid var(--color-cu-panel-soft);
+  border-radius: 9999px;
+  background-clip: border-box;
+}
+
+.cu-popup-scrollbar-dark::-webkit-scrollbar-thumb {
+  min-height: 36px;
+  background: rgb(255 255 255 / 0.45);
+  border: 2px solid rgb(30 31 34);
+  border-radius: 9999px;
+  background-clip: border-box;
+}
+
+.cu-popup-scrollbar-light::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cu-muted);
+}
+
+.cu-popup-scrollbar-dark::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.68);
 }
 
 .cu-loading-bar {
