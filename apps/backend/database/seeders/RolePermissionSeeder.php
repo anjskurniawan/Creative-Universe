@@ -37,13 +37,25 @@ class RolePermissionSeeder extends Seeder
         }
 
         // ─── Roles ────────────────────────────────────────
+        // Rename existing roles if they exist to prevent orphan roles
+        $oldRetailAdmin = Role::where('name', 'Retail Admin')->first();
+        if ($oldRetailAdmin) {
+            $oldRetailAdmin->update(['name' => 'Leader Retail']);
+        }
+        $oldRetailStaff = Role::where('name', 'Retail Staff')->first();
+        if ($oldRetailStaff) {
+            $oldRetailStaff->update(['name' => 'PIC Retail']);
+        }
+
         $root = Role::firstOrCreate(['name' => 'Root']);
         $manajer = Role::firstOrCreate(['name' => 'Manajer']);
+        $ceo = Role::firstOrCreate(['name' => 'CEO']);
         $supervisor = Role::firstOrCreate(['name' => 'Supervisor']);
         $designer = Role::firstOrCreate(['name' => 'Designer']);
+        $videographer = Role::firstOrCreate(['name' => 'Videographer']);
         $client = Role::firstOrCreate(['name' => 'Client']);
-        $retailAdmin = Role::firstOrCreate(['name' => 'Retail Admin']);
-        $retailStaff = Role::firstOrCreate(['name' => 'Retail Staff']);
+        $leaderRetail = Role::firstOrCreate(['name' => 'Leader Retail']);
+        $picRetail = Role::firstOrCreate(['name' => 'PIC Retail']);
 
         // ─── Sync Permissions to Roles ────────────────────
         // Root mendapat semua permission
@@ -58,6 +70,12 @@ class RolePermissionSeeder extends Seeder
             'manage-users',
         ]);
 
+        // CEO: akses core & pricetag (read-only, no write/edit permissions)
+        $ceo->syncPermissions([
+            'access-core',
+            'access-pricetag',
+        ]);
+
         // Supervisor: akses core & pricetag
         $supervisor->syncPermissions([
             'access-core',
@@ -70,19 +88,25 @@ class RolePermissionSeeder extends Seeder
             'access-pricetag',
         ]);
 
+        // Videographer: akses core & pricetag (sama seperti designer)
+        $videographer->syncPermissions([
+            'access-core',
+            'access-pricetag',
+        ]);
+
         // Client: hanya akses core dasar
         $client->syncPermissions([
             'access-core',
         ]);
 
-        // Retail Admin: akses core & pricetag
-        $retailAdmin->syncPermissions([
+        // Leader Retail: akses core & pricetag
+        $leaderRetail->syncPermissions([
             'access-core',
             'access-pricetag',
         ]);
 
-        // Retail Staff: akses core & pricetag
-        $retailStaff->syncPermissions([
+        // PIC Retail: akses core & pricetag
+        $picRetail->syncPermissions([
             'access-core',
             'access-pricetag',
         ]);

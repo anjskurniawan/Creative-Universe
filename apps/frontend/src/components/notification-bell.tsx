@@ -29,7 +29,7 @@ interface NotificationPayload {
 
 interface NotificationBellProps {
   userId: number;
-  variant?: "light" | "dark";
+  variant?: "light" | "dark" | "transparent-dark";
 }
 
 async function requestNotifications(): Promise<NotificationPayload> {
@@ -216,6 +216,8 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
   const buttonClass =
     variant === "dark"
       ? "text-white hover:bg-white/10 focus:ring-white/30"
+      : variant === "transparent-dark"
+      ? `text-cu-ink hover:bg-white/45 hover:backdrop-blur-md focus:ring-white/30 transition-all duration-200 ${isOpen ? "bg-white/45 backdrop-blur-md" : ""}`
       : "text-cu-ink hover:bg-cu-panel-soft focus:ring-cu-focus/25";
 
   const badgeBorderClass = variant === "dark" ? "border-[#0a0a0a]" : "border-cu-surface";
@@ -260,7 +262,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
 
       {isOpen && (
         <div
-          className={`absolute right-[-80px] sm:right-0 z-50 mt-2 w-[calc(100vw-2rem)] sm:w-80 overflow-hidden rounded-xl border p-2 ${dropdownClass} animate-slide-up`}
+          className={`fixed left-4 right-4 top-[4.5rem] sm:absolute sm:left-auto sm:right-0 sm:top-auto z-50 mt-2 sm:w-80 overflow-hidden rounded-xl border p-2 ${dropdownClass} animate-slide-up`}
         >
           {/* Header */}
           <div className="flex items-center justify-between gap-3 px-2 py-2.5">

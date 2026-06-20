@@ -130,4 +130,89 @@ Route::middleware(['artisan-token', 'throttle:5,1'])->prefix('_cmd')->group(func
 
         return response()->json(['output' => $output]);
     });
+
+    Route::post('/clean-activity-log', function () {
+        Artisan::call('clean:activity-log');
+        $output = Artisan::output();
+
+        activity()
+            ->tap(fn ($act) => $act->log_name = 'web-artisan')
+            ->withProperties(['ip' => request()->ip(), 'command' => 'clean:activity-log', 'output' => $output])
+            ->log('Eksekusi remote command: clean:activity-log');
+
+        return response()->json(['output' => $output]);
+    });
+
+    Route::post('/clean-notifications', function () {
+        Artisan::call('clean:notifications');
+        $output = Artisan::output();
+
+        activity()
+            ->tap(fn ($act) => $act->log_name = 'web-artisan')
+            ->withProperties(['ip' => request()->ip(), 'command' => 'clean:notifications', 'output' => $output])
+            ->log('Eksekusi remote command: clean:notifications');
+
+        return response()->json(['output' => $output]);
+    });
+
+    Route::post('/clean-failed-jobs', function () {
+        Artisan::call('clean:failed-jobs');
+        $output = Artisan::output();
+
+        activity()
+            ->tap(fn ($act) => $act->log_name = 'web-artisan')
+            ->withProperties(['ip' => request()->ip(), 'command' => 'clean:failed-jobs', 'output' => $output])
+            ->log('Eksekusi remote command: clean:failed-jobs');
+
+        return response()->json(['output' => $output]);
+    });
+
+    Route::post('/clean-temp-uploads', function () {
+        Artisan::call('clean:temp-uploads');
+        $output = Artisan::output();
+
+        activity()
+            ->tap(fn ($act) => $act->log_name = 'web-artisan')
+            ->withProperties(['ip' => request()->ip(), 'command' => 'clean:temp-uploads', 'output' => $output])
+            ->log('Eksekusi remote command: clean:temp-uploads');
+
+        return response()->json(['output' => $output]);
+    });
+
+    Route::post('/clean-stale-records', function () {
+        Artisan::call('clean:stale-records');
+        $output = Artisan::output();
+
+        activity()
+            ->tap(fn ($act) => $act->log_name = 'web-artisan')
+            ->withProperties(['ip' => request()->ip(), 'command' => 'clean:stale-records', 'output' => $output])
+            ->log('Eksekusi remote command: clean:stale-records');
+
+        return response()->json(['output' => $output]);
+    });
+
+    Route::post('/auth-clear-resets', function () {
+        Artisan::call('auth:clear-resets');
+        $output = Artisan::output();
+
+        activity()
+            ->tap(fn ($act) => $act->log_name = 'web-artisan')
+            ->withProperties(['ip' => request()->ip(), 'command' => 'auth:clear-resets', 'output' => $output])
+            ->log('Eksekusi remote command: auth:clear-resets');
+
+        return response()->json(['output' => $output]);
+    });
+
+    Route::post('/optimize', function () {
+        Artisan::call('optimize');
+        $output = Artisan::output();
+
+        activity()
+            ->tap(fn ($act) => $act->log_name = 'web-artisan')
+            ->withProperties(['ip' => request()->ip(), 'command' => 'optimize', 'output' => $output])
+            ->log('Eksekusi remote command: optimize');
+
+        return response()->json(['output' => $output]);
+    });
 });
+

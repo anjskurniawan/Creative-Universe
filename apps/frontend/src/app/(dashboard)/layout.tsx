@@ -18,6 +18,28 @@ export default function DashboardLayout({
 
   const isDarkPage = pathname?.startsWith("/pricetag");
 
+  // Halaman pengaturan: mobile pakai px-6 (sejajar navbar), desktop tetap card
+  const isSettingsPage =
+    pathname?.startsWith("/settings") ||
+    pathname?.startsWith("/profile");
+
+  const isAIAgentPage = pathname?.startsWith("/ai-agent");
+
+  const mainClass = (() => {
+    if (isAIAgentPage) {
+      return "w-full flex-1 flex flex-col relative z-10 pt-0 pb-0 px-0";
+    }
+    if (isFullWidthPage) {
+      return `w-full mx-auto ${isDarkPage ? "pt-16" : "pt-0"} pb-8 px-6 md:px-16 relative z-10`;
+    }
+    if (isSettingsPage) {
+      // Mobile: full-width dengan px-6 (sejajar navbar), tanpa card, tanpa padding atas bawah
+      // Desktop (md+): card dengan margin dan rounding
+      return "px-6 md:px-0 md:mx-32 xl:mx-64 mt-4 md:mt-2 md:mb-6 md:pb-6 md:rounded-2xl md:bg-cu-surface md:pt-0 md:px-6";
+    }
+    return "mx-6 md:mx-32 xl:mx-64 mt-2 mb-6 pt-0 px-6 pb-6 rounded-2xl bg-cu-surface";
+  })();
+
   return (
     <div
       className={`min-h-screen antialiased font-sans flex flex-col transition-colors duration-300 ${
@@ -25,16 +47,16 @@ export default function DashboardLayout({
       }`}
     >
       {/* Navbar mengikuti alur halaman pada sub-app Pricetag. */}
-      <Navbar variant={isDarkPage ? "transparent" : "light"} sticky={!isDarkPage} />
+      {isAIAgentPage ? (
+        <div className="absolute top-0 left-0 w-full z-[100]">
+          <Navbar variant="transparent-dark" sticky={false} />
+        </div>
+      ) : (
+        <Navbar variant={isDarkPage ? "transparent" : "light"} sticky={!isDarkPage} />
+      )}
 
       {/* Main Page Content */}
-      <main
-        className={`flex-1 flex flex-col ${
-          isFullWidthPage
-            ? `w-full mx-auto ${isDarkPage ? "pt-16" : "pt-0"} pb-8 px-6 md:px-16 relative z-10`
-            : "mx-6 md:mx-32 xl:mx-64 mt-2 mb-6 pt-0 px-6 pb-6 rounded-2xl bg-cu-surface"
-        }`}
-      >
+      <main className={`flex-1 flex flex-col ${mainClass}`}>
         {children}
       </main>
     </div>

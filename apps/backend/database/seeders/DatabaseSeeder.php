@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         // 1. Seed roles & permissions terlebih dahulu
         $this->call(RolePermissionSeeder::class);
 
-        // 2. Definisi daftar user default untuk 7 role inti
+        // 2. Definisi daftar user default untuk 9 role inti
         $defaultUsers = [
             [
                 'name' => 'Root',
@@ -33,6 +33,13 @@ class DatabaseSeeder extends Seeder
                 'role' => 'Manajer',
             ],
             [
+                'name' => 'CEO',
+                'email' => 'ceo@creativeuniverse.test',
+                'username' => 'ceo',
+                'password' => 'password',
+                'role' => 'CEO',
+            ],
+            [
                 'name' => 'Supervisor',
                 'email' => 'supervisor@creativeuniverse.test',
                 'username' => 'supervisor',
@@ -47,6 +54,13 @@ class DatabaseSeeder extends Seeder
                 'role' => 'Designer',
             ],
             [
+                'name' => 'Videographer',
+                'email' => 'videographer@creativeuniverse.test',
+                'username' => 'videographer',
+                'password' => 'password',
+                'role' => 'Videographer',
+            ],
+            [
                 'name' => 'Client',
                 'email' => 'client@creativeuniverse.test',
                 'username' => 'client',
@@ -54,18 +68,18 @@ class DatabaseSeeder extends Seeder
                 'role' => 'Client',
             ],
             [
-                'name' => 'Retail Admin',
-                'email' => 'retailadmin@creativeuniverse.test',
-                'username' => 'retailadmin',
+                'name' => 'Leader Retail',
+                'email' => 'leaderretail@creativeuniverse.test',
+                'username' => 'leaderretail',
                 'password' => 'password',
-                'role' => 'Retail Admin',
+                'role' => 'Leader Retail',
             ],
             [
-                'name' => 'Retail Staff',
-                'email' => 'retailstaff@creativeuniverse.test',
-                'username' => 'retailstaff',
+                'name' => 'PIC Retail',
+                'email' => 'picretail@creativeuniverse.test',
+                'username' => 'picretail',
                 'password' => 'password',
-                'role' => 'Retail Staff',
+                'role' => 'PIC Retail',
             ],
         ];
 

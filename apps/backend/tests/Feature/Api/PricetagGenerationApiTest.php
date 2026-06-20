@@ -135,7 +135,7 @@ class PricetagGenerationApiTest extends TestCase
             ->assertJsonPath('data.preview_url', 'https://drive.google.com/file/d/test_view_id/view');
 
         $this->assertDatabaseHas('pricetag_batches', [
-            'batch_name' => 'Single: JETE TWS T10',
+            'batch_name' => 'JETE TWS T10',
             'status' => 'completed',
             'total_items' => 1,
             'processed_items' => 1,
@@ -175,12 +175,12 @@ class PricetagGenerationApiTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.batch_name', 'Checklist Batch Test')
+            ->assertJsonPath('data.batch_name', 'Pritag #1')
             ->assertJsonPath('data.total_items', 1)
             ->assertJsonPath('data.status', 'pending');
 
         $this->assertDatabaseHas('pricetag_batches', [
-            'batch_name' => 'Checklist Batch Test',
+            'batch_name' => 'Pritag #1',
             'status' => 'pending',
             'created_by' => $this->designer1->id,
         ]);
@@ -211,7 +211,7 @@ class PricetagGenerationApiTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.batch_name', 'CSV Batch Test')
+            ->assertJsonPath('data.batch_name', 'CSV #1')
             ->assertJsonPath('data.total_items', 1);
 
         Queue::assertPushed(GeneratePricetagChunkJob::class);

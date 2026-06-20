@@ -1,6 +1,7 @@
 "use client";
 
 import React, { FormEvent, useCallback, useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
 import { apiFetch } from "@/lib/api";
@@ -11,13 +12,15 @@ import {
   PricetagCategory,
   PricetagProduct,
   PricetagPage,
+  PricetagBatch,
 } from "@/lib/pricetag";
 import { useAuth } from "@/providers/auth-provider";
+import ExcelJS from "exceljs";
 
 type Tab = "single" | "checklist" | "bulk";
 
 export default function PricetagGeneratorPage() {
-  const { hasPermission } = useAuth();
+  const { hasPermission, hasRole } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -68,6 +71,53 @@ export default function PricetagGeneratorPage() {
   const [checklistPrices, setChecklistPrices] = useState<Record<number, string>>({});
   const [checklistBatchName, setChecklistBatchName] = useState("");
   const [isSubmittingChecklist, setIsSubmittingChecklist] = useState(false);
+  const [isChecklistSuccess, setIsChecklistSuccess] = useState(false);
+  const [activeBatch, setActiveBatch] = useState<PricetagBatch | null>(null);
+  const [visualPercent, setVisualPercent] = useState(0);
+
+  const percent = activeBatch && activeBatch.total_items > 0
+    ? Math.round((activeBatch.processed_items / activeBatch.total_items) * 100)
+    : 0;
+
+  useEffect(() => {
+    if (!activeBatch) return;
+    if (activeBatch.status === "completed" || activeBatch.status === "failed") return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await apiFetch<PricetagBatch>(`/pricetag/batches/${activeBatch.id}`);
+        setActiveBatch(res);
+      } catch (err) {
+        console.error(err);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [activeBatch]);
+
+  // Trickle progress visual smoothing
+  useEffect(() => {
+    if (!activeBatch) return;
+
+    const isDone = activeBatch.status === "completed" || activeBatch.status === "failed";
+    const targetPercent = isDone
+      ? 100
+      : activeBatch.total_items > 0
+        ? Math.round((activeBatch.processed_items / activeBatch.total_items) * 95)
+        : 0;
+
+    const interval = setInterval(() => {
+      setVisualPercent((prev) => {
+        const diff = targetPercent - prev;
+        if (diff <= 0) return prev;
+        // Step increases slightly if difference is large to catch up, but still incremental
+        const step = diff > 20 ? 3 : (diff > 10 ? 2 : 1);
+        return Math.min(prev + step, targetPercent);
+      });
+    }, 150);
+
+    return () => clearInterval(interval);
+  }, [activeBatch]);
 
   // ----------------------------------------------------
   // Tab 3: Bulk CSV State
@@ -264,7 +314,20 @@ export default function PricetagGeneratorPage() {
     if (!selectedProduct) return;
 
     setIsGenerating(true);
+    setVisualPercent(0);
     setWizardStep(4); // Go to loader page
+
+    // Trickle progress up to 95%
+    const interval = setInterval(() => {
+      setVisualPercent((prev) => {
+        if (prev < 95) {
+          const diff = 95 - prev;
+          const step = diff > 20 ? 3 : 1;
+          return prev + step;
+        }
+        return prev;
+      });
+    }, 100);
 
     try {
       const res = await apiFetch<PricetagProduct>("/pricetag/generations/single", {
@@ -275,11 +338,18 @@ export default function PricetagGeneratorPage() {
         }),
       });
 
-      setGeneratedViewUrl(res.preview_url);
-      setGeneratedDownloadUrl(res.download_url);
-      setWizardStep(5);
-      notify(`Label harga untuk ${res.name} berhasil dibuat!`);
+      clearInterval(interval);
+      setVisualPercent(100);
+
+      // Delay slightly so user sees 100% completion
+      setTimeout(() => {
+        setGeneratedViewUrl(res.preview_url);
+        setGeneratedDownloadUrl(res.download_url);
+        setWizardStep(5);
+        notify(`Label harga untuk ${res.name} berhasil dibuat!`);
+      }, 500);
     } catch (err) {
+      clearInterval(interval);
       notify(pricetagError(err));
       setWizardStep(3); // Rollback to form input
     } finally {
@@ -426,7 +496,7 @@ export default function PricetagGeneratorPage() {
     });
 
     try {
-      await apiFetch("/pricetag/generations/checklist", {
+      const res = await apiFetch<PricetagBatch>("/pricetag/generations/checklist", {
         method: "POST",
         body: JSON.stringify({
           batch_name: defaultBatchName,
@@ -434,10 +504,9 @@ export default function PricetagGeneratorPage() {
         }),
       });
 
-      setSelectedVariants([]);
-      setChecklistPrices({});
-      setChecklistBatchName("");
-      router.push("/pricetag/history");
+      setActiveBatch(res);
+      setIsChecklistSuccess(true);
+      notify("Berhasil! Antrean pembuatan label telah dijadwalkan.");
     } catch (err) {
       notify(pricetagError(err));
     } finally {
@@ -450,13 +519,17 @@ export default function PricetagGeneratorPage() {
   // ----------------------------------------------------
   const handleBulkFileChange = (file: File | null) => {
     setBulkFile(file);
-    if (file) {
-      setIsValidatingCsv(true);
-      parseAndValidateCSV(file);
-    } else {
+    if (!file) {
       setCsvData([]);
       setCsvErrors([]);
       setBulkStep(1);
+    }
+  };
+
+  const handleStartCsvValidation = () => {
+    if (bulkFile) {
+      setIsValidatingCsv(true);
+      parseAndValidateCSV(bulkFile);
     }
   };
 
@@ -574,21 +647,104 @@ export default function PricetagGeneratorPage() {
     formData.append("file", bulkFile);
 
     try {
-      await apiFetch("/pricetag/generations/bulk", {
+      const res = await apiFetch<PricetagBatch>("/pricetag/generations/csv", {
         method: "POST",
         body: formData,
       });
 
-      setBulkFile(null);
-      setCsvData([]);
-      setCsvErrors([]);
-      setBulkStep(1);
-      router.push("/pricetag/history");
+      setActiveBatch(res);
+      setBulkStep(4);
+      notify("Berhasil! File CSV telah masuk ke antrean proses pembuatan.");
     } catch (err) {
       notify(pricetagError(err));
       setBulkStep(2);
     } finally {
       setIsSubmittingBulk(false);
+    }
+  };
+
+  const handleDownloadTemplate = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const res = await apiFetch<PricetagPage<PricetagProduct>>("/pricetag/products?per_page=2000");
+      if (!res.data || res.data.length === 0) {
+        notify("Tidak ada data produk di database untuk dijadikan template.");
+        return;
+      }
+
+      const workbook = new ExcelJS.Workbook();
+      
+      // Sheet 1: Template
+      const worksheet = workbook.addWorksheet("Template");
+      worksheet.columns = [
+        { header: "produk", key: "produk", width: 35 },
+        { header: "varian", key: "varian", width: 20 },
+        { header: "harga_diskon", key: "harga_diskon", width: 15 },
+      ];
+
+      const headerRow = worksheet.getRow(1);
+      headerRow.font = { bold: true };
+      headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+      // Sheet 2: Database (Visible to user)
+      const refSheet = workbook.addWorksheet("Database");
+      refSheet.columns = [
+        { header: "produk", key: "name", width: 35 },
+        { header: "varian", key: "variant", width: 20 },
+        { header: "harga_normal", key: "normal_price", width: 15 },
+        { header: "harga_diskon", key: "discount_price", width: 15 },
+      ];
+      refSheet.getRow(1).font = { bold: true };
+
+      // Populate Database sheet with all active products and their pricing from backend
+      res.data.forEach((prod, idx) => {
+        refSheet.getCell(`A${idx + 2}`).value = prod.name;
+        refSheet.getCell(`B${idx + 2}`).value = prod.variant_name || "Default";
+        refSheet.getCell(`C${idx + 2}`).value = prod.normal_price;
+        refSheet.getCell(`C${idx + 2}`).numFmt = "#,##0";
+        refSheet.getCell(`D${idx + 2}`).value = prod.discount_price || "";
+        refSheet.getCell(`D${idx + 2}`).numFmt = "#,##0";
+      });
+
+      const totalRows = res.data.length;
+
+      // Apply Excel dropdown data validation referencing the 'Database' sheet
+      for (let i = 2; i <= 100; i++) {
+        worksheet.getCell(`A${i}`).dataValidation = {
+          type: "list",
+          allowBlank: true,
+          formulae: [`Database!$A$2:$A$${totalRows + 1}`],
+          showErrorMessage: true,
+          errorTitle: "Input Salah",
+          error: "Harap pilih nama produk dari daftar yang tersedia."
+        };
+
+        worksheet.getCell(`B${i}`).dataValidation = {
+          type: "list",
+          allowBlank: true,
+          formulae: [`Database!$B$2:$B$${totalRows + 1}`],
+          showErrorMessage: true,
+          errorTitle: "Input Salah",
+          error: "Harap pilih varian dari daftar yang tersedia."
+        };
+        
+        worksheet.getCell(`C${i}`).numFmt = "#,##0";
+      }
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "pricetag_bulk_generate_template.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      notify("Berhasil mengunduh template Excel (.xlsx) dengan dropdown.");
+    } catch (err) {
+      notify("Gagal mengunduh template: " + pricetagError(err));
     }
   };
 
@@ -603,7 +759,9 @@ export default function PricetagGeneratorPage() {
   return (
     <div>
       <div className="mb-8 flex w-full justify-center">
-        <div className="grid w-full grid-cols-3 gap-1 rounded-2xl border border-cu-line bg-cu-surface-soft p-1 shadow-sm sm:inline-flex sm:w-auto sm:flex-nowrap sm:rounded-full md:gap-1.5">
+        <div className={`grid w-full gap-1 rounded-2xl border border-cu-line bg-cu-surface-soft p-1 shadow-sm sm:inline-flex sm:w-auto sm:flex-nowrap sm:rounded-full md:gap-1.5 ${
+          hasRole("root") ? "grid-cols-3" : "grid-cols-2"
+        }`}>
           <button
             type="button"
             onClick={() => setActiveTab("single")}
@@ -626,17 +784,19 @@ export default function PricetagGeneratorPage() {
           >
             Buat Label Sekaligus
           </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("bulk")}
-            className={`flex min-w-0 items-center justify-center rounded-xl px-1 py-2 text-center text-[8px] font-bold uppercase leading-tight tracking-normal transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:rounded-full sm:px-3 sm:text-[10px] sm:tracking-wider sm:whitespace-nowrap md:px-6 md:py-2.5 md:text-xs ${
-              activeTab === "bulk"
-                ? "bg-cu-ink text-white shadow-sm font-extrabold"
-                : "text-cu-muted hover:text-cu-ink hover:bg-cu-panel-soft/50"
-            }`}
-          >
-            Buat Label Massal (CSV)
-          </button>
+          {hasRole("root") && (
+            <button
+              type="button"
+              onClick={() => setActiveTab("bulk")}
+              className={`flex min-w-0 items-center justify-center rounded-xl px-1 py-2 text-center text-[8px] font-bold uppercase leading-tight tracking-normal transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:rounded-full sm:px-3 sm:text-[10px] sm:tracking-wider sm:whitespace-nowrap md:px-6 md:py-2.5 md:text-xs ${
+                activeTab === "bulk"
+                  ? "bg-cu-danger text-white shadow-sm font-extrabold"
+                  : "text-cu-danger hover:bg-cu-danger-soft/20 font-bold border border-cu-danger/25"
+              }`}
+            >
+              Buat Label Massal (CSV)
+            </button>
+          )}
         </div>
       </div>
 
@@ -851,29 +1011,34 @@ export default function PricetagGeneratorPage() {
           {/* STEP 4: Generating Loading */}
           {wizardStep === 4 && (
             <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-12 shadow-sm max-w-xl mx-auto text-center">
-              <div className="flex flex-col items-center justify-center space-y-6">
+              <div className="flex flex-col items-center justify-center space-y-5">
                 
                 {/* Custom Spinner/Pulse ring */}
                 <div className="relative flex items-center justify-center">
                   <span className="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-info opacity-20"></span>
-                  <div className="size-16 rounded-full bg-cu-info-soft flex items-center justify-center text-cu-info shadow-sm z-10 relative">
-                    <MaterialIcon size="md" name="cloud_sync" className="animate-pulse" />
+                  <div className="size-16 rounded-full bg-cu-info-soft text-cu-info flex items-center justify-center shadow-sm relative z-10">
+                    <MaterialIcon name="settings" className="animate-spin" size="lg" />
                   </div>
                 </div>
 
-                <div className="space-y-2 max-w-sm">
-                  <h3 className="text-base font-bold text-cu-ink">Sedang Menyusun Gambar Label</h3>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-bold text-cu-ink">Sedang Menyusun Gambar Label</h3>
                   <p className="text-xs text-cu-muted">Sistem Creative Universe sedang menyusun layout promo dan menghasilkan gambar. Harap tunggu...</p>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-cu-info">
-                  <span className="text-xs font-extrabold tracking-wider uppercase">Proses:</span>
-                  <span className="text-xs font-black tracking-normal animate-pulse">Berlangsung...</span>
-                </div>
-
-                <div className="w-full space-y-2">
-                  <div className="cu-loading-bar">
-                    <div className="cu-loading-bar-value"></div>
+                  
+                  <div className="w-full max-w-xs mx-auto mt-4 pt-2 space-y-1">
+                    <div className="flex justify-between text-[10px] font-bold text-cu-muted">
+                      <span>Proses pembuatan...</span>
+                      <span>{visualPercent}%</span>
+                    </div>
+                    <div className="h-1.5 w-full rounded-full bg-cu-line overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-300 bg-cu-success"
+                        style={{ width: `${visualPercent}%` }}
+                      />
+                    </div>
+                    <div className="text-[10px] text-center mt-1 font-medium text-cu-info animate-pulse">
+                      Status: Memproses
+                    </div>
                   </div>
                 </div>
               </div>
@@ -936,26 +1101,99 @@ export default function PricetagGeneratorPage() {
       {/* Tab 2: Checklist Generator */}
       {activeTab === "checklist" && (
         <div className="space-y-6">
-          <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-8 shadow-sm">
+          {isChecklistSuccess ? (
+            <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-12 shadow-sm max-w-xl mx-auto text-center">
+              <div className="flex flex-col items-center justify-center space-y-5">
+                <div className="relative flex items-center justify-center">
+                  {activeBatch?.status === "completed" ? (
+                    <>
+                      <span className="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-success opacity-20"></span>
+                      <div className="size-16 rounded-full bg-cu-success-soft text-cu-success flex items-center justify-center shadow-sm relative z-10">
+                        <MaterialIcon name="check" size="lg" />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-info opacity-20"></span>
+                      <div className="size-16 rounded-full bg-cu-info-soft text-cu-info flex items-center justify-center shadow-sm relative z-10">
+                        <MaterialIcon name="settings" className="animate-spin" size="lg" />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-bold text-cu-ink">
+                    {activeBatch?.status === "completed" ? "Pembuatan Label Selesai!" : "Antrean Pembuatan Label Dimulai!"}
+                  </h3>
+                  <p className="text-xs text-cu-muted">
+                    {activeBatch?.status === "completed"
+                      ? "Semua label promo untuk batch ini berhasil dibuat."
+                      : "Label promo sedang diproses. Silakan tunggu hingga progress mencapai 100%."}
+                  </p>
+                  
+                  {activeBatch && (
+                    <div className="w-full max-w-xs mx-auto mt-4 pt-2 space-y-1">
+                      <div className="flex justify-between text-[10px] font-bold text-cu-muted">
+                        <span>{activeBatch.processed_items} / {activeBatch.total_items} selesai</span>
+                        <span>{visualPercent}%</span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-cu-line overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            activeBatch.status === "failed" ? "bg-cu-danger" : "bg-cu-success"
+                          }`}
+                          style={{ width: `${visualPercent}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-center mt-1 font-medium capitalize">
+                        Status: <span className={activeBatch.status === "completed" ? "text-cu-success font-bold" : "text-cu-info animate-pulse"}>
+                          {activeBatch.status === "processing" ? "Memproses" : activeBatch.status === "pending" ? "Mengantre" : activeBatch.status}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center pt-4 border-t border-cu-line/40">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsChecklistSuccess(false);
+                      setVisualPercent(0);
+                      setActiveBatch(null);
+                      setSelectedVariants([]);
+                      setSelectedProductsData({});
+                      setChecklistPrices({});
+                      setChecklistBatchName("");
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full border border-cu-line bg-cu-surface px-5 py-2 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+                  >
+                    <MaterialIcon name="replay" size="xs" />
+                    Buat Label Baru
+                  </button>
+                  <Link
+                    href="/pricetag/history"
+                    className="flex items-center justify-center gap-1.5 rounded-full bg-cu-ink px-5 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm"
+                  >
+                    <MaterialIcon name="history" size="xs" />
+                    Lihat Riwayat
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-8 shadow-sm">
             <div className="flex items-start justify-between border-b border-cu-line pb-4 mb-5">
               <div>
                 <h2 className="text-lg font-semibold text-cu-ink">Buat Banyak Label Sekaligus</h2>
-                <p className="text-xs text-cu-muted mt-1">Pilih beberapa produk di bawah untuk dibuat label harganya secara bersamaan lewat antrean sistem.</p>
+                <p className="text-xs text-cu-muted mt-1">
+                  <span className="hidden lg:inline">Pilih beberapa produk di bawah untuk dibuat label harganya secara bersamaan lewat antrean sistem.</span>
+                  <span className="lg:hidden">Ketuk produk untuk melihat detail & mengatur harga promo.</span>
+                </p>
               </div>
             </div>
 
-            {/* Loading Bar Sedang Memproses Checklist */}
-            {isSubmittingChecklist && (
-              <div className="w-full space-y-2 mb-6">
-                <div className="flex items-center justify-between text-xs text-cu-info font-medium">
-                  <span>Sedang memasukkan data ke antrean sistem, mohon tunggu sejenak...</span>
-                  <span className="animate-pulse">Memuat</span>
-                </div>
-                <div className="cu-loading-bar">
-                  <div className="cu-loading-bar-value"></div>
-                </div>
-              </div>
-            )}
 
             <form onSubmit={handleChecklistGenerate} className="space-y-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-5">
@@ -1082,10 +1320,10 @@ export default function PricetagGeneratorPage() {
                         return (
                           <article
                             key={product.id}
-                            className={`overflow-hidden rounded-xl border shadow-sm ${
+                            className={`overflow-hidden rounded-xl border shadow-sm transition-colors duration-300 ${
                               isChecked
-                                ? "border-cu-border-hover bg-cu-panel-soft/30"
-                                : "border-cu-line bg-cu-surface"
+                                ? "border-cu-success"
+                                : "border-cu-line"
                             }`}
                           >
                             <button
@@ -1093,39 +1331,42 @@ export default function PricetagGeneratorPage() {
                               aria-expanded={isExpanded}
                               aria-controls={detailId}
                               onClick={() => setExpandedChecklistProductId(isExpanded ? null : product.id)}
-                              className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
+                              className={`flex w-full items-center justify-between gap-2 px-3 py-3 text-left transition-colors duration-300 ${
+                                isChecked
+                                  ? "bg-cu-success text-white"
+                                  : "bg-cu-surface text-cu-ink"
+                              }`}
                             >
                               <div className="min-w-0">
-                                <p className="break-words text-sm font-semibold text-cu-ink">{product.name}</p>
-                                <p className="mt-1 text-xs text-cu-muted">{isChecked ? "Sudah dipilih" : "Ketuk untuk melihat detail"}</p>
+                                <p className="break-words text-sm font-semibold">{product.name}</p>
                               </div>
                               <MaterialIcon
                                 name="expand_more"
                                 size="sm"
-                                className={`shrink-0 text-cu-muted transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                                className={`shrink-0 transition-all duration-200 ${isExpanded ? "rotate-180" : ""} ${isChecked ? "text-white/70" : "text-cu-muted"}`}
                               />
                             </button>
 
                             {isExpanded && (
-                              <div id={detailId} className="space-y-4 border-t border-cu-line px-4 py-4">
-                                <div>
-                                  <p className="text-[10px] font-bold uppercase tracking-wider text-cu-muted">Kategori</p>
-                                  <p className="mt-1 break-words text-sm font-medium text-cu-ink">{product.category.name}</p>
+                              <div id={detailId} className="space-y-2.5 border-t border-cu-line px-3 py-3 bg-cu-surface">
+                                <div className="flex justify-between items-center gap-2">
+                                  <span className="text-[9px] font-bold uppercase tracking-wider text-cu-muted">Kategori</span>
+                                  <span className="break-words text-xs font-semibold text-cu-ink text-right">{product.category.name}</span>
                                 </div>
-                                <div>
-                                  <p className="text-[10px] font-bold uppercase tracking-wider text-cu-muted">Varian</p>
-                                  <p className="mt-1 break-words text-sm font-medium text-cu-ink">{product.variant_name || "Default"}</p>
+                                <div className="flex justify-between items-center gap-2">
+                                  <span className="text-[9px] font-bold uppercase tracking-wider text-cu-muted">Varian</span>
+                                  <span className="break-words text-xs font-semibold text-cu-ink text-right">{product.variant_name || "Default"}</span>
                                 </div>
-                                <div>
-                                  <p className="text-[10px] font-bold uppercase tracking-wider text-cu-muted">Harga Normal</p>
-                                  <p className="mt-1 text-sm font-medium text-cu-ink">{formatRupiah(product.normal_price)}</p>
+                                <div className="flex justify-between items-center gap-2">
+                                  <span className="text-[9px] font-bold uppercase tracking-wider text-cu-muted">Harga Normal</span>
+                                  <span className="text-xs font-semibold text-cu-ink text-right">{formatRupiah(product.normal_price)}</span>
                                 </div>
-                                <div>
-                                  <label htmlFor={`checklist-price-${product.id}`} className="text-[10px] font-bold uppercase tracking-wider text-cu-muted">
+                                <div className="border-t border-cu-line/60 pt-2.5">
+                                  <label htmlFor={`checklist-price-${product.id}`} className="text-[9px] font-bold uppercase tracking-wider text-cu-muted">
                                     Harga Diskon
                                   </label>
-                                  <div className="relative mt-1.5">
-                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-semibold text-cu-muted">Rp</span>
+                                  <div className="relative mt-1">
+                                    <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 text-[10px] font-semibold text-cu-muted">Rp</span>
                                     <input
                                       id={`checklist-price-${product.id}`}
                                       type="number"
@@ -1133,20 +1374,20 @@ export default function PricetagGeneratorPage() {
                                       placeholder={product.discount_price ? String(product.discount_price) : "Harga..."}
                                       value={checklistPrices[product.id] ?? ""}
                                       onChange={(event) => handleChecklistPriceChange(product.id, event.target.value)}
-                                      className="block w-full rounded-full border border-cu-line bg-cu-surface py-2 pl-9 pr-4 text-sm text-cu-ink focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
+                                      className="block w-full rounded-full border border-cu-line bg-cu-surface py-1.5 pl-8 pr-3 text-xs text-cu-ink focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
                                     />
                                   </div>
                                 </div>
                                 <button
                                   type="button"
                                   onClick={() => handleToggleSelectProduct(product)}
-                                  className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-bold transition ${
+                                  className={`inline-flex w-full items-center justify-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold transition-colors duration-300 ${
                                     isChecked
-                                      ? "border border-cu-line bg-cu-panel-soft text-cu-ink"
-                                      : "bg-cu-ink text-white hover:bg-cu-ink/90"
+                                      ? "border-cu-line bg-cu-panel-soft text-cu-ink"
+                                      : "border-transparent bg-cu-ink text-white hover:bg-cu-ink/90"
                                   }`}
                                 >
-                                  <MaterialIcon name={isChecked ? "remove" : "add"} size="sm" weight={500} />
+                                  <MaterialIcon name={isChecked ? "remove" : "add"} size="xs" weight={500} />
                                   {isChecked ? "Hapus dari pilihan" : "Tambahkan ke pilihan"}
                                 </button>
                               </div>
@@ -1262,39 +1503,50 @@ export default function PricetagGeneratorPage() {
 
             </form>
           </div>
+          )}
         </div>
       )}      {/* Tab 3: Bulk CSV Uploader */}
       {activeTab === "bulk" && (
         <div className="w-full">
           {/* Stepper Indicator */}
           <div className="bg-cu-surface border border-cu-line rounded-xl p-4 shadow-sm mb-6">
-            <div className="flex items-center justify-between max-w-xl mx-auto">
+            <div className="flex items-start justify-between max-w-xl mx-auto">
               {/* Step 1 Upload */}
               <div className="flex flex-col items-center gap-1.5">
                 <div className={`size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${bulkStep >= 1 ? "bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10" : "bg-cu-panel-soft text-cu-muted border border-cu-line"}`}>
                   1
                 </div>
-                <span className={`text-[10px] uppercase font-bold tracking-wider hidden sm:block ${bulkStep >= 1 ? "text-cu-ink" : "text-cu-muted"}`}>Unggah CSV</span>
+                <span className={`max-w-16 text-center text-[9px] font-bold uppercase leading-tight tracking-wide sm:text-[10px] sm:tracking-wider ${bulkStep >= 1 ? "text-cu-ink" : "text-cu-muted"}`}>Unggah CSV</span>
               </div>
 
-              <div className={`h-0.5 flex-1 mx-2 transition-all duration-300 ${bulkStep >= 2 ? "bg-cu-ink" : "bg-cu-line"}`}></div>
+              <div className={`mt-4 h-0.5 flex-1 mx-2 transition-all duration-300 ${bulkStep >= 2 ? "bg-cu-ink" : "bg-cu-line"}`}></div>
 
               {/* Step 2 Validate */}
               <div className="flex flex-col items-center gap-1.5">
                 <div className={`size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${bulkStep >= 2 ? "bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10" : "bg-cu-panel-soft text-cu-muted border border-cu-line"}`}>
                   2
                 </div>
-                <span className={`text-[10px] uppercase font-bold tracking-wider hidden sm:block ${bulkStep >= 2 ? "text-cu-ink" : "text-cu-muted"}`}>Validasi Data</span>
+                <span className={`max-w-16 text-center text-[9px] font-bold uppercase leading-tight tracking-wide sm:text-[10px] sm:tracking-wider ${bulkStep >= 2 ? "text-cu-ink" : "text-cu-muted"}`}>Validasi</span>
               </div>
 
-              <div className={`h-0.5 flex-1 mx-2 transition-all duration-300 ${bulkStep >= 3 ? "bg-cu-ink" : "bg-cu-line"}`}></div>
+              <div className={`mt-4 h-0.5 flex-1 mx-2 transition-all duration-300 ${bulkStep >= 3 ? "bg-cu-ink" : "bg-cu-line"}`}></div>
 
-              {/* Step 3 Generate */}
+              {/* Step 3 Process */}
               <div className="flex flex-col items-center gap-1.5">
                 <div className={`size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${bulkStep >= 3 ? "bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10" : "bg-cu-panel-soft text-cu-muted border border-cu-line"}`}>
                   3
                 </div>
-                <span className={`text-[10px] uppercase font-bold tracking-wider hidden sm:block ${bulkStep >= 3 ? "text-cu-ink" : "text-cu-muted"}`}>Proses</span>
+                <span className={`max-w-16 text-center text-[9px] font-bold uppercase leading-tight tracking-wide sm:text-[10px] sm:tracking-wider ${bulkStep >= 3 ? "text-cu-ink" : "text-cu-muted"}`}>Proses</span>
+              </div>
+
+              <div className={`mt-4 h-0.5 flex-1 mx-2 transition-all duration-300 ${bulkStep >= 4 ? "bg-cu-ink" : "bg-cu-line"}`}></div>
+
+              {/* Step 4 Result */}
+              <div className="flex flex-col items-center gap-1.5">
+                <div className={`size-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${bulkStep >= 4 ? "bg-cu-ink text-cu-surface ring-4 ring-cu-ink/10" : "bg-cu-panel-soft text-cu-muted border border-cu-line"}`}>
+                  <MaterialIcon name="check" size="xs" />
+                </div>
+                <span className={`max-w-16 text-center text-[9px] font-bold uppercase leading-tight tracking-wide sm:text-[10px] sm:tracking-wider ${bulkStep >= 4 ? "text-cu-ink" : "text-cu-muted"}`}>Selesai</span>
               </div>
             </div>
           </div>
@@ -1305,35 +1557,65 @@ export default function PricetagGeneratorPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-cu-line pb-4 gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-cu-ink">Unggah File CSV</h2>
-                  <p className="text-xs text-cu-muted mt-1">Unggah file daftar produk untuk membuat label harga dalam jumlah besar secara otomatis.</p>
+                  <p className="text-xs text-cu-muted mt-1">
+                    Unggah file daftar produk untuk membuat label harga dalam jumlah besar secara otomatis.{" "}
+                    <a
+                      href="#"
+                      onClick={handleDownloadTemplate}
+                      className="font-bold text-cu-info hover:underline inline sm:hidden"
+                    >
+                      Download Template Excel di sini.
+                    </a>
+                  </p>
                 </div>
                 <a
                   href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const csvContent = "data:text/csv;charset=utf-8,produk,varian,harga_diskon\nJETE TWS T10,Black,199000\nJETE TWS T10,White,199000\nJETE Powerbank H1,Black,149000\n";
-                    const encodedUri = encodeURI(csvContent);
-                    const link = document.createElement("a");
-                    link.setAttribute("href", encodedUri);
-                    link.setAttribute("download", "pricetag_bulk_generate_template.csv");
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-cu-info hover:text-cu-info/80 transition shrink-0"
+                  onClick={handleDownloadTemplate}
+                  className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-cu-info hover:text-cu-info/80 transition shrink-0"
                 >
                   <MaterialIcon name="download_for_offline" size="sm" />
-                  Download Template CSV
+                  Download Template Excel
                 </a>
               </div>
 
-              <div>
+              {/* Petunjuk Penggunaan Template Excel (Collapsible) */}
+              <details className="group rounded-lg bg-cu-info-soft/30 border border-cu-info/20 p-4 text-xs transition-all duration-300">
+                <summary className="flex items-center justify-between cursor-pointer font-bold text-cu-info select-none list-none [&::-webkit-details-marker]:hidden">
+                  <div className="flex items-center gap-2">
+                    <MaterialIcon name="info" className="text-cu-info shrink-0" size="sm" />
+                    <span>Petunjuk Penggunaan Template Excel</span>
+                  </div>
+                  <div className="transition-transform duration-300 group-open:rotate-180 text-cu-info flex items-center">
+                    <MaterialIcon name="expand_more" size="xs" />
+                  </div>
+                </summary>
+                
+                <div className="text-cu-ink leading-relaxed space-y-1 mt-3 pl-7 border-t border-cu-info/10 pt-3">
+                  <ol className="list-decimal pl-4 space-y-1.5 text-cu-muted">
+                    <li>Klik <strong>Download Template Excel</strong> di atas.</li>
+                    <li>Buka file Excel tersebut, lalu pilih produk dan varian menggunakan menu <strong>dropdown</strong> yang disediakan untuk menghindari typo.</li>
+                    <li>Masukkan harga diskon pada kolom <strong>harga_diskon</strong>.</li>
+                    <li>Setelah selesai, simpan file sebagai format <strong>CSV (Comma delimited) (*.csv)</strong> sebelum mengunggahnya ke form di bawah ini.</li>
+                  </ol>
+                </div>
+              </details>
+
+              <div className="space-y-4">
                 <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-cu-line rounded-lg cursor-pointer bg-cu-surface hover:bg-cu-panel-soft transition duration-200 relative overflow-hidden">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <MaterialIcon name="cloud_upload" size="lg" className="text-cu-soft mb-2" />
-                      <p className="mb-1 text-sm text-cu-ink"><span className="font-semibold">Klik untuk memilih file</span> atau tarik file ke sini</p>
-                      <p className="text-xs text-cu-muted">File CSV (Maks. 2MB)</p>
+                  <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-cu-line rounded-lg cursor-pointer bg-cu-surface hover:bg-cu-panel-soft transition duration-200 relative overflow-hidden">
+                    <div className="flex flex-col items-center justify-center pt-4 pb-4 px-4 text-center">
+                      <MaterialIcon name={bulkFile ? "insert_drive_file" : "cloud_upload"} size="md" className="text-cu-soft mb-1.5" />
+                      {bulkFile ? (
+                        <>
+                          <p className="text-sm font-semibold text-cu-ink truncate max-w-xs">{bulkFile.name}</p>
+                          <p className="text-[10px] text-cu-muted mt-0.5">{(bulkFile.size / 1024).toFixed(1)} KB - Klik untuk mengganti file</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="mb-0.5 text-xs text-cu-ink"><span className="font-semibold">Klik untuk memilih file</span> atau tarik file ke sini</p>
+                          <p className="text-[10px] text-cu-muted">File CSV (Maks. 2MB)</p>
+                        </>
+                      )}
                     </div>
                     <input
                       type="file"
@@ -1348,6 +1630,19 @@ export default function PricetagGeneratorPage() {
                     />
                   </label>
                 </div>
+
+                {bulkFile && (
+                  <div className="flex justify-center pt-2">
+                    <button
+                      type="button"
+                      onClick={handleStartCsvValidation}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full bg-cu-ink px-6 py-2.5 text-sm font-semibold text-cu-surface shadow-sm transition hover:bg-cu-ink-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover w-full sm:w-auto"
+                    >
+                      <MaterialIcon name="done_all" size="xs" />
+                      Validasi File CSV
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1397,8 +1692,8 @@ export default function PricetagGeneratorPage() {
                 </button>
               </div>
 
-              {/* Tabel Preview CSV */}
-              <div className="border border-cu-line rounded-lg overflow-hidden bg-cu-surface">
+              {/* Tabel Preview CSV (Desktop Only) */}
+              <div className="hidden sm:block border border-cu-line rounded-lg overflow-hidden bg-cu-surface">
                 <div className="overflow-x-auto max-h-96">
                   <table className="w-full text-left border-collapse text-sm">
                     <thead>
@@ -1435,15 +1730,56 @@ export default function PricetagGeneratorPage() {
                 </div>
               </div>
 
+              {/* Cards Preview CSV (Mobile Only) */}
+              <div className="block sm:hidden space-y-2">
+                {csvData.map((row, idx) => {
+                  const normalPrice = Number(row.harga_diskon) ? Math.round(Number(row.harga_diskon) * 1.25) : 0;
+                  return (
+                    <div key={idx} className={`p-3 rounded-xl border ${row.error ? "border-cu-danger/30 bg-cu-danger-soft/10" : "border-cu-line bg-cu-surface"} shadow-xs text-xs space-y-1`}>
+                      {/* Row 1: Product Name on left, Indicator dot on right */}
+                      <div className="flex items-center justify-between gap-3 w-full">
+                        <h4 className="font-bold text-cu-ink leading-tight truncate">{row.produk}</h4>
+                        <div className="shrink-0">
+                          {row.error ? (
+                            <span className="inline-flex size-2 rounded-full bg-cu-danger" title={row.error}></span>
+                          ) : (
+                            <span className="inline-flex size-2 rounded-full bg-cu-success"></span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Row 2: Varian on left, Prices on right */}
+                      <div className="flex items-center justify-between text-[10px] text-cu-muted gap-2 w-full">
+                        <div>
+                          <span className="font-medium">Varian: {row.varian || "Default"}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="line-through bg-cu-success/15 text-cu-success px-1.5 py-0.5 rounded font-bold">
+                            {normalPrice > 0 ? formatRupiah(normalPrice) : "-"}
+                          </span>
+                          <span className="font-extrabold text-cu-ink font-mono">
+                            {row.harga_diskon ? formatRupiah(Number(row.harga_diskon)) : "-"}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {row.error && (
+                        <p className="text-[9px] font-semibold text-cu-danger mt-1 bg-cu-danger-soft/20 p-1 rounded">{row.error}</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
               {/* Action Buttons */}
               <div className="pt-4 border-t border-cu-line flex items-center gap-3">
                 <button
                   type="submit"
                   disabled={csvErrors.length > 0 || isSubmittingBulk}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-cu-ink px-6 py-2.5 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-cu-ink px-6 py-2.5 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover disabled:opacity-40 disabled:cursor-not-allowed w-full sm:w-auto"
                 >
-                  <MaterialIcon name="queue" size="sm" />
-                  <span>Mulai Membuat Label Massal</span>
+                  <span>Lanjut</span>
+                  <MaterialIcon name="navigate_next" size="xs" />
                 </button>
               </div>
             </form>
@@ -1469,6 +1805,89 @@ export default function PricetagGeneratorPage() {
                   <div className="cu-loading-bar">
                     <div className="cu-loading-bar-value"></div>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: Success Uploader State */}
+          {bulkStep === 4 && (
+            <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-12 shadow-sm max-w-xl mx-auto text-center">
+              <div className="flex flex-col items-center justify-center space-y-5">
+                <div className="relative flex items-center justify-center">
+                  {activeBatch?.status === "completed" ? (
+                    <>
+                      <span className="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-success opacity-20"></span>
+                      <div className="size-16 rounded-full bg-cu-success-soft text-cu-success flex items-center justify-center shadow-sm relative z-10">
+                        <MaterialIcon name="check" size="lg" />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-info opacity-20"></span>
+                      <div className="size-16 rounded-full bg-cu-info-soft text-cu-info flex items-center justify-center shadow-sm relative z-10">
+                        <MaterialIcon name="settings" className="animate-spin" size="lg" />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-lg font-bold text-cu-ink">
+                    {activeBatch?.status === "completed" ? "Pembuatan Label Massal Selesai!" : "File CSV Berhasil Diunggah!"}
+                  </h3>
+                  <p className="text-xs text-cu-muted">
+                    {activeBatch?.status === "completed"
+                      ? "Semua label dari file CSV berhasil diproses."
+                      : "Label dari file CSV sedang diproses. Silakan tunggu hingga progress mencapai 100%."}
+                  </p>
+                  
+                  {activeBatch && (
+                    <div className="w-full max-w-xs mx-auto mt-4 pt-2 space-y-1">
+                      <div className="flex justify-between text-[10px] font-bold text-cu-muted">
+                        <span>{activeBatch.processed_items} / {activeBatch.total_items} selesai</span>
+                        <span>{visualPercent}%</span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-cu-line overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            activeBatch.status === "failed" ? "bg-cu-danger" : "bg-cu-success"
+                          }`}
+                          style={{ width: `${visualPercent}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-center mt-1 font-medium capitalize">
+                        Status: <span className={activeBatch.status === "completed" ? "text-cu-success font-bold" : "text-cu-info animate-pulse"}>
+                          {activeBatch.status === "processing" ? "Memproses" : activeBatch.status === "pending" ? "Mengantre" : activeBatch.status}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center pt-4 border-t border-cu-line/40">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBulkFile(null);
+                      setCsvData([]);
+                      setCsvErrors([]);
+                      setBulkStep(1);
+                      setVisualPercent(0);
+                      setActiveBatch(null);
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full border border-cu-line bg-cu-surface px-5 py-2 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+                  >
+                    <MaterialIcon name="upload_file" size="xs" />
+                    Unggah CSV Baru
+                  </button>
+                  <Link
+                    href="/pricetag/history"
+                    className="flex items-center justify-center gap-1.5 rounded-full bg-cu-ink px-5 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm"
+                  >
+                    <MaterialIcon name="history" size="xs" />
+                    Lihat Riwayat
+                  </Link>
                 </div>
               </div>
             </div>

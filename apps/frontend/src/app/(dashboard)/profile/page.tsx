@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { apiFetch, ApiError, ValidationError } from "@/lib/api";
 import { User, useAuth } from "@/providers/auth-provider";
 import { MaterialIcon } from "@/components/material-icon";
@@ -43,9 +43,19 @@ export default function ProfilePage() {
   
   // Tab from URL search params (driven by SettingsLayout sidebar)
   const searchParams = useSearchParams();
-  const activeTab = (searchParams.get("tab") || "profile") as
+  const pathname = usePathname();
+  const mobileRouteTab: Record<string, string> = {
+    "/settings/profile": "profile",
+    "/settings/security": "security",
+    "/settings/role-settings": "role_settings",
+    "/settings/activity-log": "activity_log",
+  };
+  // Normalisasi: strip trailing slash agar /settings/security/ == /settings/security
+  const normalizedPathname = (pathname ?? "").replace(/\/$/, "") || "/";
+  const activeTab = (mobileRouteTab[normalizedPathname] || searchParams.get("tab") || "profile") as
     "profile" | "security" | "role_settings" | "activity_log" |
     "billing_overview" | "billing_usage" | "billing_ai" | "billing_budgets";
+
 
   // Profile forms state
   const [name, setName] = useState("");

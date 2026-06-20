@@ -135,7 +135,7 @@ class AuthApiTest extends TestCase
     public function test_auth_me_retrieves_authenticated_user_details(): void
     {
         $user = User::factory()->create(['is_active' => true]);
-        $user->assignRole('Retail Staff');
+        $user->assignRole('PIC Retail');
 
         $response = $this->actingAs($user)->getJson('/api/v1/auth/me');
 
@@ -147,7 +147,7 @@ class AuthApiTest extends TestCase
                 'name' => $user->name,
                 'email' => $user->email,
                 'is_active' => true,
-                'roles' => ['Retail Staff'],
+                'roles' => ['PIC Retail'],
             ],
         ]);
     }

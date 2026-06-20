@@ -22,6 +22,8 @@ interface NavItemBase {
 export interface SettingsNavItem extends NavItemBase {
   /** Full href including query string, e.g. "/profile?tab=security" */
   href: string;
+  /** Dedicated page used by the mobile settings flow. */
+  mobileHref?: string;
   /** If true this is an indented child item (e.g. billing sub-menu) */
   isChild?: boolean;
 }
@@ -60,13 +62,13 @@ const NAV_GROUPS: SettingsNavGroup[] = [
   {
     title: "Pengaturan Akun",
     items: [
-      { href: "/profile", label: "Profil & Tampilan", icon: "person" },
+      { href: "/profile", mobileHref: "/settings/profile", label: "Profil & Tampilan", icon: "person" },
     ],
   },
   {
     title: "Keamanan & Akses",
     items: [
-      { href: "/profile?tab=security", label: "Sandi & Perangkat", icon: "security" },
+      { href: "/profile?tab=security", mobileHref: "/settings/security", label: "Sandi & Perangkat", icon: "security" },
     ],
   },
   {
@@ -74,6 +76,7 @@ const NAV_GROUPS: SettingsNavGroup[] = [
     items: [
       {
         href: "/profile?tab=role_settings",
+        mobileHref: "/settings/role-settings",
         label: "Pengaturan Peran",
         icon: "admin_panel_settings",
         permission: "manage-settings",
@@ -83,35 +86,42 @@ const NAV_GROUPS: SettingsNavGroup[] = [
   {
     title: "Log Audit",
     items: [
-      { href: "/profile?tab=activity_log", label: "Jejak Aktivitas", icon: "history" },
+      { href: "/profile?tab=activity_log", mobileHref: "/settings/activity-log", label: "Jejak Aktivitas", icon: "history" },
     ],
   },
-  {
-    title: "Access",
-    items: [
-      {
-        label: "Billing and licensing",
-        icon: "credit_card",
-        children: [
-          { href: "/profile?tab=billing_overview", label: "Overview", isChild: true },
-          { href: "/profile?tab=billing_usage", label: "Usage", isChild: true },
-          { href: "/profile?tab=billing_ai", label: "AI usage", isChild: true },
-          { href: "/profile?tab=billing_budgets", label: "Budgets and alerts", isChild: true },
-        ],
-      },
-    ],
-  },
+  /*
+   * TEMPLATE MENU DENGAN SUBMENU
+   * Blok ini sengaja dinonaktifkan dan dipertahankan sebagai referensi ketika
+   * navigasi pengaturan membutuhkan parent menu yang dapat collapse/expand.
+   * {
+   *   title: "Access",
+   *   items: [
+   *     {
+   *       label: "Billing and licensing",
+   *       icon: "credit_card",
+   *       children: [
+   *         { href: "/profile?tab=billing_overview", label: "Overview", isChild: true },
+   *         { href: "/profile?tab=billing_usage", label: "Usage", isChild: true },
+   *         { href: "/profile?tab=billing_ai", label: "AI usage", isChild: true },
+   *         { href: "/profile?tab=billing_budgets", label: "Budgets and alerts", isChild: true },
+   *       ],
+   *     },
+   *   ],
+   * },
+   */
   {
     title: "Administrasi",
     items: [
       {
         href: "/roles",
+        mobileHref: "/settings/roles",
         label: "Kelola Role",
         icon: "shield_person",
         permission: "manage-roles",
       },
       {
         href: "/users/pending",
+        mobileHref: "/settings/pending-users",
         label: "Akun Pending",
         icon: "pending_actions",
         permission: "approve-users",
@@ -161,6 +171,16 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user, hasPermission } = useAuth();
+  const activeTab = searchParams.get("tab");
+
+  // Normalisasi: hapus trailing slash agar /settings/ == /settings
+  const normalizedPath = (pathname ?? "").replace(/\/$/, "") || "/";
+
+  const urlShowsMobileDetail =
+    (normalizedPath !== "/profile" && normalizedPath !== "/settings") ||
+    (normalizedPath === "/profile" &&
+      (searchParams.get("view") === "detail" || Boolean(activeTab)));
+  const isMobileDetail = urlShowsMobileDetail;
 
   // Collapsible menu state
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({
@@ -179,9 +199,16 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
     .toUpperCase()
     .slice(0, 2);
 
+  const activeMobileLabel = NAV_GROUPS.flatMap((group) =>
+    group.items.flatMap((item) => (isCollapsible(item) ? item.children : [item]))
+  ).find((item) =>
+    hrefMatches(item.href, normalizedPath, searchParams) || item.mobileHref === normalizedPath
+  )?.label ?? "Pengaturan";
+
   // ── Render a single link item ──
   const renderLinkItem = (item: SettingsNavItem) => {
-    const isActive = hrefMatches(item.href, pathname, searchParams);
+    const isActive = hrefMatches(item.href, normalizedPath, searchParams);
+    const mobileHref = item.mobileHref ?? item.href;
 
     return (
       <div
@@ -189,17 +216,22 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
         className="relative flex items-center w-full px-3"
       >
         {isActive && (
-          <span className="absolute left-[3px] top-1/2 -translate-y-1/2 w-[4px] h-[20px] bg-cu-info rounded-full animate-fade-in" />
+          <span className="absolute left-[3px] top-1/2 hidden h-[20px] w-[4px] -translate-y-1/2 rounded-full bg-cu-info animate-fade-in lg:block" />
         )}
         <Link
-          href={item.href}
-          className={`flex items-center gap-2.5 rounded-md py-2 text-sm transition-all cursor-pointer w-full text-left ${
+          href={mobileHref}
+          className={`flex items-center gap-2.5 rounded-md py-2 text-sm transition-all cursor-pointer w-full text-left lg:hidden ${
             item.isChild ? "pr-3 pl-[42px]" : "px-3"
-          } ${
-            isActive
-              ? "text-cu-ink bg-cu-panel-soft font-semibold"
-              : "text-cu-muted hover:text-cu-ink hover:bg-cu-panel-soft/40"
-          }`}
+          } text-cu-muted hover:text-cu-ink hover:bg-cu-panel-soft/40`}
+        >
+          {item.icon && <MaterialIcon name={item.icon} size="sm" />}
+          <span>{item.label}</span>
+        </Link>
+        <Link
+          href={item.href}
+          className={`hidden w-full cursor-pointer items-center gap-2.5 rounded-md py-2 text-left text-sm transition-all lg:flex ${
+            item.isChild ? "pr-3 pl-[42px]" : "px-3"
+          } ${isActive ? "bg-cu-panel-soft font-semibold text-cu-ink" : "text-cu-muted hover:bg-cu-panel-soft/40 hover:text-cu-ink"}`}
         >
           {item.icon && <MaterialIcon name={item.icon} size="sm" />}
           <span>{item.label}</span>
@@ -209,9 +241,9 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto">
+    <div className="flex flex-col gap-0 lg:gap-6 w-full max-w-7xl mx-auto">
       {/* Top Profile Header (GitHub Style Personal Account Card) */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 border-b border-cu-line/60">
+      <div className={`${isMobileDetail ? "hidden lg:flex" : "flex"} flex-col items-start justify-between gap-4 border-b border-cu-line/60 py-4 sm:flex-row sm:items-center`}>
         <div className="flex items-center gap-4">
           <div
             className={`relative size-12 overflow-hidden rounded-full border border-cu-line flex items-center justify-center ${
@@ -246,7 +278,7 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
       <div className="mt-2 flex flex-col gap-6 lg:flex-row items-start w-full">
         {/* Left sidebar navigation */}
         <nav
-          className="w-full shrink-0 lg:w-64 space-y-5"
+          className={`${isMobileDetail ? "hidden lg:block" : "block"} w-full shrink-0 space-y-5 lg:w-64`}
           aria-label="Settings navigation"
         >
           {NAV_GROUPS.map((group) => {
@@ -311,7 +343,22 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
         </nav>
 
         {/* Right content panel */}
-        <div className="flex-1 w-full p-2 sm:p-4">{children}</div>
+        <div className={`${isMobileDetail ? "block" : "hidden lg:block"} w-full flex-1 p-0 sm:p-4`}>
+          <div className="mb-5 flex items-center gap-3 border-b border-cu-line pb-4 lg:hidden">
+            <Link
+              href="/settings"
+              aria-label="Kembali ke menu pengaturan"
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-cu-line bg-cu-surface text-cu-ink transition hover:bg-cu-panel-soft"
+            >
+              <MaterialIcon name="arrow_back" size="sm" />
+            </Link>
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-cu-muted">Pengaturan</p>
+              <h1 className="truncate text-base font-semibold text-cu-ink">{activeMobileLabel}</h1>
+            </div>
+          </div>
+          {children}
+        </div>
       </div>
     </div>
   );

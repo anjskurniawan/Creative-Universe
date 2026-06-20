@@ -192,12 +192,14 @@ export default function PricetagDatabasePage() {
           <h1 className="mt-1 text-2xl font-semibold text-cu-ink">Manajemen Katalog</h1>
           <p className="mt-1 text-sm text-cu-muted">{total} data pada tab {tab === "categories" ? "kategori" : "produk"}.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <button type="button" onClick={() => setIsImportModalOpen(true)} className="btn btn-secondary">
-            <MaterialIcon name="upload_file" size="sm" /> Import CSV
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button type="button" onClick={() => setIsImportModalOpen(true)} className="flex-1 sm:flex-none btn btn-secondary flex items-center justify-center gap-1.5 py-2 px-3 text-xs sm:text-sm">
+            <MaterialIcon name="upload_file" size="sm" />
+            <span className="truncate">Import CSV</span>
           </button>
-          <button type="button" onClick={() => tab === "categories" ? openCategory("new") : openProduct("new")} className="btn bg-cu-ink text-white hover:bg-cu-ink-hover">
-            <MaterialIcon name="add" size="sm" /> Tambah {tab === "categories" ? "Kategori" : "Produk"}
+          <button type="button" onClick={() => tab === "categories" ? openCategory("new") : openProduct("new")} className="flex-1 sm:flex-none btn bg-cu-ink text-white hover:bg-cu-ink-hover flex items-center justify-center gap-1.5 py-2 px-3 text-xs sm:text-sm">
+            <MaterialIcon name="add" size="sm" />
+            <span className="truncate">Tambah {tab === "categories" ? "Kategori" : "Produk"}</span>
           </button>
         </div>
       </header>
@@ -233,7 +235,112 @@ function CategoryTable({ categories, onEdit, onDelete }: { categories: PricetagC
 }
 
 function ProductTable({ products, onEdit, onDelete }: { products: PricetagProduct[]; onEdit: (item: PricetagProduct) => void; onDelete: (item: PricetagProduct) => void }) {
-  return <div className="overflow-x-auto rounded-2xl border border-cu-line bg-cu-surface shadow-sm"><table className="min-w-[760px] w-full text-sm"><thead className="bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted"><tr><th className="px-4 py-3">Produk</th><th className="px-4 py-3">Kategori</th><th className="px-4 py-3">Harga</th><th className="px-4 py-3">Status</th><th className="px-4 py-3 text-right">Aksi</th></tr></thead><tbody className="divide-y divide-cu-line">{products.length === 0 ? <tr><td colSpan={5} className="p-10 text-center text-cu-muted">Belum ada produk.</td></tr> : products.map((item) => <tr key={item.id}><td className="px-4 py-3"><span className="font-semibold text-cu-ink">{item.name}</span><span className="block text-xs text-cu-muted">{item.variant_name}</span></td><td className="px-4 py-3 text-cu-muted">{item.category.name}</td><td className="px-4 py-3"><span className="block text-xs text-cu-muted line-through">{formatRupiah(item.normal_price)}</span><span className="font-semibold text-cu-success">{formatRupiah(item.discount_price)}</span></td><td className="px-4 py-3"><span className={`rounded-full px-2 py-1 text-xs ${item.is_ready ? "bg-cu-success-soft text-cu-success" : "bg-cu-panel-soft text-cu-muted"}`}>{item.is_ready ? "Ready" : "Belum"}</span></td><td className="px-4 py-3"><div className="flex justify-end gap-2"><Action icon="edit" label="Edit produk" onClick={() => onEdit(item)} /><Action icon="delete" label="Hapus produk" danger onClick={() => void onDelete(item)} /></div></td></tr>)}</tbody></table></div>;
+  return (
+    <>
+      {/* Desktop View (5-Column Table) */}
+      <div className="hidden sm:block overflow-x-auto rounded-2xl border border-cu-line bg-cu-surface shadow-sm">
+        <table className="min-w-[760px] w-full text-sm">
+          <thead className="bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted">
+            <tr>
+              <th className="px-4 py-3">Produk</th>
+              <th className="px-4 py-3">Kategori</th>
+              <th className="px-4 py-3">Harga</th>
+              <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3 text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-cu-line">
+            {products.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="p-10 text-center text-cu-muted">Belum ada produk.</td>
+              </tr>
+            ) : (
+              products.map((item) => (
+                <tr key={item.id} className="hover:bg-cu-surface-soft/50 transition-colors">
+                  <td className="px-4 py-3">
+                    <span className="font-semibold text-cu-ink">{item.name}</span>
+                    <span className="block text-xs text-cu-muted">{item.variant_name}</span>
+                  </td>
+                  <td className="px-4 py-3 text-cu-muted">{item.category.name}</td>
+                  <td className="px-4 py-3">
+                    <span className="block text-xs text-cu-muted line-through">{formatRupiah(item.normal_price)}</span>
+                    <span className="font-semibold text-cu-success">{formatRupiah(item.discount_price)}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-2 py-1 text-xs ${item.is_ready ? "bg-cu-success-soft text-cu-success" : "bg-cu-panel-soft text-cu-muted"}`}>
+                      {item.is_ready ? "Ready" : "Belum"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-end gap-2">
+                      <Action icon="edit" label="Edit produk" onClick={() => onEdit(item)} />
+                      <Action icon="delete" label="Hapus produk" danger onClick={() => void onDelete(item)} />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile View (Compact 3-Column Table) */}
+      <div className="block sm:hidden w-full rounded-2xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
+        <table className="w-full text-sm table-fixed">
+          <thead className="bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted">
+            <tr>
+              <th className="px-3 py-3 w-[45%]">Produk</th>
+              <th className="px-3 py-3 w-[25%]">Harga</th>
+              <th className="px-3 py-3 w-[30%] text-right"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-cu-line">
+            {products.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada produk.</td>
+              </tr>
+            ) : (
+              products.map((item) => (
+                <tr key={item.id} className="hover:bg-cu-surface-soft/50 transition-colors">
+                  <td className="px-3 py-2.5 align-middle">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[9px] font-bold text-cu-muted uppercase tracking-wider truncate">
+                        {item.category.name}
+                      </span>
+                      <span className="font-semibold text-cu-ink text-xs sm:text-sm truncate">
+                        {item.name}
+                      </span>
+                      {item.variant_name && item.variant_name !== "Default" && (
+                        <span className="text-[10px] text-cu-muted truncate">
+                          {item.variant_name}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5 align-middle">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-cu-muted line-through">
+                        {formatRupiah(item.normal_price)}
+                      </span>
+                      <span className="font-semibold text-cu-success text-xs sm:text-sm">
+                        {formatRupiah(item.discount_price)}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2.5 align-middle text-right">
+                    <div className="flex justify-end gap-1">
+                      <Action icon="edit" label="Edit produk" onClick={() => onEdit(item)} />
+                      <Action icon="delete" label="Hapus produk" danger onClick={() => void onDelete(item)} />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
 }
 
 function CategoryModal({ name, setName, editing, saving, onSubmit, onClose }: { name: string; setName: (value: string) => void; editing: boolean; saving: boolean; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onClose: () => void }) {

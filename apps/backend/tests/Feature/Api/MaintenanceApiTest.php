@@ -120,7 +120,7 @@ class MaintenanceApiTest extends TestCase
         $this->actingAs($this->root);
 
         $response = $this->postJson('/api/v1/maintenance/commands', [
-            'command' => 'migrate', // not in allowlist key
+            'command' => 'invalid-command', // truly not in allowlist key
         ]);
 
         $response->assertStatus(422)
@@ -183,4 +183,81 @@ class MaintenanceApiTest extends TestCase
             'description' => 'Percobaan eksekusi remote command terlarang di production: migrate:fresh',
         ]);
     }
+
+    public function test_root_can_run_extended_maintenance_commands(): void
+    {
+        $this->actingAs($this->root);
+
+        $response = $this->postJson('/api/v1/maintenance/commands', [
+            'command' => 'migrate',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['data' => ['command', 'output']]);
+    }
+
+    public function test_root_cannot_run_destructive_maintenance_commands_in_production(): void
+    {
+        $this->actingAs($this->root);
+
+        // Mock app environment to production
+        app()->detectEnvironment(fn() => 'production');
+
+        $response = $this->postJson('/api/v1/maintenance/commands', [
+            'command' => 'migrate-fresh',
+        ]);
+
+        $response->assertStatus(403)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Tindakan ini dilarang pada environment production.');
+    }
+
+    public function test_root_can_run_clean_and_optimize_commands(): void
+    {
+        $this->actingAs($this->root);
+
+        // Test clean activity-log
+        $response = $this->postJson('/api/v1/maintenance/commands', [
+            'command' => 'clean-activity-log',
+        ]);
+        $response->assertStatus(200)->assertJsonPath('success', true);
+
+        // Mock Artisan call for optimize to prevent configuration caching issues in test environment
+        Artisan::shouldReceive('call')
+            ->with('optimize')
+            ->once()
+            ->andReturn(0);
+        Artisan::shouldReceive('output')
+            ->andReturn('Configuration cached successfully!');
+
+        // Test optimize
+        $response = $this->postJson('/api/v1/maintenance/commands', [
+            'command' => 'optimize',
+        ]);
+        $response->assertStatus(200)->assertJsonPath('success', true);
+    }
+
+    public function test_web_artisan_routes_execute_clean_and_optimize_with_valid_token(): void
+    {
+        $response = $this->post('/_cmd/clean-activity-log', [], [
+            'X-Artisan-Token' => 'test-artisan-secret-token-123'
+        ]);
+        $response->assertStatus(200)->assertJsonStructure(['output']);
+
+        // Mock Artisan call for optimize
+        Artisan::shouldReceive('call')
+            ->with('optimize')
+            ->once()
+            ->andReturn(0);
+        Artisan::shouldReceive('output')
+            ->andReturn('Configuration cached successfully!');
+
+        $response = $this->post('/_cmd/optimize', [], [
+            'X-Artisan-Token' => 'test-artisan-secret-token-123'
+        ]);
+        $response->assertStatus(200)->assertJsonStructure(['output']);
+    }
 }
+
+

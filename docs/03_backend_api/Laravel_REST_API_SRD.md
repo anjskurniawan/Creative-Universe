@@ -101,7 +101,7 @@ Endpoint M6 pada tabel di atas aktif dan teruji per 2026-06-20. Response user ma
 | GET | `/api/v1/maintenance/status` | `run-artisan` | status queue/config yang aman ditampilkan |
 | POST | `/api/v1/maintenance/commands` | `run-artisan` | menjalankan command dari allowlist UI |
 
-Maintenance API memakai session Sanctum dan CSRF. Ia tidak menerima atau mengembalikan `ARTISAN_SECRET`. Command destruktif, migration, seeding penuh, dan output yang mengandung credential tidak tersedia melalui endpoint UI.
+Maintenance API memakai session Sanctum dan CSRF. Ia tidak menerima atau mengembalikan `ARTISAN_SECRET`. Command pemeliharaan mencakup pembersihan cache, restart antrean, pembuatan tautan storage, migrasi database, seeding, pemicu antrean, pembersihan log/data usang (activity logs, notifications, failed jobs, temp uploads, stale records, token password resets), serta optimasi cache sistem. Perintah destruktif (seperti `migrate-fresh` dan seeding penuh) dilindungi oleh guard environment dan otomatis ditolak pada environment production.
 
 ## 3. Target endpoint Pricetag
 

@@ -10,7 +10,7 @@ use Spatie\Permission\PermissionRegistrar;
 
 class DeleteRoleAction
 {
-    public const PROTECTED_ROLES = ['Root', 'Manajer', 'Supervisor', 'Designer', 'Client', 'Retail Admin', 'Retail Staff'];
+    public const PROTECTED_ROLES = ['Root', 'Manajer', 'CEO', 'Supervisor', 'Designer', 'Videographer', 'Client', 'Leader Retail', 'PIC Retail'];
 
     public function handle(Role $role, User $admin): void
     {

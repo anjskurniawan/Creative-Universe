@@ -44,7 +44,7 @@ class PricetagGenerationController extends BaseApiController
         $success = $generatorService->generate($product, $user->id, $user->name);
 
         // Record history
-        $batchName = 'Single: ' . $product->name . ($product->variant_name !== 'Default' ? ' (' . $product->variant_name . ')' : '');
+        $batchName = $product->name . ($product->variant_name !== 'Default' ? ' - ' . $product->variant_name : '');
         $batch = PricetagBatch::create([
             'batch_name' => $batchName,
             'status' => $success ? 'completed' : 'failed',
@@ -77,9 +77,10 @@ class PricetagGenerationController extends BaseApiController
      */
     public function checklist(ChecklistPricetagGenerationRequest $request): JsonResponse
     {
-        $batchName = $request->input('batch_name');
-        $itemsInput = $request->input('items');
         $user = $request->user();
+        $n = PricetagBatch::where('created_by', $user->id)->count();
+        $batchName = 'Pritag #' . ($n + 1);
+        $itemsInput = $request->input('items');
 
         $itemsToProcess = [];
         foreach ($itemsInput as $item) {
@@ -133,9 +134,10 @@ class PricetagGenerationController extends BaseApiController
      */
     public function csv(CsvPricetagGenerationRequest $request): JsonResponse
     {
-        $batchName = $request->input('batch_name');
-        $uploadedFile = $request->file('file');
         $user = $request->user();
+        $n = PricetagBatch::where('created_by', $user->id)->count();
+        $batchName = 'CSV #' . ($n + 1);
+        $uploadedFile = $request->file('file');
 
         $path = $uploadedFile->getRealPath();
         $file = fopen($path, 'r');

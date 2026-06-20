@@ -88,7 +88,7 @@ class UserApiTest extends TestCase
         $admin->assignRole('Root');
 
         $user1 = User::factory()->create(['name' => 'Budi Santoso', 'is_active' => true]);
-        $user1->assignRole('Retail Staff');
+        $user1->assignRole('PIC Retail');
 
         $user2 = User::factory()->create(['name' => 'Jane Doe', 'is_active' => true]);
         $user2->assignRole('Designer');
@@ -149,12 +149,12 @@ class UserApiTest extends TestCase
         $pendingUser = User::factory()->create(['is_active' => false]);
 
         $response = $this->actingAs($admin)->postJson("/api/v1/users/{$pendingUser->id}/approve", [
-            'role' => 'Retail Staff',
+            'role' => 'PIC Retail',
         ]);
 
         $response->assertStatus(200);
         $this->assertTrue($pendingUser->refresh()->is_active);
-        $this->assertTrue($pendingUser->hasRole('Retail Staff'));
+        $this->assertTrue($pendingUser->hasRole('PIC Retail'));
         $this->assertEquals($admin->id, $pendingUser->approved_by);
 
         Event::assertDispatched(UserStatusUpdated::class);
@@ -239,7 +239,7 @@ class UserApiTest extends TestCase
         $manager->assignRole('Manajer');
 
         $target = User::factory()->create(['is_active' => true]);
-        $target->assignRole('Retail Staff');
+        $target->assignRole('PIC Retail');
 
         // Try to approve with Root role
         $pending = User::factory()->create(['is_active' => false]);
@@ -268,7 +268,7 @@ class UserApiTest extends TestCase
         $manager->assignRole('Manajer');
 
         $target = User::factory()->create(['is_active' => true]);
-        $target->assignRole('Retail Staff');
+        $target->assignRole('PIC Retail');
 
         // Set Root settings: only allow 'access-pricetag' for Manager, not 'pricetag.manage' (which Manager also has)
         $root->setSetting('manageable_manager_permissions', ['access-pricetag']);
@@ -278,7 +278,7 @@ class UserApiTest extends TestCase
             'name' => $target->name,
             'email' => $target->email,
             'is_active' => true,
-            'roles' => ['Retail Staff'],
+            'roles' => ['PIC Retail'],
             'permissions' => ['access-pricetag'],
         ]);
         $response->assertStatus(200);
@@ -289,7 +289,7 @@ class UserApiTest extends TestCase
             'name' => $target->name,
             'email' => $target->email,
             'is_active' => true,
-            'roles' => ['Retail Staff'],
+            'roles' => ['PIC Retail'],
             'permissions' => ['pricetag.manage'],
         ]);
         $response->assertStatus(403);
@@ -300,7 +300,7 @@ class UserApiTest extends TestCase
             'name' => $target->name,
             'email' => $target->email,
             'is_active' => true,
-            'roles' => ['Retail Staff'],
+            'roles' => ['PIC Retail'],
             'permissions' => ['run-artisan'],
         ]);
         $response->assertStatus(403);
@@ -316,14 +316,14 @@ class UserApiTest extends TestCase
         $manager->assignRole('Manajer');
 
         $target = User::factory()->create(['is_active' => true]);
-        $target->assignRole('Retail Staff');
+        $target->assignRole('PIC Retail');
         $target->givePermissionTo('run-artisan');
 
         $this->actingAs($manager)->patchJson("/api/v1/users/{$target->id}", [
             'name' => $target->name,
             'email' => $target->email,
             'is_active' => true,
-            'roles' => ['Retail Staff'],
+            'roles' => ['PIC Retail'],
             'permissions' => ['access-pricetag'],
         ])->assertOk();
 

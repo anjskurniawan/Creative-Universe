@@ -23,11 +23,26 @@ export default function PricetagHistoryPage() {
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
 
   // Detail Modal State
   const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null);
   const [detailBatch, setDetailBatch] = useState<PricetagBatch | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [expandedModalItemId, setExpandedModalItemId] = useState<number | null>(null);
+
+  // Sync mobile viewport state
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 640px)");
+    const syncViewport = () => {
+      setIsMobile(mediaQuery.matches);
+      setPage(1); // Reset page on resize to prevent empty page states
+    };
+    syncViewport();
+    mediaQuery.addEventListener("change", syncViewport);
+    return () => mediaQuery.removeEventListener("change", syncViewport);
+  }, []);
 
   const notify = (message: string) => {
     pushLocalNotification(message, "/pricetag/history");
@@ -54,8 +69,9 @@ export default function PricetagHistoryPage() {
     if (!silent) setIsLoading(true);
 
     try {
+      const limit = isMobile ? 5 : 10;
       const res = await apiFetch<PricetagPage<PricetagBatch>>(
-        `/pricetag/batches?page=${page}&per_page=10`
+        `/pricetag/batches?page=${page}&per_page=${limit}`
       );
       setBatches(res.data);
       setLastPage(res.meta.last_page);
@@ -65,7 +81,7 @@ export default function PricetagHistoryPage() {
     } finally {
       if (!silent) setIsLoading(false);
     }
-  }, [page, hasPermission]);
+  }, [page, hasPermission, isMobile]);
 
   useEffect(() => {
     queueMicrotask(() => void loadBatches());
@@ -128,12 +144,14 @@ export default function PricetagHistoryPage() {
   const openDetail = (id: number) => {
     setSelectedBatchId(id);
     setDetailBatch(null);
+    setExpandedModalItemId(null);
     loadBatchDetail(id);
   };
 
   const closeDetail = () => {
     setSelectedBatchId(null);
     setDetailBatch(null);
+    setExpandedModalItemId(null);
   };
 
   if (!hasPermission("access-pricetag")) {
@@ -156,47 +174,134 @@ export default function PricetagHistoryPage() {
       ) : batches.length === 0 ? (
         <Empty />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-cu-line bg-cu-surface shadow-sm">
-          <table className="min-w-[800px] w-full text-sm text-left">
-            <thead className="bg-cu-panel-soft text-xs uppercase font-bold tracking-wider text-cu-muted">
-              <tr>
-                <th className="px-4 py-3">Produk/Batch</th>
-                
-                <th className="px-4 py-3">Jumlah Item</th>
-                <th className="px-4 py-3 w-48">Progress</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Tanggal Dibuat</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-cu-line">
-              {batches.map((batch) => {
-                const percent = batch.total_items > 0 ? Math.round((batch.processed_items / batch.total_items) * 100) : 0;
-                const showZip = batch.status === "completed" || (batch.status === "processing" && batch.processed_items > 0);
+        <>
+          {/* Desktop Table View */}
+          <div className="hidden sm:block overflow-x-auto rounded-2xl border border-cu-line bg-cu-surface shadow-sm">
+            <table className="min-w-[800px] w-full text-sm text-left">
+              <thead className="bg-cu-panel-soft text-xs uppercase font-bold tracking-wider text-cu-muted">
+                <tr>
+                  <th className="px-4 py-3">Produk/Batch</th>
+                  <th className="px-4 py-3">Jumlah Item</th>
+                  <th className="px-4 py-3 w-48">Progress</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Tanggal Dibuat</th>
+                  <th className="px-4 py-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-cu-line">
+                {batches.map((batch) => {
+                  const percent = batch.total_items > 0 ? Math.round((batch.processed_items / batch.total_items) * 100) : 0;
+                  const showZip = batch.status === "completed" || (batch.status === "processing" && batch.processed_items > 0);
 
-                return (
-                  <tr key={batch.id} className="hover:bg-cu-surface-soft transition">
-                    <td className="px-4 py-3 font-semibold text-cu-ink">{batch.batch_name}</td>
-                    <td className="px-4 py-3 text-cu-muted font-semibold">{batch.total_items} produk</td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold text-cu-muted">
-                          <span>{batch.processed_items} / {batch.total_items} selesai</span>
-                          <span>{percent}%</span>
+                  return (
+                    <tr key={batch.id} className="hover:bg-cu-surface-soft transition">
+                      <td className="px-4 py-3 font-semibold text-cu-ink">{batch.batch_name}</td>
+                      <td className="px-4 py-3 text-cu-muted font-semibold">{batch.total_items} produk</td>
+                      <td className="px-4 py-3">
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-[10px] font-bold text-cu-muted">
+                            <span>{batch.processed_items} / {batch.total_items} selesai</span>
+                            <span>{percent}%</span>
+                          </div>
+                          <div className="h-1.5 w-full rounded-full bg-cu-line overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                batch.status === "failed" ? "bg-cu-danger" : "bg-cu-ink"
+                              }`}
+                              style={{ width: `${percent}%` }}
+                            />
+                          </div>
                         </div>
-                        <div className="h-1.5 w-full rounded-full bg-cu-line overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              batch.status === "failed" ? "bg-cu-danger" : "bg-cu-ink"
-                            }`}
-                            style={{ width: `${percent}%` }}
-                          />
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold inline-flex items-center gap-1 ${
+                            batch.status === "completed"
+                              ? "bg-cu-success-soft text-cu-success"
+                              : batch.status === "failed"
+                              ? "bg-cu-danger-soft text-cu-danger"
+                              : batch.status === "processing"
+                              ? "bg-cu-primary-soft text-cu-primary animate-pulse"
+                              : "bg-cu-panel-soft text-cu-muted"
+                          }`}
+                        >
+                          {batch.status === "processing" && (
+                            <div className="size-1.5 animate-spin rounded-full border border-cu-primary border-t-transparent" />
+                          )}
+                          {batch.status === "completed" && "Selesai"}
+                          {batch.status === "failed" && "Gagal"}
+                          {batch.status === "processing" && "Memproses"}
+                          {batch.status === "pending" && "Mengantre"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-cu-muted">
+                        {new Date(batch.created_at).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end gap-2">
+                          {showZip ? (
+                            <a
+                              href={`/api/v1/pricetag/batches/${batch.id}/download`}
+                              download
+                              className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft"
+                              title="Unduh semua ZIP"
+                            >
+                              <MaterialIcon name="download" size="xs" />
+                            </a>
+                          ) : (
+                            <span
+                              className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-line bg-cu-panel-soft text-cu-soft cursor-not-allowed"
+                              title="Belum diproses / tidak ada item sukses"
+                            >
+                              <MaterialIcon name="download" size="xs" />
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => openDetail(batch.id)}
+                            className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft"
+                            title="Lihat detail item"
+                          >
+                            <MaterialIcon name="visibility" size="xs" />
+                          </button>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card List View */}
+          <div className="block sm:hidden space-y-3">
+            {batches.map((batch) => {
+              const percent = batch.total_items > 0 ? Math.round((batch.processed_items / batch.total_items) * 100) : 0;
+              const showZip = batch.status === "completed" || (batch.status === "processing" && batch.processed_items > 0);
+              const isExpanded = expandedCardId === batch.id;
+
+              return (
+                <div key={batch.id} className="rounded-xl border border-cu-line bg-cu-surface p-4 shadow-sm space-y-3">
+                  {/* Collapsed State: Batch Name & Status + Date */}
+                  <div
+                    onClick={() => setExpandedCardId(isExpanded ? null : batch.id)}
+                    className="flex items-center justify-between cursor-pointer select-none gap-2"
+                  >
+                    {/* Left: Batch Name */}
+                    <div className="flex items-center min-w-0">
+                      <span className="font-semibold text-cu-ink text-sm truncate">{batch.batch_name}</span>
+                    </div>
+
+                    {/* Right: Status Indicator and Date (Stacked Sejajar) */}
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-semibold inline-flex items-center gap-1 ${
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold inline-flex items-center gap-1 ${
                           batch.status === "completed"
                             ? "bg-cu-success-soft text-cu-success"
                             : batch.status === "failed"
@@ -214,51 +319,83 @@ export default function PricetagHistoryPage() {
                         {batch.status === "processing" && "Memproses"}
                         {batch.status === "pending" && "Mengantre"}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 text-cu-muted">
-                      {new Date(batch.created_at).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
+                      <span className="text-[10px] text-cu-muted">
+                        {new Date(batch.created_at).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Expanded Detail State */}
+                  {isExpanded && (
+                    <div className="border-t border-cu-line pt-3 space-y-3 text-xs">
+                      <div className="grid grid-cols-2 gap-2 text-cu-muted">
+                        <div>
+                          <p className="font-semibold text-cu-ink">ID Kelompok</p>
+                          <p>#{batch.id}</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-cu-ink">Jumlah Item</p>
+                          <p>{batch.total_items} produk</p>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold text-cu-muted">
+                          <span>{batch.processed_items} / {batch.total_items} selesai</span>
+                          <span>{percent}%</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-cu-line overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              batch.status === "failed" ? "bg-cu-danger" : "bg-cu-ink"
+                            }`}
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-2 pt-1">
                         {showZip ? (
                           <a
                             href={`/api/v1/pricetag/batches/${batch.id}/download`}
                             download
-                            className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft"
-                            title="Unduh semua ZIP"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-cu-line bg-cu-surface py-2 text-cu-ink hover:bg-cu-panel-soft font-semibold text-center"
                           >
                             <MaterialIcon name="download" size="xs" />
+                            Unduh ZIP
                           </a>
                         ) : (
                           <span
-                            className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-line bg-cu-panel-soft text-cu-soft cursor-not-allowed"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-cu-line bg-cu-panel-soft py-2 text-cu-soft cursor-not-allowed font-semibold text-center"
                             title="Belum diproses / tidak ada item sukses"
                           >
                             <MaterialIcon name="download" size="xs" />
+                            Unduh ZIP
                           </span>
                         )}
                         <button
                           type="button"
                           onClick={() => openDetail(batch.id)}
-                          className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft"
-                          title="Lihat detail item"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-cu-line bg-cu-surface py-2 text-cu-ink hover:bg-cu-panel-soft font-semibold text-center"
                         >
                           <MaterialIcon name="visibility" size="xs" />
+                          Lihat Detail
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {/* Pagination */}
@@ -266,12 +403,12 @@ export default function PricetagHistoryPage() {
 
       {/* Detail Modal */}
       {selectedBatchId && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-cu-overlay/60 p-4">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-cu-overlay/60 p-6 sm:p-4">
           <div role="dialog" aria-modal="true" className="w-full max-w-4xl rounded-2xl bg-cu-surface p-5 shadow-xl max-h-[85vh] flex flex-col">
             <div className="mb-4 flex items-center justify-between border-b border-cu-line pb-3">
               <div>
                 <h2 className="text-lg font-semibold text-cu-ink">
-                  {isLoadingDetail ? "Memuat..." : `Detail Kelompok: ${detailBatch?.batch_name}`}
+                  {isLoadingDetail ? "Memuat..." : detailBatch?.batch_name}
                 </h2>
                 {detailBatch && (
                   <p className="text-xs text-cu-muted mt-0.5">
@@ -279,9 +416,6 @@ export default function PricetagHistoryPage() {
                   </p>
                 )}
               </div>
-              <button type="button" onClick={closeDetail} aria-label="Tutup" className="text-cu-muted hover:text-cu-ink">
-                <MaterialIcon name="close" size="sm" />
-              </button>
             </div>
 
             {isLoadingDetail ? (
@@ -290,7 +424,8 @@ export default function PricetagHistoryPage() {
               </div>
             ) : detailBatch ? (
               <div className="overflow-y-auto flex-1 border border-cu-line rounded-xl">
-                <table className="min-w-[600px] w-full text-xs text-left">
+                {/* Desktop Modal Table View */}
+                <table className="hidden sm:table min-w-[600px] w-full text-xs text-left">
                   <thead className="bg-cu-panel-soft uppercase font-bold text-cu-muted tracking-wider">
                     <tr>
                       <th className="px-4 py-3">Produk / Varian</th>
@@ -374,6 +509,98 @@ export default function PricetagHistoryPage() {
                     )}
                   </tbody>
                 </table>
+
+                {/* Mobile Modal Card List View */}
+                <div className="block sm:hidden divide-y divide-cu-line p-3">
+                  {detailBatch.items && detailBatch.items.length === 0 ? (
+                    <div className="py-6 text-center text-xs text-cu-muted">Tidak ada item di batch ini.</div>
+                  ) : (
+                    detailBatch.items?.map((item) => {
+                      const isItemExpanded = expandedModalItemId === item.id;
+                      return (
+                        <div key={item.id} className="py-3 first:pt-0 last:pb-0 space-y-2">
+                          {/* Item Collapsed Header */}
+                          <div
+                            onClick={() => setExpandedModalItemId(isItemExpanded ? null : item.id)}
+                            className="flex items-center justify-between cursor-pointer select-none gap-2"
+                          >
+                            <div className="min-w-0">
+                              <span className="font-bold text-cu-ink text-xs block truncate">{item.product?.name || "Produk dihapus"}</span>
+                              {item.product?.variant_name !== "Default" && (
+                                <span className="block text-[10px] text-cu-muted mt-0.5">Varian: {item.product?.variant_name}</span>
+                              )}
+                            </div>
+                            <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                              <span
+                                className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${
+                                  item.status === "success"
+                                    ? "bg-cu-success-soft text-cu-success"
+                                    : item.status === "failed"
+                                    ? "bg-cu-danger-soft text-cu-danger"
+                                    : "bg-cu-panel-soft text-cu-muted"
+                                }`}
+                              >
+                                {item.status === "success" && "Sukses"}
+                                {item.status === "failed" && "Gagal"}
+                                {item.status === "pending" && "Mengantre"}
+                              </span>
+                              <span className="text-cu-success font-semibold text-[10px]">
+                                {formatRupiah(item.product?.discount_price ?? 0)}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Item Expanded Details */}
+                          {isItemExpanded && (
+                            <div className="pt-2 space-y-2 text-[10px] border-t border-dashed border-cu-line mt-2">
+                              {item.error_message && (
+                                <div className="bg-cu-danger-soft p-2 rounded-lg text-cu-danger">
+                                  <p className="font-semibold">Detail Eror:</p>
+                                  <p className="whitespace-pre-wrap">{item.error_message}</p>
+                                </div>
+                              )}
+                              <div className="flex justify-between items-center bg-cu-panel-soft p-2 rounded-lg">
+                                <span className="font-semibold text-cu-muted">Aksi Item:</span>
+                                <div className="flex gap-1.5">
+                                  {item.status === "success" && item.product?.preview_url ? (
+                                    <a
+                                      href={item.product.preview_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex size-7 items-center justify-center rounded-md border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft"
+                                      title="Lihat Gambar"
+                                    >
+                                      <MaterialIcon name="visibility" size="xs" />
+                                    </a>
+                                  ) : (
+                                    <span className="inline-flex size-7 items-center justify-center rounded-md border border-cu-line bg-cu-panel-soft text-cu-soft cursor-not-allowed">
+                                      <MaterialIcon name="visibility" size="xs" />
+                                    </span>
+                                  )}
+                                  {item.status === "success" && item.product?.download_url ? (
+                                    <a
+                                      href={item.product.download_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex size-7 items-center justify-center rounded-md border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft"
+                                      title="Unduh Gambar"
+                                    >
+                                      <MaterialIcon name="download" size="xs" />
+                                    </a>
+                                  ) : (
+                                    <span className="inline-flex size-7 items-center justify-center rounded-md border border-cu-line bg-cu-panel-soft text-cu-soft cursor-not-allowed">
+                                      <MaterialIcon name="download" size="xs" />
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             ) : null}
 

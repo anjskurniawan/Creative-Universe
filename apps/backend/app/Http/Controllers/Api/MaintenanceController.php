@@ -79,11 +79,27 @@ class MaintenanceController extends BaseApiController
             'clear-cache' => 'optimize:clear',
             'queue-restart' => 'queue:restart',
             'storage-link' => 'storage:link',
-            'seed-permissions' => 'db:seed', // custom parsed in execution block
+            'seed-permissions' => 'db:seed', // custom parsed
+            'migrate' => 'migrate',
+            'migrate-fresh' => 'migrate:fresh',
+            'seed' => 'db:seed', // custom parsed
+            'queue-work' => 'queue:work',
+            'clean-activity-log' => 'clean:activity-log',
+            'clean-notifications' => 'clean:notifications',
+            'clean-failed-jobs' => 'clean:failed-jobs',
+            'clean-temp-uploads' => 'clean:temp-uploads',
+            'clean-stale-records' => 'clean:stale-records',
+            'auth-clear-resets' => 'auth:clear-resets',
+            'optimize' => 'optimize',
         ];
 
         if (! array_key_exists($commandKey, $allowlist)) {
             return $this->sendError('Perintah tidak diizinkan untuk dieksekusi dari panel web.', [], 422);
+        }
+
+        // Environment guard for destructive actions in production env
+        if (($commandKey === 'migrate-fresh' || $commandKey === 'seed') && app()->environment('production')) {
+            return $this->sendError('Tindakan ini dilarang pada environment production.', [], 403);
         }
 
         $artisanCommand = $allowlist[$commandKey];
@@ -94,6 +110,22 @@ class MaintenanceController extends BaseApiController
                 Artisan::call('db:seed', [
                     '--class' => 'RolePermissionSeeder',
                     '--force' => true,
+                ]);
+            } elseif ($commandKey === 'seed') {
+                Artisan::call('db:seed', [
+                    '--force' => true,
+                ]);
+            } elseif ($commandKey === 'migrate') {
+                Artisan::call('migrate', [
+                    '--force' => true,
+                ]);
+            } elseif ($commandKey === 'migrate-fresh') {
+                Artisan::call('migrate:fresh', [
+                    '--force' => true,
+                ]);
+            } elseif ($commandKey === 'queue-work') {
+                Artisan::call('queue:work', [
+                    '--stop-when-empty' => true,
                 ]);
             } else {
                 Artisan::call($artisanCommand);

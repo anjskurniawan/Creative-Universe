@@ -30,15 +30,23 @@
 # ------------------------------------------------------------------------------
 # 2. WEB ARTISAN SECURITY COMMANDS (Untuk Shared Hosting tanpa SSH)
 # ------------------------------------------------------------------------------
-# Untuk menjalankan command Artisan dari browser, panggil URL berikut:
+# Untuk menjalankan command Artisan dari browser, panggil URL berikut dengan method POST:
 #
-# - Migrasi Database:      GET https://creative.doran.id/_cmd/migrate
-# - Drop & Reset Database: GET https://creative.doran.id/_cmd/migrate-fresh
-# - Hapus Cache & Optimize: GET https://creative.doran.id/_cmd/clear-cache
-# - Buat Storage Symlink:  GET https://creative.doran.id/_cmd/storage-link
-# - Restart Queue Worker:   GET https://creative.doran.id/_cmd/queue-restart
-# - Seed Role & Permission: GET https://creative.doran.id/_cmd/seed-permissions
-# - Run Database Seeder:    GET https://creative.doran.id/_cmd/seed
+# - Migrasi Database:       POST https://creative.doran.id/_cmd/migrate
+# - Drop & Reset Database:  POST https://creative.doran.id/_cmd/migrate-fresh  (Ditolak di production)
+# - Hapus Cache & Optimize: POST https://creative.doran.id/_cmd/clear-cache
+# - Buat Storage Symlink:   POST https://creative.doran.id/_cmd/storage-link
+# - Restart Queue Worker:   POST https://creative.doran.id/_cmd/queue-restart
+# - Seed Role & Permission: POST https://creative.doran.id/_cmd/seed-permissions
+# - Run Database Seeder:    POST https://creative.doran.id/_cmd/seed           (Ditolak di production)
+# - Jalankan Queue (Work):  POST https://creative.doran.id/_cmd/queue-work
+# - Pembersihan Log Aktivitas: POST https://creative.doran.id/_cmd/clean-activity-log
+# - Pembersihan Notifikasi:    POST https://creative.doran.id/_cmd/clean-notifications
+# - Pembersihan Failed Jobs:   POST https://creative.doran.id/_cmd/clean-failed-jobs
+# - Pembersihan Temp Uploads:  POST https://creative.doran.id/_cmd/clean-temp-uploads
+# - Pembersihan Stale Records: POST https://creative.doran.id/_cmd/clean-stale-records
+# - Pembersihan Token Reset:   POST https://creative.doran.id/_cmd/auth-clear-resets
+# - Optimasi Cache Sistem:  POST https://creative.doran.id/_cmd/optimize
 #
 # Wajib menambahkan HTTP Header berikut pada request Anda:
 #   X-Artisan-Token: cr_universe_cpanel_secure_token_2026_ab99cd
@@ -82,7 +90,7 @@ SESSION_DRIVER=database
 SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
 SESSION_PATH=/
-SESSION_DOMAIN=null
+SESSION_DOMAIN=
 
 BROADCAST_CONNECTION=pusher
 FILESYSTEM_DISK=public

@@ -7,7 +7,7 @@ import { MaterialIcon } from "./material-icon";
 import { NotificationBell } from "./notification-bell";
 
 interface NavbarProps {
-  variant?: "light" | "dark" | "transparent";
+  variant?: "light" | "dark" | "transparent" | "transparent-dark";
   sticky?: boolean;
 }
 
@@ -47,49 +47,51 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
     light: "bg-cu-surface/75 text-cu-ink backdrop-blur-xl border-b border-cu-line",
     dark: "bg-[#0a0a0a]/75 text-white backdrop-blur-xl border-b border-white/10",
     transparent: "bg-transparent text-white",
+    "transparent-dark": "bg-transparent text-cu-ink",
   }[variant];
 
-  const iconButtonClass = {
-    light: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full text-cu-ink transition-colors hover:bg-cu-panel-soft focus:outline-none focus:ring-2 focus:ring-cu-focus/25 cursor-pointer",
-    dark: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer",
-    transparent: "inline-flex size-9 sm:size-10 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer",
-  }[variant];
+
 
   const popupPanelClass = {
     light: "border-cu-line bg-cu-surface text-cu-ink shadow-xl",
     dark: "border-white/10 bg-[#0d0d0d]/95 text-white shadow-2xl backdrop-blur-xl",
     transparent: "border-white/10 bg-[#0d0d0d]/95 text-white shadow-2xl backdrop-blur-xl",
+    "transparent-dark": "border-cu-line bg-cu-surface text-cu-ink shadow-xl",
   }[variant];
 
   const popupMenuLinkClass = {
     light: "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-focus/30",
     dark: "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
     transparent: "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+    "transparent-dark": "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-focus/30",
   }[variant];
 
   const popupMenuIconClass = {
     light: "text-cu-muted transition-colors group-hover:text-cu-ink",
     dark: "text-white/50 transition-colors group-hover:text-white",
     transparent: "text-white/50 transition-colors group-hover:text-white",
+    "transparent-dark": "text-cu-muted transition-colors group-hover:text-cu-ink",
   }[variant];
 
-  const popupDividerClass = variant === "light" ? "border-cu-line" : "border-white/10";
-  const popupMutedClass = variant === "light" ? "text-cu-muted" : "text-white/50";
+  const popupDividerClass = (variant === "light" || variant === "transparent-dark") ? "border-cu-line" : "border-white/10";
+  const popupMutedClass = (variant === "light" || variant === "transparent-dark") ? "text-cu-muted" : "text-white/50";
+  const popupScrollbarClass =
+    (variant === "light" || variant === "transparent-dark") ? "cu-popup-scrollbar-light" : "cu-popup-scrollbar-dark";
 
   const profileAdminItems = [
     hasPermission("manage-users")
-      ? { href: "/users", icon: "group", label: "Kelola User" }
+      ? { href: "/users", mobileHref: "/users", icon: "group", label: "Kelola User" }
       : null,
     hasPermission("manage-roles")
-      ? { href: "/roles", icon: "admin_panel_settings", label: "Kelola Role" }
+      ? { href: "/roles", mobileHref: "/settings/roles", icon: "admin_panel_settings", label: "Kelola Role" }
       : null,
     hasPermission("approve-users")
-      ? { href: "/users/pending", icon: "pending_actions", label: "Akun Pending" }
+      ? { href: "/users/pending", mobileHref: "/settings/pending-users", icon: "pending_actions", label: "Akun Pending" }
       : null,
     hasPermission("run-artisan")
-      ? { href: "/maintenance", icon: "settings", label: "Maintenance Panel" }
+      ? { href: "/maintenance", mobileHref: "/maintenance", icon: "settings", label: "Maintenance Panel" }
       : null,
-  ].filter((item): item is { href: string; icon: string; label: string } => item !== null);
+  ].filter((item): item is { href: string; mobileHref: string; icon: string; label: string } => item !== null);
 
   const initials = user
     ? user.name
@@ -101,7 +103,7 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
     : "AK";
 
   return (
-    <nav className={`${sticky ? "sticky top-0" : "relative"} z-50 ${navClass}`}>
+    <nav className={`${sticky ? "sticky top-0" : "relative"} isolate z-[100] ${navClass}`}>
       <div className="flex w-full items-center justify-between px-6 md:px-16 py-4">
         {/* Brand Logo */}
         <Link href="/" className="inline-flex items-center">
@@ -143,7 +145,12 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
           ) : (
             <>
               {/* Notification Bell */}
-              {user && <NotificationBell userId={user.id} variant={variant === 'transparent' ? 'dark' : variant} />}
+              {user && (
+                <NotificationBell
+                  userId={user.id}
+                  variant={variant === "transparent" ? "dark" : variant}
+                />
+              )}
 
               {/* Apps Menu Dropdown */}
               <div className="relative" ref={appsRef}>
@@ -153,7 +160,13 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
                     setProfileOpen(false);
                   }}
                   type="button"
-                  className={iconButtonClass}
+                  className={`relative inline-flex size-9 sm:size-10 items-center justify-center rounded-full transition-colors focus:outline-none focus:ring-2 cursor-pointer ${
+                    variant === "transparent" || variant === "dark"
+                      ? "text-white hover:bg-white/10 focus:ring-white/30"
+                      : variant === "transparent-dark"
+                      ? `text-cu-ink hover:bg-white/45 hover:backdrop-blur-md focus:ring-white/30 transition-all duration-200 ${appsOpen ? "bg-white/45 backdrop-blur-md" : ""}`
+                      : "text-cu-ink hover:bg-cu-panel-soft focus:ring-cu-focus/25"
+                  }`}
                   aria-expanded={appsOpen}
                   aria-haspopup="menu"
                 >
@@ -162,7 +175,7 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
                 </button>
 
                 {appsOpen && (
-                  <div className={`absolute right-0 z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-xl border p-2 animate-slide-up ${popupPanelClass}`}>
+                  <div className={`absolute right-0 z-[110] mt-2 max-h-[calc(100dvh-5.5rem)] w-[min(20rem,calc(100vw-2rem))] overflow-x-hidden overflow-y-auto rounded-xl border p-2 animate-slide-up ${popupPanelClass} ${popupScrollbarClass}`}>
                     <div className="flex items-center gap-3 px-2 py-2.5">
                       <MaterialIcon name="apps" size="sm" className={popupMutedClass} />
                       <div className="min-w-0">
@@ -231,7 +244,13 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
                     setAppsOpen(false);
                   }}
                   type="button"
-                  className={`focus:outline-none cursor-pointer flex items-center justify-center shrink-0 size-9 sm:size-10 overflow-hidden rounded-full border border-cu-line ${user?.avatar_url ? "bg-white" : "bg-cu-danger text-white"}`}
+                  className={`focus:outline-none cursor-pointer flex items-center justify-center shrink-0 size-9 sm:size-10 overflow-hidden rounded-full border transition-all duration-300 ${user?.avatar_url ? "bg-white" : "bg-cu-danger text-white"} ${
+                    variant === "transparent-dark"
+                      ? `border-white/20 hover:border-white hover:shadow-[0_0_12px_rgba(255,255,255,1)] ${
+                          profileOpen ? "border-white shadow-[0_0_12px_rgba(255,255,255,1)]" : ""
+                        }`
+                      : "border-cu-line"
+                  }`}
                   aria-label="Buka menu akun"
                   aria-expanded={profileOpen}
                   aria-haspopup="menu"
@@ -249,7 +268,7 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
                 </button>
 
                 {profileOpen && (
-                  <div className={`absolute right-0 z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-xl border p-2 animate-slide-up ${popupPanelClass}`}>
+                  <div className={`absolute right-0 z-[110] mt-2 max-h-[calc(100dvh-5.5rem)] w-[min(20rem,calc(100vw-2rem))] overflow-x-hidden overflow-y-auto overscroll-contain rounded-xl border p-2 animate-slide-up ${popupPanelClass} ${popupScrollbarClass}`}>
                     <div className="flex items-center gap-3 px-2 py-2.5">
                       <div className={`flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cu-line ${user?.avatar_url ? "bg-white" : "bg-cu-danger text-white"}`}>
                         {user?.avatar_url ? (
@@ -301,9 +320,18 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
                       </li>
                       <li>
                         <Link
+                          href="/settings"
+                          onClick={() => setProfileOpen(false)}
+                          className={`${popupMenuLinkClass} lg:hidden`}
+                          role="menuitem"
+                        >
+                          <MaterialIcon name="settings" size="sm" className={popupMenuIconClass} />
+                          Pengaturan
+                        </Link>
+                        <Link
                           href="/profile"
                           onClick={() => setProfileOpen(false)}
-                          className={popupMenuLinkClass}
+                          className={`${popupMenuLinkClass} hidden lg:flex`}
                           role="menuitem"
                         >
                           <MaterialIcon name="settings" size="sm" className={popupMenuIconClass} />
@@ -322,9 +350,18 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
                           {profileAdminItems.map((item) => (
                             <li key={item.href}>
                               <Link
+                                href={item.mobileHref}
+                                onClick={() => setProfileOpen(false)}
+                                className={`${popupMenuLinkClass} lg:hidden`}
+                                role="menuitem"
+                              >
+                                <MaterialIcon name={item.icon} size="sm" className={popupMenuIconClass} />
+                                {item.label}
+                              </Link>
+                              <Link
                                 href={item.href}
                                 onClick={() => setProfileOpen(false)}
-                                className={popupMenuLinkClass}
+                                className={`${popupMenuLinkClass} hidden lg:flex`}
                                 role="menuitem"
                               >
                                 <MaterialIcon name={item.icon} size="sm" className={popupMenuIconClass} />

@@ -444,7 +444,7 @@ Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permi
 > [!success] Prinsip Role Universal & Scalable
 > Role bersifat **universal dan tidak di-scope per Sub-App**. Satu Role berlaku di seluruh ekosistem Creative Universe. Pembatasan akses per Sub-App dikendalikan oleh **Permission** (bukan Role), menggunakan konvensi prefix `access-[app-slug]` dan `[app].[resource].[action]`.
 >
-> Sistem RBAC dirancang **scalable**. Baseline aktual memiliki tujuh role inti: Root, Manajer, Supervisor, Designer, Client, Retail Admin, dan Retail Staff. Root dapat membuat role tambahan dan mengelola permission-nya melalui UI/API tanpa perubahan skema.
+> Sistem RBAC dirancang **scalable**. Baseline aktual memiliki sembilan role inti: Root, Manajer, CEO, Supervisor, Designer, Videographer, Client, Leader Retail, dan PIC Retail. Root dapat membuat role tambahan dan mengelola permission-nya melalui UI/API tanpa perubahan skema.
 
 > [!info] Akun Pending dan Role
 > User yang baru mendaftar (`is_active = false`) **tidak memiliki Role apapun**. Pada route legacy aktual, user pending dapat membuka `/pending` dan route auth yang tidak memakai middleware akun aktif; `/profile` mensyaratkan akun aktif. Target Next.js mempertahankan perilaku ini sampai ada keputusan bisnis baru.
@@ -460,16 +460,16 @@ Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permi
 > [!note] Single Source of Truth untuk Seed Awal
 > Tabel ini adalah acuan untuk `RolePermissionSeeder`. Setiap permission inti yang ditambahkan via seeder **WAJIB** didokumentasikan di sini. Permission dari Sub-App baru juga wajib ditambahkan ke sini sebelum di-deploy.
 
-| Permission Slug | Root | Manajer | Supervisor | Designer | Client | Retail Admin | Retail Staff |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `access-core` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `manage-users` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `manage-roles` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `approve-users` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `view-logs` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `run-artisan` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `access-pricetag` | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
-| `pricetag.manage` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Permission Slug | Root | Manajer | CEO | Supervisor | Designer | Videographer | Client | Leader Retail | PIC Retail |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `access-core` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `manage-users` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `manage-roles` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `approve-users` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `view-logs` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `run-artisan` | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `access-pricetag` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| `pricetag.manage` | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 > [!info] Aturan Permission Naming
 > Format slug: `[app-prefix].[resource].[action]` untuk permission spesifik Sub-App. Permission lintas app menggunakan format tanpa prefix: `manage-users`, `approve-users`, `view-logs`.
@@ -480,7 +480,7 @@ Sistem menolak penggunaan kolom statis `role` pada tabel `users`. Role dan Permi
 > Seeder yang dijalankan di production **WAJIB** menggunakan `RolePermissionSeeder` yang terpisah dari `DatabaseSeeder`. Seeder ini harus bersifat **idempotent**  -  aman dijalankan berulang kali tanpa menduplikasi data.
 
 > [!warning] Seeder vs UI Management
-> `RolePermissionSeeder` bertanggung jawab untuk **tujuh role inti** dan delapan permission baseline pada tabel di atas. Role tambahan yang dibuat Root tidak dihapus oleh seeder. Menjalankan seeder ulang me-reset assignment tujuh role inti sesuai baseline aktual.
+> `RolePermissionSeeder` bertanggung jawab untuk **sembilan role inti** dan delapan permission baseline pada tabel di atas. Role tambahan yang dibuat Root tidak dihapus oleh seeder. Menjalankan seeder ulang me-reset assignment sembilan role inti sesuai baseline aktual.
 
 ```php
 // database/seeders/RolePermissionSeeder.php
@@ -510,16 +510,18 @@ class RolePermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Step 2: Buat tujuh role inti  -  firstOrCreate menjamin idempotent.
+        // Step 2: Buat sembilan role inti  -  firstOrCreate menjamin idempotent.
         $root = Role::firstOrCreate(['name' => 'Root']);
         $manajer = Role::firstOrCreate(['name' => 'Manajer']);
+        $ceo = Role::firstOrCreate(['name' => 'CEO']);
         $supervisor = Role::firstOrCreate(['name' => 'Supervisor']);
         $designer = Role::firstOrCreate(['name' => 'Designer']);
+        $videographer = Role::firstOrCreate(['name' => 'Videographer']);
         $client = Role::firstOrCreate(['name' => 'Client']);
-        $retailAdmin = Role::firstOrCreate(['name' => 'Retail Admin']);
-        $retailStaff = Role::firstOrCreate(['name' => 'Retail Staff']);
+        $leaderRetail = Role::firstOrCreate(['name' => 'Leader Retail']);
+        $picRetail = Role::firstOrCreate(['name' => 'PIC Retail']);
 
-        // Step 3: Sync permission ke tujuh role inti.
+        // Step 3: Sync permission ke sembilan role inti.
         // CATATAN: syncPermissions menimpa assignment permission yang ada pada role-role ini.
         // Role dinamis yang dibuat via UI tidak disentuh.
         $root->syncPermissions($this->corePermissions);
@@ -527,11 +529,13 @@ class RolePermissionSeeder extends Seeder
             'access-core', 'access-pricetag', 'pricetag.manage',
             'approve-users', 'manage-users',
         ]);
+        $ceo->syncPermissions(['access-core', 'access-pricetag']);
         $supervisor->syncPermissions(['access-core', 'access-pricetag']);
         $designer->syncPermissions(['access-core', 'access-pricetag']);
+        $videographer->syncPermissions(['access-core', 'access-pricetag']);
         $client->syncPermissions(['access-core']);
-        $retailAdmin->syncPermissions(['access-core', 'access-pricetag']);
-        $retailStaff->syncPermissions(['access-core', 'access-pricetag']);
+        $leaderRetail->syncPermissions(['access-core', 'access-pricetag']);
+        $picRetail->syncPermissions(['access-core', 'access-pricetag']);
 
         // Reset cache Spatie setelah operasi selesai
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -566,11 +570,11 @@ class RolePermissionSeeder extends Seeder
 
 #### Role yang Dilindungi (Protected Roles)
 
-Tujuh role inti di bawah **tidak boleh dihapus** dalam kondisi apapun. Proteksi ini diberlakukan di level Action Class, bukan level database.
+Sembilan role inti di bawah **tidak boleh dihapus** dalam kondisi apapun. Proteksi ini diberlakukan di level Action Class, bukan level database.
 
 ```php
 // Daftar protected roles  -  tidak boleh dihapus via UI
-const PROTECTED_ROLES = ['Root', 'Manajer', 'Supervisor', 'Designer', 'Client', 'Retail Admin', 'Retail Staff'];
+const PROTECTED_ROLES = ['Root', 'Manajer', 'CEO', 'Supervisor', 'Designer', 'Videographer', 'Client', 'Leader Retail', 'PIC Retail'];
 ```
 
 #### Cache Invalidation  -  WAJIB di Setiap Perubahan Role/Permission
@@ -658,7 +662,7 @@ use App\Models\Core\User;
 
 class DeleteRoleAction
 {
-    private const PROTECTED_ROLES = ['Root', 'Manajer', 'Supervisor', 'Designer', 'Client', 'Retail Admin', 'Retail Staff'];
+    private const PROTECTED_ROLES = ['Root', 'Manajer', 'CEO', 'Supervisor', 'Designer', 'Videographer', 'Client', 'Leader Retail', 'PIC Retail'];
 
     public function handle(Role $role, User $admin): void
     {

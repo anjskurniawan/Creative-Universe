@@ -116,11 +116,64 @@ export default function MaintenancePage() {
         </div>
       ) : null}
 
-      {/* Actions & Console */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Command Panel */}
-        <section className="rounded-2xl border border-cu-line bg-cu-surface p-5 shadow-sm space-y-4 lg:col-span-1">
-          <h3 className="text-sm font-bold text-cu-ink border-b border-cu-line pb-3">Perintah Pemeliharaan</h3>
+      {/* Actions Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
+        {/* Kategori 1: Database & Migrasi */}
+        <section className="rounded-2xl border border-cu-line bg-cu-surface p-5 shadow-sm space-y-4">
+          <div className="flex items-center gap-2 border-b border-cu-line pb-3">
+            <span className="text-cu-primary flex items-center justify-center">
+              <MaterialIcon name="schema" size="xs" />
+            </span>
+            <h3 className="text-sm font-bold text-cu-ink">Database & Migrasi</h3>
+          </div>
+          <div className="flex flex-col gap-2">
+            <CommandButton
+              label="Migrasi Database"
+              desc="migrate --force (jalankan migrasi database)"
+              icon="database"
+              loading={isExecuting && activeCommand === "migrate"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("migrate", "Migrasi Database")}
+            />
+            <CommandButton
+              label="Migrasi Fresh (Reset)"
+              desc="migrate:fresh --force (RESET & migrasi database)"
+              icon="history"
+              loading={isExecuting && activeCommand === "migrate-fresh"}
+              disabled={isExecuting}
+              onClick={() => {
+                if (window.confirm("PERINGATAN! Tindakan ini akan MENGHAPUS semua tabel & data database Anda. Lanjutkan?")) {
+                  void runCommand("migrate-fresh", "Migrasi Fresh (Reset)");
+                }
+              }}
+            />
+            <CommandButton
+              label="Seed Permissions"
+              desc="db:seed --class=RolePermissionSeeder"
+              icon="rule"
+              loading={isExecuting && activeCommand === "seed-permissions"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("seed-permissions", "Seed Permissions")}
+            />
+            <CommandButton
+              label="Seed Database (Full)"
+              desc="db:seed --force (data default & test)"
+              icon="fact_check"
+              loading={isExecuting && activeCommand === "seed"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("seed", "Seed Database (Full)")}
+            />
+          </div>
+        </section>
+
+        {/* Kategori 2: Sistem & Optimasi */}
+        <section className="rounded-2xl border border-cu-line bg-cu-surface p-5 shadow-sm space-y-4">
+          <div className="flex items-center gap-2 border-b border-cu-line pb-3">
+            <span className="text-cu-primary flex items-center justify-center">
+              <MaterialIcon name="settings_suggest" size="xs" />
+            </span>
+            <h3 className="text-sm font-bold text-cu-ink">Sistem & Optimasi</h3>
+          </div>
           <div className="flex flex-col gap-2">
             <CommandButton
               label="Bersihkan Cache"
@@ -131,12 +184,28 @@ export default function MaintenancePage() {
               onClick={() => void runCommand("clear-cache", "Bersihkan Cache")}
             />
             <CommandButton
+              label="Optimasi Cache"
+              desc="optimize (cache config, route, view)"
+              icon="bolt"
+              loading={isExecuting && activeCommand === "optimize"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("optimize", "Optimasi Cache")}
+            />
+            <CommandButton
               label="Restart Antrean (Queue)"
               desc="queue:restart (refresh worker daemon)"
               icon="autorenew"
               loading={isExecuting && activeCommand === "queue-restart"}
               disabled={isExecuting}
               onClick={() => void runCommand("queue-restart", "Restart Antrean")}
+            />
+            <CommandButton
+              label="Jalankan Queue (Work)"
+              desc="queue:work --stop-when-empty (proses antrean)"
+              icon="play_arrow"
+              loading={isExecuting && activeCommand === "queue-work"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("queue-work", "Jalankan Queue (Work)")}
             />
             <CommandButton
               label="Tautkan Storage"
@@ -146,38 +215,93 @@ export default function MaintenancePage() {
               disabled={isExecuting}
               onClick={() => void runCommand("storage-link", "Tautkan Storage")}
             />
-            <CommandButton
-              label="Seed Permissions"
-              desc="db:seed --class=RolePermissionSeeder"
-              icon="rule"
-              loading={isExecuting && activeCommand === "seed-permissions"}
-              disabled={isExecuting}
-              onClick={() => void runCommand("seed-permissions", "Seed Permissions")}
-            />
           </div>
-          <p className="text-[10px] text-cu-muted">
-            * Seluruh eksekusi di atas dicatat pada sistem log audit trail dengan identifier akun pengakses.
-          </p>
         </section>
 
-        {/* Terminal output console */}
-        <section className="rounded-2xl border border-cu-line bg-cu-surface p-5 shadow-sm space-y-4 lg:col-span-2">
-          <div className="flex items-center justify-between border-b border-cu-line pb-3">
-            <h3 className="text-sm font-bold text-cu-ink">Output Konsol</h3>
-            <button
-              type="button"
-              onClick={() => setConsoleOutput("Console dibersihkan.")}
-              className="text-xs text-cu-muted hover:text-cu-ink transition flex items-center gap-1"
-            >
-              <MaterialIcon name="backspace" size="xs" /> Bersihkan
-            </button>
+        {/* Kategori 3: Pembersihan Log & Data */}
+        <section className="rounded-2xl border border-cu-line bg-cu-surface p-5 shadow-sm space-y-4">
+          <div className="flex items-center gap-2 border-b border-cu-line pb-3">
+            <span className="text-cu-primary flex items-center justify-center">
+              <MaterialIcon name="delete_sweep" size="xs" />
+            </span>
+            <h3 className="text-sm font-bold text-cu-ink">Pembersihan Log & Data</h3>
           </div>
-
-          <div className="rounded-xl bg-slate-950 p-4 font-mono text-xs text-slate-200 min-h-[250px] max-h-[450px] overflow-y-auto whitespace-pre-wrap leading-relaxed shadow-inner">
-            {consoleOutput}
+          <div className="flex flex-col gap-2">
+            <CommandButton
+              label="Bersihkan Log Aktivitas"
+              desc="clean:activity-log (> 24 bulan)"
+              icon="history_toggle_off"
+              loading={isExecuting && activeCommand === "clean-activity-log"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("clean-activity-log", "Bersihkan Log Aktivitas")}
+            />
+            <CommandButton
+              label="Bersihkan Notifikasi"
+              desc="clean:notifications (> 12 bulan)"
+              icon="notification_important"
+              loading={isExecuting && activeCommand === "clean-notifications"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("clean-notifications", "Bersihkan Notifikasi")}
+            />
+            <CommandButton
+              label="Bersihkan Failed Jobs"
+              desc="clean:failed-jobs (> 30 hari)"
+              icon="report_off"
+              loading={isExecuting && activeCommand === "clean-failed-jobs"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("clean-failed-jobs", "Bersihkan Failed Jobs")}
+            />
+            <CommandButton
+              label="Bersihkan Temp Uploads"
+              desc="clean:temp-uploads (> 7 hari)"
+              icon="folder_delete"
+              loading={isExecuting && activeCommand === "clean-temp-uploads"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("clean-temp-uploads", "Bersihkan Temp Uploads")}
+            />
+            <CommandButton
+              label="Bersihkan Stale Records"
+              desc="clean:stale-records (pemeliharaan internal)"
+              icon="auto_delete"
+              loading={isExecuting && activeCommand === "clean-stale-records"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("clean-stale-records", "Bersihkan Stale Records")}
+            />
+            <CommandButton
+              label="Bersihkan Token Reset"
+              desc="auth:clear-resets (token password kedaluwarsa)"
+              icon="vpn_key_off"
+              loading={isExecuting && activeCommand === "auth-clear-resets"}
+              disabled={isExecuting}
+              onClick={() => void runCommand("auth-clear-resets", "Bersihkan Token Reset")}
+            />
           </div>
         </section>
       </div>
+
+      {/* Terminal output console */}
+      <section className="rounded-2xl border border-cu-line bg-cu-surface p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-cu-line pb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-cu-primary flex items-center justify-center">
+              <MaterialIcon name="terminal" size="xs" />
+            </span>
+            <h3 className="text-sm font-bold text-cu-ink">Output Konsol</h3>
+          </div>
+          <button
+            type="button"
+            onClick={() => setConsoleOutput("Console dibersihkan.")}
+            className="text-xs text-cu-muted hover:text-cu-ink transition flex items-center gap-1"
+          >
+            <MaterialIcon name="backspace" size="xs" /> Bersihkan
+          </button>
+        </div>
+
+        <div className="rounded-xl bg-slate-950 p-4 font-mono text-xs text-slate-200 min-h-[250px] max-h-[450px] overflow-y-auto whitespace-pre-wrap leading-relaxed shadow-inner">
+          {consoleOutput}
+        </div>
+      </section>
+
     </div>
   );
 }
