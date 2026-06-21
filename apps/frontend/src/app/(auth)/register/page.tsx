@@ -91,7 +91,6 @@ export default function RegisterPage() {
             required
             placeholder="Nama lengkap"
             disabled={isSubmitting}
-            autoFocus
           />
           {fieldErrors.name && fieldErrors.name.map((err, i) => (
             <p key={i} className="mt-2 text-sm text-cu-danger">{err}</p>

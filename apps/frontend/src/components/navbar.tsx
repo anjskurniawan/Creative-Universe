@@ -175,7 +175,7 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
                 </button>
 
                 {appsOpen && (
-                  <div className={`absolute right-0 z-[110] mt-2 max-h-[calc(100dvh-5.5rem)] w-[min(20rem,calc(100vw-2rem))] overflow-x-hidden overflow-y-auto rounded-xl border p-2 animate-slide-up ${popupPanelClass} ${popupScrollbarClass}`}>
+                  <div className={`fixed left-4 right-4 top-[4.5rem] sm:absolute sm:left-auto sm:right-0 sm:top-auto z-[110] mt-2 sm:w-80 max-h-[calc(100dvh-5.5rem)] overflow-x-hidden overflow-y-auto rounded-xl border p-2 animate-slide-up ${popupPanelClass} ${popupScrollbarClass}`}>
                     <div className="flex items-center gap-3 px-2 py-2.5">
                       <MaterialIcon name="apps" size="sm" className={popupMutedClass} />
                       <div className="min-w-0">

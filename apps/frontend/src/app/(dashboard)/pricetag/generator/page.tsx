@@ -862,7 +862,6 @@ export default function PricetagGeneratorPage() {
                   onChange={(e) => setWizardProductSearch(e.target.value)}
                   className="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-11 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover transition"
                   placeholder="Cari nama produk..."
-                  autoFocus
                 />
               </div>
 
@@ -916,7 +915,6 @@ export default function PricetagGeneratorPage() {
                   onChange={(e) => setWizardVariantSearch(e.target.value)}
                   className="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-11 pr-4 text-sm text-cu-ink placeholder:text-cu-muted/70 focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover transition"
                   placeholder="Cari varian..."
-                  autoFocus
                 />
               </div>
 

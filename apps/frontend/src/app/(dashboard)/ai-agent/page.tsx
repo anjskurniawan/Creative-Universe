@@ -337,6 +337,13 @@ export default function AIAgentPage() {
     }
 
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (isMobile) {
+      canvas.style.display = "none";
+      return () => {
+        tweens.forEach((t) => t.kill());
+      };
+    }
+
     const hasFinePointer = window.matchMedia("(pointer: fine)").matches;
 
     // Get 2D context
@@ -661,6 +668,10 @@ export default function AIAgentPage() {
                   placeholder="Tanya AI Agent…"
                   className="flex-1 bg-transparent text-sm text-cu-ink placeholder:text-cu-ink/40 outline-none"
                   aria-label="Input pesan AI Agent"
+                  autoComplete="one-time-code"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
                 />
 
                 {/* Right controls */}

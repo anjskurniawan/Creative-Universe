@@ -118,7 +118,6 @@ export default function LoginPage() {
             required
             placeholder="Email atau username"
             disabled={isSubmitting}
-            autoFocus
           />
           {fieldErrors.login && fieldErrors.login.map((err, i) => (
             <p key={i} className="mt-2 text-sm text-cu-danger">{err}</p>
