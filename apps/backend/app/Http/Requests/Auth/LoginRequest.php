@@ -68,12 +68,16 @@ class LoginRequest extends FormRequest
             }
         } else {
             // Login menggunakan API Doran Group
-            $response = Http::post('https://api.doran.id/api/dorangroup/login?X-API-KEY=doran_data', [
+            $apiUrl = config('app.doran_api_url');
+            $apiKey = config('app.doran_api_key');
+
+            $response = Http::post($apiUrl . '?X-API-KEY=' . $apiKey, [
                 'username' => $username,
                 'password' => $password,
+                'X-API-KEY' => $apiKey,
             ]);
 
-            if ($response->successful() && $response->json('status') === 'success') {
+            if ($response->successful() && ($response->json('status') === true || $response->json('status') === 'success')) {
                 // Auto-register jika user belum ada di lokal
                 $user = User::firstOrCreate(
                     ['username' => $username],

@@ -98,14 +98,14 @@ QUEUE_CONNECTION=database
 CACHE_STORE=database
 CACHE_PREFIX=
 
-# Memcached & Redis (Tidak dipakai/standard disabled di shared hosting)
+# Memcached & Redis
 MEMCACHED_HOST=127.0.0.1
 REDIS_CLIENT=phpredis
 REDIS_HOST=127.0.0.1
 REDIS_PASSWORD=null
 REDIS_PORT=6379
 
-# Mail configuration (Default: log. Ubah ke smtp jika ingin kirim email real)
+# Mail configuration
 MAIL_MAILER=log
 MAIL_SCHEME=null
 MAIL_HOST=127.0.0.1
@@ -127,6 +127,10 @@ VITE_APP_NAME="${APP_NAME}"
 # Web Artisan Security (SRD v6.3 Seksi 8.1)
 ARTISAN_SECRET=cr_universe_cpanel_secure_token_2026_ab99cd
 ARTISAN_ALLOWED_IPS=
+
+# Doran Group API Login
+DORAN_API_URL=https://api.doran.id/api/dorangroup/login
+DORAN_API_KEY=doran_data
 
 # WhatsApp Fonnte (SRD v6.3 Seksi 11.3)
 FONNTE_TOKEN=

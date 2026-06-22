@@ -25,18 +25,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'whatsapp_number' => '628'.fake()->numerify('##########'),
             'password' => static::$password ??= Hash::make('password'),
-            'is_active' => true,
         ];
-    }
-
-    /**
-     * User yang baru mendaftar (pending approval).
-     */
-    public function pending(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'is_active' => false,
-        ]);
     }
 
     /**

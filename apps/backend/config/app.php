@@ -127,4 +127,8 @@ return [
     'artisan_secret' => env('ARTISAN_SECRET', ''),
     'artisan_allowed_ips' => env('ARTISAN_ALLOWED_IPS', ''),
 
+    // Doran Group API Login Integration
+    'doran_api_url' => env('DORAN_API_URL', 'https://api.doran.id/api/dorangroup/login'),
+    'doran_api_key' => env('DORAN_API_KEY', 'doran_data'),
+
 ];

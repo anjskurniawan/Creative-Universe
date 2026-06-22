@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign(['approved_by']);
+            // Drop index explicitly to satisfy SQLite in tests
+            $table->dropIndex(['is_active']);
+            $table->dropIndex(['approved_by']);
             $table->dropColumn([
                 'is_active',
                 'registration_note',
