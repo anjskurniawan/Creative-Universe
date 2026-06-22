@@ -46,4 +46,9 @@ return [
         'apps_script_pricetag_url' => env('GOOGLE_APPS_SCRIPT_PRICETAG_URL', ''),
     ],
 
+    // Google AI Studio Gemini API Configuration
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
 ];

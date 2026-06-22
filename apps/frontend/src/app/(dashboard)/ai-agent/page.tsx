@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { MaterialIcon } from "@/components/material-icon";
 import { useAuth } from "@/providers/auth-provider";
+import { apiFetch } from "@/lib/api";
 
 const AGENT_OPTIONS = [
   { value: "storyboard",  label: "Storyboard Writer",  icon: "movie_edit" },
@@ -13,6 +14,16 @@ const AGENT_OPTIONS = [
 ] as const;
 
 type AgentType = (typeof AGENT_OPTIONS)[number]["value"];
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  agentType?: AgentType;
+  timestamp: string;
+}
+
+// Suggested prompts removed in favor of dropdown selection
 
 export default function AIAgentPage() {
   const { user } = useAuth();
@@ -24,6 +35,8 @@ export default function AIAgentPage() {
   const textTargetRef = useRef<HTMLSpanElement>(null);
   const cursorRef = useRef<HTMLSpanElement>(null);
   const chatboxRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const [inputValue, setInputValue] = useState("");
   const [agentType, setAgentType] = useState<AgentType>("storyboard");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -34,13 +47,23 @@ export default function AIAgentPage() {
   const [isFocused, setIsFocused] = useState(false);
   const [showNewText, setShowNewText] = useState(false);
 
+  // Chat State
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const messageCounterRef = useRef(0);
+
   /* Mark client-side mounted (needed for portal) */
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
 
+  /* Scroll to bottom when messages change */
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);
+
   /* Toggle body class on focus to style navbar dark mode elements */
   useEffect(() => {
-    if (isFocused) {
+    if (isFocused || messages.length > 0) {
       document.body.classList.add("ai-agent-dark-active");
     } else {
       document.body.classList.remove("ai-agent-dark-active");
@@ -48,7 +71,7 @@ export default function AIAgentPage() {
     return () => {
       document.body.classList.remove("ai-agent-dark-active");
     };
-  }, [isFocused]);
+  }, [isFocused, messages.length]);
 
   /* Compute trigger position whenever dropdown opens */
   useEffect(() => {
@@ -62,7 +85,7 @@ export default function AIAgentPage() {
 
   const selectedAgent = AGENT_OPTIONS.find((o) => o.value === agentType)!;
 
-  /* Close dropdown on outside click — portal panel is outside dropdownRef so check trigger too */
+  /* Close dropdown on outside click */
   useEffect(() => {
     if (!dropdownOpen) return;
     const handler = (e: MouseEvent) => {
@@ -77,11 +100,14 @@ export default function AIAgentPage() {
     return () => document.removeEventListener("mousedown", handler);
   }, [dropdownOpen]);
 
-  const typewriterText = "AI Agent akan segera hadir";
+  const typewriterText = "AI Agent siap membantu Anda";
 
   // Trigger typewriter and background color updates on focus
   useEffect(() => {
     let active = true;
+
+    // If chat has started, we don't run typewriter animations
+    if (messages.length > 0) return;
 
     if (isFocused) {
       const timer = setTimeout(() => {
@@ -241,8 +267,9 @@ export default function AIAgentPage() {
       };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocused, newTypewriterText]);
+  }, [isFocused, newTypewriterText, messages.length]);
 
+  // Initial particles and aurora drawing
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -265,7 +292,8 @@ export default function AIAgentPage() {
 
     const tweens = new Set<gsap.core.Tween | gsap.core.Timeline>();
 
-    if (textTarget && cursor) {
+    // Initial setup (only if no messages exist yet)
+    if (messages.length === 0 && textTarget && cursor) {
       const splitCharacters = (text: string) => {
         if ("Segmenter" in Intl) {
           const segmenter = new Intl.Segmenter("id", { granularity: "grapheme" });
@@ -334,6 +362,9 @@ export default function AIAgentPage() {
         },
       });
       tweens.add(typewriterTween);
+    } else if (messages.length > 0 && chatbox) {
+      // Immediate load chatbox if chat started
+      gsap.set(chatbox, { opacity: 1, filter: "blur(0px)", y: 0 });
     }
 
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -480,7 +511,7 @@ export default function AIAgentPage() {
     const renderAurora = () => {
       ctx2d.clearRect(0, 0, width, height);
 
-      // We can set globalCompositeOperation to 'screen' or 'lighter' for beautiful blending
+      // screen composite operation for blending
       ctx2d.globalCompositeOperation = "screen";
 
       // Draw all blobs
@@ -489,12 +520,10 @@ export default function AIAgentPage() {
         const py = b.y * height;
         const pr = b.radius * Math.max(width, height);
 
-        // Skip drawing if out of bounds or zero radius
         if (pr <= 0) return;
 
         const grad = ctx2d.createRadialGradient(px, py, 0, px, py, pr);
         
-        // Handle transparency transition if active is defined
         let cStart = b.colorStart;
         if (b.active !== undefined) {
           cStart = hexToRgba(colorEnd, b.active * 0.25);
@@ -530,21 +559,84 @@ export default function AIAgentPage() {
       window.removeEventListener("blur", handlePointerLeave);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newTypewriterText]);
+  }, [newTypewriterText, messages.length]);
+
+  const handleSendMessage = (textToSend?: string) => {
+    const messageText = textToSend !== undefined ? textToSend : inputValue;
+    if (!messageText.trim()) return;
+
+    // Add user message
+    messageCounterRef.current += 1;
+    const userMsg: Message = {
+      id: `msg-${messageCounterRef.current}-user`,
+      role: "user",
+      content: messageText.trim(),
+      timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+    };
+
+    const currentHistory = [...messages, userMsg];
+    setMessages((prev) => [...prev, userMsg]);
+    setInputValue("");
+    setIsFocused(false);
+    setIsTyping(true);
+
+    // Call backend Google Gemini API integration
+    apiFetch<{ content: string }>("/ai/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        message: messageText.trim(),
+        agent_type: agentType,
+        history: currentHistory.slice(0, -1).map((msg) => ({
+          role: msg.role,
+          content: msg.content,
+        })),
+      }),
+    })
+      .then((data) => {
+        messageCounterRef.current += 1;
+        const assistantMsg: Message = {
+          id: `msg-${messageCounterRef.current}-assistant`,
+          role: "assistant",
+          content: data.content,
+          agentType: agentType,
+          timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
+        setIsTyping(false);
+      })
+      .catch((error) => {
+        setIsTyping(false);
+        messageCounterRef.current += 1;
+        const errorMsg: Message = {
+          id: `msg-${messageCounterRef.current}-assistant`,
+          role: "assistant",
+          content: `### ❌ Gagal Menghubungi Asisten AI\n\nTerjadi kesalahan saat memproses permintaan Anda: **${error?.message || "Kesalahan jaringan"}**.\n\nSilakan coba lagi beberapa saat lagi.`,
+          agentType: agentType,
+          timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
+        };
+        setMessages((prev) => [...prev, errorMsg]);
+      });
+  };
+
+  const handleResetChat = () => {
+    if (window.confirm("Apakah Anda ingin menghapus seluruh riwayat percakapan?")) {
+      setMessages([]);
+    }
+  };
 
   return (
     <div
       data-interactive-hero
-      className="relative isolate flex flex-1 flex-col overflow-hidden w-full h-full min-h-screen transition-colors duration-1000 ease-in-out"
-      style={{ backgroundColor: isFocused ? "#000000" : "#ffffff" }}
+      className="relative isolate flex flex-col overflow-hidden w-full h-screen max-h-screen transition-colors duration-1000 ease-in-out"
+      style={{ backgroundColor: isFocused || messages.length > 0 ? "#09090b" : "#ffffff" }}
     >
-      {/* Keyframe for custom dropdown animation and global navbar dark override styles */}
+      {/* CSS overrides for global elements and scrollbar styling */}
       <style>{`
         @keyframes cu-dropdown-in {
           from { opacity: 0; transform: translateY(6px) scale(0.97); }
           to   { opacity: 1; transform: translateY(0)   scale(1); }
         }
-        /* Smooth transitions for navbar elements */
+        /* Smooth transitions for navigation bar */
         nav, 
         nav a, 
         nav button,
@@ -564,10 +656,24 @@ export default function AIAgentPage() {
           color: #ffffff !important;
         }
         .ai-agent-dark-active nav button:hover {
-          background-color: rgba(255, 255, 255, 0.15) !important;
+          background-color: rgba(255, 255, 255, 0.1) !important;
         }
         .ai-agent-dark-active nav .border-cu-line {
-          border-color: rgba(255, 255, 255, 0.15) !important;
+          border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        /* Custom scrollbar for Chat history window */
+        .chat-scrollbar::-webkit-scrollbar {
+          width: 5px;
+        }
+        .chat-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .chat-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.15);
+          border-radius: 99px;
+        }
+        .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.35);
         }
       `}</style>
 
@@ -578,84 +684,188 @@ export default function AIAgentPage() {
         className="pointer-events-none absolute inset-0 z-0 size-full"
       />
 
-      {/* White overlays (fade out when focused) */}
+      {/* Light overlays (fade out when focused or active chat) */}
       <div 
         aria-hidden="true" 
         className="cu-landing-readability pointer-events-none absolute inset-0 z-10 transition-opacity duration-1000 ease-in-out" 
-        style={{ opacity: isFocused ? 0 : 1 }}
+        style={{ opacity: isFocused || messages.length > 0 ? 0 : 1 }}
       />
       <div 
         aria-hidden="true" 
         className="cu-landing-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40 transition-opacity duration-1000 ease-in-out" 
-        style={{ opacity: isFocused ? 0 : 1 }}
+        style={{ opacity: isFocused || messages.length > 0 ? 0 : 1 }}
       />
 
-      {/* Black overlays (fade in when focused) */}
+      {/* Dark overlays (fade in when focused or active chat) */}
       <div 
         aria-hidden="true" 
         className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-1000 ease-in-out" 
         style={{ 
-          opacity: isFocused ? 1 : 0,
-          background: "radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, transparent 100%)"
+          opacity: isFocused || messages.length > 0 ? 1 : 0,
+          background: "radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.9) 100%)"
         }}
       />
       <div 
         aria-hidden="true" 
         className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-40 transition-opacity duration-1000 ease-in-out" 
         style={{ 
-          opacity: isFocused ? 1 : 0,
-          background: "linear-gradient(to top, #000000, transparent)"
+          opacity: isFocused || messages.length > 0 ? 1 : 0,
+          background: "linear-gradient(to top, #09090b, transparent)"
         }}
       />
 
-      <main className="relative z-20 flex flex-1 items-center justify-center px-6 py-10">
-        <section
-          aria-labelledby="subapp-title"
-          className="mx-auto w-full max-w-2xl text-center flex flex-col items-center gap-8"
+      <main className={`relative z-20 flex transition-all duration-700 ease-in-out ${
+        messages.length > 0
+          ? "flex-1 flex-col w-full h-full max-w-4xl mx-auto px-4 sm:px-6 py-6 md:py-10 min-h-0"
+          : "flex-1 items-center justify-center px-4 sm:px-6 py-6 md:py-10"
+      }`}>
+        
+        {/* Central Content Column */}
+        <div 
+          className={`w-full flex flex-col transition-all duration-700 ease-in-out ${
+            messages.length > 0 ? "flex-1 min-h-0" : "mx-auto w-full max-w-2xl text-center flex flex-col items-center gap-8"
+          }`}
         >
-          {/* Typewriter Title — ukuran diperkecil agar proporsional dengan chatbox */}
-          <h1
-            ref={titleRef}
-            id="subapp-title"
-            aria-label={showNewText ? newTypewriterText : typewriterText}
-            data-typewriter={showNewText ? newTypewriterText : typewriterText}
-            className="text-center text-xl sm:text-2xl md:text-3xl font-medium leading-snug tracking-tight w-full block break-words"
-          >
-            <span
-              ref={textTargetRef}
-              data-typewriter-text
-              className={showNewText ? "bg-gradient-to-r from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end bg-clip-text text-transparent" : "text-cu-ink"}
-            >
-              {typewriterText}
-            </span>
-            <span
-              ref={cursorRef}
-              aria-hidden="true"
-              data-typewriter-cursor
-              className="ml-1.5 inline-block h-5 w-0.5 bg-gradient-to-b from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end align-middle opacity-0 sm:h-6 md:h-7"
-            />
-            <noscript>{showNewText ? newTypewriterText : typewriterText}</noscript>
-          </h1>
-
-          {/* Chatbox — Gemini-style */}
+          
+          {/* Animated Title */}
           <div
-            ref={chatboxRef}
-            className="w-full"
-            style={{ opacity: 0, filter: "blur(8px)", transform: "translateY(20px)" }}
+            style={{
+              transition: "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1), margin 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+              opacity: messages.length > 0 ? 0 : 1,
+              maxHeight: messages.length > 0 ? "0px" : "120px",
+              marginBottom: messages.length > 0 ? "0px" : "1.5rem",
+              overflow: "hidden",
+              pointerEvents: messages.length > 0 ? "none" : "auto",
+            }}
+            className="w-full text-center flex flex-col items-center"
           >
-            <div className={`relative w-full rounded-2xl border transition-all duration-1000 ease-in-out shadow-2xl bg-white ${
-              isFocused ? "border-transparent" : "border-cu-line"
+            <h1
+              ref={titleRef}
+              id="subapp-title"
+              aria-label={showNewText ? newTypewriterText : typewriterText}
+              data-typewriter={showNewText ? newTypewriterText : typewriterText}
+              className="text-center text-xl sm:text-2xl md:text-3xl font-medium leading-snug tracking-tight w-full block break-words"
+            >
+              <span
+                ref={textTargetRef}
+                data-typewriter-text
+                className={showNewText ? "bg-gradient-to-r from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end bg-clip-text text-transparent" : "text-cu-ink"}
+              >
+                {typewriterText}
+              </span>
+              <span
+                ref={cursorRef}
+                aria-hidden="true"
+                data-typewriter-cursor
+                className="ml-1.5 inline-block h-5 w-0.5 bg-gradient-to-b from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end align-middle opacity-0 sm:h-6 md:h-7"
+              />
+            </h1>
+          </div>
+
+          {/* Chat History Area: Shows when chat started */}
+          {messages.length > 0 && (
+            <section className="flex-1 flex flex-col min-h-0 w-full overflow-hidden mt-20 mb-6">
+              {/* Messages Scrollbox */}
+              <div className="flex-1 overflow-y-auto chat-scrollbar pr-2 space-y-4">
+                {messages.map((msg) => {
+                  const isUser = msg.role === "user";
+                  const agent = msg.agentType ? AGENT_OPTIONS.find((o) => o.value === msg.agentType) : null;
+
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`flex items-start gap-3 max-w-[85%] ${
+                        isUser ? "ml-auto flex-row-reverse" : "mr-auto"
+                      }`}
+                    >
+                      {/* Avatar Bubble */}
+                      <div
+                        className={`flex items-center justify-center size-8 rounded-full flex-shrink-0 text-white font-bold text-xs ${
+                          isUser
+                            ? "bg-cu-danger"
+                            : "bg-white/10 border border-white/10"
+                        }`}
+                      >
+                        {isUser ? (
+                          userName.slice(0, 2).toUpperCase()
+                        ) : (
+                          <MaterialIcon name={agent?.icon || "smart_toy"} size="xs" className="text-white" />
+                        )}
+                      </div>
+
+                      {/* Message Card */}
+                      <div className="flex flex-col gap-1">
+                        <div
+                          className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                            isUser
+                              ? "bg-white text-black rounded-tr-none"
+                              : "bg-white/5 border border-white/10 text-white/90 rounded-tl-none whitespace-pre-line"
+                          }`}
+                        >
+                          {/* Format Markdown Simulation (bold lines / lists) */}
+                          {isUser ? (
+                            msg.content
+                          ) : (
+                            <SimpleMarkdown content={msg.content} />
+                          )}
+                        </div>
+                        <span
+                          className={`text-[9px] text-white/40 ${
+                            isUser ? "text-right" : "text-left"
+                          }`}
+                        >
+                          {isUser ? "Anda" : agent?.label || "AI Agent"} · {msg.timestamp}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Typing Indicator */}
+                {isTyping && (
+                  <div className="flex items-start gap-3 max-w-[80%] mr-auto">
+                    <div className="flex items-center justify-center size-8 rounded-full bg-white/10 border border-white/10 text-white flex-shrink-0">
+                      <MaterialIcon name={selectedAgent.icon} size="xs" className="animate-spin" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-white/50 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: "0.2s" }} />
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style={{ animationDelay: "0.4s" }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            </section>
+          )}
+
+          {/* Input Box Area */}
+          <section
+            ref={chatboxRef}
+            className="w-full flex flex-col gap-4"
+            style={messages.length === 0 ? { opacity: 0, filter: "blur(8px)", transform: "translateY(20px)" } : {}}
+          >
+            {/* Gemini-Style Chatbox */}
+            <div className={`relative w-full rounded-2xl border transition-all duration-300 shadow-xl bg-white ${
+              isFocused || messages.length > 0 ? "border-white/15" : "border-cu-line"
             }`}>
-              {/* Input row */}
               <div className="flex items-center gap-3 px-4 py-3.5 rounded-t-2xl">
-                {/* Plus button */}
+                {/* Reset / Paperclip icon (Functional Reset for UI) */}
                 <button
                   type="button"
-                  aria-label="Lampirkan"
-                  title="Segera hadir"
-                  className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-cu-ink/5 text-cu-ink/60 transition hover:bg-cu-ink/10 active:scale-95"
+                  onClick={handleResetChat}
+                  disabled={messages.length === 0}
+                  aria-label="Kosongkan obrolan"
+                  title="Mulai obrolan baru"
+                  className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-all active:scale-95 ${
+                    messages.length > 0
+                      ? "bg-cu-danger/10 text-cu-danger hover:bg-cu-danger/25"
+                      : "bg-cu-ink/5 text-cu-ink/30 cursor-not-allowed"
+                  }`}
                 >
-                  <MaterialIcon name="add" size="sm" />
+                  <MaterialIcon name="refresh" size="sm" />
                 </button>
 
                 {/* Text input */}
@@ -665,10 +875,16 @@ export default function AIAgentPage() {
                   onChange={(e) => setInputValue(e.target.value)}
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
-                  placeholder="Tanya AI Agent…"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  placeholder={`Tanya ${selectedAgent.label}…`}
                   className="flex-1 bg-transparent text-sm text-cu-ink placeholder:text-cu-ink/40 outline-none"
                   aria-label="Input pesan AI Agent"
-                  autoComplete="one-time-code"
+                  autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck={false}
@@ -676,8 +892,8 @@ export default function AIAgentPage() {
 
                 {/* Right controls */}
                 <div className="flex-shrink-0 flex items-center gap-2">
-                  {/* Agent type — custom dropdown */}
-                  <div ref={dropdownRef} className="hidden sm:block relative">
+                  {/* Agent type — custom dropdown (hidden per request) */}
+                  <div ref={dropdownRef} className="hidden relative">
                     {/* Trigger button */}
                     <button
                       ref={triggerRef}
@@ -697,7 +913,7 @@ export default function AIAgentPage() {
                       `}
                     >
                       <MaterialIcon name={selectedAgent.icon} size="xs" className="opacity-70" />
-                      <span>{selectedAgent.label}</span>
+                      <span className="hidden sm:inline">{selectedAgent.label}</span>
                       <MaterialIcon
                         name="keyboard_arrow_down"
                         size="xs"
@@ -707,7 +923,7 @@ export default function AIAgentPage() {
                       />
                     </button>
 
-                    {/* Dropdown panel — rendered via Portal to escape stacking context */}
+                    {/* Dropdown panel panel — rendered via Portal */}
                     {mounted && dropdownOpen && createPortal(
                       <div
                         role="listbox"
@@ -771,20 +987,34 @@ export default function AIAgentPage() {
                     )}
                   </div>
 
-                  {/* Mic / send button */}
+                  {/* Send button */}
                   <button
                     type="button"
+                    onClick={() => handleSendMessage()}
                     aria-label="Kirim pesan"
-                    title="Segera hadir"
-                    className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-cu-ink/5 text-cu-ink/60 transition hover:bg-cu-ink/10 active:scale-95"
+                    className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-all active:scale-95 ${
+                      inputValue.trim()
+                        ? "bg-gradient-to-tr from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end text-white hover:shadow-lg"
+                        : "bg-cu-ink/5 text-cu-ink/40 hover:bg-cu-ink/10"
+                    }`}
                   >
-                    <MaterialIcon name="mic" size="sm" />
+                    <MaterialIcon name="send" size="sm" />
                   </button>
                 </div>
               </div>
 
               {/* Coming soon strip */}
-              <div className="border-t border-cu-line transition-colors duration-1000 ease-in-out px-4 py-2 flex items-center justify-center gap-2">
+              <div
+                style={{
+                  transition: "opacity 0.5s ease-out, max-height 0.5s ease-out, border-color 0.5s ease-out",
+                  opacity: messages.length > 0 ? 0 : 1,
+                  maxHeight: messages.length > 0 ? "0px" : "50px",
+                  overflow: "hidden",
+                }}
+                className={`border-t transition-colors duration-1000 ease-in-out px-4 py-2 flex items-center justify-center gap-2 ${
+                  messages.length > 0 ? "border-transparent" : "border-cu-line"
+                }`}
+              >
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-cu-gradient-start animate-pulse" />
                 <p className="text-[11px] text-cu-ink/40 select-none">
                   Fitur ini sedang dalam pengembangan
@@ -792,9 +1022,114 @@ export default function AIAgentPage() {
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-cu-gradient-end animate-pulse" style={{ animationDelay: "0.5s" }} />
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
     </div>
   );
 }
+
+function parseInlineCode(text: string, keyPrefix: string): React.ReactNode[] {
+  const codeParts = text.split(/(`.*?`)/g);
+  return codeParts.map((part, cIdx) => {
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return (
+        <code
+          key={`${keyPrefix}-code-${cIdx}`}
+          className="px-1.5 py-0.5 rounded bg-black/40 text-xs font-mono text-cu-danger/90 border border-white/5 mx-0.5"
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    return part;
+  });
+}
+
+function parseInlineMarkdown(text: string): React.ReactNode[] {
+  const boldParts = text.split(/(\*\*.*?\*\*)/g);
+  return boldParts.flatMap((part, bIdx) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      const boldText = part.slice(2, -2);
+      return parseInlineCode(boldText, `bold-${bIdx}`);
+    }
+    return parseInlineCode(part, `text-${bIdx}`);
+  });
+}
+
+function SimpleMarkdown({ content }: { content: string }) {
+  const parts = content.split("```");
+  return (
+    <div className="space-y-2 text-sm text-white/90 leading-relaxed">
+      {parts.map((part, index) => {
+        if (index % 2 === 1) {
+          // Code block
+          const lines = part.split("\n");
+          const firstLine = lines[0].trim();
+          const hasLanguage = /^[a-zA-Z0-9_-]+$/.test(firstLine);
+          const language = hasLanguage ? firstLine : "";
+          const code = hasLanguage ? lines.slice(1).join("\n") : part;
+          return (
+            <pre
+              key={index}
+              className="my-3 p-4 rounded-xl bg-black/50 border border-white/10 overflow-x-auto text-xs font-mono text-white/90"
+            >
+              {language && (
+                <div className="text-[10px] text-white/40 uppercase mb-2 font-bold select-none">
+                  {language}
+                </div>
+              )}
+              <code className="whitespace-pre">{code.trim()}</code>
+            </pre>
+          );
+        } else {
+          // Regular text
+          return (
+            <div key={index} className="space-y-1">
+              {part.split("\n").map((line, lIdx) => {
+                if (line.startsWith("### ")) {
+                  return (
+                    <h3 key={lIdx} className="text-base font-bold text-white mt-4 mb-2">
+                      {parseInlineMarkdown(line.substring(4))}
+                    </h3>
+                  );
+                }
+                if (line.startsWith("## ")) {
+                  return (
+                    <h2 key={lIdx} className="text-lg font-bold text-white mt-5 mb-2">
+                      {parseInlineMarkdown(line.substring(3))}
+                    </h2>
+                  );
+                }
+                if (line.startsWith("# ")) {
+                  return (
+                    <h1 key={lIdx} className="text-xl font-bold text-white mt-6 mb-3">
+                      {parseInlineMarkdown(line.substring(2))}
+                    </h1>
+                  );
+                }
+                if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
+                  const cleanLine = line.trim().substring(2);
+                  return (
+                    <li key={lIdx} className="ml-4 list-disc text-sm text-white/90 my-1">
+                      {parseInlineMarkdown(cleanLine)}
+                    </li>
+                  );
+                }
+                if (!line.trim()) {
+                  return <div key={lIdx} className="h-2" />;
+                }
+                return (
+                  <p key={lIdx} className="my-1">
+                    {parseInlineMarkdown(line)}
+                  </p>
+                );
+              })}
+            </div>
+          );
+        }
+      })}
+    </div>
+  );
+}
+

@@ -70,6 +70,14 @@ Konfigurasi production yang disetujui:
 
 Endpoint M5 yang sudah aktif dan teruji per 2026-06-19 adalah auth, dashboard, `GET/PATCH /profile`, perubahan password, upload avatar, active sessions, serta notification pada tabel di atas. `DELETE /profile` dan `PATCH /profile/settings` tetap merupakan kontrak target dan belum menjadi route aktif; keduanya tidak boleh dipanggil frontend sampai milestone terkait menyediakannya.
 
+### AI Agent
+
+| Method | Endpoint | Akses |
+|---|---|---|
+| POST | `/api/v1/ai/chat` | auth + `access-core` |
+
+Endpoint `/api/v1/ai/chat` terintegrasi dengan Google AI Studio Gemini API (model `gemini-3.5-flash`). Payload menerima `message` (string wajib), `agent_type` (wajib: `storyboard`, `thumbnail`, atau `copywriting`), dan `history` (array opsional berisi pesan-pesan sebelumnya untuk mempertahankan konteks multi-turn). Controller memanggil `GeminiService` untuk berinteraksi dengan API Google secara aman menggunakan `GEMINI_API_KEY` dari server.
+
 ### User dan role
 
 | Method | Endpoint | Permission |

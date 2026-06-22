@@ -42,8 +42,9 @@ apps/frontend/
 | `/pricetag/generator` | `access-pricetag` | generation API |
 | `/pricetag/history` | `access-pricetag` | batches API |
 | `/pricetag/database` | `pricetag.manage` | category/product/import API |
+| `/ai-agent` | auth aktif | mock/client-side AI agent simulator |
 
-Per 2026-06-20, route Core `/`, auth, `/pending`, `/dashboard`, `/profile`, serta route administrasi M6 `/users`, `/users/pending`, dan `/roles` sudah tersedia sebagai static export dan terhubung ke REST API. Route M7 `/pricetag/search` dan `/pricetag/database` juga sudah operasional; route generation/history tetap diselesaikan pada M8.
+Per 2026-06-22, route Core `/`, auth, `/pending`, `/dashboard`, `/profile`, serta route administrasi M6 `/users`, `/users/pending`, dan `/roles` sudah tersedia sebagai static export dan terhubung ke REST API. Route M7 `/pricetag/search` dan `/pricetag/database` juga sudah operasional. Halaman asisten AI `/ai-agent` tersedia sebagai antarmuka workspace interaktif dengan simulasi respons pintar di client-side. Route generation/history tetap diselesaikan pada M8.
 
 Halaman `/users` mencakup search/filter, pengelolaan akun, reset password admin, aktivasi, role, direct permission, whitelist delegasi Manajer, dan audit/session Root-only. Halaman `/users/pending` memakai listener Pusher tanpa polling periodik serta menyediakan approve/reject dengan konfirmasi. Halaman `/roles` menyediakan pembuatan role, perubahan permission, dan penghapusan role non-protected.
 
@@ -102,6 +103,8 @@ Frontend memakai `laravel-echo` 2.3.7 dan `pusher-js` 8.5.0 dengan cluster dari 
 - Popup avatar menyediakan item aktif `Pengaturan` menuju `/profile`. Item `Profil Saya` tetap ditampilkan sebagai placeholder nonaktif berlabel `Segera` sampai route profil publik tersedia, sehingga tidak membuat tautan rusak atau menduplikasi tujuan pengaturan.
 - Grid kategori pada `/pricetag/search` khusus mobile memakai tiga kolom dengan kartu rasio `1:1`. Glyph kategori diperbesar dan nama kategori dibungkus ke beberapa baris tanpa ellipsis; breakpoint `sm` ke atas mempertahankan layout responsif sebelumnya.
 - Halaman riwayat `/pricetag/history` pada mobile menggunakan list card collapsible (accordion) dengan paginasi 5 item per halaman (desktop tetap 10 item) tanpa menggunakan ikon toggle panah. Kartu collapsible saat tertutup menampilkan nama batch di kiri dan satu kesatuan indikator status serta tanggal/waktu yang sejajar di kanan. Detail batch seperti ID kelompok, jumlah item, progress bar, tombol unduh ZIP, dan tombol Lihat Detail berada di dalam area yang diperluas. Detail modal untuk daftar item batch tersebut pada mobile juga disajikan dalam bentuk list card collapsible yang serupa daripada tabel konvensional.
+- Halaman asisten AI (`/ai-agent`) menyediakan workspace obrolan interaktif yang dikelompokkan berdasarkan tipe agent (Storyboard Writer, YouTube Thumbnail, Copywriting) yang dapat dipilih melalui dropdown kontrol pada input box. Saat pertama kali dimuat (idle), kotak input obrolan dan teks judul terpusat secara vertikal di tengah layar, dan menampilkan strip informasi `"Fitur ini sedang dalam pengembangan"`. Ketika pengguna mengirimkan pesan pertama, judul dan strip informasi tersebut menyusut dan memudar secara halus (fade out dan collapse), dan kotak input obrolan bergeser ke bawah layar untuk menampilkan riwayat obrolan di atasnya.
+
 
 ## 7. Deployment tanpa terminal production
 
