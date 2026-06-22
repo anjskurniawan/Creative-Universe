@@ -32,7 +32,7 @@ class UserProfileResource extends JsonResource
             'avatar_url' => $this->avatar_path
                 ? Storage::disk('public')->url($this->avatar_path)
                 : null,
-            'is_active' => true,
+
             'roles' => $this->getRoleNames()->values()->all(),
             'permissions' => $this->getAllPermissions()->pluck('name')->values()->all(),
             'settings' => $safeSettings,

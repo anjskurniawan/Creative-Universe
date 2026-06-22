@@ -11,10 +11,8 @@ class GetDashboardStatsAction
     public function handle(User $user): array
     {
         $result = [
-            'active_users' => User::active()->count(),
-            'pending_users' => $user->can('approve-users')
-                ? User::pending()->count()
-                : null,
+            'active_users' => User::count(),
+            'pending_users' => null,
             'roles' => $user->getRoleNames()->values()->all(),
             'is_root' => $user->hasRole('Root'),
             'root_metrics' => null,
@@ -26,9 +24,7 @@ class GetDashboardStatsAction
 
         $result['root_metrics'] = [
             'total_sessions' => DB::table('sessions')->count(),
-            'suspended_users' => User::where('is_active', false)
-                ->whereNotNull('approved_by')
-                ->count(),
+            'suspended_users' => 0,
             'pending_jobs' => DB::table('jobs')->count(),
             'failed_jobs' => DB::table('failed_jobs')->count(),
             'database_driver' => DB::getDriverName(),

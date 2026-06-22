@@ -40,8 +40,7 @@ class MaintenanceApiTest extends TestCase
             'username' => 'root_maint_test',
             'email' => 'maint_root@test.com',
             'password' => bcrypt('password'),
-            'is_active' => true,
-        ]);
+            ]);
         $this->root->assignRole('Root');
 
         $this->designer = User::create([
@@ -49,8 +48,7 @@ class MaintenanceApiTest extends TestCase
             'username' => 'des_maint_test',
             'email' => 'maint_des@test.com',
             'password' => bcrypt('password'),
-            'is_active' => true,
-        ]);
+            ]);
         $this->designer->assignRole('Designer');
 
         // Setup app configuration for Web Artisan token

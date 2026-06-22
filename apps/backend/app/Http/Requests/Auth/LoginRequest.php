@@ -75,18 +75,23 @@ class LoginRequest extends FormRequest
                 'username' => $username,
                 'password' => $password,
                 'X-API-KEY' => $apiKey,
+                'from' => 'creative',
             ]);
 
             if ($response->successful() && ($response->json('status') === true || $response->json('status') === 'success')) {
                 // Auto-register jika user belum ada di lokal
-                $user = User::firstOrCreate(
-                    ['username' => $username],
-                    [
+                $user = User::where('username', $username)->first();
+                if (!$user) {
+                    $user = User::create([
+                        'username' => $username,
                         'name' => $username,
                         'email' => $username . '@creative.doran.id', // Placeholder email
                         'password' => Hash::make(Str::random(16)), // Password acak
-                    ]
-                );
+                    ]);
+                    
+                    // Assign default role 'Client'
+                    $user->assignRole('Client');
+                }
 
                 Auth::login($user, $this->boolean('remember'));
             } else {

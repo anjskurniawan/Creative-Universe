@@ -20,7 +20,7 @@ class DashboardApiTest extends TestCase
 
     public function test_standard_user_receives_only_standard_metrics(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
         $user->assignRole('Designer');
 
         $this->actingAs($user)
@@ -34,13 +34,9 @@ class DashboardApiTest extends TestCase
 
     public function test_root_receives_operational_metrics_and_latest_activity(): void
     {
-        $root = User::factory()->create(['is_active' => true]);
+        $root = User::factory()->create([]);
         $root->assignRole('Root');
 
-        User::factory()->create([
-            'is_active' => false,
-            'approved_by' => $root->id,
-        ]);
 
         DB::table('sessions')->insert([
             'id' => 'dashboard-session',
@@ -58,7 +54,7 @@ class DashboardApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.is_root', true)
             ->assertJsonPath('data.root_metrics.total_sessions', 1)
-            ->assertJsonPath('data.root_metrics.suspended_users', 1)
+            ->assertJsonPath('data.root_metrics.suspended_users', 0)
             ->assertJsonFragment(['description' => 'Aktivitas dashboard test'])
             ->assertJsonStructure([
                 'data' => [

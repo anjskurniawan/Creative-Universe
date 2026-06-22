@@ -304,9 +304,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-
-
-              {/* 3. Your Role */}
+              {/* 2. Your Role */}
               <div className="rounded-xl border border-cu-line bg-cu-surface p-6 shadow-sm transition-colors hover:border-cu-success/30 flex items-center justify-between gap-4">
                 <div>
                   <p className="mb-1 text-sm text-cu-muted">Role Kamu</p>
@@ -318,6 +316,22 @@ export default function DashboardPage() {
                   <MaterialIcon name="verified_user" size="md" />
                 </div>
               </div>
+
+              {/* 3. Core Feature - Pricetag Generator */}
+              <Link
+                href="/pricetag/generator"
+                className="rounded-xl border border-cu-line bg-cu-surface p-6 shadow-sm transition-all duration-200 hover:scale-[1.01] hover:border-purple-500/30 flex items-center justify-between gap-4 group"
+              >
+                <div>
+                  <p className="mb-1 text-sm text-cu-muted">Pricetag Generator</p>
+                  <p className="text-xl font-semibold text-cu-ink group-hover:text-purple-600 transition-colors">
+                    Cetak Label Baru
+                  </p>
+                </div>
+                <div className="flex size-12 items-center justify-center rounded-lg bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-all">
+                  <MaterialIcon name="local_offer" size="md" />
+                </div>
+              </Link>
             </div>
           )}
 
@@ -325,6 +339,40 @@ export default function DashboardPage() {
           <div className="rounded-xl border border-cu-line bg-cu-surface p-6 shadow-sm">
             <h2 className="mb-4 text-lg font-semibold text-cu-ink">Aksi Cepat</h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {/* Pricetag Apps */}
+              <Link
+                href="/pricetag/generator"
+                className="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft"
+              >
+                <MaterialIcon name="print" size="sm" className="text-purple-600" />
+                <span className="text-sm font-medium text-cu-ink">Buat Pricetag</span>
+              </Link>
+
+              <Link
+                href="/pricetag/search"
+                className="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft"
+              >
+                <MaterialIcon name="search" size="sm" className="text-cu-info" />
+                <span className="text-sm font-medium text-cu-ink">Cari Barcode</span>
+              </Link>
+
+              <Link
+                href="/pricetag/database"
+                className="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft"
+              >
+                <MaterialIcon name="database" size="sm" className="text-cu-warning" />
+                <span className="text-sm font-medium text-cu-ink">Data Produk</span>
+              </Link>
+
+              <Link
+                href="/pricetag/history"
+                className="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft"
+              >
+                <MaterialIcon name="history" size="sm" className="text-cu-muted" />
+                <span className="text-sm font-medium text-cu-ink">Riwayat Cetak</span>
+              </Link>
+
+              {/* Core Profile */}
               <Link
                 href="/profile"
                 className="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft"
@@ -333,6 +381,7 @@ export default function DashboardPage() {
                 <span className="text-sm font-medium text-cu-ink">Edit Profil</span>
               </Link>
 
+              {/* Admin Actions */}
               {hasPermission("manage-users") && (
                 <Link
                   href="/users"
@@ -342,8 +391,6 @@ export default function DashboardPage() {
                   <span className="text-sm font-medium text-cu-ink">Kelola User</span>
                 </Link>
               )}
-
-
 
               {hasPermission("manage-roles") && (
                 <Link
@@ -361,7 +408,7 @@ export default function DashboardPage() {
                   className="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft"
                 >
                   <MaterialIcon name="build" size="sm" className="text-cu-muted" />
-                  <span className="text-sm font-medium text-cu-ink">Panel Pemeliharaan</span>
+                  <span className="text-sm font-medium text-cu-ink">Maintenance</span>
                 </Link>
               )}
             </div>

@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/providers/auth-provider";
 
 export default function PricetagHistoryPage() {
-  const { hasPermission } = useAuth();
+  const { user, hasPermission } = useAuth();
 
   // State
   const [batches, setBatches] = useState<PricetagBatch[]>([]);
@@ -44,9 +44,9 @@ export default function PricetagHistoryPage() {
     return () => mediaQuery.removeEventListener("change", syncViewport);
   }, []);
 
-  const notify = (message: string) => {
-    pushLocalNotification(message, "/pricetag/history");
-  };
+  const notify = useCallback((message: string) => {
+    pushLocalNotification(message, "/pricetag/history", user?.id);
+  }, [user]);
 
   const loadBatchDetail = async (id: number, silent = false) => {
     if (!silent) setIsLoadingDetail(true);

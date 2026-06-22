@@ -23,7 +23,7 @@ class ProfileSessionApiTest extends TestCase
      */
     public function test_active_user_can_view_sessions(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
 
         // Seed a dummy session
         DB::table('sessions')->insert([
@@ -50,29 +50,14 @@ class ProfileSessionApiTest extends TestCase
         $this->assertEquals('dummy_session_id', $response->json('data.0.id'));
     }
 
-    /**
-     * Test pending user cannot view profile sessions (blocked by verified-active middleware).
-     */
-    public function test_pending_user_is_blocked_from_sessions(): void
-    {
-        $user = User::factory()->create(['is_active' => false]); // pending
 
-        $response = $this->actingAs($user)->getJson('/api/v1/profile/sessions');
-
-        // Middleware EnsureUserIsActive redirects web requests, but since it is JSON request,
-        // it should either be redirected or rejected.
-        // Wait, let's see how the EnsureUserIsActive middleware behaves.
-        // Let's check EnsureUserIsActive.php code to see what response it gives for json/ajax request.
-        // Typically it redirects or throws 403.
-        $response->assertStatus(403);
-    }
 
     /**
      * Test user can revoke their active session device.
      */
     public function test_user_can_revoke_session(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
 
         DB::table('sessions')->insert([
             'id' => 'session_to_revoke',
@@ -99,8 +84,8 @@ class ProfileSessionApiTest extends TestCase
      */
     public function test_user_cannot_revoke_other_users_session(): void
     {
-        $userA = User::factory()->create(['is_active' => true]);
-        $userB = User::factory()->create(['is_active' => true]);
+        $userA = User::factory()->create([]);
+        $userB = User::factory()->create([]);
 
         DB::table('sessions')->insert([
             'id' => 'session_user_b',

@@ -30,7 +30,7 @@ class UpdateUserRequest extends FormRequest
             ],
             'whatsapp_number' => ['nullable', 'string', 'regex:/^62[0-9]{8,13}$/'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'is_active' => ['required', 'boolean'],
+
             'roles' => ['present', 'array'],
             'roles.*' => ['string', 'exists:roles,name'],
             'permissions' => ['present', 'array'],
@@ -45,7 +45,7 @@ class UpdateUserRequest extends FormRequest
             'email.unique' => 'Email sudah digunakan oleh akun lain.',
             'password.min' => 'Password baru minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
-            'is_active.required' => 'Status aktif wajib ditentukan.',
+
         ];
     }
 }

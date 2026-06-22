@@ -21,18 +21,12 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Handle an incoming authentication request.
-     * SRD v6.2 — User yang is_active = false diredirect ke /pending.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
-
-        // Jika user belum diapprove, redirect ke halaman pending
-        if (! auth()->user()->is_active) {
-            return redirect()->route('pending');
-        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

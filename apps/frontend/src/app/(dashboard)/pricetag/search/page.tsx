@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/providers/auth-provider";
 
 export default function PricetagSearchPage() {
-  const { hasPermission } = useAuth();
+  const { user, hasPermission } = useAuth();
   const [category, setCategory] = useState<PricetagCategory | null>(null);
   const [categories, setCategories] = useState<PricetagCategory[]>([]);
   const [products, setProducts] = useState<PricetagProduct[]>([]);
@@ -62,11 +62,11 @@ export default function PricetagSearchPage() {
         setTotal(result.meta.total);
       }
     } catch (requestError) {
-      pushLocalNotification(pricetagError(requestError), "/pricetag/search");
+      pushLocalNotification(pricetagError(requestError), "/pricetag/search", user?.id);
     } finally {
       setIsLoading(false);
     }
-  }, [appliedSearch, category, hasPermission, page]);
+  }, [appliedSearch, category, hasPermission, page, user?.id]);
 
   useEffect(() => {
     queueMicrotask(() => void loadCatalog());

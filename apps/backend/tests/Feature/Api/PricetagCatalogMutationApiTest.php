@@ -21,7 +21,7 @@ class PricetagCatalogMutationApiTest extends TestCase
     {
         parent::setUp();
         $this->seed(RolePermissionSeeder::class);
-        $this->manager = User::factory()->create(['is_active' => true]);
+        $this->manager = User::factory()->create([]);
         $this->manager->assignRole('Manajer');
     }
 
@@ -143,7 +143,7 @@ class PricetagCatalogMutationApiTest extends TestCase
     public function test_user_without_pricetag_manage_cannot_mutate_catalog(): void
     {
         [$category, $product] = $this->catalogFixture();
-        $reader = User::factory()->create(['is_active' => true]);
+        $reader = User::factory()->create([]);
         $reader->givePermissionTo('access-pricetag');
 
         $this->actingAs($reader)->postJson('/api/v1/pricetag/categories', ['name' => 'Ditolak'])

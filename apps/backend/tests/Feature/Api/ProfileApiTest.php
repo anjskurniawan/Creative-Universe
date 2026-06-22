@@ -23,7 +23,6 @@ class ProfileApiTest extends TestCase
     public function test_active_user_can_view_and_update_profile(): void
     {
         $user = User::factory()->create([
-            'is_active' => true,
             'settings' => [
                 'theme' => 'light',
                 'pusher_app_secret' => 'never-expose-this',
@@ -61,8 +60,8 @@ class ProfileApiTest extends TestCase
 
     public function test_profile_update_validates_whatsapp_and_unique_identity(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
-        $other = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
+        $other = User::factory()->create([]);
 
         $this->actingAs($user)->patchJson('/api/v1/profile', [
             'name' => 'Nama Pengguna',
@@ -76,7 +75,6 @@ class ProfileApiTest extends TestCase
     public function test_active_user_can_update_password_with_current_password(): void
     {
         $user = User::factory()->create([
-            'is_active' => true,
             'password' => 'password-lama',
         ]);
 
@@ -102,7 +100,6 @@ class ProfileApiTest extends TestCase
         Storage::disk('public')->put('avatars/old-avatar.jpg', 'old');
 
         $user = User::factory()->create([
-            'is_active' => true,
             'avatar_path' => 'avatars/old-avatar.jpg',
         ]);
 
@@ -119,18 +116,11 @@ class ProfileApiTest extends TestCase
         Storage::disk('public')->assertMissing('avatars/old-avatar.jpg');
     }
 
-    public function test_pending_user_cannot_access_profile_mutations(): void
-    {
-        $user = User::factory()->create(['is_active' => false]);
 
-        $this->actingAs($user)
-            ->getJson('/api/v1/profile')
-            ->assertForbidden();
-    }
 
     public function test_active_user_can_view_activities(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
 
         activity('auth')
             ->causedBy($user)

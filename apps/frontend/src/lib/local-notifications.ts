@@ -1,5 +1,5 @@
 "use client";
-
+ 
 export interface LocalNotificationItem {
   id: string;
   type: "local";
@@ -19,13 +19,18 @@ function emitUpdatedEvent() {
   }
 }
 
-export function readLocalNotifications(): LocalNotificationItem[] {
+function getStorageKey(userId?: number | null): string {
+  return userId ? `${STORAGE_KEY}-${userId}` : STORAGE_KEY;
+}
+
+export function readLocalNotifications(userId?: number | null): LocalNotificationItem[] {
   if (typeof window === "undefined") {
     return [];
   }
 
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const key = getStorageKey(userId);
+    const raw = window.localStorage.getItem(key);
     if (!raw) return [];
 
     const parsed = JSON.parse(raw);
@@ -44,18 +49,19 @@ export function readLocalNotifications(): LocalNotificationItem[] {
   }
 }
 
-function writeLocalNotifications(items: LocalNotificationItem[]) {
+function writeLocalNotifications(items: LocalNotificationItem[], userId?: number | null) {
   if (typeof window === "undefined") {
     return;
   }
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items.slice(0, 20)));
+  const key = getStorageKey(userId);
+  window.localStorage.setItem(key, JSON.stringify(items.slice(0, 20)));
   emitUpdatedEvent();
 }
 
-export function pushLocalNotification(message: string, url: string | null = null) {
+export function pushLocalNotification(message: string, url: string | null = null, userId?: number | null) {
   const now = new Date().toISOString();
-  const items = readLocalNotifications();
+  const items = readLocalNotifications(userId);
 
   writeLocalNotifications([
     {
@@ -68,11 +74,11 @@ export function pushLocalNotification(message: string, url: string | null = null
       created_at: now,
     },
     ...items,
-  ]);
+  ], userId);
 }
 
-export function markLocalNotificationRead(notificationId: string): LocalNotificationItem | null {
-  const items = readLocalNotifications();
+export function markLocalNotificationRead(notificationId: string, userId?: number | null): LocalNotificationItem | null {
+  const items = readLocalNotifications(userId);
   let updatedItem: LocalNotificationItem | null = null;
 
   const updated = items.map((item) => {
@@ -87,16 +93,16 @@ export function markLocalNotificationRead(notificationId: string): LocalNotifica
     return updatedItem;
   });
 
-  writeLocalNotifications(updated);
+  writeLocalNotifications(updated, userId);
   return updatedItem;
 }
 
-export function markAllLocalNotificationsRead() {
-  const updated = readLocalNotifications().map((item) => ({
+export function markAllLocalNotificationsRead(userId?: number | null) {
+  const updated = readLocalNotifications(userId).map((item) => ({
     ...item,
     is_read: true,
     read_at: item.read_at ?? new Date().toISOString(),
   }));
 
-  writeLocalNotifications(updated);
+  writeLocalNotifications(updated, userId);
 }

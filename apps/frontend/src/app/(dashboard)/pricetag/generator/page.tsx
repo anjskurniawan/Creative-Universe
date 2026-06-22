@@ -20,7 +20,7 @@ import ExcelJS from "exceljs";
 type Tab = "single" | "checklist" | "bulk";
 
 export default function PricetagGeneratorPage() {
-  const { hasPermission, hasRole } = useAuth();
+  const { user, hasPermission, hasRole } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -28,8 +28,8 @@ export default function PricetagGeneratorPage() {
   const [activeTab, setActiveTab] = useState<Tab>("single");
 
   const notify = useCallback((message: string) => {
-    pushLocalNotification(message, "/pricetag/generator");
-  }, []);
+    pushLocalNotification(message, "/pricetag/generator", user?.id);
+  }, [user]);
 
   // ----------------------------------------------------
   // Tab 1: Wizard Single State

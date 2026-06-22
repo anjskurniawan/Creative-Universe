@@ -19,7 +19,7 @@ import { useAuth } from "@/providers/auth-provider";
 type Tab = "categories" | "products";
 
 export default function PricetagDatabasePage() {
-  const { hasPermission } = useAuth();
+  const { user, hasPermission } = useAuth();
   const [tab, setTab] = useState<Tab>("categories");
   const [categories, setCategories] = useState<PricetagCategory[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<PricetagCategory[]>([]);
@@ -41,9 +41,9 @@ export default function PricetagDatabasePage() {
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
 
-  const notify = (message: string) => {
-    pushLocalNotification(message, "/pricetag/database");
-  };
+  const notify = useCallback((message: string) => {
+    pushLocalNotification(message, "/pricetag/database", user?.id);
+  }, [user]);
 
   const loadData = useCallback(async () => {
     if (!hasPermission("pricetag.manage")) return;

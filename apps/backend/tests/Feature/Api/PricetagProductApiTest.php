@@ -24,7 +24,7 @@ class PricetagProductApiTest extends TestCase
     {
         parent::setUp();
         $this->seed(RolePermissionSeeder::class);
-        $this->user = User::factory()->create(['is_active' => true]);
+        $this->user = User::factory()->create([]);
         $this->user->givePermissionTo('access-pricetag');
         $this->category = PricetagCategory::create([
             'name' => 'Audio',
@@ -83,7 +83,7 @@ class PricetagProductApiTest extends TestCase
 
     public function test_user_without_access_pricetag_cannot_read_products(): void
     {
-        $unauthorized = User::factory()->create(['is_active' => true]);
+        $unauthorized = User::factory()->create([]);
 
         $this->actingAs($unauthorized)
             ->getJson('/api/v1/pricetag/products')

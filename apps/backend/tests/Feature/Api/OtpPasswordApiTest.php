@@ -35,8 +35,7 @@ class OtpPasswordApiTest extends TestCase
             'email' => 'tulus@example.com',
             'username' => 'tulus_r',
             'whatsapp_number' => '6281234567890',
-            'is_active' => true,
-        ]);
+            ]);
 
         $response = $this->postJson('/api/v1/auth/password/otp', [
             'login' => 'tulus@example.com',

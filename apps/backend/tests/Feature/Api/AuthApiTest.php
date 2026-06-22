@@ -20,40 +20,7 @@ class AuthApiTest extends TestCase
         $this->seed(RolePermissionSeeder::class);
     }
 
-    /**
-     * Test user registration creates a pending account.
-     */
-    public function test_user_registration_creates_pending_account(): void
-    {
-        Event::fake([PendingUserRegistered::class]);
 
-        $payload = [
-            'name' => 'Budi Santoso',
-            'username' => 'budi_s',
-            'email' => 'budi@example.com',
-            'whatsapp_number' => '6281234567890',
-            'password' => 'secret123',
-            'password_confirmation' => 'secret123',
-            'registration_note' => 'Pendaftaran staf retail.',
-        ];
-
-        $response = $this->postJson('/api/v1/auth/register', $payload);
-
-        $response->assertStatus(201);
-        $response->assertJson([
-            'success' => true,
-            'message' => 'Registrasi berhasil. Akun Anda sedang menunggu persetujuan admin.',
-        ]);
-
-        $this->assertDatabaseHas('users', [
-            'username' => 'budi_s',
-            'email' => 'budi@example.com',
-            'is_active' => false,
-        ]);
-
-        Event::assertDispatched(PendingUserRegistered::class, fn (PendingUserRegistered $event) => $event->user->email === 'budi@example.com'
-        );
-    }
 
     /**
      * Test login returns user status.
@@ -61,12 +28,12 @@ class AuthApiTest extends TestCase
     public function test_login_returns_user_status_and_works_for_active_user(): void
     {
         $user = User::factory()->create([
+            'username' => 'root',
             'password' => bcrypt('password123'),
-            'is_active' => true,
-        ]);
+            ]);
 
         $response = $this->postJson('/api/v1/auth/login', [
-            'login' => $user->email,
+            'username' => 'root',
             'password' => 'password123',
         ]);
 
@@ -77,37 +44,13 @@ class AuthApiTest extends TestCase
             'data' => [
                 'id' => $user->id,
                 'name' => $user->name,
-                'is_active' => true,
-            ],
+                ],
         ]);
 
         $this->assertTrue(Auth::check());
     }
 
-    /**
-     * Test login allows pending user to authenticate.
-     */
-    public function test_login_allows_pending_user(): void
-    {
-        $user = User::factory()->create([
-            'password' => bcrypt('password123'),
-            'is_active' => false, // pending
-        ]);
 
-        $response = $this->postJson('/api/v1/auth/login', [
-            'login' => $user->username,
-            'password' => 'password123',
-        ]);
-
-        $response->assertStatus(200);
-        $response->assertJson([
-            'success' => true,
-            'data' => [
-                'id' => $user->id,
-                'is_active' => false,
-            ],
-        ]);
-    }
 
     /**
      * Test invalid login credentials return 422 standard validation envelope.
@@ -115,7 +58,7 @@ class AuthApiTest extends TestCase
     public function test_invalid_login_returns_422(): void
     {
         $response = $this->postJson('/api/v1/auth/login', [
-            'login' => 'nonexistent',
+            'username' => 'root',
             'password' => 'wrong',
         ]);
 
@@ -124,7 +67,7 @@ class AuthApiTest extends TestCase
             'success' => false,
             'message' => 'Data yang diberikan tidak valid.',
             'errors' => [
-                'login' => ['Email/username atau password salah.'],
+                'username' => ['Username atau password salah.'],
             ],
         ]);
     }
@@ -134,7 +77,7 @@ class AuthApiTest extends TestCase
      */
     public function test_auth_me_retrieves_authenticated_user_details(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
         $user->assignRole('PIC Retail');
 
         $response = $this->actingAs($user)->getJson('/api/v1/auth/me');
@@ -146,30 +89,12 @@ class AuthApiTest extends TestCase
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'is_active' => true,
                 'roles' => ['PIC Retail'],
             ],
         ]);
     }
 
-    /**
-     * Test auth/me retrieves pending user details as well.
-     */
-    public function test_auth_me_retrieves_pending_user_details(): void
-    {
-        $user = User::factory()->create(['is_active' => false]);
 
-        $response = $this->actingAs($user)->getJson('/api/v1/auth/me');
-
-        $response->assertStatus(200);
-        $response->assertJson([
-            'success' => true,
-            'data' => [
-                'id' => $user->id,
-                'is_active' => false,
-            ],
-        ]);
-    }
 
     /**
      * Test accessing me endpoint without login returns 401.
@@ -190,7 +115,7 @@ class AuthApiTest extends TestCase
      */
     public function test_logout_destroys_session(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
 
         $response = $this->actingAs($user)->postJson('/api/v1/auth/logout');
 

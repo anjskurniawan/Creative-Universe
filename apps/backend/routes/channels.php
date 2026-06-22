@@ -15,7 +15,7 @@ Broadcast::channel('App.Models.Core.User.{id}', function (User $user, int $id): 
 });
 
 Broadcast::channel('admin.notifications', function (User $user): bool {
-    return $user->is_active && $user->can('approve-users');
+    return $user->can('approve-users');
 });
 
 Broadcast::channel('pricetag-batch.{batchId}', function (User $user, int $batchId): bool {

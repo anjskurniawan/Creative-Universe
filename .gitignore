@@ -1,6 +1,21 @@
-# Monorepo Root gitignore
+# ==============================================================================
+# CREATIVE UNIVERSE - MONOREPO ROOT GITIGNORE
+# ==============================================================================
 
-# System & IDE files
+# ------------------------------------------------------------------------------
+# 1. OS & SYSTEM METADATA
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Icon?
+ehthumbs_vista.db
+
+# ------------------------------------------------------------------------------
+# 2. IDE & DEVELOPER TOOLS (VS Code, JetBrains, Sublime, etc.)
+# ------------------------------------------------------------------------------
 .idea/
 .vscode/
 *.suo
@@ -8,46 +23,80 @@
 *.njsproj
 *.sln
 *.sw?
-.DS_Store
-Thumbs.db
+*.swo
+*.swp
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+.fleet/
+.nova/
+.zed/
 
-# Dependencies (Global & Local)
+# ------------------------------------------------------------------------------
+# 3. AGENT & AUTOMATION WORKSPACE DIRECTORIES
+# ------------------------------------------------------------------------------
+.agents/
+.codex/
+.playwright-cli/
+.phpunit.result.cache
+**/.phpunit.result.cache
+
+# ------------------------------------------------------------------------------
+# 4. DEPENDENCIES & PACKAGE MANAGERS
+# ------------------------------------------------------------------------------
 node_modules/
 **/node_modules/
 vendor/
 **/vendor/
+/auth.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Environment files
+# ------------------------------------------------------------------------------
+# 5. ENVIRONMENT & SENSITIVE CONFIGURATIONS
+# ------------------------------------------------------------------------------
+# Ignore all actual environment files but allow tracking of configuration templates
 .env
-.env.production
-.env.staging
-.env.development
-.env.local
-.env.*.local
+.env.*
+!.envhosting
+!.env.example
 **/.env
-**/.env.local
-**/.env.production
-**/.env.staging
-**/.env.development
+**/.env.*
+!**/.envhosting
+!**/.env.example
 
-# Build & Cache
-.phpunit.result.cache
-**/.phpunit.result.cache
+# ------------------------------------------------------------------------------
+# 6. BUILD & COMPILATION OUTPUTS
+# ------------------------------------------------------------------------------
 .next/
 **/out/
 **/dist/
-yarn-error.log
-npm-debug.log*
+/public/build/
+/public/hot
+*.tsbuildinfo
+next-env.d.ts
 
-# Laravel specific (ignored from apps/backend and legacy)
+# ------------------------------------------------------------------------------
+# 7. LARAVEL STORAGE & RUNTIME CACHES
+# ------------------------------------------------------------------------------
 apps/backend/storage/logs/*
 apps/backend/storage/framework/cache/data/*
 apps/backend/storage/framework/sessions/*
 apps/backend/storage/framework/views/*
 apps/backend/storage/framework/testing/*
-apps/backend/bootstrap/cache/*
+apps/backend/bootstrap/cache/*.php
+!apps/backend/bootstrap/cache/.gitignore
 
-# Backup & Migration databases
+# ------------------------------------------------------------------------------
+# 8. LOCAL DATABASES & BACKUPS
+# ------------------------------------------------------------------------------
+*.db
+*.sqlite
+apps/backend/database/*.sqlite
 tmp/migration-backups/*
 /tmp/migration-backups/
 !**/tmp/migration-backups/.gitignore

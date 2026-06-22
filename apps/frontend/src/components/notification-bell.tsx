@@ -36,8 +36,8 @@ async function requestNotifications(): Promise<NotificationPayload> {
   return apiFetch<NotificationPayload>("/notifications");
 }
 
-function mergeNotifications(serverItems: NotificationItem[]): NotificationItem[] {
-  const localItems = readLocalNotifications();
+function mergeNotifications(serverItems: NotificationItem[], userId: number): NotificationItem[] {
+  const localItems = readLocalNotifications(userId);
   return [...localItems, ...serverItems].sort((left, right) => {
     const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
     const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
@@ -55,7 +55,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
   const containerRef = useRef<HTMLDivElement>(null);
 
   const applyPayload = (payload: NotificationPayload) => {
-    const mergedNotifications = mergeNotifications(payload.notifications);
+    const mergedNotifications = mergeNotifications(payload.notifications, userId);
     setNotifications(mergedNotifications);
     setUnreadCount(mergedNotifications.filter((item) => !item.is_read).length);
   };
@@ -104,7 +104,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
         const payload = await requestNotifications();
         applyPayload(payload);
       } catch {
-        const mergedNotifications = mergeNotifications([]);
+        const mergedNotifications = mergeNotifications([], userId);
         setNotifications(mergedNotifications);
         setUnreadCount(mergedNotifications.filter((item) => !item.is_read).length);
       }
@@ -115,7 +115,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     return () => {
       window.removeEventListener(LOCAL_NOTIFICATIONS_UPDATED_EVENT, refreshLocalNotifications);
     };
-  }, []);
+  }, [userId]);
 
   // Click outside to close
   useEffect(() => {
@@ -139,7 +139,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     if (notification.is_read) return;
 
     if (notification.type === "local") {
-      const updated = markLocalNotificationRead(notification.id);
+      const updated = markLocalNotificationRead(notification.id, userId);
       if (!updated) return;
 
       setNotifications((items) =>
@@ -169,7 +169,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     );
 
     if (hasLocalUnread) {
-      markAllLocalNotificationsRead();
+      markAllLocalNotificationsRead(userId);
     }
 
     try {

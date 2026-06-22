@@ -50,8 +50,7 @@ class PricetagGenerationApiTest extends TestCase
             'username' => 'root_api_test',
             'email' => 'root@test.com',
             'password' => bcrypt('password'),
-            'is_active' => true,
-        ]);
+            ]);
         $this->root->assignRole('Root');
 
         $this->designer1 = User::create([
@@ -59,8 +58,7 @@ class PricetagGenerationApiTest extends TestCase
             'username' => 'designer1_api_test',
             'email' => 'des1@test.com',
             'password' => bcrypt('password'),
-            'is_active' => true,
-        ]);
+            ]);
         $this->designer1->assignRole('Designer');
 
         $this->designer2 = User::create([
@@ -68,8 +66,7 @@ class PricetagGenerationApiTest extends TestCase
             'username' => 'designer2_api_test',
             'email' => 'des2@test.com',
             'password' => bcrypt('password'),
-            'is_active' => true,
-        ]);
+            ]);
         $this->designer2->assignRole('Designer');
 
         // Create category and product
@@ -103,8 +100,7 @@ class PricetagGenerationApiTest extends TestCase
             'username' => 'pending_api_test',
             'email' => 'pending@test.com',
             'password' => bcrypt('password'),
-            'is_active' => true,
-        ]);
+            ]);
         // No roles, hence no access-pricetag
         $this->actingAs($unauthorized);
 

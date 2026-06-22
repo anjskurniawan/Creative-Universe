@@ -32,11 +32,8 @@ class UserResource extends JsonResource
             'avatar_url' => $this->avatar_path
                 ? Storage::disk('public')->url($this->avatar_path)
                 : null,
-            'is_active' => (bool) $this->is_active,
-            'registration_note' => $this->registration_note,
-            'approved_by' => $this->approved_by,
-            'approved_by_name' => $this->approvedBy?->name,
-            'approved_at' => $this->approved_at?->toIso8601String(),
+
+
             'created_at' => $this->created_at?->toIso8601String(),
             'roles' => $this->getRoleNames()->values()->all(),
             'permissions' => $this->relationLoaded('permissions')

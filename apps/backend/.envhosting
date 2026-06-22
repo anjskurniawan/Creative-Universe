@@ -1,59 +1,12 @@
 # ==============================================================================
-# CREATIVE UNIVERSE - CPANEL PRODUCTION ENVIRONMENT CONFIGURATION (.envhosting)
+# CREATIVE UNIVERSE - CPANEL PRODUCTION ENVIRONMENT CONFIGURATION
 # ==============================================================================
-#
-# PETUNJUK DEPLOYMENT KE CPANEL:
-# 1. Rename file ini menjadi '.env' setelah di-upload ke root folder cPanel.
-# 2. Pastikan file symlink storage sudah dibuat di hosting. Jika belum, jalankan link command di bawah.
-# 3. Jalankan migrasi database via URL Artisan Command di bawah.
-#
-# ------------------------------------------------------------------------------
-# 1. KONFIGURASI CRON JOB DI CPANEL (Wajib Didaftarkan)
-# ------------------------------------------------------------------------------
-# Masuk ke cPanel -> Menu "Cron Jobs" -> Tambahkan Cron Job Baru (Setiap Menit):
-#
-#   * * * * * cd /home/[username_cpanel]/[folder_project] && php artisan schedule:run >> /dev/null 2>&1
-#
-# Catatan:
-# - Ganti [username_cpanel] dengan nama user cPanel Anda.
-# - Ganti [folder_project] dengan nama folder root project Laravel Anda.
-# - Scheduler Laravel secara otomatis akan menjalankan:
-#   * queue:work --stop-when-empty (tiap menit, untuk WhatsApp Fonnte & Pusher)
-#   * clean:activity-log (bulanan)
-#   * clean:notifications (bulanan)
-#   * clean:failed-jobs (harian)
-#   * clean:temp-uploads (harian)
-#
-# Jika ingin menjalankan queue worker secara terpisah via cron job:
-#   * * * * * cd /home/[username_cpanel]/[folder_project] && php artisan queue:work --stop-when-empty --tries=3 >> /dev/null 2>&1
-#
-# ------------------------------------------------------------------------------
-# 2. WEB ARTISAN SECURITY COMMANDS (Untuk Shared Hosting tanpa SSH)
-# ------------------------------------------------------------------------------
-# Untuk menjalankan command Artisan dari browser, panggil URL berikut dengan method POST:
-#
-# - Migrasi Database:       POST https://creative.doran.id/_cmd/migrate
-# - Drop & Reset Database:  POST https://creative.doran.id/_cmd/migrate-fresh  (Ditolak di production)
-# - Hapus Cache & Optimize: POST https://creative.doran.id/_cmd/clear-cache
-# - Buat Storage Symlink:   POST https://creative.doran.id/_cmd/storage-link
-# - Restart Queue Worker:   POST https://creative.doran.id/_cmd/queue-restart
-# - Seed Role & Permission: POST https://creative.doran.id/_cmd/seed-permissions
-# - Run Database Seeder:    POST https://creative.doran.id/_cmd/seed           (Ditolak di production)
-# - Jalankan Queue (Work):  POST https://creative.doran.id/_cmd/queue-work
-# - Pembersihan Log Aktivitas: POST https://creative.doran.id/_cmd/clean-activity-log
-# - Pembersihan Notifikasi:    POST https://creative.doran.id/_cmd/clean-notifications
-# - Pembersihan Failed Jobs:   POST https://creative.doran.id/_cmd/clean-failed-jobs
-# - Pembersihan Temp Uploads:  POST https://creative.doran.id/_cmd/clean-temp-uploads
-# - Pembersihan Stale Records: POST https://creative.doran.id/_cmd/clean-stale-records
-# - Pembersihan Token Reset:   POST https://creative.doran.id/_cmd/auth-clear-resets
-# - Optimasi Cache Sistem:  POST https://creative.doran.id/_cmd/optimize
-#
-# Wajib menambahkan HTTP Header berikut pada request Anda:
-#   X-Artisan-Token: cr_universe_cpanel_secure_token_2026_ab99cd
-#
+# File: .envhosting (Rename to .env on production server)
 # ==============================================================================
 
-# Core App Configurations
+# ------------------------------------------------------------------------------
+# 1. CORE APPLICATION CONFIGURATION
+# ------------------------------------------------------------------------------
 APP_NAME=CreativeUniverse
 APP_ENV=production
 APP_KEY=base64:9kUKJ0Bi8gBbFHMzI4t1fiiqaCIoP7Vlw0xAGwtu/y4=
@@ -64,20 +17,22 @@ APP_URL=https://creative.doran.id
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en
 APP_FAKER_LOCALE=en_US
-
 APP_MAINTENANCE_DRIVER=file
-# APP_MAINTENANCE_STORE=database
 
 PHP_CLI_SERVER_WORKERS=4
 BCRYPT_ROUNDS=12
 
-# Logs Rotation (daily log channel prevent disk full in hosting)
+# ------------------------------------------------------------------------------
+# 2. LOGGING SYSTEM
+# ------------------------------------------------------------------------------
 LOG_CHANNEL=daily
 LOG_STACK=single
 LOG_DEPRECATIONS_CHANNEL=null
 LOG_LEVEL=error
 
-# Database Configuration (cPanel MySQL)
+# ------------------------------------------------------------------------------
+# 3. DATABASE CONFIGURATION (cPanel MySQL)
+# ------------------------------------------------------------------------------
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -85,7 +40,9 @@ DB_DATABASE=creativedoran_creativeuniverse
 DB_USERNAME=creativedoran_root
 DB_PASSWORD=doran2026
 
-# Session & Cache Drivers
+# ------------------------------------------------------------------------------
+# 4. SESSION & CACHE CONFIGURATION
+# ------------------------------------------------------------------------------
 SESSION_DRIVER=database
 SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
@@ -98,14 +55,9 @@ QUEUE_CONNECTION=database
 CACHE_STORE=database
 CACHE_PREFIX=
 
-# Memcached & Redis
-MEMCACHED_HOST=127.0.0.1
-REDIS_CLIENT=phpredis
-REDIS_HOST=127.0.0.1
-REDIS_PASSWORD=null
-REDIS_PORT=6379
-
-# Mail configuration
+# ------------------------------------------------------------------------------
+# 5. MAIL SERVICES (Default: Log Channel)
+# ------------------------------------------------------------------------------
 MAIL_MAILER=log
 MAIL_SCHEME=null
 MAIL_HOST=127.0.0.1
@@ -115,37 +67,60 @@ MAIL_PASSWORD=null
 MAIL_FROM_ADDRESS="hello@example.com"
 MAIL_FROM_NAME="${APP_NAME}"
 
-# AWS S3 (Optional)
+# ------------------------------------------------------------------------------
+# 6. EXTERNAL API INTEGRATIONS
+# ------------------------------------------------------------------------------
+# Doran Group API Login
+DORAN_API_URL=https://api.doran.id/api/dorangroup/login
+DORAN_API_KEY=doran_data
+
+# Google Apps Script (Pricetag Generator)
+GOOGLE_APPS_SCRIPT_PRICETAG_URL="https://script.google.com/macros/s/AKfycbxpG3q5EakWiXjL6JuiCb7n3DliQ8ngcaWPiuOTN2eM-dXgYCM3fi6E4pATrPxK3FJa/exec"
+
+# ------------------------------------------------------------------------------
+# 7. THIRD-PARTY SERVICES
+# ------------------------------------------------------------------------------
+# WhatsApp Fonnte Gateway
+FONNTE_TOKEN=
+FONNTE_SENDER=
+
+# Pusher Channels
+PUSHER_APP_ID=2167533
+PUSHER_APP_KEY=b88ba5daddcbbabcbb96
+PUSHER_APP_SECRET=05ca7ae0f5cf4d978d23
+PUSHER_APP_CLUSTER=ap1
+
+# ------------------------------------------------------------------------------
+# 8. WEB ARTISAN SECURITY COMMANDS (HTTP Endpoint execution)
+# ------------------------------------------------------------------------------
+ARTISAN_SECRET=cr_universe_cpanel_secure_token_2026_ab99cd
+ARTISAN_ALLOWED_IPS=
+
+# ------------------------------------------------------------------------------
+# 9. FRONTEND ENVIRONMENT CONFIGURATIONS (Vite/Next.js)
+# ------------------------------------------------------------------------------
+VITE_APP_NAME="${APP_NAME}"
+VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+
+# ------------------------------------------------------------------------------
+# 10. UNUSED / BACKUP DRIVERS (Disabled by default)
+# ------------------------------------------------------------------------------
+# Memcached & Redis
+MEMCACHED_HOST=127.0.0.1
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+# AWS S3 Storage
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 AWS_DEFAULT_REGION=us-east-1
 AWS_BUCKET=
 AWS_USE_PATH_STYLE_ENDPOINT=false
 
-VITE_APP_NAME="${APP_NAME}"
-
-# Web Artisan Security (SRD v6.3 Seksi 8.1)
-ARTISAN_SECRET=cr_universe_cpanel_secure_token_2026_ab99cd
-ARTISAN_ALLOWED_IPS=
-
-# Doran Group API Login
-DORAN_API_URL=https://api.doran.id/api/dorangroup/login
-DORAN_API_KEY=doran_data
-
-# WhatsApp Fonnte (SRD v6.3 Seksi 11.3)
-FONNTE_TOKEN=
-FONNTE_SENDER=
-
-# Pusher Channels (SRD v6.3 Seksi 11.2)
-PUSHER_APP_ID=2167533
-PUSHER_APP_KEY=b88ba5daddcbbabcbb96
-PUSHER_APP_SECRET=05ca7ae0f5cf4d978d23
-PUSHER_APP_CLUSTER=ap1
-
-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
-
-# Reverb configuration (Tidak digunakan di production, gunakan Pusher di atas)
+# Reverb (Use Pusher instead on Shared Hosting)
 REVERB_APP_ID=473623
 REVERB_APP_KEY=m9a7jcwzdldlcvjclgvp
 REVERB_APP_SECRET=luhdxys3s7oyi6hhzybm
@@ -157,6 +132,3 @@ VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
 VITE_REVERB_HOST="${REVERB_HOST}"
 VITE_REVERB_PORT="${REVERB_PORT}"
 VITE_REVERB_SCHEME="${REVERB_SCHEME}"
-
-# Google Apps Script Sub-App Pricetag Generator Integration
-GOOGLE_APPS_SCRIPT_PRICETAG_URL="https://script.google.com/macros/s/AKfycbxpG3q5EakWiXjL6JuiCb7n3DliQ8ngcaWPiuOTN2eM-dXgYCM3fi6E4pATrPxK3FJa/exec"

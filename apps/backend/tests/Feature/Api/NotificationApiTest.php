@@ -16,8 +16,8 @@ class NotificationApiTest extends TestCase
 
     public function test_user_can_list_only_their_latest_notifications(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
-        $other = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
+        $other = User::factory()->create([]);
 
         $ownId = $this->insertNotification($user, 'Notifikasi milik user');
         $this->insertNotification($other, 'Notifikasi milik user lain');
@@ -35,7 +35,7 @@ class NotificationApiTest extends TestCase
 
     public function test_user_can_mark_owned_notification_as_read(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
         $notificationId = $this->insertNotification($user, 'Perlu dibaca');
 
         $this->actingAs($user)
@@ -51,8 +51,8 @@ class NotificationApiTest extends TestCase
 
     public function test_user_cannot_read_another_users_notification(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
-        $other = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
+        $other = User::factory()->create([]);
         $notificationId = $this->insertNotification($other, 'Milik user lain');
 
         $this->actingAs($user)
@@ -67,8 +67,8 @@ class NotificationApiTest extends TestCase
 
     public function test_user_can_mark_all_owned_notifications_as_read(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
-        $other = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
+        $other = User::factory()->create([]);
         $this->insertNotification($user, 'Satu');
         $this->insertNotification($user, 'Dua');
         $otherId = $this->insertNotification($other, 'Tetap unread');
@@ -100,8 +100,8 @@ class NotificationApiTest extends TestCase
             fn (User $authenticatedUser, int $id): bool => $authenticatedUser->id === $id
         );
 
-        $user = User::factory()->create(['is_active' => true]);
-        $other = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
+        $other = User::factory()->create([]);
 
         $this->actingAs($user)
             ->postJson('/broadcasting/auth', [

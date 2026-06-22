@@ -597,75 +597,70 @@ export default function ProfilePage() {
                       </div>
                     )}
 
-                    <form onSubmit={submitPassword} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-cu-ink" htmlFor="current-pw">
-                          Password Saat Ini
-                        </label>
-                        <input
-                          id="current-pw"
-                          className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
-                          type="password"
-                          value={currentPassword}
-                          onChange={(e) => setCurrentPassword(e.target.value)}
-                          required
-                          disabled={isSavingPassword}
-                        />
+                    {user.username !== "root" ? (
+                      <div className="rounded-xl border border-cu-line bg-cu-panel-soft p-5 text-xs text-cu-muted leading-relaxed flex items-start gap-3">
+                        <MaterialIcon name="info" size="sm" className="text-cu-info shrink-0 mt-0.5" />
+                        <div>
+                          <strong className="block text-cu-ink mb-1">Autentikasi Terpusat Aktif</strong>
+                          Akun Anda terhubung dengan autentikasi eksternal Doran Group. Kata sandi Anda dikelola sepenuhnya oleh sistem IT Doran Group dan tidak dapat diubah dari sistem Creative Universe.
+                        </div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-cu-ink" htmlFor="new-pw">
-                          Password Baru
-                        </label>
-                        <input
-                          id="new-pw"
-                          className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                          disabled={isSavingPassword}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-cu-ink" htmlFor="confirm-pw">
-                          Konfirmasi Password Baru
-                        </label>
-                        <input
-                          id="confirm-pw"
-                          className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
-                          type="password"
-                          value={passwordConfirmation}
-                          onChange={(e) => setPasswordConfirmation(e.target.value)}
-                          required
-                          disabled={isSavingPassword}
-                        />
-                      </div>
+                    ) : (
+                      <form onSubmit={submitPassword} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-cu-ink" htmlFor="current-pw">
+                            Password Saat Ini
+                          </label>
+                          <input
+                            id="current-pw"
+                            className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                            type="password"
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            required
+                            disabled={isSavingPassword}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-cu-ink" htmlFor="new-pw">
+                            Password Baru
+                          </label>
+                          <input
+                            id="new-pw"
+                            className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            disabled={isSavingPassword}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-cu-ink" htmlFor="confirm-pw">
+                            Konfirmasi Password Baru
+                          </label>
+                          <input
+                            id="confirm-pw"
+                            className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
+                            type="password"
+                            value={passwordConfirmation}
+                            onChange={(e) => setPasswordConfirmation(e.target.value)}
+                            required
+                            disabled={isSavingPassword}
+                          />
+                        </div>
 
-                      <button
-                        type="submit"
-                        className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-5 text-sm font-medium leading-none text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
-                        disabled={isSavingPassword}
-                      >
-                        {isSavingPassword ? "Memperbarui..." : "Perbarui Password"}
-                      </button>
-                    </form>
+                        <button
+                          type="submit"
+                          className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-5 text-sm font-medium leading-none text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                          disabled={isSavingPassword}
+                        >
+                          {isSavingPassword ? "Memperbarui..." : "Perbarui Password"}
+                        </button>
+                      </form>
+                    )}
                   </div>
 
-                  {/* Danger Zone */}
-                  {hasPermission("run-artisan") && (
-                    <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
-                      <h3 className="text-sm font-bold text-red-600 flex items-center gap-2">
-                        <MaterialIcon name="warning" size="sm" className="text-red-500" />
-                        Danger Zone
-                      </h3>
-                      <p className="text-xs text-red-600/80 mt-1">Hapus Akun secara permanen.</p>
-                      <div className="mt-4 border-t border-red-500/10 pt-4">
-                        <p className="text-xs text-red-600">
-                          Penghapusan akun langsung secara mandiri saat ini dinonaktifkan. Silakan hubungi admin utama PT Doran Sukses Indonesia.
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Kolom Kanan: Sesi & Perangkat Aktif */}

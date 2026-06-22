@@ -33,7 +33,6 @@ class RoleController extends BaseApiController
                     ->selectRaw('count(*)')
                     ->whereColumn("{$modelHasRolesTable}.role_id", 'roles.id')
                     ->where("{$modelHasRolesTable}.model_type", User::class)
-                    ->where('users.is_active', true)
                     ->whereNull('users.deleted_at'),
             ])
             ->orderBy('name')

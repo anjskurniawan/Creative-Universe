@@ -22,7 +22,7 @@ class PricetagCatalogImportApiTest extends TestCase
     {
         parent::setUp();
         $this->seed(RolePermissionSeeder::class);
-        $this->manager = User::factory()->create(['is_active' => true]);
+        $this->manager = User::factory()->create([]);
         $this->manager->assignRole('Manajer');
     }
 
@@ -164,7 +164,7 @@ class PricetagCatalogImportApiTest extends TestCase
 
     public function test_user_without_pricetag_manage_cannot_import(): void
     {
-        $reader = User::factory()->create(['is_active' => true]);
+        $reader = User::factory()->create([]);
         $reader->givePermissionTo('access-pricetag');
         $file = UploadedFile::fake()->createWithContent(
             'catalog.csv',

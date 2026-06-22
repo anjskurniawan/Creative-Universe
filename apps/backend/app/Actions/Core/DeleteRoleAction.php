@@ -18,7 +18,7 @@ class DeleteRoleAction
             throw new RuntimeException("Role '{$role->name}' adalah role inti yang dilindungi dan tidak dapat dihapus.");
         }
 
-        $activeUserCount = $role->users()->where('is_active', true)->count();
+        $activeUserCount = $role->users()->count();
 
         if ($activeUserCount > 0) {
             throw new RuntimeException(

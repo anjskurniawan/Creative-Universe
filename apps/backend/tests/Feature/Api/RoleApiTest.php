@@ -20,7 +20,7 @@ class RoleApiTest extends TestCase
 
     public function test_unauthorized_user_cannot_access_roles(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
 
         $response = $this->actingAs($user)->getJson('/api/v1/roles');
 
@@ -29,7 +29,7 @@ class RoleApiTest extends TestCase
 
     public function test_unauthorized_user_cannot_mutate_roles(): void
     {
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
         $role = Role::findByName('Designer', 'web');
 
         $this->actingAs($user)->postJson('/api/v1/roles', [
@@ -47,7 +47,7 @@ class RoleApiTest extends TestCase
 
     public function test_authorized_user_can_list_roles(): void
     {
-        $admin = User::factory()->create(['is_active' => true]);
+        $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
         $response = $this->actingAs($admin)->getJson('/api/v1/roles');
@@ -73,7 +73,7 @@ class RoleApiTest extends TestCase
 
     public function test_create_role_validations(): void
     {
-        $admin = User::factory()->create(['is_active' => true]);
+        $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
         // Required name
@@ -95,7 +95,7 @@ class RoleApiTest extends TestCase
 
     public function test_create_role_successfully(): void
     {
-        $admin = User::factory()->create(['is_active' => true]);
+        $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
         $response = $this->actingAs($admin)->postJson('/api/v1/roles', [
@@ -114,7 +114,7 @@ class RoleApiTest extends TestCase
 
     public function test_update_role_permissions(): void
     {
-        $admin = User::factory()->create(['is_active' => true]);
+        $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
         $role = Role::create(['name' => 'IT Support']);
@@ -131,7 +131,7 @@ class RoleApiTest extends TestCase
 
     public function test_delete_protected_role_is_prevented(): void
     {
-        $admin = User::factory()->create(['is_active' => true]);
+        $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
         $role = Role::findByName('Supervisor', 'web');
@@ -145,14 +145,14 @@ class RoleApiTest extends TestCase
 
     public function test_delete_role_with_active_users_is_prevented(): void
     {
-        $admin = User::factory()->create(['is_active' => true]);
+        $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
         // Create a custom non-protected role
         $role = Role::create(['name' => 'Custom Role']);
 
         // Assign user to role
-        $user = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create([]);
         $user->assignRole('Custom Role');
 
         $response = $this->actingAs($admin)->deleteJson("/api/v1/roles/{$role->id}");
@@ -164,7 +164,7 @@ class RoleApiTest extends TestCase
 
     public function test_delete_role_successfully(): void
     {
-        $admin = User::factory()->create(['is_active' => true]);
+        $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
         $role = Role::create(['name' => 'Temporary Role']);
@@ -177,7 +177,7 @@ class RoleApiTest extends TestCase
 
     public function test_get_permissions_list(): void
     {
-        $admin = User::factory()->create(['is_active' => true]);
+        $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
         $response = $this->actingAs($admin)->getJson('/api/v1/permissions');
