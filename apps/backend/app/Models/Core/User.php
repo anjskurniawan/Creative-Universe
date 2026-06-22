@@ -37,10 +37,6 @@ class User extends Authenticatable
         'email',
         'whatsapp_number',
         'password',
-        'is_active',
-        'registration_note',
-        'approved_by',
-        'approved_at',
         'avatar_path',
         'settings',
         'created_by',
@@ -55,8 +51,6 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
-            'approved_at' => 'datetime',
             'password' => 'hashed',
             'settings' => 'array',
         ];
@@ -74,10 +68,6 @@ class User extends Authenticatable
                 'username',
                 'email',
                 'whatsapp_number',
-                'is_active',
-                'registration_note',
-                'approved_by',
-                'approved_at',
                 'avatar_path',
                 'created_by',
                 'updated_by',
@@ -91,15 +81,7 @@ class User extends Authenticatable
     // Self-referencing Relations — ERD v1.0 Seksi 4.2
     // ──────────────────────────────────────────────
 
-    public function approvedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'approved_by');
-    }
-
-    public function approvedUsers(): HasMany
-    {
-        return $this->hasMany(User::class, 'approved_by');
-    }
+    // Removed approvedBy and approvedUsers relations
 
     public function createdBy(): BelongsTo
     {
@@ -129,15 +111,7 @@ class User extends Authenticatable
     // Scopes — SRD v6.2 Seksi 5.4
     // ──────────────────────────────────────────────
 
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
-    public function scopePending($query)
-    {
-        return $query->where('is_active', false);
-    }
+    // Removed scopeActive and scopePending
 
     // ──────────────────────────────────────────────
     // Settings Helper Methods

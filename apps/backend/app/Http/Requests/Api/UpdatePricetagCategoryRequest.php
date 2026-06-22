@@ -24,6 +24,7 @@ class UpdatePricetagCategoryRequest extends FormRequest
                 'max:255',
                 Rule::unique('pricetag_categories', 'name')->ignore($this->route('category')),
             ],
+            'icon_svg' => ['nullable', 'string'],
         ];
     }
 

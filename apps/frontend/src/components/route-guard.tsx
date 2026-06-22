@@ -25,37 +25,28 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
     if (isAuthenticated) {
       // User is logged in
-      if (!user?.is_active) {
-        // Logged in but pending admin approval
-        if (currentPath !== "/pending") {
-          router.replace("/pending");
-        }
-      } else {
-        // Logged in and active
-        if (currentIsGuestPath || currentPath === "/pending") {
-          let targetPath = "/";
-          const configuredTarget = typeof user?.settings?.redirect_to === "string"
-            ? safeInternalRedirect(user.settings.redirect_to)
-            : null;
+      if (currentIsGuestPath) {
+        let targetPath = "/";
+        const configuredTarget = typeof user?.settings?.redirect_to === "string"
+          ? safeInternalRedirect(user.settings.redirect_to)
+          : null;
 
-          if (
-            configuredTarget &&
-            !isGuestPath(configuredTarget) &&
-            pathnameFromTarget(configuredTarget) !== "/pending"
-          ) {
-            targetPath = configuredTarget;
-          } else if (
-            user?.roles.includes("Root") || 
-            user?.roles.includes("root")
-          ) {
-            targetPath = "/dashboard";
-          }
-          router.replace(targetPath);
+        if (
+          configuredTarget &&
+          !isGuestPath(configuredTarget)
+        ) {
+          targetPath = configuredTarget;
+        } else if (
+          user?.roles.includes("Root") || 
+          user?.roles.includes("root")
+        ) {
+          targetPath = "/dashboard";
         }
+        router.replace(targetPath);
       }
     } else {
       // User is not logged in
-      if (!currentIsPublicPath && currentPath !== "/pending") {
+      if (!currentIsPublicPath) {
         router.replace(`/login?redirect=${encodeURIComponent(currentPath)}`);
       }
     }
@@ -89,14 +80,11 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
   // Prevent flashing of children components before redirect executes
   if (isAuthenticated) {
-    if (!user?.is_active && currentPath !== "/pending") {
-      return null;
-    }
-    if (user?.is_active && (currentIsGuestPath || currentPath === "/pending")) {
+    if (currentIsGuestPath) {
       return null;
     }
   } else {
-    if (!currentIsPublicPath && currentPath !== "/pending") {
+    if (!currentIsPublicPath) {
       return null;
     }
   }

@@ -19,11 +19,6 @@ export interface ManagedUser {
   email: string;
   whatsapp_number: string | null;
   avatar_url: string | null;
-  is_active: boolean;
-  registration_note: string | null;
-  approved_by: number | null;
-  approved_by_name: string | null;
-  approved_at: string | null;
   created_at: string | null;
   roles: string[];
   permissions: string[];

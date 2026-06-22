@@ -2,15 +2,34 @@
 
 namespace Database\Seeders;
 
+use App\Models\Core\AssetLink;
 use App\Models\Core\User;
 use App\Models\Pricetag\PricetagCategory;
 use App\Models\Pricetag\PricetagProduct;
+use App\Models\Pricetag\PricetagBatch;
+use App\Models\Pricetag\PricetagBatchItem;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class PricetagTestDataSeeder extends Seeder
 {
     public function run(): void
     {
+        // 1. Drop/Truncate all pricetag database tables
+        Schema::disableForeignKeyConstraints();
+
+        DB::table('pricetag_batch_items')->truncate();
+        DB::table('pricetag_batches')->truncate();
+        DB::table('pricetag_products')->truncate();
+        // DB::table('pricetag_categories')->truncate(); // Do not delete existing categories
+
+        // Also clean up polymorphic asset links for products
+        AssetLink::where('linkable_type', PricetagProduct::class)->delete();
+
+        Schema::enableForeignKeyConstraints();
+
+        // Get admin/root user ID for ownership
         $admin = User::where('email', 'admin@creativeuniverse.test')->first();
         if (! $admin) {
             $admin = User::first();
@@ -18,90 +37,78 @@ class PricetagTestDataSeeder extends Seeder
 
         $userId = $admin ? $admin->id : 1;
 
-        // 1. Categories
-        $audio = PricetagCategory::withTrashed()->firstOrCreate(['name' => 'Audio'], ['created_by' => $userId]);
-        if ($audio->trashed()) {
-            $audio->restore();
-        }
-        $powerbank = PricetagCategory::withTrashed()->firstOrCreate(['name' => 'Powerbank'], ['created_by' => $userId]);
-        if ($powerbank->trashed()) {
-            $powerbank->restore();
+        // 2. Read and parse CSV file
+        $csvPath = base_path('../../DB Produk Sementara.csv');
+        if (!file_exists($csvPath)) {
+            $this->command->error("CSV file not found at: {$csvPath}");
+            return;
         }
 
-        // 2. Products (carrying pricing)
-        $p1 = PricetagProduct::withTrashed()->where([
-            'name' => 'JETE TWS T10',
-            'variant_name' => 'Black',
-        ])->first();
-        if ($p1) {
-            if ($p1->trashed()) {
-                $p1->restore();
-            }
-            $p1->update([
-                'category_id' => $audio->id,
-                'normal_price' => 399000,
-                'discount_price' => 199000,
-                'created_by' => $userId,
-            ]);
-        } else {
-            PricetagProduct::create([
-                'name' => 'JETE TWS T10',
-                'variant_name' => 'Black',
-                'category_id' => $audio->id,
-                'normal_price' => 399000,
-                'discount_price' => 199000,
-                'created_by' => $userId,
-            ]);
+        $file = fopen($csvPath, 'r');
+        $header = fgetcsv($file); // Skip header
+
+        $categoriesMap = []; // name => id
+
+        // Preload existing categories so we don't recreate them
+        $existingCategories = PricetagCategory::all();
+        foreach ($existingCategories as $cat) {
+            $categoriesMap[$cat->name] = $cat->id;
         }
 
-        $p2 = PricetagProduct::withTrashed()->where([
-            'name' => 'JETE TWS T10',
-            'variant_name' => 'White',
-        ])->first();
-        if ($p2) {
-            if ($p2->trashed()) {
-                $p2->restore();
+        $defaultCategories = [
+            'Smarthome Devices',
+            'Smart Wearables',
+            'Headphone',
+            'Speaker',
+            'Mobile Power & Connectivity',
+            'Device Tracking',
+            'Bag',
+            'Computer Peripherals',
+            'Storage',
+            'Remote Collaboration',
+            'Content Creation Essentials',
+            'Phone Accessories',
+        ];
+
+        foreach ($defaultCategories as $name) {
+            if (!isset($categoriesMap[$name])) {
+                $category = PricetagCategory::create([
+                    'name' => $name,
+                    'created_by' => $userId,
+                ]);
+                $categoriesMap[$name] = $category->id;
             }
-            $p2->update([
-                'category_id' => $audio->id,
-                'normal_price' => 399000,
-                'discount_price' => 199000,
-                'created_by' => $userId,
-            ]);
-        } else {
-            PricetagProduct::create([
-                'name' => 'JETE TWS T10',
-                'variant_name' => 'White',
-                'category_id' => $audio->id,
-                'normal_price' => 399000,
-                'discount_price' => 199000,
-                'created_by' => $userId,
-            ]);
         }
 
-        $p3 = PricetagProduct::withTrashed()->where([
-            'name' => 'JETE Powerbank H1',
-            'variant_name' => 'Black',
-        ])->first();
-        if ($p3) {
-            if ($p3->trashed()) {
-                $p3->restore();
+        while (($row = fgetcsv($file)) !== false) {
+            if (count($row) < 5) continue; // Skip invalid rows
+
+            $categoryName = trim($row[0]);
+            $productName = trim($row[1]);
+            $variantName = trim($row[2]) ?: 'Default';
+            $normalPrice = intval(preg_replace('/[^0-9]/', '', $row[3]));
+            $discountPriceRaw = trim($row[4]);
+            $discountPrice = $discountPriceRaw === '' ? null : intval(preg_replace('/[^0-9]/', '', $discountPriceRaw));
+
+            if (!isset($categoriesMap[$categoryName])) {
+                $category = PricetagCategory::create([
+                    'name' => $categoryName,
+                    'created_by' => $userId,
+                ]);
+                $categoriesMap[$categoryName] = $category->id;
             }
-            $p3->update([
-                'category_id' => $powerbank->id,
-                'normal_price' => 299000,
-                'discount_price' => 149000,
-                'created_by' => $userId,
-            ]);
-        } else {
+
             PricetagProduct::create([
-                'name' => 'JETE Powerbank H1',
-                'variant_name' => 'Black',
-                'category_id' => $powerbank->id,
-                'normal_price' => 299000,
-                'discount_price' => 149000,
+                'category_id' => $categoriesMap[$categoryName],
+                'name' => $productName,
+                'variant_name' => $variantName,
+                'normal_price' => $normalPrice,
+                'discount_price' => $discountPrice,
                 'created_by' => $userId,
             ]);
         }
+        fclose($file);
+
+        $this->command->info('Seeded products and categories from DB Produk Sementara.csv');
     }
 }

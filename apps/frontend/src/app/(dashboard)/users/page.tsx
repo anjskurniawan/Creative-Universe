@@ -19,7 +19,6 @@ interface UserFormState {
   name: string;
   email: string;
   whatsapp_number: string;
-  is_active: boolean;
   password: string;
   password_confirmation: string;
   roles: string[];
@@ -30,7 +29,6 @@ const emptyForm: UserFormState = {
   name: "",
   email: "",
   whatsapp_number: "",
-  is_active: true,
   password: "",
   password_confirmation: "",
   roles: [],
@@ -125,7 +123,6 @@ export default function UsersPage() {
         name: detail.user.name,
         email: detail.user.email,
         whatsapp_number: detail.user.whatsapp_number || "",
-        is_active: detail.user.is_active,
         password: "",
         password_confirmation: "",
         roles: detail.user.roles,
@@ -307,7 +304,6 @@ export default function UsersPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-cu-ink">{managedUser.name}</span>
-                            {!managedUser.is_active && <Badge tone="danger">Nonaktif</Badge>}
                           </div>
                           <span className="text-xs text-cu-muted">ID #{managedUser.id}</span>
                         </div>
@@ -366,12 +362,6 @@ export default function UsersPage() {
                     </Field>
                     <Field label="Nomor WhatsApp">
                       <input value={form.whatsapp_number} onChange={(event) => setForm({ ...form, whatsapp_number: event.target.value })} placeholder="62812..." className="form-input" />
-                    </Field>
-                    <Field label="Status akun">
-                      <label className="flex h-10 items-center gap-3 rounded-lg border border-cu-line px-3 text-sm">
-                        <input type="checkbox" checked={form.is_active} onChange={(event) => setForm({ ...form, is_active: event.target.checked })} />
-                        {form.is_active ? "Aktif" : "Nonaktif"}
-                      </label>
                     </Field>
                     <Field label="Password baru">
                       <input type="password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} placeholder="Kosongkan jika tidak diubah" className="form-input" />

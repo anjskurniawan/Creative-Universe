@@ -119,13 +119,6 @@ const NAV_GROUPS: SettingsNavGroup[] = [
         icon: "shield_person",
         permission: "manage-roles",
       },
-      {
-        href: "/users/pending",
-        mobileHref: "/settings/pending-users",
-        label: "Akun Pending",
-        icon: "pending_actions",
-        permission: "approve-users",
-      },
     ],
   },
 ];

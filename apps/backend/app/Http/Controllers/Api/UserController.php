@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Actions\Core\ApproveUserAction;
-use App\Actions\Core\RejectUserAction;
-use App\Events\Core\UserStatusUpdated;
 use App\Http\Requests\Api\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Core\User;
@@ -26,10 +23,7 @@ class UserController extends BaseApiController
         $roleFilter = trim((string) $request->query('role', ''));
         $perPage = min(max($request->integer('per_page', 15), 1), 50);
 
-        $query = User::query()
-            ->whereNot(fn ($query) => $query
-                ->where('is_active', false)
-                ->whereNull('approved_by'));
+        $query = User::query();
 
         if ($search !== '') {
             $query->where(function ($query) use ($search) {
@@ -44,7 +38,7 @@ class UserController extends BaseApiController
         }
 
         $users = $query
-            ->with(['roles', 'permissions', 'approvedBy'])
+            ->with(['roles', 'permissions'])
             ->latest()
             ->paginate($perPage);
 
@@ -101,7 +95,7 @@ class UserController extends BaseApiController
             return $this->sendError('Manajer tidak dapat melihat detail pengguna Root.', [], 403);
         }
 
-        $user->load(['roles', 'permissions', 'approvedBy']);
+        $user->load(['roles', 'permissions']);
         $canViewAudit = $actor->hasRole('Root');
 
         return $this->sendResponse([
@@ -112,60 +106,7 @@ class UserController extends BaseApiController
         ], 'Detail pengelolaan pengguna berhasil diambil.');
     }
 
-    public function pending(Request $request): JsonResponse
-    {
-        $perPage = min(max($request->integer('per_page', 10), 1), 50);
-
-        $users = User::pending()
-            ->whereNull('approved_by')
-            ->with(['roles', 'permissions'])
-            ->latest()
-            ->paginate($perPage);
-
-        return $this->sendResponse(
-            UserResource::collection($users)->response()->getData(true),
-            'Daftar pengguna pending berhasil diambil.'
-        );
-    }
-
-    public function approve(Request $request, User $user, ApproveUserAction $action): JsonResponse
-    {
-        $request->validate([
-            'role' => ['required', 'string', 'exists:roles,name'],
-        ], [
-            'role.required' => 'Role wajib dipilih untuk user yang disetujui.',
-            'role.exists' => 'Role yang dipilih tidak valid.',
-        ]);
-
-        if (! $this->isPending($user)) {
-            return $this->sendError('Akun ini tidak lagi menunggu persetujuan.', [], 422);
-        }
-
-        $roleName = (string) $request->input('role');
-        if (! $request->user()->hasRole('Root') && $roleName === 'Root') {
-            return $this->sendError('Manajer tidak dapat memberikan peran Root.', [], 403);
-        }
-
-        $action->handle($user, $request->user(), $roleName);
-        $user->load(['roles', 'permissions', 'approvedBy']);
-
-        return $this->sendResponse(
-            (new UserResource($user))->resolve($request),
-            "Akun {$user->name} berhasil disetujui sebagai {$roleName}."
-        );
-    }
-
-    public function reject(Request $request, User $user, RejectUserAction $action): JsonResponse
-    {
-        if (! $this->isPending($user)) {
-            return $this->sendError('Akun ini tidak lagi menunggu persetujuan.', [], 422);
-        }
-
-        $name = $user->name;
-        $action->handle($user, $request->user());
-
-        return $this->sendResponse(null, "Akun {$name} telah ditolak dan dihapus.");
-    }
+    // Removed pending, approve, reject
 
     public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
@@ -210,13 +151,10 @@ class UserController extends BaseApiController
         }
 
         $statusChanged = DB::transaction(function () use ($request, $user, $actor, $selectedRoles, $permissionsToSync) {
-            $statusChanged = $user->is_active !== $request->boolean('is_active');
-
             $user->fill([
                 'name' => $request->string('name')->toString(),
                 'email' => $request->string('email')->toString(),
                 'whatsapp_number' => $request->input('whatsapp_number'),
-                'is_active' => $request->boolean('is_active'),
                 'updated_by' => $actor->id,
             ]);
 
@@ -229,16 +167,10 @@ class UserController extends BaseApiController
             $user->syncPermissions($permissionsToSync);
             app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-            if ($statusChanged && ! $user->is_active) {
-                DB::table('sessions')->where('user_id', $user->id)->delete();
-            }
-
             activity('user-management')
                 ->causedBy($actor)
                 ->performedOn($user)
                 ->withProperties([
-                    'status_changed' => $statusChanged,
-                    'is_active' => $user->is_active,
                     'password_reset' => $request->filled('password'),
                     'roles' => $selectedRoles,
                     'permissions' => $permissionsToSync,
@@ -246,14 +178,10 @@ class UserController extends BaseApiController
                 ])
                 ->log("[CORE] User account settings managed: {$user->email}");
 
-            return $statusChanged;
+            return true;
         });
 
-        if ($statusChanged) {
-            event(new UserStatusUpdated);
-        }
-
-        $user->load(['roles', 'permissions', 'approvedBy']);
+        $user->load(['roles', 'permissions']);
 
         return $this->sendResponse(
             (new UserResource($user))->resolve($request),
@@ -347,10 +275,7 @@ class UserController extends BaseApiController
         return $actor->hasRole('Root') || ! $target->hasRole('Root');
     }
 
-    private function isPending(User $user): bool
-    {
-        return ! $user->is_active && $user->approved_by === null;
-    }
+    // Removed isPending
 
     private function sessionsFor(User $user): array
     {

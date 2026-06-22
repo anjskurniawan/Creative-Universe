@@ -304,29 +304,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* 2. Pending Users */}
-              {hasPermission("approve-users") && (
-                <div className="rounded-xl border border-cu-line bg-cu-surface p-6 shadow-sm transition-colors hover:border-cu-warning/30">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="mb-1 text-sm text-cu-muted">Menunggu Persetujuan</p>
-                      <p className="text-3xl font-semibold text-cu-ink">{stats.pending_users || 0}</p>
-                    </div>
-                    <div className="flex size-12 items-center justify-center rounded-lg bg-cu-warning-soft text-cu-warning">
-                      <MaterialIcon name="pending_actions" size="md" />
-                    </div>
-                  </div>
-                  {(stats.pending_users || 0) > 0 && (
-                    <Link
-                      href="/users/pending"
-                      className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-cu-warning transition-colors hover:text-cu-warning-hover"
-                    >
-                      Tinjau akun pending
-                      <MaterialIcon name="arrow_forward" size="xs" />
-                    </Link>
-                  )}
-                </div>
-              )}
+
 
               {/* 3. Your Role */}
               <div className="rounded-xl border border-cu-line bg-cu-surface p-6 shadow-sm transition-colors hover:border-cu-success/30 flex items-center justify-between gap-4">
@@ -365,15 +343,7 @@ export default function DashboardPage() {
                 </Link>
               )}
 
-              {hasPermission("approve-users") && (
-                <Link
-                  href="/users/pending"
-                  className="flex items-center gap-3 rounded-lg border border-cu-line bg-cu-surface px-4 py-3 transition-all duration-200 hover:border-cu-border-hover hover:bg-cu-panel-soft"
-                >
-                  <MaterialIcon name="how_to_reg" size="sm" className="text-cu-muted" />
-                  <span className="text-sm font-medium text-cu-ink">Persetujuan Akun</span>
-                </Link>
-              )}
+
 
               {hasPermission("manage-roles") && (
                 <Link

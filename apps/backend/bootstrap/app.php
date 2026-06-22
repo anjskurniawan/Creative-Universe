@@ -2,7 +2,6 @@
 
 use App\Http\Middleware\ArtisanTokenMiddleware;
 use App\Http\Middleware\EnsureUserCanAccessApp;
-use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Auth\AccessDeniedException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -42,7 +41,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // SRD v6.2 Seksi 8.3 — Middleware aliases
         $middleware->alias([
-            'verified-active' => EnsureUserIsActive::class,
             'app' => EnsureUserCanAccessApp::class,
             'artisan-token' => ArtisanTokenMiddleware::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,

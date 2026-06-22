@@ -85,9 +85,6 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
     hasPermission("manage-roles")
       ? { href: "/roles", mobileHref: "/settings/roles", icon: "admin_panel_settings", label: "Kelola Role" }
       : null,
-    hasPermission("approve-users")
-      ? { href: "/users/pending", mobileHref: "/settings/pending-users", icon: "pending_actions", label: "Akun Pending" }
-      : null,
     hasPermission("run-artisan")
       ? { href: "/maintenance", mobileHref: "/maintenance", icon: "settings", label: "Maintenance Panel" }
       : null,

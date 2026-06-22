@@ -30,7 +30,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/health', [HealthController::class, 'index']);
 
 // Guest Authentication Routes
-Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/password/otp', [OtpPasswordController::class, 'requestOtp']);
 Route::post('/auth/password/otp/verify', [OtpPasswordController::class, 'verifyOtp']);
@@ -41,8 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
 
-    // Active/Verified User Protected Routes
-    Route::middleware('verified-active')->group(function () {
+    // User Protected Routes
         Route::get('/dashboard', [DashboardController::class, 'index']);
         Route::get('/profile', [ProfileController::class, 'show']);
         Route::patch('/profile', [ProfileController::class, 'update']);
@@ -93,11 +91,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users/options', [UserController::class, 'options'])
             ->middleware('permission:manage-users|approve-users');
 
-        Route::middleware(['can:approve-users'])->group(function () {
-            Route::get('/users/pending', [UserController::class, 'pending']);
-            Route::post('/users/{user}/approve', [UserController::class, 'approve']);
-            Route::post('/users/{user}/reject', [UserController::class, 'reject']);
-        });
+        // Removed approve-users routes
 
         // Role & Permission Management Routes
         Route::middleware(['can:manage-roles'])->group(function () {
@@ -125,5 +119,4 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/users/{user}/sessions', [UserController::class, 'sessions'])->middleware('role:Root');
             Route::delete('/users/{user}/sessions/{session}', [UserController::class, 'destroySession']);
         });
-    });
 });

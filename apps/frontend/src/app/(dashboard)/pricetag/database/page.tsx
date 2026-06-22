@@ -33,6 +33,7 @@ export default function PricetagDatabasePage() {
 
   const [categoryModal, setCategoryModal] = useState<PricetagCategory | "new" | null>(null);
   const [categoryName, setCategoryName] = useState("");
+  const [categoryIconSvg, setCategoryIconSvg] = useState("");
   const [productModal, setProductModal] = useState<PricetagProduct | "new" | null>(null);
   const [productForm, setProductForm] = useState<PricetagProductForm>(emptyProductForm);
   const [isSaving, setIsSaving] = useState(false);
@@ -93,6 +94,7 @@ export default function PricetagDatabasePage() {
   const openCategory = (category: PricetagCategory | "new") => {
     setCategoryModal(category);
     setCategoryName(category === "new" ? "" : category.name);
+    setCategoryIconSvg(category === "new" ? "" : category.icon_svg || "");
   };
 
   const saveCategory = async (event: FormEvent<HTMLFormElement>) => {
@@ -103,7 +105,7 @@ export default function PricetagDatabasePage() {
       const editing = categoryModal !== "new";
       await apiFetch(editing ? `/pricetag/categories/${categoryModal.id}` : "/pricetag/categories", {
         method: editing ? "PATCH" : "POST",
-        body: JSON.stringify({ name: categoryName }),
+        body: JSON.stringify({ name: categoryName, icon_svg: categoryIconSvg || null }),
       });
       setCategoryModal(null);
       notify(editing ? "Kategori berhasil diperbarui." : "Kategori berhasil dibuat.");
@@ -223,7 +225,7 @@ export default function PricetagDatabasePage() {
 
       <Pagination page={page} lastPage={lastPage} onPage={setPage} />
 
-      {categoryModal && <CategoryModal name={categoryName} setName={setCategoryName} editing={categoryModal !== "new"} saving={isSaving} onSubmit={saveCategory} onClose={() => setCategoryModal(null)} />}
+      {categoryModal && <CategoryModal name={categoryName} setName={setCategoryName} iconSvg={categoryIconSvg} setIconSvg={setCategoryIconSvg} editing={categoryModal !== "new"} saving={isSaving} onSubmit={saveCategory} onClose={() => setCategoryModal(null)} />}
       {productModal && <ProductModal form={productForm} setForm={setProductForm} categories={categoryOptions} editing={productModal !== "new"} saving={isSaving} onSubmit={saveProduct} onClose={() => setProductModal(null)} />}
       {isImportModalOpen && <ImportCsvModal importFile={importFile} setImportFile={setImportFile} isImporting={isImporting} onSubmit={importCatalog} onClose={() => setIsImportModalOpen(false)} />}
     </div>
@@ -231,7 +233,7 @@ export default function PricetagDatabasePage() {
 }
 
 function CategoryTable({ categories, onEdit, onDelete }: { categories: PricetagCategory[]; onEdit: (item: PricetagCategory) => void; onDelete: (item: PricetagCategory) => void }) {
-  return <div className="overflow-x-auto rounded-2xl border border-cu-line bg-cu-surface shadow-sm"><table className="min-w-full text-sm"><thead className="bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted"><tr><th className="px-4 py-3">Kategori</th><th className="px-4 py-3">Produk</th><th className="px-4 py-3 text-right">Aksi</th></tr></thead><tbody className="divide-y divide-cu-line">{categories.length === 0 ? <tr><td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada kategori.</td></tr> : categories.map((item) => <tr key={item.id}><td className="px-4 py-3 font-semibold text-cu-ink">{item.name}</td><td className="px-4 py-3 text-cu-muted">{item.products_count}</td><td className="px-4 py-3"><div className="flex justify-end gap-2"><Action icon="edit" label="Edit kategori" onClick={() => onEdit(item)} /><Action icon="delete" label="Hapus kategori" danger onClick={() => void onDelete(item)} /></div></td></tr>)}</tbody></table></div>;
+  return <div className="overflow-x-auto rounded-2xl border border-cu-line bg-cu-surface shadow-sm"><table className="min-w-full text-sm"><thead className="bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted"><tr><th className="px-4 py-3">Kategori</th><th className="px-4 py-3">Produk</th><th className="px-4 py-3 text-right">Aksi</th></tr></thead><tbody className="divide-y divide-cu-line">{categories.length === 0 ? <tr><td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada kategori.</td></tr> : categories.map((item) => <tr key={item.id}><td className="px-4 py-3 font-semibold text-cu-ink"><div className="flex items-center gap-2"><span className="flex size-6 shrink-0 items-center justify-center text-cu-muted">{item.icon_svg ? <span dangerouslySetInnerHTML={{ __html: item.icon_svg }} className="flex size-full items-center justify-center *:size-full" /> : <MaterialIcon name="category" size="xs" />}</span>{item.name}</div></td><td className="px-4 py-3 text-cu-muted">{item.products_count}</td><td className="px-4 py-3"><div className="flex justify-end gap-2"><Action icon="edit" label="Edit kategori" onClick={() => onEdit(item)} /><Action icon="delete" label="Hapus kategori" danger onClick={() => void onDelete(item)} /></div></td></tr>)}</tbody></table></div>;
 }
 
 function ProductTable({ products, onEdit, onDelete }: { products: PricetagProduct[]; onEdit: (item: PricetagProduct) => void; onDelete: (item: PricetagProduct) => void }) {
@@ -343,8 +345,29 @@ function ProductTable({ products, onEdit, onDelete }: { products: PricetagProduc
   );
 }
 
-function CategoryModal({ name, setName, editing, saving, onSubmit, onClose }: { name: string; setName: (value: string) => void; editing: boolean; saving: boolean; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onClose: () => void }) {
-  return <Modal title={editing ? "Edit Kategori" : "Tambah Kategori"} onClose={onClose}><form onSubmit={onSubmit} className="space-y-4"><label className="block text-sm font-medium">Nama kategori<input autoFocus value={name} onChange={(event) => setName(event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><ModalActions saving={saving} onClose={onClose} /></form></Modal>;
+function CategoryModal({ name, setName, iconSvg, setIconSvg, editing, saving, onSubmit, onClose }: { name: string; setName: (value: string) => void; iconSvg: string; setIconSvg: (value: string) => void; editing: boolean; saving: boolean; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onClose: () => void }) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result;
+      if (typeof text === "string") setIconSvg(text);
+    };
+    reader.readAsText(file);
+  };
+
+  return <Modal title={editing ? "Edit Kategori" : "Tambah Kategori"} onClose={onClose}><form onSubmit={onSubmit} className="space-y-4"><label className="block text-sm font-medium">Nama kategori<input autoFocus value={name} onChange={(event) => setName(event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label>
+  <div>
+    <label className="block text-sm font-medium">Icon SVG (Opsional)</label>
+    <div className="mt-1 flex items-center gap-2">
+      <button type="button" onClick={() => fileInputRef.current?.click()} className="btn btn-secondary text-xs px-3 py-2"><MaterialIcon name="upload_file" size="xs" className="mr-1" />Upload File .svg</button>
+      <input type="file" accept=".svg" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+    </div>
+    <textarea value={iconSvg} onChange={(e) => setIconSvg(e.target.value)} placeholder="Atau paste kode <svg> mentah di sini..." rows={4} className="mt-2 w-full rounded-lg border border-cu-line p-3 text-xs font-mono"></textarea>
+  </div>
+  <ModalActions saving={saving} onClose={onClose} /></form></Modal>;
 }
 
 function ProductModal({ form, setForm, categories, editing, saving, onSubmit, onClose }: { form: PricetagProductForm; setForm: (form: PricetagProductForm) => void; categories: PricetagCategory[]; editing: boolean; saving: boolean; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onClose: () => void }) {

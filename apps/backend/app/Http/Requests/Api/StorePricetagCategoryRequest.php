@@ -19,6 +19,7 @@ class StorePricetagCategoryRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255', Rule::unique('pricetag_categories', 'name')],
+            'icon_svg' => ['nullable', 'string'],
         ];
     }
 

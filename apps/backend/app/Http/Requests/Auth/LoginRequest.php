@@ -9,12 +9,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Http;
+use App\Models\Core\User;
+use Illuminate\Support\Facades\Hash;
 
 /**
- * LoginRequest — SRD v6.2 Seksi 8.5
+ * LoginRequest
  *
- * Login mendukung email ATAU username.
- * Rate limiting: 5 percobaan per menit (SRD Seksi 8.5).
+ * Login menggunakan username.
+ * Rate limiting: 5 percobaan per menit.
  */
 class LoginRequest extends FormRequest
 {
@@ -29,7 +32,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => ['required', 'string'],
+            'username' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -37,14 +40,13 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'login.required' => 'Email atau username wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
             'password.required' => 'Password wajib diisi.',
         ];
     }
 
     /**
      * Attempt to authenticate.
-     * Deteksi apakah input berisi @ → email, selain itu → username.
      *
      * @throws ValidationException
      */
@@ -52,29 +54,50 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $loginField = filter_var($this->input('login'), FILTER_VALIDATE_EMAIL)
-            ? 'email'
-            : 'username';
+        $username = $this->input('username');
+        $password = $this->input('password');
 
-        $credentials = [
-            $loginField => $this->input('login'),
-            'password' => $this->input('password'),
-        ];
+        if ($username === 'root') {
+            // Login lokal khusus root
+            if (! Auth::attempt(['username' => $username, 'password' => $password], $this->boolean('remember'))) {
+                RateLimiter::hit($this->throttleKey());
 
-        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'login' => 'Email/username atau password salah.',
+                throw ValidationException::withMessages([
+                    'username' => 'Username atau password salah.',
+                ]);
+            }
+        } else {
+            // Login menggunakan API Doran Group
+            $response = Http::post('https://api.doran.id/api/dorangroup/login?X-API-KEY=doran_data', [
+                'username' => $username,
+                'password' => $password,
             ]);
+
+            if ($response->successful() && $response->json('status') === 'success') {
+                // Auto-register jika user belum ada di lokal
+                $user = User::firstOrCreate(
+                    ['username' => $username],
+                    [
+                        'name' => $username,
+                        'email' => $username . '@creative.doran.id', // Placeholder email
+                        'password' => Hash::make(Str::random(16)), // Password acak
+                    ]
+                );
+
+                Auth::login($user, $this->boolean('remember'));
+            } else {
+                RateLimiter::hit($this->throttleKey());
+
+                throw ValidationException::withMessages([
+                    'username' => 'Username atau password salah.',
+                ]);
+            }
         }
 
         RateLimiter::clear($this->throttleKey());
     }
 
     /**
-     * SRD v6.2 Seksi 8.5 — 5 percobaan per menit, kunci 1 menit.
-     *
      * @throws ValidationException
      */
     public function ensureIsNotRateLimited(): void
@@ -88,12 +111,12 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'login' => "Terlalu banyak percobaan login. Silakan coba lagi dalam {$seconds} detik.",
+            'username' => "Terlalu banyak percobaan login. Silakan coba lagi dalam {$seconds} detik.",
         ]);
     }
 
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
     }
 }

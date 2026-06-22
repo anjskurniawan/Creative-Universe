@@ -16,6 +16,7 @@ class PricetagCategory extends Model
 
     protected $fillable = [
         'name',
+        'icon_svg',
         'created_by',
         'updated_by',
         'deleted_by',

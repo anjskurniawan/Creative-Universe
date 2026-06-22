@@ -6,6 +6,7 @@ export type PricetagPage<T> = PaginatedResponse<T>;
 export interface PricetagCategory {
   id: number;
   name: string;
+  icon_svg: string | null;
   products_count: number;
   created_at: string | null;
   updated_at: string | null;
