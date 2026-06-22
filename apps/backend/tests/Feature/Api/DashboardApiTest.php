@@ -37,7 +37,6 @@ class DashboardApiTest extends TestCase
         $root = User::factory()->create([]);
         $root->assignRole('Root');
 
-
         DB::table('sessions')->insert([
             'id' => 'dashboard-session',
             'user_id' => $root->id,

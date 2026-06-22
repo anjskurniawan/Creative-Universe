@@ -25,6 +25,27 @@ export default function DashboardLayout({
 
   const isAIAgentPage = pathname?.startsWith("/ai-agent");
 
+  // Track if AI Agent page is in dark mode
+  const [isAiAgentDark, setIsAiAgentDark] = React.useState(() => {
+    if (typeof window !== "undefined") {
+      return document.body.classList.contains("ai-agent-dark-active");
+    }
+    return false;
+  });
+
+  React.useEffect(() => {
+    if (!isAIAgentPage) return;
+
+    // Observe body class changes
+    const observer = new MutationObserver(() => {
+      setIsAiAgentDark(document.body.classList.contains("ai-agent-dark-active"));
+    });
+
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
+    return () => observer.disconnect();
+  }, [isAIAgentPage]);
+
   const mainClass = (() => {
     if (isAIAgentPage) {
       return "w-full flex-1 flex flex-col relative z-10 pt-0 pb-0 px-0";
@@ -49,7 +70,7 @@ export default function DashboardLayout({
       {/* Navbar mengikuti alur halaman pada sub-app Pricetag. */}
       {isAIAgentPage ? (
         <div className="absolute top-0 left-0 w-full z-[100]">
-          <Navbar variant="transparent-dark" sticky={false} />
+          <Navbar variant={isAiAgentDark ? "transparent" : "transparent-dark"} sticky={false} />
         </div>
       ) : (
         <Navbar variant={isDarkPage ? "transparent" : "light"} sticky={!isDarkPage} />

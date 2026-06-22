@@ -8,22 +8,16 @@ trait ApiResponseTrait
 {
     /**
      * Send standard success response.
-     *
-     * @param mixed $result
-     * @param string $message
-     * @param int $code
-     * @param array $meta
-     * @return JsonResponse
      */
     public function sendResponse(mixed $result, string $message = '', int $code = 200, array $meta = []): JsonResponse
     {
         $response = [
             'success' => true,
             'message' => $message ?: 'Proses berhasil.',
-            'data'    => $result,
+            'data' => $result,
         ];
 
-        if (!empty($meta)) {
+        if (! empty($meta)) {
             $response['meta'] = $meta;
         }
 
@@ -32,11 +26,6 @@ trait ApiResponseTrait
 
     /**
      * Send standard error response.
-     *
-     * @param string $error
-     * @param array $errorMessages
-     * @param int $code
-     * @return JsonResponse
      */
     public function sendError(string $error, array $errorMessages = [], int $code = 404): JsonResponse
     {
@@ -45,7 +34,7 @@ trait ApiResponseTrait
             'message' => $error,
         ];
 
-        if (!empty($errorMessages)) {
+        if (! empty($errorMessages)) {
             $response['errors'] = $errorMessages;
         }
 

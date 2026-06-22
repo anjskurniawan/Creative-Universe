@@ -11,6 +11,7 @@ use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Http\Resources\UserProfileResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Spatie\Activitylog\Models\Activity;
 
 class ProfileController extends BaseApiController
 {
@@ -55,7 +56,7 @@ class ProfileController extends BaseApiController
 
     public function activities(Request $request): JsonResponse
     {
-        $activities = \Spatie\Activitylog\Models\Activity::where('causer_id', $request->user()->id)
+        $activities = Activity::where('causer_id', $request->user()->id)
             ->latest()
             ->take(10)
             ->get();

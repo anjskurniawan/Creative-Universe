@@ -17,6 +17,7 @@ class MaintenanceApiTest extends TestCase
     use RefreshDatabase;
 
     private User $root;
+
     private User $designer;
 
     protected function setUp(): void
@@ -40,7 +41,7 @@ class MaintenanceApiTest extends TestCase
             'username' => 'root_maint_test',
             'email' => 'maint_root@test.com',
             'password' => bcrypt('password'),
-            ]);
+        ]);
         $this->root->assignRole('Root');
 
         $this->designer = User::create([
@@ -48,7 +49,7 @@ class MaintenanceApiTest extends TestCase
             'username' => 'des_maint_test',
             'email' => 'maint_des@test.com',
             'password' => bcrypt('password'),
-            ]);
+        ]);
         $this->designer->assignRole('Designer');
 
         // Setup app configuration for Web Artisan token
@@ -89,7 +90,7 @@ class MaintenanceApiTest extends TestCase
                     'failed_jobs_count',
                     'disk_free_space',
                     'log_file_size',
-                ]
+                ],
             ]);
     }
 
@@ -134,7 +135,7 @@ class MaintenanceApiTest extends TestCase
     {
         // Old GET route should be 405 Method Not Allowed or 404 (registered as POST only)
         $response = $this->get('/_cmd/migrate', [
-            'X-Artisan-Token' => 'test-artisan-secret-token-123'
+            'X-Artisan-Token' => 'test-artisan-secret-token-123',
         ]);
         $response->assertStatus(405);
     }
@@ -142,7 +143,7 @@ class MaintenanceApiTest extends TestCase
     public function test_web_artisan_routes_reject_invalid_token(): void
     {
         $response = $this->post('/_cmd/migrate', [], [
-            'X-Artisan-Token' => 'wrong-token-abc'
+            'X-Artisan-Token' => 'wrong-token-abc',
         ]);
         $response->assertStatus(403);
     }
@@ -150,7 +151,7 @@ class MaintenanceApiTest extends TestCase
     public function test_web_artisan_routes_execute_with_valid_token(): void
     {
         $response = $this->post('/_cmd/clear-cache', [], [
-            'X-Artisan-Token' => 'test-artisan-secret-token-123'
+            'X-Artisan-Token' => 'test-artisan-secret-token-123',
         ]);
 
         $response->assertStatus(200)
@@ -166,11 +167,11 @@ class MaintenanceApiTest extends TestCase
     public function test_web_artisan_routes_deny_migrate_fresh_in_production(): void
     {
         // Mock app environment to production
-        app()->detectEnvironment(fn() => 'production');
+        app()->detectEnvironment(fn () => 'production');
         $this->assertEquals('production', app()->environment());
 
         $response = $this->post('/_cmd/migrate-fresh', [], [
-            'X-Artisan-Token' => 'test-artisan-secret-token-123'
+            'X-Artisan-Token' => 'test-artisan-secret-token-123',
         ]);
 
         $response->assertStatus(403)
@@ -200,7 +201,7 @@ class MaintenanceApiTest extends TestCase
         $this->actingAs($this->root);
 
         // Mock app environment to production
-        app()->detectEnvironment(fn() => 'production');
+        app()->detectEnvironment(fn () => 'production');
 
         $response = $this->postJson('/api/v1/maintenance/commands', [
             'command' => 'migrate-fresh',
@@ -239,7 +240,7 @@ class MaintenanceApiTest extends TestCase
     public function test_web_artisan_routes_execute_clean_and_optimize_with_valid_token(): void
     {
         $response = $this->post('/_cmd/clean-activity-log', [], [
-            'X-Artisan-Token' => 'test-artisan-secret-token-123'
+            'X-Artisan-Token' => 'test-artisan-secret-token-123',
         ]);
         $response->assertStatus(200)->assertJsonStructure(['output']);
 
@@ -252,10 +253,8 @@ class MaintenanceApiTest extends TestCase
             ->andReturn('Configuration cached successfully!');
 
         $response = $this->post('/_cmd/optimize', [], [
-            'X-Artisan-Token' => 'test-artisan-secret-token-123'
+            'X-Artisan-Token' => 'test-artisan-secret-token-123',
         ]);
         $response->assertStatus(200)->assertJsonStructure(['output']);
     }
 }
-
-

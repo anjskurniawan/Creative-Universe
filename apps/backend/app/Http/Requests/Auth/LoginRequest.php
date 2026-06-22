@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\Core\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Http;
-use App\Models\Core\User;
-use Illuminate\Support\Facades\Hash;
 
 /**
  * LoginRequest
@@ -71,7 +71,7 @@ class LoginRequest extends FormRequest
             $apiUrl = config('app.doran_api_url');
             $apiKey = config('app.doran_api_key');
 
-            $response = Http::post($apiUrl . '?X-API-KEY=' . $apiKey, [
+            $response = Http::post($apiUrl.'?X-API-KEY='.$apiKey, [
                 'username' => $username,
                 'password' => $password,
                 'X-API-KEY' => $apiKey,
@@ -81,14 +81,14 @@ class LoginRequest extends FormRequest
             if ($response->successful() && ($response->json('status') === true || $response->json('status') === 'success')) {
                 // Auto-register jika user belum ada di lokal
                 $user = User::where('username', $username)->first();
-                if (!$user) {
+                if (! $user) {
                     $user = User::create([
                         'username' => $username,
                         'name' => $username,
-                        'email' => $username . '@creative.doran.id', // Placeholder email
+                        'email' => $username.'@creative.doran.id', // Placeholder email
                         'password' => Hash::make(Str::random(16)), // Password acak
                     ]);
-                    
+
                     // Assign default role 'Client'
                     $user->assignRole('Client');
                 }

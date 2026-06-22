@@ -215,4 +215,3 @@ Route::middleware(['artisan-token', 'throttle:5,1'])->prefix('_cmd')->group(func
         return response()->json(['output' => $output]);
     });
 });
-

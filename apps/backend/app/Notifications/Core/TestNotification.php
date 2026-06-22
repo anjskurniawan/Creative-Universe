@@ -9,14 +9,13 @@ use Illuminate\Notifications\Notification;
 class TestNotification extends Notification
 {
     public int $tries = 3;
+
     public int $backoff = 60;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(private string $testMessage, private array $channels = ['database', 'broadcast', FonnteChannel::class])
-    {
-    }
+    public function __construct(private string $testMessage, private array $channels = ['database', 'broadcast', FonnteChannel::class]) {}
 
     /**
      * Get the notification's delivery channels.
@@ -42,11 +41,11 @@ class TestNotification extends Notification
     public function toFonnte(object $notifiable): string
     {
         return "Creative Universe - Uji Coba Notifikasi WhatsApp\n\n"
-             . "Halo {$notifiable->name},\n"
-             . "Ini adalah pesan uji coba pengiriman notifikasi dari sistem.\n\n"
-             . "Pesan Anda: \"{$this->testMessage}\"\n\n"
-             . "Waktu Uji: " . now()->format('Y-m-d H:i:s') . " (WIB)\n"
-             . "Status: Koneksi Fonnte Channel Berfungsi.";
+             ."Halo {$notifiable->name},\n"
+             ."Ini adalah pesan uji coba pengiriman notifikasi dari sistem.\n\n"
+             ."Pesan Anda: \"{$this->testMessage}\"\n\n"
+             .'Waktu Uji: '.now()->format('Y-m-d H:i:s')." (WIB)\n"
+             .'Status: Koneksi Fonnte Channel Berfungsi.';
     }
 
     /**
@@ -57,7 +56,7 @@ class TestNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'message' => 'Uji coba notifikasi berhasil dikirim: "' . $this->testMessage . '"',
+            'message' => 'Uji coba notifikasi berhasil dikirim: "'.$this->testMessage.'"',
             'url' => '/dashboard',
         ];
     }

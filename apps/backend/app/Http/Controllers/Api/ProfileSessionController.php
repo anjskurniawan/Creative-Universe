@@ -10,9 +10,6 @@ class ProfileSessionController extends BaseApiController
 {
     /**
      * Display a listing of active user sessions.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -37,10 +34,6 @@ class ProfileSessionController extends BaseApiController
 
     /**
      * Revoke / destroy a specific user session.
-     *
-     * @param Request $request
-     * @param string $sessionId
-     * @return JsonResponse
      */
     public function destroy(Request $request, string $sessionId): JsonResponse
     {
@@ -48,7 +41,7 @@ class ProfileSessionController extends BaseApiController
             ->where('id', $sessionId)
             ->where('user_id', $request->user()->id);
 
-        if (!$sessionQuery->exists()) {
+        if (! $sessionQuery->exists()) {
             return $this->sendError('Sesi tidak ditemukan atau Anda tidak memiliki akses.', [], 404);
         }
 

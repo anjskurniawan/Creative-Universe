@@ -42,8 +42,8 @@ creativeuniverse/
 
 Sistem Core menyediakan infrastruktur dasar seperti manajemen pengguna, autentikasi, otorisasi, pencatatan aktivitas, serta layanan komunikasi global.
 
-### 2.1 Pendaftaran Akun & Alur Persetujuan (Approval)
-Pendaftaran akun memerlukan persetujuan administrator sebelum akun dapat aktif digunakan.
+### 2.1 Manajemen Akun
+Pembuatan akun dilakukan sepenuhnya oleh administrator sistem; tidak ada pendaftaran mandiri (self-registration).
 
 ### 2.2 Otorisasi Dinamis & RBAC (Role-Based Access Control)
 Manajemen otorisasi tingkat lanjut berbasis peran dan izin (roles & permissions).

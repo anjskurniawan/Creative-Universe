@@ -11,16 +11,13 @@ use App\Http\Resources\PricetagBatchResource;
 use App\Http\Resources\PricetagProductResource;
 use App\Jobs\Pricetag\GeneratePricetagChunkJob;
 use App\Models\Pricetag\PricetagBatch;
-use App\Models\Pricetag\PricetagBatchItem;
 use App\Models\Pricetag\PricetagProduct;
 use App\Services\GoogleAppScript\PricetagGeneratorService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PricetagGenerationController extends BaseApiController
 {
@@ -44,7 +41,7 @@ class PricetagGenerationController extends BaseApiController
         $success = $generatorService->generate($product, $user->id, $user->name);
 
         // Record history
-        $batchName = $product->name . ($product->variant_name !== 'Default' ? ' - ' . $product->variant_name : '');
+        $batchName = $product->name.($product->variant_name !== 'Default' ? ' - '.$product->variant_name : '');
         $batch = PricetagBatch::create([
             'batch_name' => $batchName,
             'status' => $success ? 'completed' : 'failed',
@@ -79,7 +76,7 @@ class PricetagGenerationController extends BaseApiController
     {
         $user = $request->user();
         $n = PricetagBatch::where('created_by', $user->id)->count();
-        $batchName = 'Pritag #' . ($n + 1);
+        $batchName = 'Pritag #'.($n + 1);
         $itemsInput = $request->input('items');
 
         $itemsToProcess = [];
@@ -136,7 +133,7 @@ class PricetagGenerationController extends BaseApiController
     {
         $user = $request->user();
         $n = PricetagBatch::where('created_by', $user->id)->count();
-        $batchName = 'CSV #' . ($n + 1);
+        $batchName = 'CSV #'.($n + 1);
         $uploadedFile = $request->file('file');
 
         $path = $uploadedFile->getRealPath();
@@ -201,8 +198,9 @@ class PricetagGenerationController extends BaseApiController
 
         if ($prodIdx === false || $discountIdx === false) {
             fclose($file);
+
             return $this->sendError('File CSV harus memiliki kolom "produk" dan "harga diskon".', [
-                'file' => ['File CSV harus memiliki kolom "produk" dan "harga diskon".']
+                'file' => ['File CSV harus memiliki kolom "produk" dan "harga diskon".'],
             ], 422);
         }
 
@@ -230,7 +228,7 @@ class PricetagGenerationController extends BaseApiController
                 ->first();
 
             if (! $productModel) {
-                $invalidProducts[] = "{$productName} Varian: " . ($variantName ?: 'Default') . " (baris {$lineNum})";
+                $invalidProducts[] = "{$productName} Varian: ".($variantName ?: 'Default')." (baris {$lineNum})";
             } else {
                 $itemsToProcess[] = [
                     'product_id' => $productModel->id,
@@ -242,14 +240,14 @@ class PricetagGenerationController extends BaseApiController
         fclose($file);
 
         if (! empty($invalidProducts)) {
-            return $this->sendError('Produk berikut tidak terdaftar di database: ' . implode(', ', $invalidProducts), [
-                'file' => ['Produk berikut tidak terdaftar di database: ' . implode(', ', $invalidProducts)]
+            return $this->sendError('Produk berikut tidak terdaftar di database: '.implode(', ', $invalidProducts), [
+                'file' => ['Produk berikut tidak terdaftar di database: '.implode(', ', $invalidProducts)],
             ], 422);
         }
 
         if (empty($itemsToProcess)) {
             return $this->sendError('File CSV tidak memiliki data yang valid.', [
-                'file' => ['File CSV tidak memiliki data yang valid.']
+                'file' => ['File CSV tidak memiliki data yang valid.'],
             ], 422);
         }
 
@@ -349,14 +347,14 @@ class PricetagGenerationController extends BaseApiController
         if ($batch->created_by !== $user->id && ! $user->hasRole('Root')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Akses ditolak.'
+                'message' => 'Akses ditolak.',
             ], 403);
         }
 
         if (! class_exists('ZipArchive')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ekstensi PHP zip (ZipArchive) tidak aktif di server ini.'
+                'message' => 'Ekstensi PHP zip (ZipArchive) tidak aktif di server ini.',
             ], 500);
         }
 
@@ -365,12 +363,12 @@ class PricetagGenerationController extends BaseApiController
         if ($batch->status !== 'completed' && $batch->processed_items === 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Batch ini belum selesai diproses atau tidak memiliki item sukses.'
+                'message' => 'Batch ini belum selesai diproses atau tidak memiliki item sukses.',
             ], 400);
         }
 
-        $zipFileName = 'pricetag-batch-' . Str::slug($batch->batch_name) . '-' . $batch->id . '.zip';
-        $zipPath = storage_path('app/public/' . $zipFileName);
+        $zipFileName = 'pricetag-batch-'.Str::slug($batch->batch_name).'-'.$batch->id.'.zip';
+        $zipPath = storage_path('app/public/'.$zipFileName);
 
         $zip = new \ZipArchive;
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
@@ -394,7 +392,7 @@ class PricetagGenerationController extends BaseApiController
                 if ($downloadLink) {
                     // Convert Drive View URL to Direct Download link if necessary
                     if (preg_match('/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/', $downloadLink, $matches)) {
-                        $downloadLink = 'https://drive.google.com/uc?export=download&id=' . $matches[1];
+                        $downloadLink = 'https://drive.google.com/uc?export=download&id='.$matches[1];
                     }
 
                     try {
@@ -406,17 +404,18 @@ class PricetagGenerationController extends BaseApiController
                             // Ensure it's not an HTML page (like drive error confirmation page)
                             if (str_contains($response->header('Content-Type', ''), 'text/html')) {
                                 Log::warning("[ZIP] Downloaded content for Product: {$product->name} is HTML instead of image data.");
+
                                 continue;
                             }
 
-                            $fileName = str($product->name . '-' . ($product->variant_name ?: 'Default'))->slug() . '.jpg';
+                            $fileName = str($product->name.'-'.($product->variant_name ?: 'Default'))->slug().'.jpg';
                             $zip->addFromString($fileName, $fileContent);
                             $hasFiles = true;
                         } else {
-                            Log::error("[ZIP] Failed to fetch file for Product: {$product->name}. Status: " . $response->status());
+                            Log::error("[ZIP] Failed to fetch file for Product: {$product->name}. Status: ".$response->status());
                         }
                     } catch (\Exception $e) {
-                        Log::error("[ZIP] Exception downloading file for Product: {$product->name}: " . $e->getMessage());
+                        Log::error("[ZIP] Exception downloading file for Product: {$product->name}: ".$e->getMessage());
                     }
                 }
             }
@@ -429,15 +428,16 @@ class PricetagGenerationController extends BaseApiController
                 if (file_exists($zipPath)) {
                     @unlink($zipPath);
                 }
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'Gagal mengunduh gambar untuk semua item di kelompok ini.'
+                    'message' => 'Gagal mengunduh gambar untuk semua item di kelompok ini.',
                 ], 400);
             }
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal membuat file ZIP di server.'
+                'message' => 'Gagal membuat file ZIP di server.',
             ], 500);
         }
     }

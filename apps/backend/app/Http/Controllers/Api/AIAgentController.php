@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Services\GeminiService;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
 use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AIAgentController extends BaseApiController
 {
@@ -19,9 +19,6 @@ class AIAgentController extends BaseApiController
 
     /**
      * Handle AI chat request to generate response using Gemini Service
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function chat(Request $request): JsonResponse
     {
@@ -45,7 +42,7 @@ class AIAgentController extends BaseApiController
             $responseContent = $this->geminiService->generateResponse($message, $agentType, $history);
 
             return $this->sendResponse([
-                'content' => $responseContent
+                'content' => $responseContent,
             ], 'Respon AI berhasil dibuat.');
 
         } catch (Exception $e) {

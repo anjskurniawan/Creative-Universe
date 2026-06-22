@@ -6,11 +6,9 @@ use App\Models\Core\AssetLink;
 use App\Models\Core\User;
 use App\Models\Pricetag\PricetagCategory;
 use App\Models\Pricetag\PricetagProduct;
-use App\Models\Pricetag\PricetagBatch;
-use App\Models\Pricetag\PricetagBatchItem;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PricetagTestDataSeeder extends Seeder
 {
@@ -39,8 +37,9 @@ class PricetagTestDataSeeder extends Seeder
 
         // 2. Read and parse CSV file
         $csvPath = base_path('../../DB Produk Sementara.csv');
-        if (!file_exists($csvPath)) {
+        if (! file_exists($csvPath)) {
             $this->command->error("CSV file not found at: {$csvPath}");
+
             return;
         }
 
@@ -71,7 +70,7 @@ class PricetagTestDataSeeder extends Seeder
         ];
 
         foreach ($defaultCategories as $name) {
-            if (!isset($categoriesMap[$name])) {
+            if (! isset($categoriesMap[$name])) {
                 $category = PricetagCategory::create([
                     'name' => $name,
                     'created_by' => $userId,
@@ -81,7 +80,9 @@ class PricetagTestDataSeeder extends Seeder
         }
 
         while (($row = fgetcsv($file)) !== false) {
-            if (count($row) < 5) continue; // Skip invalid rows
+            if (count($row) < 5) {
+                continue;
+            } // Skip invalid rows
 
             $categoryName = trim($row[0]);
             $productName = trim($row[1]);
@@ -90,7 +91,7 @@ class PricetagTestDataSeeder extends Seeder
             $discountPriceRaw = trim($row[4]);
             $discountPrice = $discountPriceRaw === '' ? null : intval(preg_replace('/[^0-9]/', '', $discountPriceRaw));
 
-            if (!isset($categoriesMap[$categoryName])) {
+            if (! isset($categoriesMap[$categoryName])) {
                 $category = PricetagCategory::create([
                     'name' => $categoryName,
                     'created_by' => $userId,

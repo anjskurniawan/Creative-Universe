@@ -37,7 +37,6 @@ Konfigurasi production yang disetujui:
 
 | Method | Endpoint | Akses | Tujuan |
 |---|---|---|---|
-| POST | `/api/v1/auth/register` | guest | membuat akun pending |
 | POST | `/api/v1/auth/login` | guest | membuat session |
 | POST | `/api/v1/auth/logout` | auth | mengakhiri session aktif |
 | GET | `/api/v1/auth/me` | auth | bootstrap user, role, permission, status |
@@ -84,9 +83,6 @@ Endpoint `/api/v1/ai/chat` terintegrasi dengan Google AI Studio Gemini API (mode
 |---|---|---|
 | GET | `/api/v1/users` | `manage-users` |
 | GET | `/api/v1/users/options` | `manage-users` atau `approve-users`; hasil dibatasi capability pemanggil |
-| GET | `/api/v1/users/pending` | `approve-users` |
-| POST | `/api/v1/users/{user}/approve` | `approve-users` |
-| POST | `/api/v1/users/{user}/reject` | `approve-users` |
 | GET | `/api/v1/users/{user}` | `manage-users`; session/activity hanya Root |
 | PATCH | `/api/v1/users/{user}` | `manage-users` + policy hierarchy |
 | GET | `/api/v1/users/{user}/audit` | Root |
@@ -151,8 +147,6 @@ Setiap eksekusi harus tercatat pada `activity_log`. `migrate:fresh` dan seeding 
 - package backend: `pusher/pusher-php-server` 7.2.8;
 - cluster: `PUSHER_APP_CLUSTER`, saat ini `ap1`;
 - channel notifikasi: private per user `private-App.Models.Core.User.{id}`;
-- channel antrean approval: `private-admin.notifications`, hanya akun aktif dengan permission `approve-users`;
-- event antrean approval: `.PendingUserRegistered`, dikirim segera setelah registrasi pending;
 - channel batch Pricetag: private per batch dan hanya dapat diakses creator atau Root;
 - payload event hanya memuat identifier dan status minimum;
 - detail data diambil ulang melalui REST API setelah event diterima.
@@ -160,7 +154,7 @@ Setiap eksekusi harus tercatat pada `activity_log`. `migrate:fresh` dan seeding 
 ## 6. Testing minimum
 
 - auth, CSRF, same-origin production, CORS development, dan rate limiting;
-- pending/active middleware;
+- active middleware;
 - seluruh permission dan hierarchy Root/Manajer;
 - validation response `422`;
 - ownership history batch;

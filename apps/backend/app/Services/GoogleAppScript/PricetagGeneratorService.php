@@ -34,7 +34,7 @@ class PricetagGeneratorService
             return false;
         }
 
-        $fileName = str($product->name . '-' . ($product->variant_name ?: 'Default'))->slug() . '.jpg';
+        $fileName = str($product->name.'-'.($product->variant_name ?: 'Default'))->slug().'.jpg';
 
         $payload = [
             'user' => $userName,

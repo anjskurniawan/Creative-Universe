@@ -20,7 +20,7 @@ return new class extends Migration
                 'is_active',
                 'registration_note',
                 'approved_by',
-                'approved_at'
+                'approved_at',
             ]);
         });
     }
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->text('registration_note')->nullable();
             $table->unsignedBigInteger('approved_by')->nullable();
             $table->timestamp('approved_at')->nullable();
-            
+
             $table->foreign('approved_by')->references('id')->on('users')->nullOnDelete();
             $table->index('approved_by');
         });

@@ -25,7 +25,7 @@ class AIAgentApiTest extends TestCase
     {
         $response = $this->postJson('/api/v1/ai/chat', [
             'message' => 'Halo',
-            'agent_type' => 'storyboard'
+            'agent_type' => 'storyboard',
         ]);
 
         $response->assertStatus(401);
@@ -41,7 +41,7 @@ class AIAgentApiTest extends TestCase
 
         $response = $this->actingAs($user)->postJson('/api/v1/ai/chat', [
             'message' => 'Halo',
-            'agent_type' => 'storyboard'
+            'agent_type' => 'storyboard',
         ]);
 
         // Since the user does not have access-core, Spatie middleware will return 403 Forbidden
@@ -58,7 +58,7 @@ class AIAgentApiTest extends TestCase
 
         $response = $this->actingAs($user)->postJson('/api/v1/ai/chat', [
             'message' => '',
-            'agent_type' => 'invalid_agent'
+            'agent_type' => 'invalid_agent',
         ]);
 
         $response->assertStatus(422);
@@ -80,12 +80,12 @@ class AIAgentApiTest extends TestCase
                     [
                         'content' => [
                             'parts' => [
-                                ['text' => 'Ini adalah respon mock dari Gemini untuk naskah video.']
-                            ]
-                        ]
-                    ]
-                ]
-            ], 200)
+                                ['text' => 'Ini adalah respon mock dari Gemini untuk naskah video.'],
+                            ],
+                        ],
+                    ],
+                ],
+            ], 200),
         ]);
 
         $response = $this->actingAs($user)->postJson('/api/v1/ai/chat', [
@@ -93,8 +93,8 @@ class AIAgentApiTest extends TestCase
             'agent_type' => 'storyboard',
             'history' => [
                 ['role' => 'user', 'content' => 'Halo'],
-                ['role' => 'assistant', 'content' => 'Halo! Ada yang bisa saya bantu?']
-            ]
+                ['role' => 'assistant', 'content' => 'Halo! Ada yang bisa saya bantu?'],
+            ],
         ]);
 
         $response->assertStatus(200);
@@ -102,8 +102,8 @@ class AIAgentApiTest extends TestCase
             'success' => true,
             'message' => 'Respon AI berhasil dibuat.',
             'data' => [
-                'content' => 'Ini adalah respon mock dari Gemini untuk naskah video.'
-            ]
+                'content' => 'Ini adalah respon mock dari Gemini untuk naskah video.',
+            ],
         ]);
     }
 
@@ -119,20 +119,20 @@ class AIAgentApiTest extends TestCase
         Http::fake([
             'generativelanguage.googleapis.com/*' => Http::response([
                 'error' => [
-                    'message' => 'API Key invalid.'
-                ]
-            ], 400)
+                    'message' => 'API Key invalid.',
+                ],
+            ], 400),
         ]);
 
         $response = $this->actingAs($user)->postJson('/api/v1/ai/chat', [
             'message' => 'Halo',
-            'agent_type' => 'storyboard'
+            'agent_type' => 'storyboard',
         ]);
 
         $response->assertStatus(500);
         $response->assertJson([
             'success' => false,
-            'message' => 'Google Gemini API Error: API Key invalid.'
+            'message' => 'Google Gemini API Error: API Key invalid.',
         ]);
     }
 }

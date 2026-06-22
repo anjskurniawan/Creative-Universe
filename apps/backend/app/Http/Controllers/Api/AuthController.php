@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends BaseApiController
 {
-
     /**
      * Handle user login.
      */

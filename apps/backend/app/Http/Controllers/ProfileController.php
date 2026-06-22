@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Spatie\Activitylog\Models\Activity;
 
 class ProfileController extends Controller
 {
@@ -27,7 +28,7 @@ class ProfileController extends Controller
             ->get();
 
         // Fetch user's personal activity logs
-        $activities = \Spatie\Activitylog\Models\Activity::where('causer_id', $user->id)
+        $activities = Activity::where('causer_id', $user->id)
             ->latest()
             ->take(10)
             ->get();
@@ -45,7 +46,7 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
-        
+
         $data = $request->safe()->except(['avatar', 'settings']);
 
         // Handle Avatar File Upload

@@ -116,8 +116,6 @@ class ProfileApiTest extends TestCase
         Storage::disk('public')->assertMissing('avatars/old-avatar.jpg');
     }
 
-
-
     public function test_active_user_can_view_activities(): void
     {
         $user = User::factory()->create([]);

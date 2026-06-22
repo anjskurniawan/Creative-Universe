@@ -8,8 +8,6 @@ class HealthController extends BaseApiController
 {
     /**
      * Return backend health status.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {

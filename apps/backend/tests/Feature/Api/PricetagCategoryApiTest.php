@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\Core\User;
 use App\Models\Pricetag\PricetagCategory;
+use App\Models\Pricetag\PricetagProduct;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -119,7 +120,7 @@ class PricetagCategoryApiTest extends TestCase
         $c1 = PricetagCategory::create(['name' => 'Kategori A', 'created_by' => $this->user->id]);
         $c2 = PricetagCategory::create(['name' => 'Kategori B', 'created_by' => $this->user->id]);
 
-        \App\Models\Pricetag\PricetagProduct::create([
+        PricetagProduct::create([
             'category_id' => $c2->id,
             'name' => 'Produk B1',
             'variant_name' => 'Default',
@@ -127,7 +128,7 @@ class PricetagCategoryApiTest extends TestCase
             'discount_price' => 900,
             'created_by' => $this->user->id,
         ]);
-        \App\Models\Pricetag\PricetagProduct::create([
+        PricetagProduct::create([
             'category_id' => $c2->id,
             'name' => 'Produk B2',
             'variant_name' => 'Default',
@@ -135,7 +136,7 @@ class PricetagCategoryApiTest extends TestCase
             'discount_price' => 900,
             'created_by' => $this->user->id,
         ]);
-        \App\Models\Pricetag\PricetagProduct::create([
+        PricetagProduct::create([
             'category_id' => $c1->id,
             'name' => 'Produk A1',
             'variant_name' => 'Default',

@@ -8,6 +8,7 @@
  */
 
 use App\Models\Core\User;
+use App\Models\Pricetag\PricetagBatch;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.Core.User.{id}', function (User $user, int $id): bool {
@@ -19,6 +20,7 @@ Broadcast::channel('admin.notifications', function (User $user): bool {
 });
 
 Broadcast::channel('pricetag-batch.{batchId}', function (User $user, int $batchId): bool {
-    $batch = \App\Models\Pricetag\PricetagBatch::find($batchId);
+    $batch = PricetagBatch::find($batchId);
+
     return $batch && ($user->id === (int) $batch->created_by || $user->hasRole('Root'));
 });

@@ -21,7 +21,7 @@ class MaintenanceController extends BaseApiController
         try {
             $failedJobs = DB::table('failed_jobs')->count();
         } catch (\Exception $e) {
-            Log::warning('[MAINTENANCE] Failed to query failed_jobs table: ' . $e->getMessage());
+            Log::warning('[MAINTENANCE] Failed to query failed_jobs table: '.$e->getMessage());
         }
 
         $diskFree = 'N/A';
@@ -29,7 +29,7 @@ class MaintenanceController extends BaseApiController
             if (function_exists('disk_free_space')) {
                 $bytes = disk_free_space(base_path());
                 if ($bytes !== false) {
-                    $diskFree = round($bytes / (1024 * 1024 * 1024), 2) . ' GB';
+                    $diskFree = round($bytes / (1024 * 1024 * 1024), 2).' GB';
                 }
             }
         } catch (\Exception $e) {
@@ -42,7 +42,7 @@ class MaintenanceController extends BaseApiController
             if (file_exists($logPath)) {
                 $bytes = filesize($logPath);
                 if ($bytes !== false) {
-                    $logSize = round($bytes / (1024 * 1024), 2) . ' MB';
+                    $logSize = round($bytes / (1024 * 1024), 2).' MB';
                 }
             }
         } catch (\Exception $e) {
@@ -146,7 +146,7 @@ class MaintenanceController extends BaseApiController
                 ->log("Menjalankan maintenance command: {$commandKey}");
 
         } catch (\Exception $e) {
-            Log::error("[MAINTENANCE] Error running UI command {$commandKey}: " . $e->getMessage());
+            Log::error("[MAINTENANCE] Error running UI command {$commandKey}: ".$e->getMessage());
 
             activity()
                 ->performedOn($request->user())
@@ -159,7 +159,7 @@ class MaintenanceController extends BaseApiController
                 ])
                 ->log("Gagal menjalankan maintenance command: {$commandKey}");
 
-            return $this->sendError('Terjadi kesalahan saat mengeksekusi perintah: ' . $e->getMessage(), [], 500);
+            return $this->sendError('Terjadi kesalahan saat mengeksekusi perintah: '.$e->getMessage(), [], 500);
         }
 
         return $this->sendResponse([

@@ -2,12 +2,10 @@
 
 namespace Tests\Feature\Api;
 
-use App\Events\Core\UserStatusUpdated;
 use App\Models\Core\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class UserApiTest extends TestCase
@@ -52,8 +50,8 @@ class UserApiTest extends TestCase
         $admin->assignRole('Root');
 
         // Create 2 extra active users
-        User::factory()->create(['name' => 'Budi Santoso', ]);
-        User::factory()->create(['name' => 'Jane Doe', ]);
+        User::factory()->create(['name' => 'Budi Santoso']);
+        User::factory()->create(['name' => 'Jane Doe']);
 
         $response = $this->actingAs($admin)->getJson('/api/v1/users');
 
@@ -79,10 +77,10 @@ class UserApiTest extends TestCase
         $admin = User::factory()->create([]);
         $admin->assignRole('Root');
 
-        $user1 = User::factory()->create(['name' => 'Budi Santoso', ]);
+        $user1 = User::factory()->create(['name' => 'Budi Santoso']);
         $user1->assignRole('PIC Retail');
 
-        $user2 = User::factory()->create(['name' => 'Jane Doe', ]);
+        $user2 = User::factory()->create(['name' => 'Jane Doe']);
         $user2->assignRole('Designer');
 
         // Search test
@@ -97,8 +95,6 @@ class UserApiTest extends TestCase
         $this->assertCount(1, $response->json('data.data'));
         $this->assertEquals('Jane Doe', $response->json('data.data.0.name'));
     }
-
-
 
     public function test_manager_cannot_edit_root_users(): void
     {
@@ -235,8 +231,6 @@ class UserApiTest extends TestCase
 
         $this->assertEquals(['access-pricetag'], $root->refresh()->getSetting('manageable_manager_permissions'));
     }
-
-
 
     public function test_user_options_respect_manager_hierarchy_and_whitelist(): void
     {

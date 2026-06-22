@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Pricetag;
 
+use App\Events\Pricetag\PricetagBatchUpdated;
 use App\Models\Pricetag\PricetagBatch;
 use App\Models\Pricetag\PricetagBatchItem;
 use App\Models\Pricetag\PricetagProduct;
@@ -113,6 +114,6 @@ class GeneratePricetagChunkJob implements ShouldQueue
             Log::info("[PRICETAG] Batch ID {$this->batchId} finished processing. Status: {$newStatus}");
         }
 
-        event(new \App\Events\Pricetag\PricetagBatchUpdated($this->batchId));
+        event(new PricetagBatchUpdated($this->batchId));
     }
 }

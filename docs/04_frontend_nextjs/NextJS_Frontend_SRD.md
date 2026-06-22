@@ -29,13 +29,10 @@ apps/frontend/
 |---|---|---|
 | `/` | publik | konten landing |
 | `/login` | guest | auth API |
-| `/register` | guest | auth API |
 | `/forgot-password` | guest | OTP API |
-| `/pending` | auth pending | `/auth/me` |
 | `/dashboard` | auth aktif | dashboard API |
 | `/profile` | auth aktif | profile API |
 | `/users` | `manage-users` | users API |
-| `/users/pending` | `approve-users` | pending users API |
 | `/roles` | `manage-roles` | roles/permissions API |
 | `/maintenance` | `run-artisan` | maintenance API berbasis Sanctum; bukan Web Artisan secret endpoint |
 | `/pricetag/search` | `access-pricetag` | categories/products API |
@@ -44,9 +41,9 @@ apps/frontend/
 | `/pricetag/database` | `pricetag.manage` | category/product/import API |
 | `/ai-agent` | auth aktif | mock/client-side AI agent simulator |
 
-Per 2026-06-22, route Core `/`, auth, `/pending`, `/dashboard`, `/profile`, serta route administrasi M6 `/users`, `/users/pending`, dan `/roles` sudah tersedia sebagai static export dan terhubung ke REST API. Route M7 `/pricetag/search` dan `/pricetag/database` juga sudah operasional. Halaman asisten AI `/ai-agent` tersedia sebagai antarmuka workspace interaktif dengan simulasi respons pintar di client-side. Route generation/history tetap diselesaikan pada M8.
+Per 2026-06-22, route Core `/`, auth, `/dashboard`, `/profile`, serta route administrasi M6 `/users` dan `/roles` sudah tersedia sebagai static export dan terhubung ke REST API. Route M7 `/pricetag/search` dan `/pricetag/database` juga sudah operasional. Halaman asisten AI `/ai-agent` tersedia sebagai antarmuka workspace interaktif dengan simulasi respons pintar di client-side. Route generation/history tetap diselesaikan pada M8.
 
-Halaman `/users` mencakup search/filter, pengelolaan akun, reset password admin, aktivasi, role, direct permission, whitelist delegasi Manajer, dan audit/session Root-only. Halaman `/users/pending` memakai listener Pusher tanpa polling periodik serta menyediakan approve/reject dengan konfirmasi. Halaman `/roles` menyediakan pembuatan role, perubahan permission, dan penghapusan role non-protected.
+Halaman `/users` mencakup search/filter, pengelolaan akun, reset password admin, aktivasi, role, direct permission, whitelist delegasi Manajer, dan audit/session Root-only. Halaman `/roles` menyediakan pembuatan role, perubahan permission, dan penghapusan role non-protected.
 
 ## 4. Auth dan authorization UX
 
@@ -54,7 +51,6 @@ Halaman `/users` mencakup search/filter, pengelolaan akun, reset password admin,
 - Frontend boleh menyembunyikan menu berdasarkan permission, tetapi backend tetap memutuskan akses.
 - `401` mengarah ke login.
 - `403` menampilkan halaman akses ditolak.
-- akun pending diarahkan ke `/pending` dan tidak dapat membuka `/profile` sampai backend rule berubah.
 - `419` memicu refresh CSRF/session yang aman.
 
 ## 5. Data fetching
@@ -68,7 +64,7 @@ Halaman `/users` mencakup search/filter, pengelolaan akun, reset password admin,
 
 Notifikasi Core memakai private channel `App.Models.Core.User.{id}`. Browser hanya menerima identifier/status minimum dari Pusher lalu mengambil ulang data melalui `GET /api/v1/notifications`. Kredensial frontend dibatasi pada `NEXT_PUBLIC_PUSHER_KEY` dan `NEXT_PUBLIC_PUSHER_CLUSTER`; Pusher secret tetap hanya berada di backend.
 
-Frontend memakai `laravel-echo` 2.3.7 dan `pusher-js` 8.5.0 dengan cluster dari `NEXT_PUBLIC_PUSHER_CLUSTER` (saat ini `ap1`). Halaman `/users/pending` subscribe ke `private-admin.notifications` dan mendengar `.PendingUserRegistered`; event hanya memicu refetch REST API. Build production wajib memiliki `NEXT_PUBLIC_PUSHER_KEY`. Polling `setInterval` tidak digunakan sebagai fallback karena dapat menciptakan respons balapan dengan event realtime.
+Frontend memakai `laravel-echo` 2.3.7 dan `pusher-js` 8.5.0 dengan cluster dari `NEXT_PUBLIC_PUSHER_CLUSTER` (saat ini `ap1`). Build production wajib memiliki `NEXT_PUBLIC_PUSHER_KEY`. Polling `setInterval` tidak digunakan sebagai fallback karena dapat menciptakan respons balapan dengan event realtime.
 
 ## 6. UI/UX
 
@@ -127,5 +123,5 @@ Frontend memakai `laravel-echo` 2.3.7 dan `pusher-js` 8.5.0 dengan cluster dari 
 - unit test utility dan mapper;
 - component test untuk form dan permission-driven UI;
 - integration test dengan API mock;
-- end-to-end test login, pending, approval, role, dan seluruh flow Pricetag;
+- end-to-end test login, role, dan seluruh flow Pricetag;
 - test responsive dan accessibility pada halaman kritis.

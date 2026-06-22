@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Api;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class HealthCheckTest extends TestCase
@@ -22,7 +21,7 @@ class HealthCheckTest extends TestCase
                 'status' => 'up',
                 'environment' => config('app.env'),
                 'version' => '1.0.0',
-            ]
+            ],
         ]);
     }
 

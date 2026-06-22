@@ -413,12 +413,9 @@ Tabel ini wajib mendukung `SoftDeletes`  -  kebijakan data abadi, data karyawan 
 | `email`                     | String(255) | UNIQUE, NOT NULL          | Kredensial login                                                                      |
 | `whatsapp_number`           | String(20)  | Nullable                  | Format: `628xxxx` untuk notifikasi Fonnte                                             |
 | `password`                  | String(255) | NOT NULL                  | Bcrypt hashed. Wajib diisi saat registrasi                                            |
-| `is_active`                 | Boolean     | Default: **false**, index | `false` = pending approval. `true` = akun aktif dan dapat login penuh                 |
-| `registration_note`         | Text        | Nullable                  | Catatan dari pendaftar saat registrasi  -  membantu admin mengenali identitas pendaftar |
-| `approved_by`               | BigInt      | Nullable, FK → users.id   | Root yang menyetujui akun ini                                                   |
-| `approved_at`               | Timestamp   | Nullable                  | Waktu approval                                                                        |
+| `is_active`                 | Boolean     | Default: **true**, index | `false` = akun dinonaktifkan. `true` = akun aktif dan dapat login penuh                 |
 | `avatar_path`               | String(500) | Nullable                  | UUID-based filename, max 2MB                                                          |
-| `created_by`                | BigInt      | Nullable, FK → users.id   | Nullable karena registrasi mandiri tidak memiliki `created_by`                        |
+| `created_by`                | BigInt      | Nullable, FK → users.id   | User yang membuat akun ini                        |
 | `updated_by`                | BigInt      | Nullable, FK → users.id   | User yang terakhir mengubah data ini                                                  |
 | `deleted_by`                | BigInt      | Nullable, FK → users.id   | User yang melakukan soft delete                                                       |
 | `deleted_at`                | Timestamp   | Nullable                  | SoftDeletes field                                                                     |
@@ -428,14 +425,10 @@ Tabel ini wajib mendukung `SoftDeletes`  -  kebijakan data abadi, data karyawan 
 >
 > - Kolom `google_id` **dihapus**  -  SSO Google tidak ada di ekosistem ini.
 > - Kolom `password` **NOT NULL**  -  tidak ada lagi akun tanpa password.
-> - Kolom `is_active` **default: false**  -  semua akun baru masuk sebagai pending, tidak bisa login ke Sub-App sampai diapprove Root.
-> - Kolom `registration_note`, `approved_by`, `approved_at` **ditambahkan** untuk mendukung alur approval.
+> - Kolom `registration_note`, `approved_by`, `approved_at` **dihapus** karena pendaftaran mandiri dihentikan.
 
 > [!warning] Kebijakan Penamaan File Avatar
 > File avatar **WAJIB** di-rename saat upload menggunakan `Storage::putFile()` yang auto-generate UUID filename. Format: `{uuid}.{ext}`. Jangan pakai nama asli file dari user karena rentan path traversal dan naming collision.
-
-> [!info] Kolom `created_by` Nullable pada `users`
-> Kolom `created_by` di tabel `users` bersifat Nullable sebagai pengecualian dari aturan ownership global. Alasannya: user yang mendaftar sendiri (self-register) tidak memiliki `created_by`. Kolom ini terisi hanya jika akun dibuat manual oleh Root.
 
 ### 6.2 Strategi RBAC  -  Spatie Permission
 
@@ -1212,16 +1205,11 @@ class NotificationBell extends Component
 
 #### Baseline Headless Aktif (M6)
 
-| Komponen | Konfigurasi aktif |
-|---|---|
-| Backend SDK | `pusher/pusher-php-server` 7.2.8 |
-| Frontend SDK | `pusher-js` 8.5.0 dan `laravel-echo` 2.3.7 |
-| Driver | `BROADCAST_CONNECTION=pusher`; `BROADCAST_DRIVER=pusher` dipertahankan sebagai alias kompatibilitas |
-| Cluster | `ap1`, melalui `PUSHER_APP_CLUSTER` dan `NEXT_PUBLIC_PUSHER_CLUSTER` |
-| Notifikasi user | `private-App.Models.Core.User.{id}` |
-| Antrean approval | `private-admin.notifications`, event `.PendingUserRegistered` |
+| Channel Type | Channel Name Format | Event List |
+|---|---|---|
+| Private Notifikasi User | `private-App.Models.Core.User.{id}` | `.Illuminate\Notifications\Events\BroadcastNotificationCreated` |
 
-Pada target Next.js, akun aktif dengan permission `approve-users` dapat mengotorisasi channel `admin.notifications`. Event registrasi hanya mengirim `user_id` dan waktu registrasi, lalu frontend mengambil ulang `GET /api/v1/users/pending`. Halaman ini tidak memakai polling periodik. `PUSHER_APP_SECRET` hanya berada di Laravel; frontend hanya menerima public app key dan cluster saat build static export.
+Pada target Next.js, notifikasi dikirimkan langsung ke user yang bersangkutan. Halaman ini tidak memakai polling periodik. `PUSHER_APP_SECRET` hanya berada di Laravel; frontend hanya menerima public app key dan cluster saat build static export.
 
 #### Instalasi Package
 

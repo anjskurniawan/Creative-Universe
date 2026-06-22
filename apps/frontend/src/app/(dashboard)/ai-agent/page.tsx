@@ -636,31 +636,7 @@ export default function AIAgentPage() {
           from { opacity: 0; transform: translateY(6px) scale(0.97); }
           to   { opacity: 1; transform: translateY(0)   scale(1); }
         }
-        /* Smooth transitions for navigation bar */
-        nav, 
-        nav a, 
-        nav button,
-        nav svg,
-        nav .text-cu-ink,
-        nav span {
-          transition: color 1000ms ease-in-out, background-color 1000ms ease-in-out, border-color 1000ms ease-in-out, shadow 1000ms ease-in-out, box-shadow 1000ms ease-in-out !important;
-        }
-        .ai-agent-dark-active nav {
-          color: #ffffff !important;
-        }
-        .ai-agent-dark-active nav a, 
-        .ai-agent-dark-active nav button,
-        .ai-agent-dark-active nav svg,
-        .ai-agent-dark-active nav .text-cu-ink,
-        .ai-agent-dark-active nav span {
-          color: #ffffff !important;
-        }
-        .ai-agent-dark-active nav button:hover {
-          background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        .ai-agent-dark-active nav .border-cu-line {
-          border-color: rgba(255, 255, 255, 0.1) !important;
-        }
+
         /* Custom scrollbar for Chat history window */
         .chat-scrollbar::-webkit-scrollbar {
           width: 5px;

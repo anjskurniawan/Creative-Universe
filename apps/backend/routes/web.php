@@ -12,4 +12,3 @@
 
 // Web Artisan routes (remote artisan commands)
 require __DIR__.'/web_artisan.php';
-

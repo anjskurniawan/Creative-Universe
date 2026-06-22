@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Listeners\LogAuthActivity;
+use App\Models\Core\User;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -36,9 +38,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Dynamically override configurations from Root settings at runtime
         try {
-            if (\Illuminate\Support\Facades\Schema::hasTable('users')) {
+            if (Schema::hasTable('users')) {
                 // Fetch first Root's preferences
-                $root = \App\Models\Core\User::role('Root')->first();
+                $root = User::role('Root')->first();
                 if ($root) {
                     if ($scriptUrl = $root->getSetting('google_apps_script_url')) {
                         config(['services.google.apps_script_pricetag_url' => $scriptUrl]);

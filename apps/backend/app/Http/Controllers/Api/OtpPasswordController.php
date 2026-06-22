@@ -15,8 +15,6 @@ class OtpPasswordController extends BaseApiController
     /**
      * Request OTP via WhatsApp.
      *
-     * @param Request $request
-     * @return JsonResponse
      * @throws ValidationException
      */
     public function requestOtp(Request $request): JsonResponse
@@ -34,7 +32,7 @@ class OtpPasswordController extends BaseApiController
             ->orWhere('username', $login)
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'login' => 'Akun dengan email/username tersebut tidak ditemukan.',
             ]);
@@ -63,13 +61,13 @@ class OtpPasswordController extends BaseApiController
         $message = "🔐 *Creative Universe — Reset Password*\n\n"
             ."Kode OTP kamu: *{$otpCode}*\n\n"
             ."Kode ini berlaku 15 menit.\n"
-            ."Jangan bagikan kode ini kepada siapapun.";
+            .'Jangan bagikan kode ini kepada siapapun.';
 
         $fonnte->send($user->whatsapp_number, $message);
 
         // Mask phone number for display
         $phone = $user->whatsapp_number;
-        $maskedPhone = substr($phone, 0, 4) . '****' . substr($phone, -4);
+        $maskedPhone = substr($phone, 0, 4).'****'.substr($phone, -4);
 
         // Store user email in session for subsequent steps
         $request->session()->put('password_reset_email', $user->email);
@@ -83,8 +81,6 @@ class OtpPasswordController extends BaseApiController
     /**
      * Verify OTP code.
      *
-     * @param Request $request
-     * @return JsonResponse
      * @throws ValidationException
      */
     public function verifyOtp(Request $request): JsonResponse
@@ -98,7 +94,7 @@ class OtpPasswordController extends BaseApiController
 
         $email = $request->session()->get('password_reset_email');
 
-        if (!$email) {
+        if (! $email) {
             return $this->sendError('Sesi kedaluwarsa. Silakan ulangi dari awal.', [], 400);
         }
 
@@ -106,7 +102,7 @@ class OtpPasswordController extends BaseApiController
             ->where('email', $email)
             ->first();
 
-        if (!$record) {
+        if (! $record) {
             throw ValidationException::withMessages([
                 'otp' => 'Kode OTP tidak valid atau sudah digunakan.',
             ]);
@@ -116,11 +112,12 @@ class OtpPasswordController extends BaseApiController
         if (now()->diffInMinutes($record->created_at) > 15) {
             DB::table('password_reset_tokens')->where('email', $email)->delete();
             $request->session()->forget('password_reset_email');
+
             return $this->sendError('Kode OTP sudah kedaluwarsa. Silakan kirim ulang.', [], 400);
         }
 
         // Verify OTP hash
-        if (!Hash::check($request->input('otp'), $record->token)) {
+        if (! Hash::check($request->input('otp'), $record->token)) {
             throw ValidationException::withMessages([
                 'otp' => 'Kode OTP salah. Periksa kembali.',
             ]);
@@ -135,8 +132,6 @@ class OtpPasswordController extends BaseApiController
     /**
      * Reset password to a new value.
      *
-     * @param Request $request
-     * @return JsonResponse
      * @throws ValidationException
      */
     public function resetPassword(Request $request): JsonResponse
@@ -152,13 +147,13 @@ class OtpPasswordController extends BaseApiController
         $email = $request->session()->get('password_reset_email');
         $verified = $request->session()->get('password_reset_verified');
 
-        if (!$email || !$verified) {
+        if (! $email || ! $verified) {
             return $this->sendError('Sesi tidak valid atau kedaluwarsa. Silakan ulangi dari awal.', [], 400);
         }
 
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return $this->sendError('Akun tidak ditemukan.', [], 404);
         }
 
@@ -175,7 +170,7 @@ class OtpPasswordController extends BaseApiController
         activity('auth')
             ->performedOn($user)
             ->withProperties(['ip' => $request->ip()])
-            ->log('[CORE] Password reset via WhatsApp OTP: ' . $user->email);
+            ->log('[CORE] Password reset via WhatsApp OTP: '.$user->email);
 
         return $this->sendResponse(null, 'Password berhasil direset. Silakan masuk dengan password baru.');
     }

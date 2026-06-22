@@ -116,5 +116,10 @@ class DatabaseSeeder extends Seeder
 
         // 3. Seed data test Pricetag Generator
         $this->call(PricetagTestDataSeeder::class);
+
+        // 4. Seed data awal ODDS
+        $this->call(OddsPermissionSeeder::class);
+        $this->call(OddsDesignCategorySeeder::class);
+        $this->call(OddsTestSeeder::class);
     }
 }

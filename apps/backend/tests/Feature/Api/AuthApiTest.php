@@ -2,12 +2,10 @@
 
 namespace Tests\Feature\Api;
 
-use App\Events\PendingUserRegistered;
 use App\Models\Core\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class AuthApiTest extends TestCase
@@ -20,8 +18,6 @@ class AuthApiTest extends TestCase
         $this->seed(RolePermissionSeeder::class);
     }
 
-
-
     /**
      * Test login returns user status.
      */
@@ -30,7 +26,7 @@ class AuthApiTest extends TestCase
         $user = User::factory()->create([
             'username' => 'root',
             'password' => bcrypt('password123'),
-            ]);
+        ]);
 
         $response = $this->postJson('/api/v1/auth/login', [
             'username' => 'root',
@@ -44,13 +40,11 @@ class AuthApiTest extends TestCase
             'data' => [
                 'id' => $user->id,
                 'name' => $user->name,
-                ],
+            ],
         ]);
 
         $this->assertTrue(Auth::check());
     }
-
-
 
     /**
      * Test invalid login credentials return 422 standard validation envelope.
@@ -93,8 +87,6 @@ class AuthApiTest extends TestCase
             ],
         ]);
     }
-
-
 
     /**
      * Test accessing me endpoint without login returns 401.

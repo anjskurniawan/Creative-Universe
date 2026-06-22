@@ -24,9 +24,13 @@ class PricetagGenerationApiTest extends TestCase
     use RefreshDatabase;
 
     private User $root;
+
     private User $designer1;
+
     private User $designer2;
+
     private PricetagCategory $category;
+
     private PricetagProduct $product;
 
     protected function setUp(): void
@@ -50,7 +54,7 @@ class PricetagGenerationApiTest extends TestCase
             'username' => 'root_api_test',
             'email' => 'root@test.com',
             'password' => bcrypt('password'),
-            ]);
+        ]);
         $this->root->assignRole('Root');
 
         $this->designer1 = User::create([
@@ -58,7 +62,7 @@ class PricetagGenerationApiTest extends TestCase
             'username' => 'designer1_api_test',
             'email' => 'des1@test.com',
             'password' => bcrypt('password'),
-            ]);
+        ]);
         $this->designer1->assignRole('Designer');
 
         $this->designer2 = User::create([
@@ -66,7 +70,7 @@ class PricetagGenerationApiTest extends TestCase
             'username' => 'designer2_api_test',
             'email' => 'des2@test.com',
             'password' => bcrypt('password'),
-            ]);
+        ]);
         $this->designer2->assignRole('Designer');
 
         // Create category and product
@@ -100,7 +104,7 @@ class PricetagGenerationApiTest extends TestCase
             'username' => 'pending_api_test',
             'email' => 'pending@test.com',
             'password' => bcrypt('password'),
-            ]);
+        ]);
         // No roles, hence no access-pricetag
         $this->actingAs($unauthorized);
 
@@ -297,7 +301,8 @@ class PricetagGenerationApiTest extends TestCase
         Broadcast::setDefaultDriver('pusher');
         Broadcast::purge('pusher');
         Broadcast::channel('pricetag-batch.{batchId}', function (User $user, int $batchId): bool {
-            $batch = \App\Models\Pricetag\PricetagBatch::find($batchId);
+            $batch = PricetagBatch::find($batchId);
+
             return $batch && ($user->id === (int) $batch->created_by || $user->hasRole('Root'));
         });
 
@@ -309,7 +314,7 @@ class PricetagGenerationApiTest extends TestCase
         ]);
 
         $channelName = "pricetag-batch.{$batch->id}";
-        
+
         // Broadcast authorize route check
         $this->actingAs($this->designer1);
         $response1 = $this->postJson('/broadcasting/auth', [

@@ -35,7 +35,7 @@ class OtpPasswordApiTest extends TestCase
             'email' => 'tulus@example.com',
             'username' => 'tulus_r',
             'whatsapp_number' => '6281234567890',
-            ]);
+        ]);
 
         $response = $this->postJson('/api/v1/auth/password/otp', [
             'login' => 'tulus@example.com',
@@ -47,7 +47,7 @@ class OtpPasswordApiTest extends TestCase
             'message' => 'Kode OTP berhasil dikirim ke WhatsApp Anda.',
             'data' => [
                 'masked_phone' => '6281****7890',
-            ]
+            ],
         ]);
 
         // Assert OTP is saved in database
@@ -119,8 +119,8 @@ class OtpPasswordApiTest extends TestCase
             'success' => false,
             'message' => 'Data yang diberikan tidak valid.',
             'errors' => [
-                'otp' => ['Kode OTP salah. Periksa kembali.']
-            ]
+                'otp' => ['Kode OTP salah. Periksa kembali.'],
+            ],
         ]);
     }
 

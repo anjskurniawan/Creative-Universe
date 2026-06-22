@@ -33,7 +33,6 @@ class UserResource extends JsonResource
                 ? Storage::disk('public')->url($this->avatar_path)
                 : null,
 
-
             'created_at' => $this->created_at?->toIso8601String(),
             'roles' => $this->getRoleNames()->values()->all(),
             'permissions' => $this->relationLoaded('permissions')

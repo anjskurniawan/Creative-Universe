@@ -32,7 +32,7 @@ class ProfileSessionApiTest extends TestCase
             'ip_address' => '192.168.1.1',
             'user_agent' => 'Mozilla/Chrome',
             'payload' => 'payload',
-            'last_activity' => time()
+            'last_activity' => time(),
         ]);
 
         $response = $this->actingAs($user)->getJson('/api/v1/profile/sessions');
@@ -42,15 +42,13 @@ class ProfileSessionApiTest extends TestCase
             'success',
             'message',
             'data' => [
-                '*' => ['id', 'ip_address', 'user_agent', 'last_activity', 'is_current']
-            ]
+                '*' => ['id', 'ip_address', 'user_agent', 'last_activity', 'is_current'],
+            ],
         ]);
 
         $this->assertCount(1, $response->json('data'));
         $this->assertEquals('dummy_session_id', $response->json('data.0.id'));
     }
-
-
 
     /**
      * Test user can revoke their active session device.
@@ -65,7 +63,7 @@ class ProfileSessionApiTest extends TestCase
             'ip_address' => '192.168.1.2',
             'user_agent' => 'Mozilla/Safari',
             'payload' => 'payload',
-            'last_activity' => time()
+            'last_activity' => time(),
         ]);
 
         $response = $this->actingAs($user)->deleteJson('/api/v1/profile/sessions/session_to_revoke');
@@ -93,7 +91,7 @@ class ProfileSessionApiTest extends TestCase
             'ip_address' => '192.168.1.3',
             'user_agent' => 'Mozilla/Firefox',
             'payload' => 'payload',
-            'last_activity' => time()
+            'last_activity' => time(),
         ]);
 
         $response = $this->actingAs($userA)->deleteJson('/api/v1/profile/sessions/session_user_b');
