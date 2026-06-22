@@ -94,7 +94,6 @@ class DatabaseSeeder extends Seeder
                     'email' => $item['email'],
                     'username' => $item['username'],
                     'password' => bcrypt($item['password']),
-                    'is_active' => true,
                 ]);
             }
 
