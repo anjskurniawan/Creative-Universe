@@ -122,38 +122,40 @@ export default function DocsContent({ slug }: DocsContentProps) {
   const [state, setState] = useState<FetchState>({ status: "idle" });
 
   useEffect(() => {
-    if (!slug || slug === "components/navbar") {
-      setState({ status: "idle" });
-      return;
-    }
+    if (!slug || slug === "components/navbar") return;
 
     let cancelled = false;
     const url = `/docs/${slug}.md`;
 
-    setState({ status: "loading" });
+    const loadTimer = window.setTimeout(() => {
+      if (cancelled) return;
 
-    fetch(url)
-      .then(async (res) => {
-        if (!res.ok) {
-          throw new Error(`Dokumen tidak ditemukan (${res.status}): ${url}`);
-        }
+      setState({ status: "loading" });
 
-        return res.text();
-      })
-      .then((text) => {
-        if (!cancelled) setState({ status: "success", content: text });
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          setState({
-            status: "error",
-            message: err instanceof Error ? err.message : String(err),
-          });
-        }
-      });
+      fetch(url)
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error(`Dokumen tidak ditemukan (${res.status}): ${url}`);
+          }
+
+          return res.text();
+        })
+        .then((text) => {
+          if (!cancelled) setState({ status: "success", content: text });
+        })
+        .catch((err: unknown) => {
+          if (!cancelled) {
+            setState({
+              status: "error",
+              message: err instanceof Error ? err.message : String(err),
+            });
+          }
+        });
+    }, 0);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(loadTimer);
     };
   }, [slug]);
 
@@ -161,7 +163,7 @@ export default function DocsContent({ slug }: DocsContentProps) {
     return <ComponentViewer />;
   }
 
-  if (state.status === "idle") return <EmptyState />;
+  if (!slug || state.status === "idle") return <EmptyState />;
   if (state.status === "loading") return <LoadingState />;
   if (state.status === "error") {
     return <ErrorState message={state.message} onRetry={() => setState({ status: "idle" })} />;
