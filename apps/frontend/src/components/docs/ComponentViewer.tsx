@@ -96,9 +96,10 @@ function jsonResponse(payload: unknown, status = 200) {
 }
 
 function MockApiBoundary({ role, children }: MockApiBoundaryProps) {
-  const [isReady, setIsReady] = useState(false);
+  const [activeRole, setActiveRole] = useState<PreviewRole | null>(null);
 
   useEffect(() => {
+    let active = true;
     const originalFetch = window.fetch.bind(window);
 
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -152,15 +153,18 @@ function MockApiBoundary({ role, children }: MockApiBoundaryProps) {
       return originalFetch(input, init);
     };
 
-    setIsReady(true);
+    const readyTimer = window.setTimeout(() => {
+      if (active) setActiveRole(role);
+    }, 0);
 
     return () => {
+      active = false;
+      window.clearTimeout(readyTimer);
       window.fetch = originalFetch;
-      setIsReady(false);
     };
   }, [role]);
 
-  if (!isReady) {
+  if (activeRole !== role) {
     return (
       <div className="flex h-20 items-center justify-center rounded-xl border border-dashed border-cu-line bg-cu-panel-soft text-sm text-cu-muted">
         Preparing Navbar preview...
