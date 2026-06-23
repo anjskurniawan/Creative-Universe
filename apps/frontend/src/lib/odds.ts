@@ -10,6 +10,7 @@ export interface OddsTicket {
   requester?: { name: string };
   assignedDesigner?: { name: string };
   brief?: any;
+  important_matrix?: string;
 }
 
 export const getOddsTickets = async (): Promise<OddsTicket[]> => {

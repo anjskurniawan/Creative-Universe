@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 
@@ -6,6 +8,7 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-cu-surface font-sans text-cu-ink antialiased px-4 py-8">
       {/* Logo */}
