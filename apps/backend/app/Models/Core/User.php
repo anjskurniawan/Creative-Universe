@@ -107,6 +107,16 @@ class User extends Authenticatable
         return $this->hasMany(AssetLink::class, 'created_by');
     }
 
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class);
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
     // ──────────────────────────────────────────────
     // Scopes — SRD v6.2 Seksi 5.4
     // ──────────────────────────────────────────────

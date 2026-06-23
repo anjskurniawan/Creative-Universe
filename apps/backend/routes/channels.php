@@ -24,3 +24,7 @@ Broadcast::channel('pricetag-batch.{batchId}', function (User $user, int $batchI
 
     return $batch && ($user->id === (int) $batch->created_by || $user->hasRole('Root'));
 });
+
+Broadcast::channel('conversation.{conversationId}', function (User $user, int $conversationId): bool {
+    return $user->conversations()->where('conversation_id', $conversationId)->exists();
+});

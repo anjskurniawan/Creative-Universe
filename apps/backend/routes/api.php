@@ -44,6 +44,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // User Protected Routes
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::post('/ai/chat', [AIAgentController::class, 'chat'])->middleware('can:access-core');
+    
+    // Private Chat Routes
+    Route::prefix('chat')->group(function () {
+        Route::get('/conversations', [\App\Http\Controllers\Api\V1\ChatController::class, 'getConversations']);
+        Route::get('/conversations/{id}/messages', [\App\Http\Controllers\Api\V1\ChatController::class, 'getMessages']);
+        Route::post('/messages', [\App\Http\Controllers\Api\V1\ChatController::class, 'sendMessage']);
+        Route::get('/contacts', [\App\Http\Controllers\Api\V1\ChatController::class, 'getContacts']);
+    });
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::patch('/profile', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
