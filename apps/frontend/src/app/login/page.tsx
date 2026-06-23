@@ -1,8 +1,9 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { gsap } from "gsap";
 import { useAuth } from "@/providers/auth-provider";
 import { isGuestPath, safeInternalRedirect } from "@/lib/routes";
 import { ValidationError } from "@/lib/api";
@@ -11,6 +12,8 @@ type MobileStep = "username" | "password";
 
 const LOGIN_ERROR_MESSAGE =
   "Username dan Password yang anda masukan tidak sesuai dengan database Pasti Sukses. Periksa kembali data anda";
+
+const MOBILE_BRAND_TEXT = "Creative Universe";
 
 function LoginErrorAlert({ message }: { message: string }) {
   const isDefaultMessage = message === LOGIN_ERROR_MESSAGE;
@@ -30,6 +33,88 @@ function LoginErrorAlert({ message }: { message: string }) {
           message
         )}
       </p>
+    </div>
+  );
+}
+
+function MobileAnimatedBrand() {
+  const textTargetRef = useRef<HTMLSpanElement>(null);
+  const cursorRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const textTarget = textTargetRef.current;
+    const cursor = cursorRef.current;
+
+    if (!textTarget || !cursor) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reducedMotion) {
+      textTarget.textContent = MOBILE_BRAND_TEXT;
+      cursor.style.opacity = "0";
+      return;
+    }
+
+    const splitCharacters = (text: string) => {
+      if ("Segmenter" in Intl) {
+        const segmenter = new Intl.Segmenter("id", {
+          granularity: "grapheme",
+        });
+
+        return Array.from(segmenter.segment(text), ({ segment }) => segment);
+      }
+
+      return Array.from(text);
+    };
+
+    const characters = splitCharacters(MOBILE_BRAND_TEXT);
+    const progress = { count: 0 };
+
+    textTarget.textContent = "";
+    gsap.set(cursor, { opacity: 1 });
+
+    const blink = gsap.to(cursor, {
+      opacity: 0.2,
+      duration: 0.55,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+    });
+
+    const typewriterTween = gsap.to(progress, {
+      count: characters.length,
+      duration: 1.5,
+      ease: "none",
+      onUpdate: () => {
+        textTarget.textContent = characters
+          .slice(0, Math.round(progress.count))
+          .join("");
+      },
+      onComplete: () => {
+        textTarget.textContent = MOBILE_BRAND_TEXT;
+      },
+    });
+
+    return () => {
+      blink.kill();
+      typewriterTween.kill();
+    };
+  }, []);
+
+  return (
+    <div className="pointer-events-none absolute left-1/2 top-[21%] z-10 flex w-full -translate-x-1/2 justify-center px-8 md:hidden">
+      <h2
+        aria-label={MOBILE_BRAND_TEXT}
+        className="text-center text-[22px] font-medium leading-[28px] tracking-[-0.03em] text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+      >
+        <span ref={textTargetRef}>{MOBILE_BRAND_TEXT}</span>
+        <span
+          ref={cursorRef}
+          aria-hidden="true"
+          className="ml-1 inline-block h-5 w-[2px] bg-white align-[-3px] opacity-0"
+        />
+        <noscript>{MOBILE_BRAND_TEXT}</noscript>
+      </h2>
     </div>
   );
 }
@@ -344,6 +429,8 @@ export default function LoginPage() {
     <main className="min-h-screen bg-[url('https://i.pinimg.com/1200x/2a/68/ff/2a68ffb5bc0ea3d310d7ad3708f6282e.jpg')] bg-cover bg-center bg-no-repeat font-sans text-[#232925]">
       <div className="relative flex min-h-screen w-full items-end justify-center px-0 pt-10 md:items-center md:px-5 md:py-10">
         <div className="absolute inset-0 bg-black/25" />
+
+        <MobileAnimatedBrand />
 
         <Suspense
           fallback={

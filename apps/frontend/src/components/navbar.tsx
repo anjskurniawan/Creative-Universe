@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/providers/auth-provider";
 import { MaterialIcon } from "./material-icon";
 import { NotificationBell } from "./notification-bell";
+import { MessageBell } from "./message-bell";
 
 interface NavbarProps {
   variant?: "light" | "dark" | "transparent" | "transparent-dark";
@@ -141,6 +142,32 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
             </Link>
           ) : (
             <>
+              {/* Developer Shortcut */}
+              {user && (user.roles.includes("Root") || user.roles.includes("root")) && (
+                <Link
+                  href="/maintenance"
+                  className={`relative inline-flex size-9 sm:size-10 items-center justify-center rounded-full transition-colors focus:outline-none focus:ring-2 cursor-pointer ${
+                    variant === "transparent" || variant === "dark"
+                      ? "text-white hover:bg-white/10 focus:ring-white/30"
+                      : variant === "transparent-dark"
+                      ? "text-cu-ink hover:bg-white/45 hover:backdrop-blur-md focus:ring-white/30"
+                      : "text-cu-ink hover:bg-cu-panel-soft focus:ring-cu-focus/25"
+                  }`}
+                  aria-label="Developer Panel"
+                  title="Developer Panel"
+                >
+                  <MaterialIcon name="code" size="md" />
+                </Link>
+              )}
+
+              {/* Message Bell */}
+              {user && (
+                <MessageBell
+                  userId={user.id}
+                  variant={variant === "transparent" ? "dark" : variant}
+                />
+              )}
+
               {/* Notification Bell */}
               {user && (
                 <NotificationBell
