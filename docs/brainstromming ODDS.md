@@ -693,33 +693,35 @@ Permission ODDS awal ini sudah terdaftar dalam dokumen Core/ERD sebagai initial 
 
 ## Permission Tambahan yang Direkomendasikan
 
-| Permission                           | Fungsi                                   |
-| ------------------------------------ | ---------------------------------------- |
-| `view-all-odds-tickets`              | Melihat semua ticket                     |
-| `view-own-odds-tickets`              | Melihat ticket milik sendiri             |
-| `view-assigned-odds-tickets`         | Melihat ticket yang di-assign ke dirinya |
-| `submit-odds-output`                 | Submit output desain                     |
-| `request-odds-clarification`         | Minta klarifikasi brief                  |
-| `review-odds-spv`                    | Review sebagai SPV                       |
-| `review-odds-manager`                | Review sebagai Manager                   |
-| `request-odds-revision`              | Meminta revisi                           |
-| `rate-odds-tickets`                  | Memberi rating                           |
-| `view-odds-analytics`                | Melihat analytics ODDS                   |
-| `manage-odds-settings`               | Mengelola setting ODDS                   |
-| `use-odds-ai`                        | Menggunakan fitur AI                     |
-| `manage-odds-ai`                     | Mengatur konfigurasi AI                  |
+| Permission                   | Fungsi                                   |
+| ---------------------------- | ---------------------------------------- |
+| `view-all-odds-tickets`      | Melihat semua ticket                     |
+| `view-own-odds-tickets`      | Melihat ticket milik sendiri             |
+| `view-assigned-odds-tickets` | Melihat ticket yang di-assign ke dirinya |
+| `submit-odds-output`         | Submit output desain                     |
+| `request-odds-clarification` | Minta klarifikasi brief                  |
+| `review-odds-spv`            | Review sebagai SPV                       |
+| `review-odds-manager`        | Review sebagai Manager                   |
+| `request-odds-revision`      | Meminta revisi                           |
+| `rate-odds-tickets`          | Memberi rating                           |
+| `view-odds-analytics`        | Melihat analytics ODDS                   |
+
+| `manage-odds-settings`
+| Mengelola setting ODDS |
+| `use-odds-ai` | Menggunakan fitur AI |
+| `manage-odds-ai` | Mengatur konfigurasi AI |
 
 ---
 
 # 8. Role dan Akses
 
-| Role               | Akses Utama                                 |
-| ------------------ | ------------------------------------------- |
-| Root               | Full access                                 |
-| Manajer            | Review, assign, approve, analytics          |
-| SPV                | Review, assign, revisi, approval            |
-| Designer           | Workspace, submit output, revisi            |
-| Staff / Client     | Buat request, review output, revisi, rating |
+| Role           | Akses Utama                                 |
+| -------------- | ------------------------------------------- |
+| Root           | Full access                                 |
+| Manajer        | Review, assign, approve, analytics          |
+| SPV            | Review, assign, revisi, approval            |
+| Designer       | Workspace, submit output, revisi            |
+| Staff / Client | Buat request, review output, revisi, rating |
 
 Role default yang sudah ada di Core adalah Root, Manajer, dan Designer; mapping permission awalnya sudah membedakan kemampuan Manajer dan Designer.
 
