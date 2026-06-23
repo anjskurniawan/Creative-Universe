@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import hljs from "highlight.js/lib/core";
 import typescript from "highlight.js/lib/languages/typescript";
 import { AuthProvider, type User } from "@/providers/auth-provider";
@@ -13,7 +13,7 @@ type PreviewRole = "guest" | "member" | "admin";
 
 type MockApiBoundaryProps = {
   role: PreviewRole;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 const NAVBAR_SOURCE_URL =
@@ -218,7 +218,7 @@ function PreviewFrame({ viewMode, role }: { viewMode: ViewMode; role: PreviewRol
       ? "mx-auto w-[390px] max-w-full overflow-hidden rounded-[28px] border border-cu-line bg-cu-surface shadow-2xl"
       : "w-full overflow-visible rounded-2xl border border-cu-line bg-cu-surface shadow-xl";
 
-  function stopPreviewNavigation(event: React.MouseEvent<HTMLDivElement>) {
+  function stopPreviewNavigation(event: MouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement;
     const link = target.closest("a");
     const button = target.closest("button");
