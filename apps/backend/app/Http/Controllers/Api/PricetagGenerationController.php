@@ -41,7 +41,7 @@ class PricetagGenerationController extends BaseApiController
         $success = $generatorService->generate($product, $user->id, $user->name);
 
         // Record history
-        $batchName = $product->name.($product->variant_name !== 'Default' ? ' - '.$product->variant_name : '');
+        $batchName = $product->name.($product->variant_name !== ' ' ? ' - '.$product->variant_name : '');
         $batch = PricetagBatch::create([
             'batch_name' => $batchName,
             'status' => $success ? 'completed' : 'failed',
@@ -215,7 +215,7 @@ class PricetagGenerationController extends BaseApiController
             }
 
             $productName = trim($row[$prodIdx]);
-            $variantName = $varIdx !== false ? trim($row[$varIdx]) : 'Default';
+            $variantName = $varIdx !== false ? trim($row[$varIdx]) : ' ';
             $discountPrice = trim($row[$discountIdx]);
 
             if (empty($productName)) {
@@ -224,11 +224,11 @@ class PricetagGenerationController extends BaseApiController
 
             // Verify product existence
             $productModel = PricetagProduct::where('name', $productName)
-                ->where('variant_name', $variantName ?: 'Default')
+                ->where('variant_name', $variantName ?: ' ')
                 ->first();
 
             if (! $productModel) {
-                $invalidProducts[] = "{$productName} Varian: ".($variantName ?: 'Default')." (baris {$lineNum})";
+                $invalidProducts[] = "{$productName} Varian: ".($variantName ?: ' ')." (baris {$lineNum})";
             } else {
                 $itemsToProcess[] = [
                     'product_id' => $productModel->id,
@@ -408,7 +408,7 @@ class PricetagGenerationController extends BaseApiController
                                 continue;
                             }
 
-                            $fileName = str($product->name.'-'.($product->variant_name ?: 'Default'))->slug().'.jpg';
+                            $fileName = str($product->name.'-'.($product->variant_name ?: ' '))->slug().'.jpg';
                             $zip->addFromString($fileName, $fileContent);
                             $hasFiles = true;
                         } else {

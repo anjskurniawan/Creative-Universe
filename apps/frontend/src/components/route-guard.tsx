@@ -5,7 +5,6 @@ import {
   isGuestPath,
   isPublicPath,
   normalizePathname,
-  pathnameFromTarget,
   safeInternalRedirect,
 } from "@/lib/routes";
 import { useRouter, usePathname } from "next/navigation";

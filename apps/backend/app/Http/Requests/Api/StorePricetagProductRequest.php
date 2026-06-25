@@ -13,7 +13,7 @@ class StorePricetagProductRequest extends FormRequest
     {
         $this->merge([
             'name' => trim((string) $this->input('name')),
-            'variant_name' => trim((string) $this->input('variant_name')) ?: 'Default',
+            'variant_name' => trim((string) $this->input('variant_name')) ?: ' ',
         ]);
     }
 
@@ -34,7 +34,7 @@ class StorePricetagProductRequest extends FormRequest
                 Rule::unique('pricetag_products', 'name')
                     ->where(fn ($query) => $query->where('variant_name', $this->input('variant_name'))),
             ],
-            'variant_name' => ['required', 'string', 'max:100'],
+            'variant_name' => ['present', 'string', 'max:100'],
             'normal_price' => ['required', 'integer', 'min:0'],
             'discount_price' => ['nullable', 'integer', 'min:0'],
         ];

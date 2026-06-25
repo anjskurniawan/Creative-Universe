@@ -457,7 +457,7 @@ export default function HomePage() {
                   </span>
                 </Link>
 
-                <Link href="/register" className={btnGrayClass}>
+                <Link href="/login" className={btnGrayClass}>
                   <span className="flex h-full items-center justify-center gap-2">
                     <span className="flex h-full items-center justify-center whitespace-nowrap leading-none">
                       Daftar Akun

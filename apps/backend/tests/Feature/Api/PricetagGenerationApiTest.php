@@ -82,7 +82,7 @@ class PricetagGenerationApiTest extends TestCase
         $this->product = PricetagProduct::create([
             'category_id' => $this->category->id,
             'name' => 'JETE TWS T10',
-            'variant_name' => 'Default',
+            'variant_name' => ' ',
             'normal_price' => 399000,
             'discount_price' => 199000,
             'created_by' => $this->root->id,

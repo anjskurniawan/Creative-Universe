@@ -22,7 +22,7 @@ class PricetagProductResource extends JsonResource
                 'name' => $this->category->name,
             ],
             'name' => $this->name,
-            'variant_name' => $this->variant_name ?: 'Default',
+            'variant_name' => $this->variant_name ?: ' ',
             'normal_price' => $this->normal_price,
             'discount_price' => $this->discount_price,
             'is_ready' => $viewLink !== null,

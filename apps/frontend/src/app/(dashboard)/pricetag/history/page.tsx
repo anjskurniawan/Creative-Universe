@@ -159,11 +159,11 @@ export default function PricetagHistoryPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="space-y-5 md:space-y-6">
+      <header className="hidden flex-col gap-4 sm:flex sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-cu-muted">Pricetag Generate</p>
-          <h1 className="mt-1 text-2xl font-semibold text-cu-ink">Riwayat User</h1>
+          <h1 className="mt-1 text-2xl font-semibold text-cu-ink">Riwayat pengguna</h1>
           <p className="mt-1 text-sm text-cu-muted">
             Total {total} antrean pembuatan label ditemukan di sistem.
           </p>
@@ -280,22 +280,22 @@ export default function PricetagHistoryPage() {
           </div>
 
           {/* Mobile Card List View */}
-          <div className="block sm:hidden space-y-3">
+          <div className="block space-y-2 rounded-[36px] bg-white p-4 sm:hidden">
             {batches.map((batch) => {
               const percent = batch.total_items > 0 ? Math.round((batch.processed_items / batch.total_items) * 100) : 0;
               const showZip = batch.status === "completed" || (batch.status === "processing" && batch.processed_items > 0);
               const isExpanded = expandedCardId === batch.id;
 
               return (
-                <div key={batch.id} className="rounded-xl border border-cu-line bg-cu-surface p-4 shadow-sm space-y-3">
+                <div key={batch.id} className="space-y-3 rounded-[24px] border border-[#c9c9c9] bg-white p-4 text-[#2c2c2c] transition-all duration-200 ease-out">
                   {/* Collapsed State: Batch Name & Status + Date */}
                   <div
                     onClick={() => setExpandedCardId(isExpanded ? null : batch.id)}
-                    className="flex items-center justify-between cursor-pointer select-none gap-2"
+                    className="flex cursor-pointer select-none items-center justify-between gap-2"
                   >
                     {/* Left: Batch Name */}
                     <div className="flex items-center min-w-0">
-                      <span className="font-semibold text-cu-ink text-sm truncate">{batch.batch_name}</span>
+                      <span className="truncate text-[13px] font-semibold leading-tight text-[#2c2c2c]">{batch.batch_name}</span>
                     </div>
 
                     {/* Right: Status Indicator and Date (Stacked Sejajar) */}
@@ -335,11 +335,11 @@ export default function PricetagHistoryPage() {
                     <div className="border-t border-cu-line pt-3 space-y-3 text-xs">
                       <div className="grid grid-cols-2 gap-2 text-cu-muted">
                         <div>
-                          <p className="font-semibold text-cu-ink">ID Kelompok</p>
+                          <p className="font-semibold text-cu-ink">ID kelompok</p>
                           <p>#{batch.id}</p>
                         </div>
                         <div>
-                          <p className="font-semibold text-cu-ink">Jumlah Item</p>
+                          <p className="font-semibold text-cu-ink">Jumlah item</p>
                           <p>{batch.total_items} produk</p>
                         </div>
                       </div>
@@ -386,7 +386,7 @@ export default function PricetagHistoryPage() {
                           className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-cu-line bg-cu-surface py-2 text-cu-ink hover:bg-cu-panel-soft font-semibold text-center"
                         >
                           <MaterialIcon name="visibility" size="xs" />
-                          Lihat Detail
+                          Lihat detail
                         </button>
                       </div>
                     </div>
@@ -429,7 +429,7 @@ export default function PricetagHistoryPage() {
                   <thead className="bg-cu-panel-soft uppercase font-bold text-cu-muted tracking-wider">
                     <tr>
                       <th className="px-4 py-3">Produk / Varian</th>
-                      <th className="px-4 py-3">Harga Promo</th>
+                      <th className="px-4 py-3">Harga promo</th>
                       <th className="px-4 py-3">Status</th>
                       <th className="px-4 py-3">Detail Eror</th>
                       <th className="px-4 py-3 text-right">Aksi</th>
@@ -445,7 +445,7 @@ export default function PricetagHistoryPage() {
                         <tr key={item.id} className="hover:bg-cu-surface-soft transition">
                           <td className="px-4 py-3">
                             <span className="font-bold text-cu-ink">{item.product?.name || "Produk dihapus"}</span>
-                            {item.product?.variant_name !== "Default" && (
+                            {item.product?.variant_name !== " " && (
                               <span className="block text-[10px] text-cu-muted mt-0.5">Varian: {item.product?.variant_name}</span>
                             )}
                           </td>
@@ -526,7 +526,7 @@ export default function PricetagHistoryPage() {
                           >
                             <div className="min-w-0">
                               <span className="font-bold text-cu-ink text-xs block truncate">{item.product?.name || "Produk dihapus"}</span>
-                              {item.product?.variant_name !== "Default" && (
+                              {item.product?.variant_name !== " " && (
                                 <span className="block text-[10px] text-cu-muted mt-0.5">Varian: {item.product?.variant_name}</span>
                               )}
                             </div>
@@ -622,7 +622,7 @@ export default function PricetagHistoryPage() {
 function Pagination({ page, lastPage, onPage }: { page: number; lastPage: number; onPage: (page: number) => void }) {
   if (lastPage <= 1) return null;
   return (
-    <div className="flex items-center justify-between text-xs text-cu-muted mt-4">
+    <div className="hidden items-center justify-between text-xs text-cu-muted sm:flex mt-4">
       <span>Halaman {page} dari {lastPage}</span>
       <div className="flex gap-2">
         <button
@@ -648,7 +648,7 @@ function Pagination({ page, lastPage, onPage }: { page: number; lastPage: number
 
 function Loading() {
   return (
-    <div className="rounded-2xl border border-cu-line bg-cu-surface p-12 text-center text-sm text-cu-muted">
+    <div className="flex min-h-[88px] items-center justify-center rounded-[28px] bg-white px-8 py-8 text-center text-[15px] font-medium leading-tight text-[#9aa1af] sm:rounded-2xl sm:border sm:border-cu-line sm:bg-cu-surface sm:p-12 sm:text-sm sm:text-cu-muted">
       Memuat riwayat antrean batch...
     </div>
   );
@@ -656,11 +656,11 @@ function Loading() {
 
 function Empty() {
   return (
-    <div className="rounded-2xl border border-dashed border-cu-line bg-cu-surface p-12 text-center">
-      <MaterialIcon name="history" size="lg" className="mx-auto text-cu-soft animate-pulse" />
-      <h2 className="mt-3 text-sm font-semibold text-cu-ink">Belum Ada Riwayat Batch</h2>
-      <p className="mt-1 text-xs text-cu-muted max-w-xs mx-auto">
-        Anda belum pernah membuat label harga promo secara kelompok (Checklist/CSV) atau single.
+    <div className="rounded-[28px] bg-white px-8 py-8 text-center text-[#9aa1af] sm:rounded-2xl sm:border sm:border-dashed sm:border-cu-line sm:bg-cu-surface sm:p-12">
+      <MaterialIcon name="history" size="md" className="mx-auto text-cu-soft animate-pulse" />
+      <h2 className="mt-3 text-[15px] font-medium leading-tight sm:text-sm sm:font-semibold sm:text-cu-ink">Belum ada riwayat batch</h2>
+      <p className="mx-auto mt-1 max-w-xs text-xs text-cu-muted">
+        Anda belum pernah membuat label harga promo secara kelompok atau satuan.
       </p>
     </div>
   );

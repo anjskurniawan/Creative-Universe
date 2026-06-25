@@ -86,7 +86,7 @@ class PricetagTestDataSeeder extends Seeder
 
             $categoryName = trim($row[0]);
             $productName = trim($row[1]);
-            $variantName = trim($row[2]) ?: 'Default';
+            $variantName = trim($row[2]) ?: ' ';
             $normalPrice = intval(preg_replace('/[^0-9]/', '', $row[3]));
             $discountPriceRaw = trim($row[4]);
             $discountPrice = $discountPriceRaw === '' ? null : intval(preg_replace('/[^0-9]/', '', $discountPriceRaw));

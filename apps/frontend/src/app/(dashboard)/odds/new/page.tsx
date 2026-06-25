@@ -3,13 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createOddsTicket, getOddsCategories } from "@/lib/odds";
+import { ValidationError } from "@/lib/api";
+import { createOddsTicket, getOddsCategories, OddsCategory } from "@/lib/odds";
 import { MaterialIcon } from "@/components/material-icon";
 
 export default function CreateTicketPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<OddsCategory[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -57,12 +58,12 @@ export default function CreateTicketPage() {
     try {
       await createOddsTicket(formData);
       router.push("/odds");
-    } catch (err: any) {
-      if (err.name === "ValidationError") {
+    } catch (err: unknown) {
+      if (err instanceof ValidationError) {
         const errMsgs = Object.values(err.errors).flat().join(", ");
         setError(errMsgs);
       } else {
-        setError(err.message || "Gagal membuat tiket.");
+        setError(err instanceof Error ? err.message : "Gagal membuat tiket.");
       }
       setLoading(false);
     }

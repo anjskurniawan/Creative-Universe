@@ -34,13 +34,13 @@ class PricetagGeneratorService
             return false;
         }
 
-        $fileName = str($product->name.'-'.($product->variant_name ?: 'Default'))->slug().'.jpg';
+        $fileName = str($product->name.'-'.($product->variant_name ?: ' '))->slug().'.jpg';
 
         $payload = [
             'user' => $userName,
             'category' => $category->name,
             'produk' => $product->name,
-            'varian' => $product->variant_name ?: 'Default',
+            'varian' => $product->variant_name ?: ' ',
             'hargaNormal' => (int) $product->normal_price,
             'hargaPotongan' => (int) $product->discount_price,
             'fileName' => $fileName,

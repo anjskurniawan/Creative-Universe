@@ -733,6 +733,55 @@
   background: rgb(255 255 255 / 0.68);
 }
 
+.cu-animated-rainbow-border {
+  background: conic-gradient(
+    from var(--cu-rainbow-angle, 0deg),
+    #ff7a00,
+    #d923ff,
+    #00c8ff,
+    #d923ff,
+    #ff7a00
+  );
+  animation: cu-rainbow-angle 1.8s linear infinite;
+}
+
+.cu-animated-rainbow-line::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    #ff7a00,
+    #d923ff,
+    #00c8ff,
+    #d923ff,
+    #ff7a00
+  );
+  background-size: 240% 100%;
+  animation: cu-rainbow-slide 1.8s linear infinite;
+}
+
+@property --cu-rainbow-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes cu-rainbow-angle {
+  to {
+    --cu-rainbow-angle: 360deg;
+  }
+}
+
+@keyframes cu-rainbow-slide {
+  to {
+    background-position: 240% 0;
+  }
+}
+
 .cu-loading-bar {
   position: relative;
   height: 6px;

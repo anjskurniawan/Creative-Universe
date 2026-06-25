@@ -51,12 +51,15 @@ export default function PricetagGeneratorPage() {
   const [generatedViewUrl, setGeneratedViewUrl] = useState<string | null>(null);
   const [generatedDownloadUrl, setGeneratedDownloadUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [wizardGenerationFailed, setWizardGenerationFailed] = useState(false);
 
   // ----------------------------------------------------
   // Tab 2: Checklist State
   // ----------------------------------------------------
   const [checklistSearch, setChecklistSearch] = useState("");
   const [checklistAppliedSearch, setChecklistAppliedSearch] = useState("");
+  const [checklistCategories, setChecklistCategories] = useState<PricetagCategory[]>([]);
+  const [checklistCategory, setChecklistCategory] = useState<PricetagCategory | null>(null);
   const [checklistProducts, setChecklistProducts] = useState<PricetagProduct[]>([]);
   const [checklistPage, setChecklistPage] = useState(1);
   const [checklistLastPage, setChecklistLastPage] = useState(1);
@@ -253,7 +256,7 @@ export default function PricetagGeneratorPage() {
         const list = res.data.filter((p) => p.name === prodName);
         if (list.length === 1) {
           const singleVar = list[0];
-          if (singleVar.variant_name === "Default" || !singleVar.variant_name) {
+          if (singleVar.variant_name === " " || !singleVar.variant_name) {
             // Auto skip to step 3
             setWizardProductId(singleVar.id);
             setSelectedProduct(singleVar);
@@ -298,7 +301,7 @@ export default function PricetagGeneratorPage() {
         const list = res.data.filter((p) => p.name === wizardProductName);
         if (list.length === 1) {
           const singleVar = list[0];
-          if (singleVar.variant_name === "Default" || !singleVar.variant_name) {
+          if (singleVar.variant_name === " " || !singleVar.variant_name) {
             setWizardStep(1);
             return;
           }
@@ -312,8 +315,10 @@ export default function PricetagGeneratorPage() {
   const handleGenerateSingle = async (e: FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
+    if (Number(wizardDiscountPrice || 0) <= 0) return;
 
     setIsGenerating(true);
+    setWizardGenerationFailed(false);
     setVisualPercent(0);
     setWizardStep(4); // Go to loader page
 
@@ -351,7 +356,8 @@ export default function PricetagGeneratorPage() {
     } catch (err) {
       clearInterval(interval);
       notify(pricetagError(err));
-      setWizardStep(3); // Rollback to form input
+      setWizardGenerationFailed(true);
+      setWizardStep(6);
     } finally {
       setIsGenerating(false);
     }
@@ -369,12 +375,48 @@ export default function PricetagGeneratorPage() {
     setWizardDiscountPrice("");
     setGeneratedViewUrl(null);
     setGeneratedDownloadUrl(null);
+    setWizardGenerationFailed(false);
   };
+
+  const loadChecklistCategories = useCallback(async () => {
+    if (
+      activeTab !== "checklist" ||
+      isChecklistDesktop ||
+      checklistAppliedSearch.trim() ||
+      checklistCategory
+    ) {
+      return;
+    }
+
+    setChecklistIsLoading(true);
+
+    try {
+      const params = new URLSearchParams({
+        page: "1",
+        per_page: "100",
+        sort_by: "products_count",
+        sort_order: "desc",
+      });
+      const result = await apiFetch<PricetagPage<PricetagCategory>>(`/pricetag/categories?${params}`);
+      setChecklistCategories(result.data);
+      setChecklistProducts([]);
+      setChecklistLastPage(1);
+      setChecklistTotal(result.meta.total);
+    } catch (err) {
+      notify(pricetagError(err));
+    } finally {
+      setChecklistIsLoading(false);
+    }
+  }, [activeTab, checklistAppliedSearch, checklistCategory, isChecklistDesktop, notify]);
+
+  useEffect(() => {
+    queueMicrotask(() => void loadChecklistCategories());
+  }, [loadChecklistCategories]);
 
   const loadChecklistProducts = useCallback(async () => {
     if (activeTab !== "checklist") return;
 
-    if (!checklistAppliedSearch.trim()) {
+    if (!checklistAppliedSearch.trim() && !checklistCategory) {
       setChecklistProducts([]);
       setChecklistLastPage(1);
       setChecklistTotal(0);
@@ -389,8 +431,16 @@ export default function PricetagGeneratorPage() {
       const params = new URLSearchParams({
         page: String(isChecklistDesktop ? checklistPage : 1),
         per_page: isChecklistDesktop ? "10" : "100",
-        search,
       });
+
+      if (search) {
+        params.set("search", search);
+      }
+
+      if (checklistCategory) {
+        params.set("category_id", String(checklistCategory.id));
+      }
+
       const firstPage = await apiFetch<PricetagPage<PricetagProduct>>(`/pricetag/products?${params}`);
 
       if (!isChecklistDesktop && firstPage.meta.last_page > 1) {
@@ -419,7 +469,7 @@ export default function PricetagGeneratorPage() {
     } finally {
       setChecklistIsLoading(false);
     }
-  }, [checklistPage, checklistAppliedSearch, activeTab, isChecklistDesktop, notify]);
+  }, [checklistPage, checklistAppliedSearch, checklistCategory, activeTab, isChecklistDesktop, notify]);
 
   useEffect(() => {
     queueMicrotask(() => void loadChecklistProducts());
@@ -699,7 +749,7 @@ export default function PricetagGeneratorPage() {
       // Populate Database sheet with all active products and their pricing from backend
       res.data.forEach((prod, idx) => {
         refSheet.getCell(`A${idx + 2}`).value = prod.name;
-        refSheet.getCell(`B${idx + 2}`).value = prod.variant_name || "Default";
+        refSheet.getCell(`B${idx + 2}`).value = prod.variant_name || " ";
         refSheet.getCell(`C${idx + 2}`).value = prod.normal_price;
         refSheet.getCell(`C${idx + 2}`).numFmt = "#,##0";
         refSheet.getCell(`D${idx + 2}`).value = prod.discount_price || "";
@@ -755,40 +805,95 @@ export default function PricetagGeneratorPage() {
   const displayedChecklistProducts = showOnlySelected
     ? Object.values(selectedProductsData)
     : checklistProducts;
+  const shouldShowChecklistCategories =
+    !isChecklistDesktop &&
+    activeTab === "checklist" &&
+    !checklistCategory &&
+    !checklistAppliedSearch.trim() &&
+    !showOnlySelected;
+  const shouldShowChecklistProducts =
+    checklistAppliedSearch.trim() !== "" || showOnlySelected || Boolean(checklistCategory);
+  const hasChecklistBack = Boolean(checklistCategory || checklistAppliedSearch);
+  const mobileWizardMeta = (() => {
+    if (wizardGenerationFailed || wizardStep === 6) {
+      return { label: "SELESAI", percent: 100 };
+    }
+
+    if (wizardStep === 5) {
+      return { label: "SELESAI", percent: 100 };
+    }
+
+    if (wizardStep === 4) {
+      return { label: "PROSES MEMBUAT PRICETAG", percent: 80 };
+    }
+
+    if (wizardStep === 3) {
+      return { label: "ATUR HARGA DISKON", percent: 60 };
+    }
+
+    if (wizardStep === 2) {
+      return { label: "PILIH VARIANT", percent: 40 };
+    }
+
+    return { label: "PILIH PRODUK", percent: 20 };
+  })();
+
+  const handleSelectChecklistCategory = (category: PricetagCategory) => {
+    setChecklistCategory(category);
+    setChecklistSearch("");
+    setChecklistAppliedSearch("");
+    setChecklistPage(1);
+    setExpandedChecklistProductId(null);
+  };
+
+  const handleBackToChecklistCategories = () => {
+    setChecklistCategory(null);
+    setChecklistSearch("");
+    setChecklistAppliedSearch("");
+    setChecklistPage(1);
+    setExpandedChecklistProductId(null);
+  };
+
+  const mobileBackFromProductSearch = () => {
+    setWizardProductSearch("");
+    setProductsList([]);
+  };
+  const hasMobileWizardBack = wizardStep !== 1 || wizardProductSearch.trim() !== "";
+  const isWizardDiscountInvalid = Number(wizardDiscountPrice || 0) <= 0;
 
   return (
     <div>
-      <div className="mb-8 flex w-full justify-center">
-        <div className={`grid w-full gap-1 rounded-2xl border border-cu-line bg-cu-surface-soft p-1 shadow-sm sm:inline-flex sm:w-auto sm:flex-nowrap sm:rounded-full md:gap-1.5 ${
-          hasRole("root") ? "grid-cols-3" : "grid-cols-2"
+      <div className="mb-6 flex w-full justify-center lg:mb-8">
+        <div className={`grid w-full grid-cols-2 items-stretch gap-0 lg:gap-1 lg:rounded-2xl lg:border lg:border-cu-line lg:bg-cu-surface-soft lg:p-1 lg:shadow-sm sm:grid sm:w-full sm:flex-nowrap sm:rounded-full md:gap-1.5 ${
+          hasRole("root") ? "lg:grid-cols-3" : "lg:grid-cols-2"
         }`}>
           <button
             type="button"
             onClick={() => setActiveTab("single")}
-            className={`flex min-w-0 items-center justify-center rounded-xl px-1 py-2 text-center text-[8px] font-bold uppercase leading-tight tracking-normal transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:rounded-full sm:px-3 sm:text-[10px] sm:tracking-wider sm:whitespace-nowrap md:px-6 md:py-2.5 md:text-xs ${
+            className={`flex h-full w-full min-w-0 items-center justify-center rounded-full px-2 py-3 text-center text-[11px] font-bold uppercase leading-none tracking-normal transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:px-3 sm:text-[10px] sm:tracking-wider sm:whitespace-nowrap md:px-6 md:py-2.5 md:text-xs lg:rounded-full lg:py-2 ${
               activeTab === "single"
-                ? "bg-cu-ink text-white shadow-sm font-extrabold"
-                : "text-cu-muted hover:text-cu-ink hover:bg-cu-panel-soft/50"
+                ? "bg-white text-[#111] shadow-sm font-extrabold lg:bg-cu-ink lg:text-white"
+                : "text-white hover:text-white/80 lg:text-cu-muted lg:hover:text-cu-ink lg:hover:bg-cu-panel-soft/50"
             }`}
           >
-            Buat Label Satuan
+            Buat satuan
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("checklist")}
-            className={`flex min-w-0 items-center justify-center rounded-xl px-1 py-2 text-center text-[8px] font-bold uppercase leading-tight tracking-normal transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:rounded-full sm:px-3 sm:text-[10px] sm:tracking-wider sm:whitespace-nowrap md:px-6 md:py-2.5 md:text-xs ${
+            className={`flex h-full w-full min-w-0 items-center justify-center rounded-full px-2 py-3 text-center text-[11px] font-bold uppercase leading-none tracking-normal transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:px-3 sm:text-[10px] sm:tracking-wider sm:whitespace-nowrap md:px-6 md:py-2.5 md:text-xs lg:rounded-full lg:py-2 ${
               activeTab === "checklist"
-                ? "bg-cu-ink text-white shadow-sm font-extrabold"
-                : "text-cu-muted hover:text-cu-ink hover:bg-cu-panel-soft/50"
+                ? "bg-white text-[#111] shadow-sm font-extrabold lg:bg-cu-ink lg:text-white"
+                : "text-white hover:text-white/80 lg:text-cu-muted lg:hover:text-cu-ink lg:hover:bg-cu-panel-soft/50"
             }`}
           >
-            Buat Label Sekaligus
+            Buat sekaligus
           </button>
           {hasRole("root") && (
             <button
               type="button"
               onClick={() => setActiveTab("bulk")}
-              className={`flex min-w-0 items-center justify-center rounded-xl px-1 py-2 text-center text-[8px] font-bold uppercase leading-tight tracking-normal transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:rounded-full sm:px-3 sm:text-[10px] sm:tracking-wider sm:whitespace-nowrap md:px-6 md:py-2.5 md:text-xs ${
+              className={`hidden min-w-0 items-center justify-center rounded-full px-3 py-4 text-center text-[14px] font-bold uppercase leading-tight tracking-normal transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:px-3 sm:text-[10px] sm:tracking-wider sm:whitespace-nowrap md:px-6 md:py-2.5 md:text-xs lg:flex lg:rounded-full lg:py-2 ${
                 activeTab === "bulk"
                   ? "bg-cu-danger text-white shadow-sm font-extrabold"
                   : "text-cu-danger hover:bg-cu-danger-soft/20 font-bold border border-cu-danger/25"
@@ -802,7 +907,176 @@ export default function PricetagGeneratorPage() {
 
       {/* Tab 1: Single Generator Wizard */}
       {activeTab === "single" && (
-        <div className="space-y-8">
+        <div>
+          <div className="space-y-5 lg:hidden">
+            <div className="space-y-2">
+              <h2 className="text-[13px] font-bold uppercase tracking-wide text-white">{mobileWizardMeta.label}</h2>
+              <div className="h-3 overflow-hidden rounded-full bg-[#121212]">
+                <div
+                  className="h-full rounded-full bg-[#269556] transition-all duration-500"
+                  style={{ width: `${mobileWizardMeta.percent}%` }}
+                />
+              </div>
+            </div>
+
+            {(wizardStep === 1 || wizardStep === 2 || wizardStep === 3) && (
+              <div className="flex items-center">
+                <div className="cu-animated-rainbow-border min-w-0 flex-1 rounded-full p-[2px] transition-all duration-300 ease-out">
+                  <div className="relative h-[46px] rounded-full bg-black">
+                    <MaterialIcon
+                      name="search"
+                      size="md"
+                      className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-white/70"
+                      filled={false}
+                    />
+                    <input
+                      type="search"
+                      value={wizardStep === 1 ? wizardProductSearch : wizardVariantSearch}
+                      onChange={(event) => {
+                        if (wizardStep === 1) {
+                          setWizardProductSearch(event.target.value);
+                        } else {
+                          setWizardVariantSearch(event.target.value);
+                        }
+                      }}
+                      className="h-full w-full rounded-full border-0 bg-transparent pl-14 pr-5 text-[15px] font-medium text-white outline-none placeholder:text-white/65 focus:ring-0"
+                      placeholder={wizardStep === 1 ? "Cari produk..." : "Cari varian..."}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={!hasMobileWizardBack}
+                  onClick={() => {
+                    if (wizardStep === 1) {
+                      mobileBackFromProductSearch();
+                    } else if (wizardStep === 2) {
+                      setWizardStep(1);
+                      setWizardVariantSearch("");
+                    } else {
+                      handleBackFromStep3();
+                    }
+                  }}
+                  className={`flex h-[46px] shrink-0 items-center justify-center gap-2 overflow-hidden whitespace-nowrap text-[16px] font-medium text-white transition-all duration-300 ease-out ${
+                    hasMobileWizardBack
+                      ? "ml-8 w-24 translate-x-0 opacity-100"
+                      : "ml-0 w-0 translate-x-2 opacity-0"
+                  }`}
+                  aria-hidden={!hasMobileWizardBack}
+                  aria-label="Kembali"
+                >
+                  <MaterialIcon name="arrow_back" size="md" filled={false} />
+                  <span>Kembali</span>
+                </button>
+              </div>
+            )}
+
+            {wizardStep === 1 && wizardProductSearch.trim() !== "" && (
+              <div className="rounded-[36px] bg-white p-4">
+                {isGenerating ? (
+                  <MobileGeneratorMessage text="Memuat..." />
+                ) : productsList.length > 0 ? (
+                  <div className="space-y-2">
+                    {productsList.map((prodName) => (
+                      <MobileGeneratorListButton
+                        key={prodName}
+                        label={prodName}
+                        onClick={() => handleSelectProduct(prodName)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <MobileGeneratorMessage icon="sentiment_dissatisfied" text="Produk tidak ditemukan" />
+                )}
+              </div>
+            )}
+
+            {wizardStep === 2 && (
+              <div className="rounded-[36px] bg-white p-4">
+                {variantsList.length > 0 ? (
+                  <div className="space-y-2">
+                    {variantsList.map((prod) => (
+                      <MobileGeneratorListButton
+                        key={prod.id}
+                        label={prod.variant_name || " "}
+                        onClick={() => handleSelectVariant(prod)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <MobileGeneratorMessage icon="sentiment_dissatisfied" text="Varian tidak ditemukan" />
+                )}
+              </div>
+            )}
+
+            {wizardStep === 3 && selectedProduct && (
+              <form onSubmit={handleGenerateSingle} className="rounded-[36px] bg-white p-4">
+                <div className="rounded-[24px] border border-[#b9bbb9] px-5 py-4">
+                  <h3 className="text-[18px] font-semibold leading-tight text-[#303431]">Detail Pricetag</h3>
+                  <div className="mt-5 space-y-2 text-[#303431]">
+                    <MobileDetailRow label="Kategori" value={wizardCategoryName} />
+                    <MobileDetailRow label="Produk" value={selectedProduct.name} />
+                    <MobileDetailRow label="Varian" value={selectedProduct.variant_name || " "} />
+                    <MobileDetailRow label="Harga normal" value={formatRupiah(selectedProduct.normal_price)} />
+                    <MobileDetailRow label="Harga diskon terakhir" value={formatRupiah(selectedProduct.discount_price)} />
+                  </div>
+
+                  <label htmlFor="mobileWizardDiscountPrice" className="mt-8 block text-[13px] font-bold text-black">
+                    Harga promo / diskon
+                  </label>
+                  <div className="mt-2 flex h-[46px] items-center rounded-[14px] border border-[#aeb0ae] px-4">
+                    <span className="border-r border-[#aeb0ae] pr-3 text-[18px] font-semibold text-[#8f9690]">Rp</span>
+                    <input
+                      id="mobileWizardDiscountPrice"
+                      type="number"
+                      min="0"
+                      value={wizardDiscountPrice}
+                      onChange={(event) => setWizardDiscountPrice(event.target.value)}
+                      className="h-full min-w-0 flex-1 border-0 bg-transparent pl-3 text-[18px] font-medium text-[#303431] outline-none placeholder:text-[#8f9690] focus:ring-0"
+                      placeholder="0"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isGenerating || isWizardDiscountInvalid}
+                  className={`mt-4 flex h-[46px] w-full items-center justify-center rounded-full text-[16px] font-bold transition ${
+                    isWizardDiscountInvalid
+                      ? "cursor-not-allowed bg-[#b7b7b7] text-white"
+                      : "bg-black text-white disabled:opacity-50"
+                  }`}
+                >
+                  Lanjutkan
+                </button>
+              </form>
+            )}
+
+            {wizardStep === 4 && (
+              <MobileProcessCard visualPercent={visualPercent} />
+            )}
+
+            {wizardStep === 5 && (
+              <MobileResultCard
+                success
+                title="Membuat Pricetag Berhasil"
+                generatedViewUrl={generatedViewUrl}
+                generatedDownloadUrl={generatedDownloadUrl}
+                onReset={resetWizard}
+              />
+            )}
+
+            {wizardStep === 6 && (
+              <MobileResultCard
+                title="Membuat Pricetag Gagal"
+                description="Silahkan hubungi Leader Creative terkait kendala yang dialami."
+              />
+            )}
+          </div>
+
+          <div className="hidden space-y-8 lg:block">
           {/* Modern Stepper Indicator */}
           <div className="bg-cu-surface border border-cu-line rounded-xl p-4 shadow-sm">
             <div className="flex items-start justify-between max-w-xl mx-auto">
@@ -849,7 +1123,7 @@ export default function PricetagGeneratorPage() {
           {/* STEP 1: Select Product */}
           {wizardStep === 1 && (
             <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-8 shadow-sm max-w-xl mx-auto">
-              <h3 className="text-base font-bold text-cu-ink mb-4">Cari Produk</h3>
+              <h3 className="text-base font-bold text-cu-ink mb-4">Cari produk</h3>
               
               {/* Search Bar */}
               <div className="relative mb-4">
@@ -929,9 +1203,9 @@ export default function PricetagGeneratorPage() {
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-cu-ink group-hover:text-cu-focus transition-colors">{prod.variant_name || "Default"}</span>
+                        <span className="text-sm font-semibold text-cu-ink group-hover:text-cu-focus transition-colors">{prod.variant_name || " "}</span>
                       </div>
-                      <span className="text-xs text-cu-muted">Harga Normal: {formatRupiah(prod.normal_price)}</span>
+                      <span className="text-xs text-cu-muted">Harga normal: {formatRupiah(prod.normal_price)}</span>
                     </div>
                     <div className="text-cu-muted group-hover:text-cu-ink transition">
                       <MaterialIcon name="chevron_right" size="sm" />
@@ -950,7 +1224,7 @@ export default function PricetagGeneratorPage() {
           {wizardStep === 3 && selectedProduct && (
             <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-8 shadow-sm max-w-xl mx-auto">
               <div className="flex items-center justify-between mb-5 border-b border-cu-line pb-3">
-                <h3 className="text-base font-bold text-cu-ink">Atur Harga Promo</h3>
+                <h3 className="text-base font-bold text-cu-ink">Atur harga promo</h3>
                 <button type="button" onClick={handleBackFromStep3} className="inline-flex items-center gap-1 text-xs text-cu-muted hover:text-cu-ink transition">
                   <MaterialIcon name="arrow_back" size="xs" /> Kembali
                 </button>
@@ -967,16 +1241,16 @@ export default function PricetagGeneratorPage() {
                     <span className="font-bold text-cu-ink text-right">{selectedProduct.name}</span>
 
                     <span className="text-cu-muted">Varian</span>
-                    <span className="font-semibold text-cu-ink text-right font-mono">{selectedProduct.variant_name || "Default"}</span>
+                    <span className="font-semibold text-cu-ink text-right font-mono">{selectedProduct.variant_name || " "}</span>
 
-                    <span className="text-cu-muted">Harga Normal</span>
+                    <span className="text-cu-muted">Harga normal</span>
                     <span className="font-bold text-cu-ink text-right">{formatRupiah(selectedProduct.normal_price)}</span>
                   </div>
                 </div>
 
                 {/* Harga Diskon */}
                 <div>
-                  <label htmlFor="wizardDiscountPrice" className="block text-sm font-medium text-cu-ink mb-1.5">Harga Promo / Diskon</label>
+                  <label htmlFor="wizardDiscountPrice" className="block text-sm font-medium text-cu-ink mb-1.5">Harga promo / diskon</label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-semibold text-cu-muted">Rp</span>
                     <input
@@ -995,8 +1269,8 @@ export default function PricetagGeneratorPage() {
                 <div className="flex items-center gap-3 border-t border-cu-line pt-4">
                   <button
                     type="submit"
-                    disabled={isGenerating}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-cu-ink px-6 py-2.5 text-sm font-semibold text-cu-surface shadow-sm transition hover:bg-cu-ink-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover sm:w-auto"
+                    disabled={isGenerating || isWizardDiscountInvalid}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-cu-ink px-6 py-2.5 text-sm font-semibold text-cu-surface shadow-sm transition hover:bg-cu-ink-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover disabled:cursor-not-allowed disabled:bg-[#b7b7b7] sm:w-auto"
                   >
                     <MaterialIcon name="photo_filter" size="sm" />
                     <span>Buat Gambar Label</span>
@@ -1094,6 +1368,7 @@ export default function PricetagGeneratorPage() {
             </div>
           )}
         </div>
+        </div>
       )}
 
       {/* Tab 2: Checklist Generator */}
@@ -1181,8 +1456,8 @@ export default function PricetagGeneratorPage() {
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-8 shadow-sm">
-            <div className="flex items-start justify-between border-b border-cu-line pb-4 mb-5">
+            <div className="bg-transparent lg:rounded-2xl lg:border lg:border-cu-line lg:bg-cu-surface lg:p-8 lg:shadow-sm">
+            <div className="mb-5 hidden items-start justify-between border-b border-cu-line pb-4 lg:flex">
               <div>
                 <h2 className="text-lg font-semibold text-cu-ink">Buat Banyak Label Sekaligus</h2>
                 <p className="text-xs text-cu-muted mt-1">
@@ -1194,32 +1469,54 @@ export default function PricetagGeneratorPage() {
 
 
             <form onSubmit={handleChecklistGenerate} className="space-y-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-5">
+              <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 {/* Pencarian Varian (Kiri) */}
-                <div className="order-2 w-full sm:order-1 sm:max-w-md">
-                  <label htmlFor="checklistSearch" className="block text-sm font-medium text-cu-ink mb-1.5">Cari Produk</label>
-                  <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cu-muted">
-                      <MaterialIcon name="search" size="sm" />
+                <div className="order-2 w-full lg:order-1 lg:max-w-md">
+                  <label htmlFor="checklistSearch" className="mb-1.5 hidden text-sm font-medium text-cu-ink lg:block">Cari produk</label>
+                  <div className="flex w-full items-center lg:block">
+                    <div className="cu-animated-rainbow-border min-w-0 flex-1 rounded-full p-[2px] transition-all duration-300 ease-out lg:bg-none lg:p-0">
+                      <div className="relative h-[46px] rounded-full bg-black lg:h-auto lg:bg-transparent">
+                        <MaterialIcon
+                          name="search"
+                          size="md"
+                          className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-white/70 lg:left-4 lg:text-cu-muted"
+                        />
+                        <input
+                          type="search"
+                          id="checklistSearch"
+                          value={checklistSearch}
+                          onChange={(e) => {
+                            const nextSearch = e.target.value;
+                            setChecklistSearch(nextSearch);
+                            setChecklistAppliedSearch(nextSearch);
+                            setChecklistCategory(null);
+                            setChecklistPage(1);
+                          }}
+                          className="h-full w-full rounded-full border-0 bg-transparent pl-14 pr-5 text-[15px] font-medium text-white shadow-none outline-none placeholder:text-white/65 focus:ring-0 lg:h-11 lg:border lg:border-cu-line lg:bg-cu-surface lg:pl-11 lg:pr-4 lg:text-sm lg:font-normal lg:text-cu-ink lg:shadow-sm lg:placeholder:text-cu-muted lg:focus:border-cu-border-hover lg:focus:outline-none lg:focus:ring-1 lg:focus:ring-cu-border-hover"
+                          placeholder="Cari produk..."
+                        />
+                      </div>
                     </div>
-                    <input
-                      type="search"
-                      id="checklistSearch"
-                      value={checklistSearch}
-                      onChange={(e) => {
-                        const nextSearch = e.target.value;
-                        setChecklistSearch(nextSearch);
-                        setChecklistAppliedSearch(nextSearch);
-                        setChecklistPage(1);
-                      }}
-                      className="h-11 w-full rounded-full border border-cu-line bg-cu-surface pl-11 pr-4 text-sm text-cu-ink placeholder-cu-muted shadow-sm focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
-                      placeholder="Cari nama produk..."
-                    />
+                    <button
+                      type="button"
+                      onClick={handleBackToChecklistCategories}
+                      disabled={!hasChecklistBack}
+                      className={`flex h-[46px] shrink-0 items-center justify-center gap-2 overflow-hidden whitespace-nowrap text-[16px] font-medium text-white transition-all duration-300 ease-out lg:hidden ${
+                        hasChecklistBack
+                          ? "ml-8 w-24 translate-x-0 opacity-100"
+                          : "ml-0 w-0 translate-x-2 opacity-0"
+                      }`}
+                      aria-label="Kembali ke kategori"
+                      aria-hidden={!hasChecklistBack}
+                    >
+                      <MaterialIcon name="arrow_back" size="md" />
+                      <span>Kembali</span>
+                    </button>
                   </div>
                 </div>
 
                 {/* Keterangan Produk Terpilih & Action Group (Kanan) - Tinggi disesuaikan dengan Searchbar */}
-                <div className="order-1 flex h-11 items-center gap-2 self-end sm:order-2">
+                <div className="order-1 hidden h-11 items-center gap-2 self-end lg:order-2 lg:flex">
                   <div className="inline-flex items-center h-full rounded-full border border-cu-line bg-cu-surface p-1 shadow-sm gap-1">
                     {/* Angka total item terpilih */}
                     <span className="flex items-center justify-center min-w-9 h-9 px-2.5 rounded-full bg-cu-panel-soft text-xs font-bold text-cu-ink" title="Total produk terpilih">
@@ -1265,13 +1562,51 @@ export default function PricetagGeneratorPage() {
                 </div>
               </div>
 
+              {shouldShowChecklistCategories && (
+                <div className="rounded-[36px] bg-white p-4 lg:hidden">
+                  {checklistIsLoading ? (
+                    <div className="py-8 text-center text-base font-medium text-[#626662]">Memuat...</div>
+                  ) : checklistCategories.length === 0 ? (
+                    <div className="py-8 text-center text-base font-medium text-[#626662]">Kategori tidak ditemukan.</div>
+                  ) : (
+                    <div className="space-y-2">
+                      {checklistCategories.map((category) => (
+                        <button
+                          key={category.id}
+                          type="button"
+                          onClick={() => handleSelectChecklistCategory(category)}
+                          className="flex min-h-[60px] w-full items-center justify-between gap-2 rounded-[24px] border border-[#c9c9c9] bg-white px-5 text-left text-[#2c2c2c] transition-all duration-200 ease-out focus:border-[#2da3ff] focus:bg-[#d8efff] focus:outline-none focus:ring-2 focus:ring-[#2da3ff] active:scale-[0.99] active:border-[#2da3ff] active:bg-[#d8efff]"
+                        >
+                          <span className="flex min-w-0 items-center gap-1">
+                            <span className="flex size-9 shrink-0 items-center justify-center text-[#2c2c2c]">
+                              {category.icon_svg ? (
+                                <span
+                                  dangerouslySetInnerHTML={{ __html: category.icon_svg }}
+                                  className="flex size-full items-center justify-center *:size-full"
+                                />
+                              ) : (
+                                <MaterialIcon name="headphones" size="md" />
+                              )}
+                            </span>
+                            <span className="min-w-0 truncate text-[13px] font-semibold leading-tight">
+                              {category.name}
+                            </span>
+                          </span>
+                          <MaterialIcon name="chevron_right" size="md" className="shrink-0 text-[#2c2c2c]" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Checklist Table (Collapsible) */}
               <div 
                 className="transition-all duration-500 ease-in-out overflow-hidden"
                 style={{
-                  maxHeight: (checklistAppliedSearch.trim() !== "" || showOnlySelected) ? "1500px" : "0px",
-                  opacity: (checklistAppliedSearch.trim() !== "" || showOnlySelected) ? 1 : 0,
-                  marginTop: (checklistAppliedSearch.trim() !== "" || showOnlySelected) ? "1.25rem" : "0px",
+                  maxHeight: shouldShowChecklistProducts ? "1500px" : "0px",
+                  opacity: shouldShowChecklistProducts ? 1 : 0,
+                  marginTop: shouldShowChecklistProducts ? "1.25rem" : "0px",
                 }}
               >
                 <div className="overflow-hidden bg-transparent lg:rounded-lg lg:border lg:border-cu-line lg:bg-cu-surface">
@@ -1298,11 +1633,11 @@ export default function PricetagGeneratorPage() {
                   </div>
                   
                   {/* Mobile: kartu produk dengan detail collapse/expand. */}
-                  <div className="space-y-3 lg:hidden">
+                  <div className="space-y-2 rounded-[36px] bg-white p-4 lg:hidden">
                     {checklistIsLoading ? (
-                      <div className="px-4 py-8 text-center text-sm text-cu-muted">Memuat...</div>
+                      <div className="flex min-h-[88px] items-center justify-center text-center text-[15px] font-medium leading-tight text-[#9aa1af]">Memuat...</div>
                     ) : displayedChecklistProducts.length === 0 ? (
-                      <div className="px-4 py-8 text-center text-sm text-cu-muted">
+                      <div className="flex min-h-[88px] items-center justify-center px-4 text-center text-[15px] font-medium leading-tight text-[#9aa1af]">
                         {showOnlySelected
                           ? "Belum ada produk terpilih."
                           : !checklistAppliedSearch.trim()
@@ -1318,10 +1653,10 @@ export default function PricetagGeneratorPage() {
                         return (
                           <article
                             key={product.id}
-                            className={`overflow-hidden rounded-xl border shadow-sm transition-colors duration-300 ${
+                            className={`overflow-hidden rounded-[24px] border bg-white transition-colors duration-300 ${
                               isChecked
-                                ? "border-cu-success"
-                                : "border-cu-line"
+                                ? "border-[#2da3ff]"
+                                : "border-[#c9c9c9]"
                             }`}
                           >
                             <button
@@ -1329,42 +1664,46 @@ export default function PricetagGeneratorPage() {
                               aria-expanded={isExpanded}
                               aria-controls={detailId}
                               onClick={() => setExpandedChecklistProductId(isExpanded ? null : product.id)}
-                              className={`flex w-full items-center justify-between gap-2 px-3 py-3 text-left transition-colors duration-300 ${
+                              className={`flex min-h-[60px] w-full items-center justify-between gap-2 px-5 text-left transition-all duration-200 ease-out focus:border-[#2da3ff] focus:bg-[#d8efff] focus:outline-none focus:ring-2 focus:ring-[#2da3ff] active:scale-[0.99] ${
                                 isChecked
-                                  ? "bg-cu-success text-white"
-                                  : "bg-cu-surface text-cu-ink"
+                                  ? "bg-[#d8efff] text-[#2c2c2c]"
+                                  : "bg-white text-[#2c2c2c]"
                               }`}
                             >
-                              <div className="min-w-0">
-                                <p className="break-words text-sm font-semibold">{product.name}</p>
+                              <div className="flex min-w-0 items-center gap-1">
+                                <span className={`size-2 shrink-0 rounded-full ${isChecked ? "bg-[#139300]" : "bg-[#dddddd]"}`} />
+                                <span className="flex size-9 shrink-0 items-center justify-center">
+                                  <MaterialIcon name="sell" size="md" />
+                                </span>
+                                <p className="min-w-0 truncate text-[13px] font-semibold leading-tight">{product.name}</p>
                               </div>
                               <MaterialIcon
-                                name="expand_more"
-                                size="sm"
-                                className={`shrink-0 transition-all duration-200 ${isExpanded ? "rotate-180" : ""} ${isChecked ? "text-white/70" : "text-cu-muted"}`}
+                                name="chevron_right"
+                                size="md"
+                                className={`shrink-0 text-[#2c2c2c] transition-all duration-200 ${isExpanded ? "rotate-90" : ""}`}
                               />
                             </button>
 
                             {isExpanded && (
-                              <div id={detailId} className="space-y-2.5 border-t border-cu-line px-3 py-3 bg-cu-surface">
+                              <div id={detailId} className="space-y-3 border-t border-[#E3E4E3] bg-[#f8f9fb] p-4">
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-[9px] font-bold uppercase tracking-wider text-cu-muted">Kategori</span>
-                                  <span className="break-words text-xs font-semibold text-cu-ink text-right">{product.category.name}</span>
+                                  <span className="text-[10px] font-medium leading-tight text-[#8a8a8a]">Kategori</span>
+                                  <span className="break-words text-right text-[12px] font-semibold text-[#303431]">{product.category.name}</span>
                                 </div>
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-[9px] font-bold uppercase tracking-wider text-cu-muted">Varian</span>
-                                  <span className="break-words text-xs font-semibold text-cu-ink text-right">{product.variant_name || "Default"}</span>
+                                  <span className="text-[10px] font-medium leading-tight text-[#8a8a8a]">Varian</span>
+                                  <span className="break-words text-right text-[12px] font-semibold text-[#303431]">{product.variant_name || " "}</span>
                                 </div>
                                 <div className="flex justify-between items-center gap-2">
-                                  <span className="text-[9px] font-bold uppercase tracking-wider text-cu-muted">Harga Normal</span>
-                                  <span className="text-xs font-semibold text-cu-ink text-right">{formatRupiah(product.normal_price)}</span>
+                                  <span className="text-[10px] font-medium leading-tight text-[#8a8a8a]">Harga normal</span>
+                                  <span className="text-right text-[12px] font-semibold text-[#303431]">{formatRupiah(product.normal_price)}</span>
                                 </div>
-                                <div className="border-t border-cu-line/60 pt-2.5">
-                                  <label htmlFor={`checklist-price-${product.id}`} className="text-[9px] font-bold uppercase tracking-wider text-cu-muted">
-                                    Harga Diskon
+                                <div className="border-t border-[#E3E4E3] pt-3">
+                                  <label htmlFor={`checklist-price-${product.id}`} className="text-[10px] font-medium leading-tight text-[#8a8a8a]">
+                                    Harga diskon
                                   </label>
                                   <div className="relative mt-1">
-                                    <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 text-[10px] font-semibold text-cu-muted">Rp</span>
+                                    <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-semibold text-[#777B78]">Rp</span>
                                     <input
                                       id={`checklist-price-${product.id}`}
                                       type="number"
@@ -1372,17 +1711,17 @@ export default function PricetagGeneratorPage() {
                                       placeholder={product.discount_price ? String(product.discount_price) : "Harga..."}
                                       value={checklistPrices[product.id] ?? ""}
                                       onChange={(event) => handleChecklistPriceChange(product.id, event.target.value)}
-                                      className="block w-full rounded-full border border-cu-line bg-cu-surface py-1.5 pl-8 pr-3 text-xs text-cu-ink focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
+                                      className="block h-[46px] w-full rounded-full border border-[#C7C9C8] bg-white pl-10 pr-4 text-sm text-[#303431] focus:border-[#2da3ff] focus:outline-none"
                                     />
                                   </div>
                                 </div>
                                 <button
                                   type="button"
                                   onClick={() => handleToggleSelectProduct(product)}
-                                  className={`inline-flex w-full items-center justify-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold transition-colors duration-300 ${
+                                  className={`inline-flex h-[46px] w-full items-center justify-center gap-1.5 rounded-full border px-4 text-[13px] font-bold transition-colors duration-300 ${
                                     isChecked
-                                      ? "border-cu-line bg-cu-panel-soft text-cu-ink"
-                                      : "border-transparent bg-cu-ink text-white hover:bg-cu-ink/90"
+                                      ? "border-[#c9c9c9] bg-white text-[#303431]"
+                                      : "border-transparent bg-[#2da3ff] text-white"
                                   }`}
                                 >
                                   <MaterialIcon name={isChecked ? "remove" : "add"} size="xs" weight={500} />
@@ -1404,7 +1743,7 @@ export default function PricetagGeneratorPage() {
                           <th className="px-6 py-3 hidden sm:table-cell">Kategori</th>
                           <th className="px-6 py-3">Produk</th>
                           <th className="px-6 py-3 hidden sm:table-cell">Varian</th>
-                          <th className="px-6 py-3 text-right hidden sm:table-cell">Harga Normal</th>
+                          <th className="px-6 py-3 text-right hidden sm:table-cell">Harga normal</th>
                           <th className="px-6 py-3 text-right text-cu-success">Harga Diskon</th>
                           <th className="px-6 py-3 text-center w-24">Pilih</th>
                         </tr>
@@ -1439,12 +1778,12 @@ export default function PricetagGeneratorPage() {
                                     <div className="font-semibold text-cu-ink">{p.name}</div>
                                     <div className="sm:hidden text-[10px] text-cu-muted mt-1 space-y-0.5">
                                       <span>Kategori: {p.category.name}</span>
-                                      <span>• Varian: {p.variant_name || "Default"}</span>
+                                      <span>• Varian: {p.variant_name || " "}</span>
                                       <span className="block line-through">Normal: {formatRupiah(p.normal_price)}</span>
                                     </div>
                                   </td>
                                   <td className="px-6 py-4 font-medium text-cu-ink hidden sm:table-cell">
-                                    {p.variant_name || "Default"}
+                                    {p.variant_name || " "}
                                   </td>
                                   <td className="px-6 py-4 text-right font-medium text-cu-ink hidden sm:table-cell">
                                     {formatRupiah(p.normal_price)}
@@ -1498,6 +1837,33 @@ export default function PricetagGeneratorPage() {
                   )}
                 </div>
               </div>
+
+              {selectedVariants.length > 0 && (
+                <div className="rounded-[36px] bg-white p-4 lg:hidden">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowOnlySelected(!showOnlySelected)}
+                      className={`flex h-[46px] min-w-[46px] items-center justify-center rounded-full px-4 text-sm font-bold transition ${
+                        showOnlySelected
+                          ? "bg-[#2da3ff] text-white"
+                          : "bg-[#d8efff] text-[#2c2c2c]"
+                      }`}
+                      aria-pressed={showOnlySelected}
+                      aria-label={showOnlySelected ? "Tampilkan semua produk" : "Tampilkan produk terpilih"}
+                    >
+                      {selectedVariants.length}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmittingChecklist}
+                      className="flex h-[46px] flex-1 items-center justify-center rounded-full bg-[#2da3ff] px-5 text-[13px] font-bold text-white disabled:cursor-not-allowed disabled:bg-[#b7b7b7]"
+                    >
+                      {isSubmittingChecklist ? "Memproses..." : "Generate label"}
+                    </button>
+                  </div>
+                </div>
+              )}
 
             </form>
           </div>
@@ -1708,7 +2074,7 @@ export default function PricetagGeneratorPage() {
                         <tr key={idx} className={row.error ? "bg-cu-danger-soft/10" : ""}>
                           <td className="px-4 py-2 text-center text-xs text-cu-muted">{idx + 1}</td>
                           <td className="px-4 py-2 font-medium text-cu-ink">{row.produk}</td>
-                          <td className="px-4 py-2 text-cu-muted">{row.varian || "Default"}</td>
+                          <td className="px-4 py-2 text-cu-muted">{row.varian || " "}</td>
                           <td className="px-4 py-2 text-right font-mono font-medium">{row.harga_diskon ? formatRupiah(Number(row.harga_diskon)) : "-"}</td>
                           <td className="px-4 py-2 text-center">
                             {row.error ? (
@@ -1749,7 +2115,7 @@ export default function PricetagGeneratorPage() {
                       {/* Row 2: Varian on left, Prices on right */}
                       <div className="flex items-center justify-between text-[10px] text-cu-muted gap-2 w-full">
                         <div>
-                          <span className="font-medium">Varian: {row.varian || "Default"}</span>
+                          <span className="font-medium">Varian: {row.varian || " "}</span>
                         </div>
                         <div className="flex items-center gap-1.5 shrink-0">
                           <span className="line-through bg-cu-success/15 text-cu-success px-1.5 py-0.5 rounded font-bold">
@@ -1899,6 +2265,122 @@ export default function PricetagGeneratorPage() {
 // ----------------------------------------------------
 // UI Helpers
 // ----------------------------------------------------
+
+function MobileGeneratorListButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex min-h-[60px] w-full items-center justify-between gap-2 rounded-[24px] border border-[#c9c9c9] bg-white px-5 text-left text-[#2c2c2c] transition-all duration-200 ease-out focus:border-[#2da3ff] focus:bg-[#d8efff] focus:outline-none focus:ring-2 focus:ring-[#2da3ff] active:scale-[0.99] active:border-[#2da3ff] active:bg-[#d8efff]"
+    >
+      <span className="min-w-0 truncate text-[13px] font-semibold leading-tight">{label}</span>
+      <MaterialIcon name="chevron_right" size="md" className="shrink-0 text-[#2c2c2c]" />
+    </button>
+  );
+}
+
+function MobileGeneratorMessage({ icon, text }: { icon?: string; text: string }) {
+  return (
+    <div className="flex min-h-[88px] items-center justify-center gap-2 text-center text-[#9aa1af]">
+      {icon && <MaterialIcon name={icon} size="md" filled={false} />}
+      <span className="text-[15px] font-medium leading-tight">{text}</span>
+    </div>
+  );
+}
+
+function MobileDetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid grid-cols-[1fr_1.25fr] gap-3 text-[13px] leading-snug">
+      <span className="text-[#303431]/80">{label}</span>
+      <span className="break-words text-right font-bold">{value}</span>
+    </div>
+  );
+}
+
+function MobileProcessCard({ visualPercent }: { visualPercent: number }) {
+  return (
+    <div className="rounded-[28px] bg-white px-14 py-10 text-[#303431]">
+      <div className="mx-auto size-32 rounded-full bg-[#269556]" />
+      <div className="mx-auto mt-8 h-2 max-w-[480px] overflow-hidden rounded-full bg-[#e3e3e3]">
+        <div
+          className="h-full rounded-full bg-[#269556] transition-all duration-300"
+          style={{ width: `${Math.max(12, visualPercent)}%` }}
+        />
+      </div>
+      <h3 className="mt-8 text-[30px] font-bold leading-tight">Sedang Menyusun Gambar Label</h3>
+      <p className="mt-3 text-[22px] leading-snug">
+        Sistem Creative Universe sedang menyusun layout promo dan menghasilkan pricetag. Harap tunggu ...
+      </p>
+    </div>
+  );
+}
+
+function MobileResultCard({
+  success = false,
+  title,
+  description,
+  generatedViewUrl,
+  generatedDownloadUrl,
+  onReset,
+}: {
+  success?: boolean;
+  title: string;
+  description?: string;
+  generatedViewUrl?: string | null;
+  generatedDownloadUrl?: string | null;
+  onReset?: () => void;
+}) {
+  return (
+    <div className="rounded-[28px] bg-white px-12 py-10 text-center text-[#303431]">
+      <div className={`mx-auto size-32 rounded-full ${success ? "bg-[#269556]" : "bg-[#9f2424]"}`} />
+      <h3 className="mt-8 text-[30px] font-bold leading-tight">{title}</h3>
+      {description && <p className="mt-3 text-[20px] leading-snug">{description}</p>}
+
+      <div className="mx-auto mt-8 flex max-w-[464px] flex-col gap-4">
+        {success ? (
+          <>
+            {generatedViewUrl && (
+              <a
+                href={generatedViewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-[78px] items-center justify-center rounded-full bg-black text-[30px] font-bold text-white"
+              >
+                Lihat
+              </a>
+            )}
+            {generatedDownloadUrl && (
+              <a
+                href={generatedDownloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-[78px] items-center justify-center rounded-full bg-black text-[30px] font-bold text-white"
+              >
+                Download
+              </a>
+            )}
+            {onReset && (
+              <button
+                type="button"
+                onClick={onReset}
+                className="flex h-[78px] items-center justify-center rounded-full bg-[#269556] text-[30px] font-bold text-white"
+              >
+                Buat Lagi
+              </button>
+            )}
+          </>
+        ) : (
+          <a
+            href="mailto:"
+            className="flex h-[78px] items-center justify-center rounded-full bg-black text-[30px] font-bold text-white"
+          >
+            Contact
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function Pagination({ page, lastPage, onPage }: { page: number; lastPage: number; onPage: (page: number) => void }) {
   if (lastPage <= 1) return null;

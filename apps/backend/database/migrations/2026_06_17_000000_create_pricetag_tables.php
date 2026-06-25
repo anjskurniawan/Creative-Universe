@@ -33,7 +33,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('category_id');
             $table->string('name', 255);
-            $table->string('variant_name', 100)->default('Default')->nullable();
+            $table->string('variant_name', 100)->default(' ');
             $table->integer('normal_price')->default(0);
             $table->integer('discount_price')->nullable()->default(0);
 

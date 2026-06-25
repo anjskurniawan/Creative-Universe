@@ -17,8 +17,8 @@ export default function ODDSDashboard() {
       try {
         const data = await getOddsTickets();
         setTickets(data);
-      } catch (err: any) {
-        setError(err.message || "Gagal memuat data tiket.");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Gagal memuat data tiket.");
       } finally {
         setLoading(false);
       }

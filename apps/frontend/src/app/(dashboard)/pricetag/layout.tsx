@@ -68,21 +68,16 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
   ];
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col items-center gap-8 py-4">
-      {/* Animated glowing blobs in background */}
-      <div className="fixed inset-0 -z-10 bg-[#0a0a0a] overflow-hidden pointer-events-none">
-        <div className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-fuchsia-600 via-purple-600 to-indigo-600 opacity-30 blur-[120px] animate-blob-1"></div>
-        <div className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-tr from-blue-600 via-cyan-600 to-teal-600 opacity-25 blur-[120px] animate-blob-2"></div>
-        <div className="absolute top-[30%] -right-[10%] w-[35%] h-[35%] rounded-full bg-gradient-to-bl from-rose-600 via-pink-600 to-orange-500 opacity-20 blur-[100px] animate-blob-3"></div>
-      </div>
+    <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-6 px-0 py-0 md:gap-8 md:py-4">
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-black" />
 
       {/* Centered Header Title */}
-      <div className="text-center">
+      <div className="w-full text-left md:text-center">
         <h1
           id="pricetag-title"
           aria-label={titleText}
           data-typewriter={titleText}
-          className="text-center text-4xl md:text-5xl lg:text-8xl font-medium text-white tracking-normal leading-none"
+          className="whitespace-nowrap text-left text-[clamp(28px,8.4vw,38px)] font-medium leading-[1.04] tracking-normal text-white md:text-center md:text-5xl lg:text-8xl"
         >
           <span ref={textTargetRef} data-typewriter-text>
             {titleText}
@@ -91,14 +86,13 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
             ref={cursorRef}
             aria-hidden="true"
             data-typewriter-cursor
-            className="ml-2 inline-block h-8 w-1 bg-gradient-to-b from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end align-middle opacity-0 md:h-12 lg:h-20"
+            className="ml-2 inline-block h-7 w-1 bg-gradient-to-b from-cu-gradient-start via-cu-gradient-middle to-cu-gradient-end align-middle opacity-0 md:h-12 lg:h-20"
           ></span>
           <noscript>{titleText}</noscript>
         </h1>
       </div>
 
-      {/* Pill Navigation Switcher */}
-      <nav className="flex items-center p-1 rounded-full border border-white/10 bg-[#0d0d0d]/60 backdrop-blur-md gap-1 md:gap-1.5 shadow-xl transition-all duration-300 max-w-full overflow-x-auto scrollbar-none flex-nowrap mx-4 sm:mx-0">
+      <nav className="mx-0 flex w-full max-w-full flex-nowrap items-center overflow-x-auto border-b border-white/50 bg-transparent scrollbar-none transition-all duration-300">
         {tabs
           .filter((tab) => hasPermission(tab.permission))
           .map((tab) => {
@@ -107,10 +101,10 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
               <Link
                 key={tab.path}
                 href={tab.path}
-                className={`flex items-center justify-center px-3 py-2 md:px-6 md:py-2.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap ${
+                className={`relative flex flex-1 items-center justify-center px-1 py-3 text-center text-[10px] font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap md:px-6 md:py-4 md:text-xs ${
                   active
-                    ? "bg-white text-cu-ink shadow-md font-extrabold"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                    ? "cu-animated-rainbow-line text-white"
+                    : "text-white/55 hover:text-white"
                 }`}
               >
                 {tab.label}
@@ -120,7 +114,7 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
       </nav>
 
       {/* Main Content Card Panel */}
-      <main className="w-full bg-white text-cu-ink rounded-2xl p-6 md:p-8 shadow-2xl border border-white/5 min-h-fit animate-fade-in">
+      <main className="min-h-fit w-full animate-fade-in text-cu-ink md:rounded-2xl md:border md:border-white/5 md:bg-white md:p-8 md:shadow-2xl">
         {children}
       </main>
     </div>

@@ -143,8 +143,8 @@ class PricetagCatalogImportService
                 $category = trim((string) ($values[$indexes['category']] ?? ''));
                 $product = trim((string) ($values[$indexes['product']] ?? ''));
                 $variant = $indexes['variant'] === null
-                    ? 'Default'
-                    : (trim((string) ($values[$indexes['variant']] ?? '')) ?: 'Default');
+                    ? ' '
+                    : (trim((string) ($values[$indexes['variant']] ?? '')) ?: ' ');
                 $normalPrice = $this->parsePrice($values[$indexes['normal_price']] ?? null);
                 $discountPrice = $indexes['discount_price'] === null
                     ? 0

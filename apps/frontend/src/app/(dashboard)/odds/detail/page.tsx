@@ -15,20 +15,34 @@ function TicketDetailContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!id) return;
+
     const fetchTicket = async () => {
       try {
-        if (!id) throw new Error("ID Tiket tidak ditemukan.");
         const data = await getOddsTicket(id);
         setTicket(data);
-      } catch (err: any) {
-        setError(err.message || "Gagal memuat detail tiket.");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Gagal memuat detail tiket.");
       } finally {
         setLoading(false);
       }
     };
-    if (id) fetchTicket();
-    else setLoading(false);
+    fetchTicket();
   }, [id]);
+
+  if (!id) {
+    return (
+      <div className="p-6 md:p-10 max-w-5xl mx-auto w-full">
+        <div className="bg-cu-danger/10 text-cu-danger p-4 rounded-lg flex items-center gap-2">
+          <MaterialIcon name="error" size="sm" />
+          ID Tiket tidak ditemukan.
+        </div>
+        <Link href="/odds" className="mt-4 inline-block text-cu-info hover:underline">
+          &larr; Kembali ke Dashboard
+        </Link>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

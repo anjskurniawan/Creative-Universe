@@ -130,37 +130,41 @@ export default function DocsContent({ slug }: DocsContentProps) {
 
   useEffect(() => {
     if (!slug) {
-      setState({ status: "idle" });
-      return;
+      const timeout = window.setTimeout(() => setState({ status: "idle" }), 0);
+      return () => window.clearTimeout(timeout);
     }
 
     let cancelled = false;
-    setState({ status: "loading" });
-
     const url = `/docs/${slug}.md`;
+    const timeout = window.setTimeout(() => {
+      if (cancelled) return;
 
-    fetch(url)
-      .then(async (res) => {
-        if (!res.ok) {
-          throw new Error(
-            `Dokumen tidak ditemukan (${res.status}): ${url}`
-          );
-        }
-        return res.text();
-      })
-      .then((text) => {
-        if (!cancelled) setState({ status: "success", content: text });
-      })
-      .catch((err: unknown) => {
-        if (!cancelled)
-          setState({
-            status: "error",
-            message: err instanceof Error ? err.message : String(err),
-          });
-      });
+      setState({ status: "loading" });
+
+      fetch(url)
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Dokumen tidak ditemukan (${res.status}): ${url}`
+            );
+          }
+          return res.text();
+        })
+        .then((text) => {
+          if (!cancelled) setState({ status: "success", content: text });
+        })
+        .catch((err: unknown) => {
+          if (!cancelled)
+            setState({
+              status: "error",
+              message: err instanceof Error ? err.message : String(err),
+            });
+        });
+    }, 0);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timeout);
     };
   }, [slug]);
 

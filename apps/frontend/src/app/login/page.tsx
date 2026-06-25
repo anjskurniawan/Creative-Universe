@@ -1,7 +1,6 @@
 "use client";
 
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { gsap } from "gsap";
 import { useAuth } from "@/providers/auth-provider";
@@ -204,6 +203,16 @@ function LoginCard() {
 
   const buttonLabel = !isDesktop && mobileStep === "username" ? "Lanjutkan" : "Masuk";
 
+  function handleBackToUsername() {
+    setMobileStep("username");
+    setError(null);
+    clearFieldError("password");
+
+    setTimeout(() => {
+      document.getElementById("username")?.focus();
+    }, 50);
+  }
+
   function clearFieldError(field: "username" | "password") {
     setFieldErrors((current) => ({
       ...current,
@@ -271,15 +280,41 @@ function LoginCard() {
 
   return (
     <div className="relative z-10 w-full rounded-t-[32px] bg-white px-8 pb-14 pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10">
-      <h1 className="mb-[25px] text-[40px] font-medium leading-[48px] tracking-[-0.03em] text-black md:mb-[14px]">
-        <span className="md:hidden">Masuk</span>
+      <div className="mb-[25px] flex items-start justify-between gap-3 md:mb-[14px]">
+        <h1 className="text-[40px] font-medium leading-[48px] tracking-[-0.03em] text-black">
+          <span className="md:hidden">Masuk</span>
 
-        <span className="hidden md:inline">
-          Sign in to
-          <br />
-          Creative Universe
-        </span>
-      </h1>
+          <span className="hidden md:inline">
+            Sign in to
+            <br />
+            Creative Universe
+          </span>
+        </h1>
+
+        {isPasswordStep && (
+          <button
+            type="button"
+            onClick={handleBackToUsername}
+            disabled={isSubmitting}
+            className="mt-[7px] flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#E0E3E1] bg-white text-[#232925] transition-colors duration-200 hover:bg-[#F4F6F5] active:bg-[#ECEFED] disabled:cursor-not-allowed disabled:opacity-50 md:hidden"
+            aria-label="Kembali ke input username"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       {error && <LoginErrorAlert message={error} />}
 
@@ -397,28 +432,7 @@ function LoginCard() {
       </form>
 
       <p className="mx-auto mt-[25px] max-w-[338px] text-center text-[13px] font-normal leading-[18px] text-[#909692] md:mt-7 md:max-w-[364px]">
-        Dengan melanjutkan, Anda menyetujui{" "}
-        <Link
-          href="#"
-          className="underline underline-offset-2 transition-colors duration-200 hover:text-[#232925]"
-        >
-          Syarat Layanan
-        </Link>
-        ,{" "}
-        <Link
-          href="#"
-          className="underline underline-offset-2 transition-colors duration-200 hover:text-[#232925]"
-        >
-          Kebijakan Privasi
-        </Link>{" "}
-        dan{" "}
-        <Link
-          href="#"
-          className="underline underline-offset-2 transition-colors duration-200 hover:text-[#232925]"
-        >
-          Penggunaan Cookie
-        </Link>{" "}
-        kami.
+        Untuk masuk silahkan menggunakan akun Pasti Sukses. Jika memiliki kendala, silahkan hubungi admin Pasti Sukses untuk mendapatkan bantuan.
       </p>
     </div>
   );

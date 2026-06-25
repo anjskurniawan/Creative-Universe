@@ -1,4 +1,4 @@
-export const GUEST_PATHS = ["/login", "/register", "/forgot-password"] as const;
+export const GUEST_PATHS = ["/login", "/forgot-password"] as const;
 export const PUBLIC_PATHS = ["/", ...GUEST_PATHS] as const;
 
 export function normalizePathname(pathname: string): string {

@@ -129,7 +129,7 @@ export default function PricetagDatabasePage() {
     setProductForm(product === "new" ? emptyProductForm : {
       category_id: product.category.id,
       name: product.name,
-      variant_name: product.variant_name === "Default" ? "" : product.variant_name,
+      variant_name: product.variant_name === " " ? "" : product.variant_name,
       normal_price: String(product.normal_price),
       discount_price: String(product.discount_price ?? 0),
     });
@@ -187,11 +187,11 @@ export default function PricetagDatabasePage() {
   };
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div className="space-y-5 md:space-y-6">
+      <header className="hidden flex-col gap-4 lg:flex lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-cu-muted">Pricetag Studio</p>
-          <h1 className="mt-1 text-2xl font-semibold text-cu-ink">Manajemen Katalog</h1>
+          <h1 className="mt-1 text-2xl font-semibold text-cu-ink">Manajemen katalog</h1>
           <p className="mt-1 text-sm text-cu-muted">{total} data pada tab {tab === "categories" ? "kategori" : "produk"}.</p>
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -201,20 +201,24 @@ export default function PricetagDatabasePage() {
           </button>
           <button type="button" onClick={() => tab === "categories" ? openCategory("new") : openProduct("new")} className="flex-1 sm:flex-none btn bg-cu-ink text-white hover:bg-cu-ink-hover flex items-center justify-center gap-1.5 py-2 px-3 text-xs sm:text-sm">
             <MaterialIcon name="add" size="sm" />
-            <span className="truncate">Tambah {tab === "categories" ? "Kategori" : "Produk"}</span>
+            <span className="truncate">Tambah {tab === "categories" ? "kategori" : "produk"}</span>
           </button>
         </div>
       </header>
 
-      <div className="flex border-b border-cu-line">
+      <div className="flex border-b border-white/50 md:border-cu-line">
         <TabButton active={tab === "categories"} onClick={() => changeTab("categories")} icon="category" label="Kategori" />
-        <TabButton active={tab === "products"} onClick={() => changeTab("products")} icon="inventory_2" label="Produk & Varian" />
+        <TabButton active={tab === "products"} onClick={() => changeTab("products")} icon="inventory_2" label="Produk & varian" />
       </div>
 
       <form onSubmit={submitSearch} className="relative max-w-lg">
-        <MaterialIcon name="search" size="sm" className="pointer-events-none absolute left-3 top-2.5 text-cu-muted" />
-        <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={tab === "categories" ? "Cari kategori..." : "Cari produk atau varian..."} className="h-10 w-full rounded-full border border-cu-line bg-cu-surface pl-10 pr-20 text-sm outline-none" />
-        <button type="submit" className="absolute right-1 top-1 h-8 rounded-full bg-cu-panel-soft px-4 text-xs font-semibold">Cari</button>
+        <div className="cu-animated-rainbow-border rounded-full p-[2px] md:bg-none md:p-0">
+          <div className="relative h-[46px] rounded-full bg-black md:h-auto md:bg-transparent">
+            <MaterialIcon name="search" size="md" className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-white/70 md:left-3 md:top-2.5 md:translate-y-0 md:text-cu-muted" />
+            <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={tab === "categories" ? "Cari kategori..." : "Cari produk atau varian..."} className="h-full w-full rounded-full border-0 bg-transparent pl-14 pr-20 text-[15px] font-medium text-white outline-none placeholder:text-white/65 md:h-10 md:border md:border-cu-line md:bg-cu-surface md:pl-10 md:text-sm md:font-normal md:text-cu-ink md:placeholder:text-cu-muted" />
+            <button type="submit" className="absolute right-1 top-1 h-[38px] rounded-full bg-white/10 px-4 text-xs font-semibold text-white md:h-8 md:bg-cu-panel-soft md:text-cu-ink">Cari</button>
+          </div>
+        </div>
       </form>
 
       {isLoading ? <Loading /> : tab === "categories" ? (
@@ -233,7 +237,7 @@ export default function PricetagDatabasePage() {
 }
 
 function CategoryTable({ categories, onEdit, onDelete }: { categories: PricetagCategory[]; onEdit: (item: PricetagCategory) => void; onDelete: (item: PricetagCategory) => void }) {
-  return <div className="overflow-x-auto rounded-2xl border border-cu-line bg-cu-surface shadow-sm"><table className="min-w-full text-sm"><thead className="bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted"><tr><th className="px-4 py-3">Kategori</th><th className="px-4 py-3">Produk</th><th className="px-4 py-3 text-right">Aksi</th></tr></thead><tbody className="divide-y divide-cu-line">{categories.length === 0 ? <tr><td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada kategori.</td></tr> : categories.map((item) => <tr key={item.id}><td className="px-4 py-3 font-semibold text-cu-ink"><div className="flex items-center gap-2"><span className="flex size-6 shrink-0 items-center justify-center text-cu-muted">{item.icon_svg ? <span dangerouslySetInnerHTML={{ __html: item.icon_svg }} className="flex size-full items-center justify-center *:size-full" /> : <MaterialIcon name="category" size="xs" />}</span>{item.name}</div></td><td className="px-4 py-3 text-cu-muted">{item.products_count}</td><td className="px-4 py-3"><div className="flex justify-end gap-2"><Action icon="edit" label="Edit kategori" onClick={() => onEdit(item)} /><Action icon="delete" label="Hapus kategori" danger onClick={() => void onDelete(item)} /></div></td></tr>)}</tbody></table></div>;
+  return <div className="overflow-x-auto rounded-[36px] bg-white p-4 shadow-sm md:rounded-2xl md:border md:border-cu-line md:bg-cu-surface md:p-0"><table className="min-w-full text-sm"><thead className="hidden bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted md:table-header-group"><tr><th className="px-4 py-3">Kategori</th><th className="px-4 py-3">Produk</th><th className="px-4 py-3 text-right">Aksi</th></tr></thead><tbody className="block space-y-2 md:table-row-group md:divide-y md:divide-cu-line">{categories.length === 0 ? <tr><td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada kategori.</td></tr> : categories.map((item) => <tr key={item.id} className="block rounded-[24px] border border-[#c9c9c9] bg-white md:table-row md:rounded-none md:border-0 md:bg-transparent"><td className="block px-5 py-3 font-semibold text-[#2c2c2c] md:table-cell md:px-4 md:text-cu-ink"><div className="flex items-center gap-1"><span className="flex size-9 shrink-0 items-center justify-center text-[#2c2c2c] md:size-6 md:text-cu-muted">{item.icon_svg ? <span dangerouslySetInnerHTML={{ __html: item.icon_svg }} className="flex size-full items-center justify-center *:size-full" /> : <MaterialIcon name="category" size="sm" />}</span><span className="truncate text-[13px] font-semibold leading-tight md:text-sm">{item.name}</span></div></td><td className="hidden px-4 py-3 text-cu-muted md:table-cell">{item.products_count}</td><td className="block px-5 pb-3 md:table-cell md:px-4 md:py-3"><div className="flex justify-end gap-2"><Action icon="edit" label="Edit kategori" onClick={() => onEdit(item)} /><Action icon="delete" label="Hapus kategori" danger onClick={() => void onDelete(item)} /></div></td></tr>)}</tbody></table></div>;
 }
 
 function ProductTable({ products, onEdit, onDelete }: { products: PricetagProduct[]; onEdit: (item: PricetagProduct) => void; onDelete: (item: PricetagProduct) => void }) {
@@ -270,7 +274,7 @@ function ProductTable({ products, onEdit, onDelete }: { products: PricetagProduc
                   </td>
                   <td className="px-4 py-3">
                     <span className={`rounded-full px-2 py-1 text-xs ${item.is_ready ? "bg-cu-success-soft text-cu-success" : "bg-cu-panel-soft text-cu-muted"}`}>
-                      {item.is_ready ? "Ready" : "Belum"}
+                      {item.is_ready ? "Tersedia" : "Belum tersedia"}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -287,49 +291,49 @@ function ProductTable({ products, onEdit, onDelete }: { products: PricetagProduc
       </div>
 
       {/* Mobile View (Compact 3-Column Table) */}
-      <div className="block sm:hidden w-full rounded-2xl border border-cu-line bg-cu-surface shadow-sm overflow-hidden">
+      <div className="block w-full overflow-hidden rounded-[36px] bg-white p-4 shadow-sm sm:hidden">
         <table className="w-full text-sm table-fixed">
-          <thead className="bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted">
+          <thead className="hidden bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted">
             <tr>
               <th className="px-3 py-3 w-[45%]">Produk</th>
               <th className="px-3 py-3 w-[25%]">Harga</th>
               <th className="px-3 py-3 w-[30%] text-right"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-cu-line">
+          <tbody className="block space-y-2">
             {products.length === 0 ? (
               <tr>
                 <td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada produk.</td>
               </tr>
             ) : (
               products.map((item) => (
-                <tr key={item.id} className="hover:bg-cu-surface-soft/50 transition-colors">
-                  <td className="px-3 py-2.5 align-middle">
+                <tr key={item.id} className="block rounded-[24px] border border-[#c9c9c9] bg-white transition-colors">
+                  <td className="block px-5 pt-3 align-middle">
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[9px] font-bold text-cu-muted uppercase tracking-wider truncate">
+                      <span className="truncate text-[10px] font-medium leading-tight text-[#8a8a8a]">
                         {item.category.name}
                       </span>
-                      <span className="font-semibold text-cu-ink text-xs sm:text-sm truncate">
+                      <span className="truncate text-[13px] font-semibold leading-tight text-[#2c2c2c]">
                         {item.name}
                       </span>
-                      {item.variant_name && item.variant_name !== "Default" && (
+                      {item.variant_name && item.variant_name !== " " && (
                         <span className="text-[10px] text-cu-muted truncate">
                           {item.variant_name}
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="px-3 py-2.5 align-middle">
+                  <td className="block px-5 py-2 align-middle">
                     <div className="flex flex-col">
-                      <span className="text-[10px] text-cu-muted line-through">
+                      <span className="text-[10px] text-[#777777] line-through">
                         {formatRupiah(item.normal_price)}
                       </span>
-                      <span className="font-semibold text-cu-success text-xs sm:text-sm">
+                      <span className="text-[13px] font-semibold text-cu-success">
                         {formatRupiah(item.discount_price)}
                       </span>
                     </div>
                   </td>
-                  <td className="px-3 py-2.5 align-middle text-right">
+                  <td className="block px-5 pb-3 align-middle text-right">
                     <div className="flex justify-end gap-1">
                       <Action icon="edit" label="Edit produk" onClick={() => onEdit(item)} />
                       <Action icon="delete" label="Hapus produk" danger onClick={() => void onDelete(item)} />
@@ -372,7 +376,7 @@ function CategoryModal({ name, setName, iconSvg, setIconSvg, editing, saving, on
 
 function ProductModal({ form, setForm, categories, editing, saving, onSubmit, onClose }: { form: PricetagProductForm; setForm: (form: PricetagProductForm) => void; categories: PricetagCategory[]; editing: boolean; saving: boolean; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onClose: () => void }) {
   const field = (key: keyof PricetagProductForm, value: string | number) => setForm({ ...form, [key]: value });
-  return <Modal title={editing ? "Edit Produk" : "Tambah Produk"} onClose={onClose}><form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2"><label className="sm:col-span-2 text-sm font-medium">Kategori<select value={form.category_id} onChange={(event) => field("category_id", Number(event.target.value) || "")} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3"><option value="">Pilih kategori</option>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label className="text-sm font-medium">Nama produk<input value={form.name} onChange={(event) => field("name", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Varian<input value={form.variant_name} onChange={(event) => field("variant_name", event.target.value)} placeholder="Default" className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Harga normal<input type="number" min="0" value={form.normal_price} onChange={(event) => field("normal_price", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Harga diskon<input type="number" min="0" value={form.discount_price} onChange={(event) => field("discount_price", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><div className="sm:col-span-2"><ModalActions saving={saving} onClose={onClose} /></div></form></Modal>;
+  return <Modal title={editing ? "Edit Produk" : "Tambah Produk"} onClose={onClose}><form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2"><label className="sm:col-span-2 text-sm font-medium">Kategori<select value={form.category_id} onChange={(event) => field("category_id", Number(event.target.value) || "")} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3"><option value="">Pilih kategori</option>{categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label className="text-sm font-medium">Nama produk<input value={form.name} onChange={(event) => field("name", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Varian<input value={form.variant_name} onChange={(event) => field("variant_name", event.target.value)} placeholder="Opsional" className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Harga normal<input type="number" min="0" value={form.normal_price} onChange={(event) => field("normal_price", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><label className="text-sm font-medium">Harga diskon<input type="number" min="0" value={form.discount_price} onChange={(event) => field("discount_price", event.target.value)} className="mt-1 h-10 w-full rounded-lg border border-cu-line px-3" /></label><div className="sm:col-span-2"><ModalActions saving={saving} onClose={onClose} /></div></form></Modal>;
 }
 
 function ImportCsvModal({ importFile, setImportFile, isImporting, onSubmit, onClose }: { importFile: File | null; setImportFile: (file: File | null) => void; isImporting: boolean; onSubmit: (event: FormEvent<HTMLFormElement>) => void; onClose: () => void }) {
@@ -395,7 +399,7 @@ function ImportCsvModal({ importFile, setImportFile, isImporting, onSubmit, onCl
 function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) { return <div className="fixed inset-0 z-[120] flex items-center justify-center bg-cu-overlay/70 p-4"><div role="dialog" aria-modal="true" className="relative z-[121] w-full max-w-xl rounded-2xl bg-cu-surface p-5 shadow-xl"><div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-semibold">{title}</h2><button type="button" onClick={onClose} aria-label="Tutup"><MaterialIcon name="close" size="sm" /></button></div>{children}</div></div>; }
 function ModalActions({ saving, onClose, submitLabel }: { saving: boolean; onClose: () => void; submitLabel?: string }) { return <div className="flex justify-end gap-2"><button type="button" onClick={onClose} className="btn btn-secondary">Batal</button><button type="submit" disabled={saving} className="btn bg-cu-ink text-white">{submitLabel ?? (saving ? "Menyimpan..." : "Simpan")}</button></div>; }
 function Action({ icon, label, onClick, danger = false }: { icon: string; label: string; onClick: () => void; danger?: boolean }) { return <button type="button" onClick={onClick} aria-label={label} className={`inline-flex size-8 items-center justify-center rounded-lg border ${danger ? "border-cu-danger/20 bg-cu-danger-soft text-cu-danger" : "border-cu-line bg-cu-surface text-cu-ink"}`}><MaterialIcon name={icon} size="xs" /></button>; }
-function TabButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: string; label: string }) { return <button type="button" onClick={onClick} className={`inline-flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold ${active ? "border-cu-ink text-cu-ink" : "border-transparent text-cu-muted"}`}><MaterialIcon name={icon} size="sm" />{label}</button>; }
-function Pagination({ page, lastPage, onPage }: { page: number; lastPage: number; onPage: (page: number) => void }) { if (lastPage <= 1) return null; return <div className="flex items-center justify-between text-xs text-cu-muted"><span>Halaman {page} dari {lastPage}</span><div className="flex gap-2"><button type="button" disabled={page <= 1} onClick={() => onPage(page - 1)} className="btn btn-secondary">Sebelumnya</button><button type="button" disabled={page >= lastPage} onClick={() => onPage(page + 1)} className="btn btn-secondary">Berikutnya</button></div></div>; }
-function Loading() { return <div className="rounded-2xl border border-cu-line bg-cu-surface p-12 text-center text-sm text-cu-muted">Memuat database katalog...</div>; }
+function TabButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: string; label: string }) { return <button type="button" onClick={onClick} className={`relative inline-flex flex-1 items-center justify-center gap-1.5 border-b-2 px-2 py-3 text-[10px] font-bold uppercase tracking-wider md:flex-none md:gap-2 md:px-4 md:text-sm md:normal-case md:tracking-normal ${active ? "border-[#2da3ff] text-white md:border-cu-ink md:text-cu-ink" : "border-transparent text-white/55 md:text-cu-muted"}`}><MaterialIcon name={icon} size="sm" />{label}</button>; }
+function Pagination({ page, lastPage, onPage }: { page: number; lastPage: number; onPage: (page: number) => void }) { if (lastPage <= 1) return null; return <div className="hidden items-center justify-between text-xs text-cu-muted md:flex"><span>Halaman {page} dari {lastPage}</span><div className="flex gap-2"><button type="button" disabled={page <= 1} onClick={() => onPage(page - 1)} className="btn btn-secondary">Sebelumnya</button><button type="button" disabled={page >= lastPage} onClick={() => onPage(page + 1)} className="btn btn-secondary">Berikutnya</button></div></div>; }
+function Loading() { return <div className="flex min-h-[88px] items-center justify-center rounded-[28px] bg-white px-8 py-8 text-center text-[15px] font-medium leading-tight text-[#9aa1af] md:rounded-2xl md:border md:border-cu-line md:bg-cu-surface md:p-12 md:text-sm md:text-cu-muted">Memuat database katalog...</div>; }
 function AccessDenied() { return <div className="rounded-2xl border border-cu-danger/20 bg-cu-danger-soft p-8 text-center"><MaterialIcon name="lock" size="lg" className="mx-auto text-cu-danger" /><h1 className="mt-3 text-lg font-semibold">Akses ditolak</h1><p className="mt-1 text-sm text-cu-muted">Anda tidak memiliki permission pricetag.manage.</p></div>; }

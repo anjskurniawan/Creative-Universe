@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 import { getEchoClient } from "@/lib/echo";
 import { apiFetch } from "@/lib/api";
@@ -16,49 +16,16 @@ export default function MessagesPage() {
   const [showContacts, setShowContacts] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    fetchUser();
-    fetchConversations();
-    fetchContacts();
-  }, []);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const data = await apiFetch<Record<string, unknown>>("/auth/me");
       setUser(data);
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
 
-  useEffect(() => {
-    if (activeConversation) {
-      fetchMessages(activeConversation.id as number);
-      
-      const echo = getEchoClient();
-      if (echo) {
-        const channel = echo.private(`conversation.${activeConversation.id}`);
-        channel.listen("MessageSent", (e: { message: Record<string, unknown> }) => {
-          // If message is from someone else, add to list
-          if (e.message.sender_id !== user?.id) {
-            setMessages((prev) => [...prev, e.message]);
-            // Also update last message in conversation list
-            updateConversationLastMessage(activeConversation.id as number, e.message);
-          }
-        });
-        return () => {
-          channel.stopListening("MessageSent");
-          echo.leave(`conversation.${activeConversation.id}`);
-        };
-      }
-    }
-  }, [activeConversation, user?.id]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     try {
       const res = await apiFetch<{data: Record<string, unknown>[]}>("/chat/conversations");
       if (res?.data) {
@@ -67,9 +34,9 @@ export default function MessagesPage() {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
 
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async () => {
     try {
       const res = await apiFetch<{data: Record<string, unknown>[]}>("/chat/contacts");
       if (res?.data) {
@@ -78,9 +45,9 @@ export default function MessagesPage() {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
 
-  const fetchMessages = async (id: number) => {
+  const fetchMessages = useCallback(async (id: number) => {
     try {
       const res = await apiFetch<{data: Record<string, unknown>[]}>(`/chat/conversations/${id}/messages`);
       if (res?.data) {
@@ -89,9 +56,9 @@ export default function MessagesPage() {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, []);
 
-  const updateConversationLastMessage = (convId: number, message: Record<string, unknown>) => {
+  const updateConversationLastMessage = useCallback((convId: number, message: Record<string, unknown>) => {
     setConversations((prev) =>
       prev.map((c) =>
         c.id === convId
@@ -113,7 +80,44 @@ export default function MessagesPage() {
         return dateB - dateA;
       })
     );
-  };
+  }, []);
+
+  useEffect(() => {
+    void Promise.resolve().then(() => {
+      fetchUser();
+      fetchConversations();
+      fetchContacts();
+    });
+  }, [fetchContacts, fetchConversations, fetchUser]);
+
+  useEffect(() => {
+    if (activeConversation) {
+      void Promise.resolve().then(() => {
+        fetchMessages(activeConversation.id as number);
+      });
+      
+      const echo = getEchoClient();
+      if (echo) {
+        const channel = echo.private(`conversation.${activeConversation.id}`);
+        channel.listen("MessageSent", (e: { message: Record<string, unknown> }) => {
+          // If message is from someone else, add to list
+          if (e.message.sender_id !== user?.id) {
+            setMessages((prev) => [...prev, e.message]);
+            // Also update last message in conversation list
+            updateConversationLastMessage(activeConversation.id as number, e.message);
+          }
+        });
+        return () => {
+          channel.stopListening("MessageSent");
+          echo.leave(`conversation.${activeConversation.id}`);
+        };
+      }
+    }
+  }, [activeConversation, fetchMessages, updateConversationLastMessage, user?.id]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();

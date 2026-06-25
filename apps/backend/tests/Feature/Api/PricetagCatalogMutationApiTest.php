@@ -91,13 +91,13 @@ class PricetagCatalogMutationApiTest extends TestCase
         ]);
 
         $created->assertCreated()
-            ->assertJsonPath('data.variant_name', 'Default');
+            ->assertJsonPath('data.variant_name', ' ');
         $productId = $created->json('data.id');
 
         $this->actingAs($this->manager)->patchJson("/api/v1/pricetag/products/{$productId}", [
             'category_id' => $category->id,
             'name' => 'Smart Watch',
-            'variant_name' => 'Default',
+            'variant_name' => ' ',
             'normal_price' => 1500000,
             'discount_price' => 1100000,
         ])->assertOk();
