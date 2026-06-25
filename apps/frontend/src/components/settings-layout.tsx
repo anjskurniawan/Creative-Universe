@@ -234,12 +234,12 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
   };
 
   return (
-    <div className="flex flex-col gap-0 lg:gap-6 w-full max-w-7xl mx-auto">
+    <div className="flex w-full max-w-7xl flex-col gap-0 lg:mx-auto lg:gap-6">
       {/* Top Profile Header (GitHub Style Personal Account Card) */}
-      <div className={`${isMobileDetail ? "hidden lg:flex" : "flex"} flex-col items-start justify-between gap-4 border-b border-cu-line/60 py-4 sm:flex-row sm:items-center`}>
+      <div className={`${isMobileDetail ? "hidden lg:flex" : "flex"} flex-col items-start justify-between gap-4 border-b border-cu-line/60 pb-5 pt-1 sm:flex-row sm:items-center lg:pt-4`}>
         <div className="flex items-center gap-4">
           <div
-            className={`relative size-12 overflow-hidden rounded-full border border-cu-line flex items-center justify-center ${
+            className={`relative flex size-16 items-center justify-center overflow-hidden rounded-full border border-cu-line sm:size-14 ${
               user.avatar_url ? "bg-white" : "bg-cu-panel-soft"
             }`}
           >
@@ -251,7 +251,7 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
                 alt="Avatar"
               />
             ) : (
-              <span className="text-lg font-bold uppercase text-cu-muted">
+              <span className="text-xl font-bold uppercase text-cu-muted">
                 {userInitials}
               </span>
             )}
@@ -263,12 +263,11 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
                 ({user.username})
               </span>
             </h2>
-            <p className="text-xs text-cu-muted">Your personal account</p>
           </div>
         </div>
       </div>
 
-      <div className="mt-2 flex flex-col gap-6 lg:flex-row items-start w-full">
+      <div className="mt-4 flex w-full flex-col items-start gap-6 lg:mt-2 lg:flex-row">
         {/* Left sidebar navigation */}
         <nav
           className={`${isMobileDetail ? "hidden lg:block" : "block"} w-full shrink-0 space-y-5 lg:w-64`}

@@ -15,7 +15,7 @@ import {
 import { useAuth } from "@/providers/auth-provider";
 
 export default function PricetagHistoryPage() {
-  const { user, hasPermission } = useAuth();
+  const { user } = useAuth();
 
   // State
   const [batches, setBatches] = useState<PricetagBatch[]>([]);
@@ -65,7 +65,6 @@ export default function PricetagHistoryPage() {
   // Load History Batches
   // ----------------------------------------------------
   const loadBatches = useCallback(async (silent = false) => {
-    if (!hasPermission("access-pricetag")) return;
     if (!silent) setIsLoading(true);
 
     try {
@@ -81,7 +80,7 @@ export default function PricetagHistoryPage() {
     } finally {
       if (!silent) setIsLoading(false);
     }
-  }, [page, hasPermission, isMobile]);
+  }, [page, isMobile]);
 
   useEffect(() => {
     queueMicrotask(() => void loadBatches());
@@ -153,10 +152,6 @@ export default function PricetagHistoryPage() {
     setDetailBatch(null);
     setExpandedModalItemId(null);
   };
-
-  if (!hasPermission("access-pricetag")) {
-    return <AccessDenied />;
-  }
 
   return (
     <div className="space-y-5 md:space-y-6">
@@ -287,11 +282,20 @@ export default function PricetagHistoryPage() {
               const isExpanded = expandedCardId === batch.id;
 
               return (
-                <div key={batch.id} className="space-y-3 rounded-[24px] border border-[#c9c9c9] bg-white p-4 text-[#2c2c2c] transition-all duration-200 ease-out">
+                <div
+                  key={batch.id}
+                  className={`space-y-3 rounded-[24px] border p-4 text-[#2c2c2c] transition-all duration-200 ease-out ${
+                    isExpanded
+                      ? "border-[#2da3ff] bg-[#d8efff] ring-2 ring-[#2da3ff]/25"
+                      : "border-[#c9c9c9] bg-white"
+                  }`}
+                >
                   {/* Collapsed State: Batch Name & Status + Date */}
-                  <div
+                  <button
+                    type="button"
                     onClick={() => setExpandedCardId(isExpanded ? null : batch.id)}
-                    className="flex cursor-pointer select-none items-center justify-between gap-2"
+                    className="flex w-full cursor-pointer select-none items-center justify-between gap-2 rounded-[18px] text-left transition-all duration-200 ease-out focus:outline-none active:scale-[0.99]"
+                    aria-expanded={isExpanded}
                   >
                     {/* Left: Batch Name */}
                     <div className="flex items-center min-w-0">
@@ -328,7 +332,7 @@ export default function PricetagHistoryPage() {
                         })}
                       </span>
                     </div>
-                  </div>
+                  </button>
 
                   {/* Expanded Detail State */}
                   {isExpanded && (
@@ -366,7 +370,7 @@ export default function PricetagHistoryPage() {
                           <a
                             href={`/api/v1/pricetag/batches/${batch.id}/download`}
                             download
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-cu-line bg-cu-surface py-2 text-cu-ink hover:bg-cu-panel-soft font-semibold text-center"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-[14px] border border-[#2da3ff] bg-[#2da3ff] py-2 text-white shadow-sm transition-all duration-200 hover:bg-[#1476b8] hover:shadow-md active:scale-[0.98] font-semibold text-center"
                           >
                             <MaterialIcon name="download" size="xs" />
                             Unduh ZIP
@@ -383,7 +387,7 @@ export default function PricetagHistoryPage() {
                         <button
                           type="button"
                           onClick={() => openDetail(batch.id)}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-cu-line bg-cu-surface py-2 text-cu-ink hover:bg-cu-panel-soft font-semibold text-center"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-[14px] border border-[#c9c9c9] bg-white py-2 text-[#303431] shadow-sm transition-all duration-200 hover:border-[#2da3ff] hover:bg-[#2da3ff] hover:text-white hover:shadow-md active:scale-[0.98] font-semibold text-center"
                         >
                           <MaterialIcon name="visibility" size="xs" />
                           Lihat detail
@@ -404,15 +408,21 @@ export default function PricetagHistoryPage() {
       {/* Detail Modal */}
       {selectedBatchId && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-cu-overlay/60 p-6 sm:p-4">
-          <div role="dialog" aria-modal="true" className="w-full max-w-4xl rounded-2xl bg-cu-surface p-5 shadow-xl max-h-[85vh] flex flex-col">
-            <div className="mb-4 flex items-center justify-between border-b border-cu-line pb-3">
-              <div>
-                <h2 className="text-lg font-semibold text-cu-ink">
+          <div role="dialog" aria-modal="true" className="flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-[24px] border border-[#c9c9c9] bg-white shadow-xl sm:rounded-2xl">
+            <div className="flex min-h-[60px] items-center border-b border-[#E3E4E3] px-5">
+              <div className="min-w-0">
+                <h2 className="truncate text-[16px] font-bold leading-tight text-[#303431] sm:text-lg">
                   {isLoadingDetail ? "Memuat..." : detailBatch?.batch_name}
                 </h2>
                 {detailBatch && (
-                  <p className="text-xs text-cu-muted mt-0.5">
-                    Dibuat oleh <b>{detailBatch.creator?.name}</b> pada {new Date(detailBatch.created_at).toLocaleString("id-ID")}
+                  <p className="mt-1 text-[11px] font-medium leading-tight text-[#8a8a8a] sm:text-xs">
+                    {new Date(detailBatch.created_at).toLocaleString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </p>
                 )}
               </div>
@@ -423,7 +433,7 @@ export default function PricetagHistoryPage() {
                 Memuat detail antrean item...
               </div>
             ) : detailBatch ? (
-              <div className="overflow-y-auto flex-1 border border-cu-line rounded-xl">
+              <div className="flex-1 overflow-y-auto bg-[#f8f9fb] sm:border sm:border-cu-line sm:bg-white">
                 {/* Desktop Modal Table View */}
                 <table className="hidden sm:table min-w-[600px] w-full text-xs text-left">
                   <thead className="bg-cu-panel-soft uppercase font-bold text-cu-muted tracking-wider">
@@ -449,8 +459,9 @@ export default function PricetagHistoryPage() {
                               <span className="block text-[10px] text-cu-muted mt-0.5">Varian: {item.product?.variant_name}</span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-cu-success font-semibold">
-                            {formatRupiah(item.product?.discount_price ?? 0)}
+                          <td className="px-4 py-3">
+                            <span className="block text-[10px] text-cu-muted line-through">{formatRupiah(item.product?.normal_price ?? 0)}</span>
+                            <span className="font-semibold text-cu-success">{formatRupiah(item.product?.discount_price ?? 0)}</span>
                           </td>
                           <td className="px-4 py-3">
                             <span
@@ -511,28 +522,31 @@ export default function PricetagHistoryPage() {
                 </table>
 
                 {/* Mobile Modal Card List View */}
-                <div className="block sm:hidden divide-y divide-cu-line p-3">
+                <div className="block space-y-2 p-4 sm:hidden">
                   {detailBatch.items && detailBatch.items.length === 0 ? (
                     <div className="py-6 text-center text-xs text-cu-muted">Tidak ada item di batch ini.</div>
                   ) : (
                     detailBatch.items?.map((item) => {
                       const isItemExpanded = expandedModalItemId === item.id;
                       return (
-                        <div key={item.id} className="py-3 first:pt-0 last:pb-0 space-y-2">
+                        <div key={item.id} className="overflow-hidden rounded-[20px] border border-[#d8d8d8] bg-white">
                           {/* Item Collapsed Header */}
-                          <div
+                          <button
+                            type="button"
                             onClick={() => setExpandedModalItemId(isItemExpanded ? null : item.id)}
-                            className="flex items-center justify-between cursor-pointer select-none gap-2"
+                            className="flex min-h-[60px] w-full cursor-pointer select-none items-center justify-between gap-3 px-4 text-left transition active:scale-[0.99]"
+                            aria-expanded={isItemExpanded}
                           >
-                            <div className="min-w-0">
-                              <span className="font-bold text-cu-ink text-xs block truncate">{item.product?.name || "Produk dihapus"}</span>
+                            <div className="min-w-0 flex-1">
+                              <span className="block truncate text-[13px] font-semibold leading-tight text-[#303431]">{item.product?.name || "Produk dihapus"}</span>
                               {item.product?.variant_name !== " " && (
-                                <span className="block text-[10px] text-cu-muted mt-0.5">Varian: {item.product?.variant_name}</span>
+                                <span className="mt-1 block truncate text-[10px] font-medium leading-tight text-[#8a8a8a]">Varian: {item.product?.variant_name}</span>
                               )}
                             </div>
-                            <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                            <div className="grid shrink-0 grid-cols-[auto_auto] items-center gap-x-2 gap-y-1 text-right">
+                              <span className="text-[9px] font-medium leading-none text-[#8a8a8a]">Status</span>
                               <span
-                                className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ${
+                                className={`justify-self-end rounded-full px-2 py-0.5 text-[9px] font-semibold leading-none ${
                                   item.status === "success"
                                     ? "bg-cu-success-soft text-cu-success"
                                     : item.status === "failed"
@@ -544,30 +558,38 @@ export default function PricetagHistoryPage() {
                                 {item.status === "failed" && "Gagal"}
                                 {item.status === "pending" && "Mengantre"}
                               </span>
-                              <span className="text-cu-success font-semibold text-[10px]">
+                              <span className="text-[9px] font-medium leading-none text-[#8a8a8a]">Normal</span>
+                              <span className="text-[10px] font-medium leading-none text-[#8a8a8a] line-through">
+                                {formatRupiah(item.product?.normal_price ?? 0)}
+                              </span>
+                              <span className="text-[9px] font-medium leading-none text-[#8a8a8a]">Promo</span>
+                              <span className="text-[12px] font-semibold leading-none text-cu-success">
                                 {formatRupiah(item.product?.discount_price ?? 0)}
                               </span>
                             </div>
-                          </div>
+                          </button>
 
                           {/* Item Expanded Details */}
                           {isItemExpanded && (
-                            <div className="pt-2 space-y-2 text-[10px] border-t border-dashed border-cu-line mt-2">
+                            <div className="space-y-3 border-t border-[#E3E4E3] bg-[#f8f9fb] p-4 text-[10px]">
                               {item.error_message && (
                                 <div className="bg-cu-danger-soft p-2 rounded-lg text-cu-danger">
                                   <p className="font-semibold">Detail Eror:</p>
                                   <p className="whitespace-pre-wrap">{item.error_message}</p>
                                 </div>
                               )}
-                              <div className="flex justify-between items-center bg-cu-panel-soft p-2 rounded-lg">
-                                <span className="font-semibold text-cu-muted">Aksi Item:</span>
-                                <div className="flex gap-1.5">
+                              <div className="flex items-center justify-between gap-3">
+                                <div>
+                                  <p className="font-semibold text-[#303431]">Aksi item</p>
+                                  <p className="mt-0.5 text-[#8a8a8a]">Lihat atau unduh file label.</p>
+                                </div>
+                                <div className="flex shrink-0 gap-1.5">
                                   {item.status === "success" && item.product?.preview_url ? (
                                     <a
                                       href={item.product.preview_url}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex size-7 items-center justify-center rounded-md border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft"
+                                      className="inline-flex size-8 items-center justify-center rounded-full border border-[#c9c9c9] bg-white text-[#303431] transition hover:border-[#2da3ff] hover:bg-[#2da3ff] hover:text-white"
                                       title="Lihat Gambar"
                                     >
                                       <MaterialIcon name="visibility" size="xs" />
@@ -582,7 +604,7 @@ export default function PricetagHistoryPage() {
                                       href={item.product.download_url}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex size-7 items-center justify-center rounded-md border border-cu-line bg-cu-surface text-cu-ink hover:bg-cu-panel-soft"
+                                      className="inline-flex size-8 items-center justify-center rounded-full border border-[#2da3ff] bg-[#2da3ff] text-white transition hover:bg-[#1476b8]"
                                       title="Unduh Gambar"
                                     >
                                       <MaterialIcon name="download" size="xs" />
@@ -604,8 +626,8 @@ export default function PricetagHistoryPage() {
               </div>
             ) : null}
 
-            <div className="mt-4 flex justify-end border-t border-cu-line pt-3">
-              <button type="button" onClick={closeDetail} className="btn btn-secondary">
+            <div className="flex justify-end border-t border-[#E3E4E3] bg-white px-5 py-4">
+              <button type="button" onClick={closeDetail} className="inline-flex h-10 items-center justify-center rounded-full border border-[#c9c9c9] bg-white px-5 text-sm font-semibold text-[#303431] transition hover:bg-[#f8f9fb]">
                 Tutup
               </button>
             </div>
@@ -661,18 +683,6 @@ function Empty() {
       <h2 className="mt-3 text-[15px] font-medium leading-tight sm:text-sm sm:font-semibold sm:text-cu-ink">Belum ada riwayat batch</h2>
       <p className="mx-auto mt-1 max-w-xs text-xs text-cu-muted">
         Anda belum pernah membuat label harga promo secara kelompok atau satuan.
-      </p>
-    </div>
-  );
-}
-
-function AccessDenied() {
-  return (
-    <div className="rounded-2xl border border-cu-danger/20 bg-cu-danger-soft p-8 text-center max-w-lg mx-auto mt-12">
-      <MaterialIcon name="lock" size="lg" className="mx-auto text-cu-danger" />
-      <h1 className="mt-3 text-lg font-semibold">Akses ditolak</h1>
-      <p className="mt-1 text-sm text-cu-muted">
-        Anda tidak memiliki permission <code>access-pricetag</code> yang diperlukan untuk membuka modul ini.
       </p>
     </div>
   );

@@ -221,7 +221,7 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <header className="flex flex-col gap-4 px-6 sm:flex-row sm:items-end sm:justify-between md:px-0">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-cu-muted">
             Administrasi Core
@@ -243,10 +243,10 @@ export default function UsersPage() {
         )}
       </header>
 
-      {notice && <Alert type="success" message={notice} onClose={() => setNotice(null)} />}
-      {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
+      {notice && <div className="px-6 md:px-0"><Alert type="success" message={notice} onClose={() => setNotice(null)} /></div>}
+      {error && <div className="px-6 md:px-0"><Alert type="error" message={error} onClose={() => setError(null)} /></div>}
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3 px-6 sm:flex-row md:px-0">
         <form onSubmit={submitSearch} className="relative w-full max-w-lg">
           <MaterialIcon
             name="search"
@@ -276,8 +276,51 @@ export default function UsersPage() {
         </select>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-cu-line bg-cu-surface shadow-sm">
-        <div className="overflow-x-auto">
+      <div className="overflow-hidden border border-cu-line bg-cu-surface shadow-sm md:rounded-2xl">
+        <div className="block space-y-2 bg-white p-4 md:hidden">
+          {isLoading ? (
+            <div className="rounded-[24px] border border-cu-line bg-cu-surface px-4 py-8 text-center text-sm text-cu-muted">Memuat pengguna...</div>
+          ) : users.length === 0 ? (
+            <div className="rounded-[24px] border border-cu-line bg-cu-surface px-4 py-8 text-center text-sm text-cu-muted">Tidak ada pengguna yang sesuai.</div>
+          ) : users.map((managedUser) => {
+            const protectedFromManager = !hasRole("Root") && managedUser.roles.includes("Root");
+            return (
+              <article key={managedUser.id} className="rounded-[24px] border border-cu-line bg-cu-surface p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Avatar user={managedUser} />
+                    <div className="min-w-0">
+                      <h2 className="truncate text-sm font-semibold leading-tight text-cu-ink">{managedUser.name}</h2>
+                      <p className="truncate text-[11px] leading-tight text-cu-muted">@{managedUser.username}</p>
+                    </div>
+                  </div>
+                  {protectedFromManager ? (
+                    <span className="shrink-0 rounded-full bg-cu-panel-soft px-2 py-1 text-[10px] font-semibold text-cu-muted">Protected</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void openUser(managedUser)}
+                      className="shrink-0 rounded-full border border-cu-line bg-white px-3 py-1.5 text-[11px] font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+                    >
+                      Kelola
+                    </button>
+                  )}
+                </div>
+                <p className="mt-3 truncate text-xs text-cu-muted">{managedUser.email}</p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {managedUser.roles.map((role) => <Badge key={role} tone={role === "Root" ? "danger" : role === "Manajer" ? "info" : "neutral"}>{role}</Badge>)}
+                  {managedUser.permissions.slice(0, 2).map((permission) => <Badge key={permission} tone="soft">+{permission}</Badge>)}
+                  {managedUser.permissions.length > 2 && <Badge tone="soft">+{managedUser.permissions.length - 2} lagi</Badge>}
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t border-cu-line/70 pt-3 text-[11px] text-cu-muted">
+                  <span>ID #{managedUser.id}</span>
+                  <span>{formatDate(managedUser.created_at)}</span>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[900px] text-left text-sm">
             <thead className="border-b border-cu-line bg-cu-panel-soft/60 text-[10px] font-bold uppercase tracking-wider text-cu-muted">
               <tr>

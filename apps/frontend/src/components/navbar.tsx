@@ -78,6 +78,8 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
   const popupMutedClass = (variant === "light" || variant === "transparent-dark") ? "text-cu-muted" : "text-white/50";
   const popupScrollbarClass =
     (variant === "light" || variant === "transparent-dark") ? "cu-popup-scrollbar-light" : "cu-popup-scrollbar-dark";
+  const primaryRole = user?.roles?.[0] ?? "User";
+  const isRootUser = Boolean(user?.roles.includes("Root") || user?.roles.includes("root"));
 
   const profileAdminItems = [
     hasPermission("manage-users")
@@ -143,7 +145,7 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
           ) : (
             <>
               {/* Developer Shortcut */}
-              {user && (user.roles.includes("Root") || user.roles.includes("root")) && (
+              {isRootUser && (
                 <Link
                   href="/maintenance"
                   className={`relative inline-flex size-9 sm:size-10 items-center justify-center rounded-full transition-colors focus:outline-none focus:ring-2 cursor-pointer ${
@@ -161,7 +163,7 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
               )}
 
               {/* Message Bell */}
-              {user && (
+              {user && isRootUser && (
                 <MessageBell
                   userId={user.id}
                   variant={variant === "transparent" ? "dark" : variant}
@@ -200,16 +202,6 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
 
                 {appsOpen && (
                   <div className={`fixed left-4 right-4 top-[4.5rem] sm:absolute sm:left-auto sm:right-0 sm:top-auto z-[110] mt-2 sm:w-80 max-h-[calc(100dvh-5.5rem)] overflow-x-hidden overflow-y-auto rounded-xl border p-2 animate-slide-up ${popupPanelClass} ${popupScrollbarClass}`}>
-                    <div className="flex items-center gap-3 px-2 py-2.5">
-                      <MaterialIcon name="apps" size="sm" className={popupMutedClass} />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold">Menu Aplikasi</p>
-                        <p className={`mt-0.5 text-xs ${popupMutedClass}`}>Pilih area kerja Creative Universe</p>
-                      </div>
-                    </div>
-
-                    <div className={`mx-2 border-t ${popupDividerClass}`} />
-
                     <ul role="menu" aria-label="Menu aplikasi" className="m-0 list-none space-y-0.5 p-2">
                       <li>
                         <Link
@@ -308,9 +300,9 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
                       </div>
                       <div className="min-w-0 flex-1 leading-tight">
                         <p className="truncate text-sm font-semibold">
-                          @{user?.username}
+                          {user?.name}
                         </p>
-                        <p className={`mt-0.5 truncate text-xs ${popupMutedClass}`}>{user?.name}</p>
+                        <p className={`mt-0.5 truncate text-xs ${popupMutedClass}`}>{primaryRole}</p>
                       </div>
                       <MaterialIcon name="manage_accounts" size="sm" className={popupMutedClass} />
                     </div>

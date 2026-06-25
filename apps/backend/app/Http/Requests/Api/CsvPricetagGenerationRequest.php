@@ -10,7 +10,7 @@ class CsvPricetagGenerationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()->can('access-pricetag');
+        return $this->user() !== null;
     }
 
     public function rules(): array

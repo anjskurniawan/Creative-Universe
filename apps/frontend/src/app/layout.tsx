@@ -6,7 +6,7 @@ import "./globals.css";
 /* eslint-disable @next/next/no-page-custom-font -- App Router root layout owns this global icon font. */
 
 export const metadata: Metadata = {
-  title: "Creative Universe - Portal Generator Pricetag & Admin",
+  title: "Creative Universe",
   description: "Aplikasi internal PT Doran Sukses Indonesia (JETE) untuk manajemen pricetag dan administrasi sistem.",
   icons: {
     icon: [

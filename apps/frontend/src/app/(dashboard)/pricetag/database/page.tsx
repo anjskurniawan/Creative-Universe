@@ -237,7 +237,42 @@ export default function PricetagDatabasePage() {
 }
 
 function CategoryTable({ categories, onEdit, onDelete }: { categories: PricetagCategory[]; onEdit: (item: PricetagCategory) => void; onDelete: (item: PricetagCategory) => void }) {
-  return <div className="overflow-x-auto rounded-[36px] bg-white p-4 shadow-sm md:rounded-2xl md:border md:border-cu-line md:bg-cu-surface md:p-0"><table className="min-w-full text-sm"><thead className="hidden bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted md:table-header-group"><tr><th className="px-4 py-3">Kategori</th><th className="px-4 py-3">Produk</th><th className="px-4 py-3 text-right">Aksi</th></tr></thead><tbody className="block space-y-2 md:table-row-group md:divide-y md:divide-cu-line">{categories.length === 0 ? <tr><td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada kategori.</td></tr> : categories.map((item) => <tr key={item.id} className="block rounded-[24px] border border-[#c9c9c9] bg-white md:table-row md:rounded-none md:border-0 md:bg-transparent"><td className="block px-5 py-3 font-semibold text-[#2c2c2c] md:table-cell md:px-4 md:text-cu-ink"><div className="flex items-center gap-1"><span className="flex size-9 shrink-0 items-center justify-center text-[#2c2c2c] md:size-6 md:text-cu-muted">{item.icon_svg ? <span dangerouslySetInnerHTML={{ __html: item.icon_svg }} className="flex size-full items-center justify-center *:size-full" /> : <MaterialIcon name="category" size="sm" />}</span><span className="truncate text-[13px] font-semibold leading-tight md:text-sm">{item.name}</span></div></td><td className="hidden px-4 py-3 text-cu-muted md:table-cell">{item.products_count}</td><td className="block px-5 pb-3 md:table-cell md:px-4 md:py-3"><div className="flex justify-end gap-2"><Action icon="edit" label="Edit kategori" onClick={() => onEdit(item)} /><Action icon="delete" label="Hapus kategori" danger onClick={() => void onDelete(item)} /></div></td></tr>)}</tbody></table></div>;
+  return (
+    <>
+      <div className="space-y-2 rounded-[36px] bg-white p-4 shadow-sm md:hidden">
+        {categories.length === 0 ? (
+          <div className="rounded-[24px] border border-[#c9c9c9] bg-white px-4 py-8 text-center text-sm text-cu-muted">Belum ada kategori.</div>
+        ) : categories.map((item) => (
+          <div key={item.id} className="flex min-h-[62px] items-center justify-between gap-2 rounded-[24px] border border-[#d8d8d8] bg-white px-4 py-2.5">
+            <div className="flex min-w-0 items-center gap-1">
+              <span className="flex size-8 shrink-0 items-center justify-center text-[#2c2c2c]">
+                {item.icon_svg ? <span dangerouslySetInnerHTML={{ __html: item.icon_svg }} className="flex size-full items-center justify-center *:size-full" /> : <MaterialIcon name="category" size="sm" />}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-[13px] font-semibold leading-tight text-[#2c2c2c]">{item.name}</p>
+                <p className="text-[10px] font-medium leading-tight text-[#8a8a8a]">{item.products_count} produk</p>
+              </div>
+            </div>
+            <div className="flex shrink-0 justify-end gap-1.5">
+              <Action icon="edit" label="Edit kategori" onClick={() => onEdit(item)} />
+              <Action icon="delete" label="Hapus kategori" danger onClick={() => void onDelete(item)} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-2xl border border-cu-line bg-cu-surface shadow-sm md:block">
+        <table className="min-w-full text-sm">
+          <thead className="bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted">
+            <tr><th className="px-4 py-3">Kategori</th><th className="px-4 py-3">Produk</th><th className="px-4 py-3 text-right">Aksi</th></tr>
+          </thead>
+          <tbody className="divide-y divide-cu-line">
+            {categories.length === 0 ? <tr><td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada kategori.</td></tr> : categories.map((item) => <tr key={item.id}><td className="px-4 py-3 font-semibold text-cu-ink"><div className="flex items-center gap-2"><span className="flex size-6 shrink-0 items-center justify-center text-cu-muted">{item.icon_svg ? <span dangerouslySetInnerHTML={{ __html: item.icon_svg }} className="flex size-full items-center justify-center *:size-full" /> : <MaterialIcon name="category" size="sm" />}</span><span>{item.name}</span></div></td><td className="px-4 py-3 text-cu-muted">{item.products_count}</td><td className="px-4 py-3"><div className="flex justify-end gap-2"><Action icon="edit" label="Edit kategori" onClick={() => onEdit(item)} /><Action icon="delete" label="Hapus kategori" danger onClick={() => void onDelete(item)} /></div></td></tr>)}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
 }
 
 function ProductTable({ products, onEdit, onDelete }: { products: PricetagProduct[]; onEdit: (item: PricetagProduct) => void; onDelete: (item: PricetagProduct) => void }) {
@@ -290,60 +325,33 @@ function ProductTable({ products, onEdit, onDelete }: { products: PricetagProduc
         </table>
       </div>
 
-      {/* Mobile View (Compact 3-Column Table) */}
-      <div className="block w-full overflow-hidden rounded-[36px] bg-white p-4 shadow-sm sm:hidden">
-        <table className="w-full text-sm table-fixed">
-          <thead className="hidden bg-cu-panel-soft text-left text-xs uppercase tracking-wide text-cu-muted">
-            <tr>
-              <th className="px-3 py-3 w-[45%]">Produk</th>
-              <th className="px-3 py-3 w-[25%]">Harga</th>
-              <th className="px-3 py-3 w-[30%] text-right"></th>
-            </tr>
-          </thead>
-          <tbody className="block space-y-2">
-            {products.length === 0 ? (
-              <tr>
-                <td colSpan={3} className="p-10 text-center text-cu-muted">Belum ada produk.</td>
-              </tr>
-            ) : (
-              products.map((item) => (
-                <tr key={item.id} className="block rounded-[24px] border border-[#c9c9c9] bg-white transition-colors">
-                  <td className="block px-5 pt-3 align-middle">
-                    <div className="flex flex-col min-w-0">
-                      <span className="truncate text-[10px] font-medium leading-tight text-[#8a8a8a]">
-                        {item.category.name}
-                      </span>
-                      <span className="truncate text-[13px] font-semibold leading-tight text-[#2c2c2c]">
-                        {item.name}
-                      </span>
-                      {item.variant_name && item.variant_name !== " " && (
-                        <span className="text-[10px] text-cu-muted truncate">
-                          {item.variant_name}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="block px-5 py-2 align-middle">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-[#777777] line-through">
-                        {formatRupiah(item.normal_price)}
-                      </span>
-                      <span className="text-[13px] font-semibold text-cu-success">
-                        {formatRupiah(item.discount_price)}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="block px-5 pb-3 align-middle text-right">
-                    <div className="flex justify-end gap-1">
-                      <Action icon="edit" label="Edit produk" onClick={() => onEdit(item)} />
-                      <Action icon="delete" label="Hapus produk" danger onClick={() => void onDelete(item)} />
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div className="block space-y-2 rounded-[36px] bg-white p-4 shadow-sm sm:hidden">
+        {products.length === 0 ? (
+          <div className="rounded-[24px] border border-[#c9c9c9] bg-white px-4 py-8 text-center text-sm text-cu-muted">Belum ada produk.</div>
+        ) : products.map((item) => (
+          <article key={item.id} className="rounded-[24px] border border-[#d8d8d8] bg-white p-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-[10px] font-medium leading-tight text-[#8a8a8a]">{item.category.name}</p>
+                <h3 className="truncate text-[13px] font-semibold leading-tight text-[#2c2c2c]">{item.name}</h3>
+                {item.variant_name && item.variant_name !== " " && <p className="truncate text-[10px] leading-tight text-cu-muted">{item.variant_name}</p>}
+              </div>
+              <div className="flex shrink-0 gap-1.5">
+                <Action icon="edit" label="Edit produk" onClick={() => onEdit(item)} />
+                <Action icon="delete" label="Hapus produk" danger onClick={() => void onDelete(item)} />
+              </div>
+            </div>
+            <div className="mt-2 flex items-end justify-between gap-2 border-t border-[#e8e8e8] pt-2">
+              <div>
+                <p className="text-[10px] leading-tight text-[#777777] line-through">{formatRupiah(item.normal_price)}</p>
+                <p className="text-[14px] font-semibold leading-tight text-cu-success">{formatRupiah(item.discount_price)}</p>
+              </div>
+              <span className={`rounded-full px-2 py-1 text-[10px] font-semibold leading-none ${item.is_ready ? "bg-cu-success-soft text-cu-success" : "bg-cu-panel-soft text-cu-muted"}`}>
+                {item.is_ready ? "Tersedia" : "Belum tersedia"}
+              </span>
+            </div>
+          </article>
+        ))}
       </div>
     </>
   );

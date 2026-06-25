@@ -19,7 +19,7 @@ const mobileRowMetaClass = "mt-0.5 block text-[10px] font-medium leading-tight t
 const mobileProductTitleClass = "min-w-0 truncate text-[13px] font-semibold leading-tight";
 
 export default function PricetagSearchPage() {
-  const { user, hasPermission } = useAuth();
+  const { user } = useAuth();
   const [category, setCategory] = useState<PricetagCategory | null>(null);
   const [categories, setCategories] = useState<PricetagCategory[]>([]);
   const [products, setProducts] = useState<PricetagProduct[]>([]);
@@ -32,7 +32,6 @@ export default function PricetagSearchPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadCatalog = useCallback(async () => {
-    if (!hasPermission("access-pricetag")) return;
     setIsLoading(true);
 
     const params = new URLSearchParams({ page: String(page), per_page: "12" });
@@ -70,7 +69,7 @@ export default function PricetagSearchPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [appliedSearch, category, hasPermission, page, user?.id]);
+  }, [appliedSearch, category, page, user?.id]);
 
   useEffect(() => {
     queueMicrotask(() => void loadCatalog());
@@ -88,10 +87,6 @@ export default function PricetagSearchPage() {
       clearTimeout(handler);
     };
   }, [search, appliedSearch]);
-
-  if (!hasPermission("access-pricetag")) {
-    return <AccessDenied />;
-  }
 
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -470,4 +465,3 @@ function LoadingState() {
     </div>
   );
 }
-function AccessDenied() { return <div className="rounded-2xl border border-cu-danger/20 bg-cu-danger-soft p-8 text-center"><MaterialIcon name="lock" size="lg" className="mx-auto text-cu-danger" /><h1 className="mt-3 text-lg font-semibold">Akses ditolak</h1><p className="mt-1 text-sm text-cu-muted">Anda tidak memiliki permission access-pricetag.</p></div>; }

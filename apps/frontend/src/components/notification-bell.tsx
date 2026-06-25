@@ -32,6 +32,9 @@ interface NotificationBellProps {
   variant?: "light" | "dark" | "transparent-dark";
 }
 
+const TOAST_VISIBLE_MS = 6000;
+const TOAST_EXIT_MS = 280;
+
 async function requestNotifications(): Promise<NotificationPayload> {
   return apiFetch<NotificationPayload>("/notifications");
 }
@@ -51,11 +54,28 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
   const [error, setError] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [toastNotification, setToastNotification] = useState<NotificationItem | null>(null);
+  const [isToastLeaving, setIsToastLeaving] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const toastExitTimeoutRef = useRef<number | null>(null);
+  const knownNotificationIdsRef = useRef<Set<string>>(new Set());
+  const didHydrateNotificationsRef = useRef(false);
 
   const applyPayload = (payload: NotificationPayload) => {
     const mergedNotifications = mergeNotifications(payload.notifications, userId);
+    const nextIds = new Set(mergedNotifications.map((item) => item.id));
+    const newestUnread = mergedNotifications.find(
+      (item) => !item.is_read && !knownNotificationIdsRef.current.has(item.id)
+    );
+
+    if (didHydrateNotificationsRef.current && newestUnread) {
+      setIsToastLeaving(false);
+      setToastNotification(newestUnread);
+    }
+
+    knownNotificationIdsRef.current = nextIds;
+    didHydrateNotificationsRef.current = true;
     setNotifications(mergedNotifications);
     setUnreadCount(mergedNotifications.filter((item) => !item.is_read).length);
   };
@@ -116,6 +136,26 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
       window.removeEventListener(LOCAL_NOTIFICATIONS_UPDATED_EVENT, refreshLocalNotifications);
     };
   }, [userId]);
+
+  useEffect(() => {
+    if (!toastNotification) return;
+
+    const timeout = window.setTimeout(() => {
+      setIsToastLeaving(true);
+      toastExitTimeoutRef.current = window.setTimeout(() => {
+        setToastNotification(null);
+        setIsToastLeaving(false);
+      }, TOAST_EXIT_MS);
+    }, TOAST_VISIBLE_MS);
+
+    return () => {
+      window.clearTimeout(timeout);
+      if (toastExitTimeoutRef.current) {
+        window.clearTimeout(toastExitTimeoutRef.current);
+        toastExitTimeoutRef.current = null;
+      }
+    };
+  }, [toastNotification]);
 
   // Click outside to close
   useEffect(() => {
@@ -237,8 +277,60 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
   const unreadItemClass =
     variant === "dark" ? "bg-blue-400/15" : "bg-cu-info-soft";
 
+  const dismissToast = () => {
+    setIsToastLeaving(true);
+    if (toastExitTimeoutRef.current) window.clearTimeout(toastExitTimeoutRef.current);
+    toastExitTimeoutRef.current = window.setTimeout(() => {
+      setToastNotification(null);
+      setIsToastLeaving(false);
+      toastExitTimeoutRef.current = null;
+    }, TOAST_EXIT_MS);
+  };
+
+  const getNotificationIcon = (notification: NotificationItem) => {
+    const message = notification.message.toLowerCase();
+    if (notification.url?.includes("/pricetag") || message.includes("pricetag") || message.includes("label")) return "sell";
+    if (message.includes("gagal") || message.includes("error")) return "error";
+    if (message.includes("berhasil") || message.includes("selesai")) return "check_circle";
+    return "notifications";
+  };
+
   return (
     <div className="relative" ref={containerRef}>
+      {toastNotification && (
+        <div
+          role="status"
+          className={`fixed left-4 right-4 top-[4.75rem] z-[140] rounded-[20px] border p-3 shadow-2xl sm:left-auto sm:right-6 sm:w-80 ${
+            isToastLeaving ? "cu-toast-exit" : "cu-toast-enter"
+          } ${
+            variant === "dark"
+              ? "border-white/15 bg-[#111214]/95 text-white backdrop-blur-xl"
+              : "border-cu-line bg-white text-cu-ink"
+          }`}
+        >
+          <div className="flex items-start gap-3">
+            <div className={`flex size-10 shrink-0 items-center justify-center rounded-full ${variant === "dark" ? "bg-white/10 text-white" : "bg-cu-info-soft text-cu-info"}`}>
+              <MaterialIcon name={getNotificationIcon(toastNotification)} size="sm" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[11px] font-bold uppercase tracking-wide opacity-70">Notifikasi Baru</p>
+              <p className="mt-0.5 line-clamp-2 text-sm font-semibold leading-snug">{toastNotification.message}</p>
+              <p className={`mt-1 text-[11px] ${variant === "dark" ? "text-white/55" : "text-cu-muted"}`}>Baru saja</p>
+            </div>
+            <button
+              type="button"
+              onClick={dismissToast}
+              className={`inline-flex size-8 shrink-0 items-center justify-center rounded-full transition ${
+                variant === "dark" ? "hover:bg-white/10" : "hover:bg-cu-panel-soft"
+              }`}
+              aria-label="Tutup notifikasi"
+            >
+              <MaterialIcon name="close" size="xs" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <button
         onClick={() => setIsOpen(!isOpen)}
         type="button"

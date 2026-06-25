@@ -22,6 +22,7 @@ export default function DashboardLayout({
   const isSettingsPage =
     pathname?.startsWith("/settings") ||
     pathname?.startsWith("/profile");
+  const isUsersPage = pathname?.startsWith("/users");
 
   const isAIAgentPage = pathname?.startsWith("/ai-agent");
 
@@ -54,9 +55,12 @@ export default function DashboardLayout({
       return `w-full mx-auto ${isDarkPage ? "pt-16" : "pt-0"} pb-8 px-6 md:px-16 relative z-10`;
     }
     if (isSettingsPage) {
-      // Mobile: full-width dengan px-6 (sejajar navbar), tanpa card, tanpa padding atas bawah
+      // Mobile: full-width dengan px-6 (sejajar navbar), dengan jarak dari navbar.
       // Desktop (md+): card dengan margin dan rounding
-      return "px-6 md:px-0 md:mx-32 xl:mx-64 mt-4 md:mt-2 md:mb-6 md:pb-6 md:rounded-2xl md:bg-cu-surface md:pt-0 md:px-6";
+      return "px-6 pt-4 md:px-0 md:mx-32 xl:mx-64 md:mt-2 md:mb-6 md:pb-6 md:rounded-2xl md:bg-cu-surface md:pt-0 md:px-6";
+    }
+    if (isUsersPage) {
+      return "w-full px-0 md:mx-32 xl:mx-64 md:mt-2 md:mb-6 md:px-6 md:pb-6 md:rounded-2xl md:bg-cu-surface";
     }
     return "mx-6 md:mx-32 xl:mx-64 mt-2 mb-6 pt-0 px-6 pb-6 rounded-2xl bg-cu-surface";
   })();

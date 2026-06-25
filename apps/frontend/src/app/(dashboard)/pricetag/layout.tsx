@@ -61,9 +61,9 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
   }, []);
 
   const tabs = [
-    { label: "Cari Pricetag", path: "/pricetag/search", permission: "access-pricetag" },
-    { label: "Generator", path: "/pricetag/generator", permission: "access-pricetag" },
-    { label: "Riwayat", path: "/pricetag/history", permission: "access-pricetag" },
+    { label: "Cari Pricetag", path: "/pricetag/search" },
+    { label: "Generator", path: "/pricetag/generator" },
+    { label: "Riwayat", path: "/pricetag/history" },
     { label: "Database", path: "/pricetag/database", permission: "pricetag.manage" },
   ];
 
@@ -72,12 +72,12 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-black" />
 
       {/* Centered Header Title */}
-      <div className="w-full text-left md:text-center">
+      <div className="w-full text-center">
         <h1
           id="pricetag-title"
           aria-label={titleText}
           data-typewriter={titleText}
-          className="whitespace-nowrap text-left text-[clamp(28px,8.4vw,38px)] font-medium leading-[1.04] tracking-normal text-white md:text-center md:text-5xl lg:text-8xl"
+          className="whitespace-nowrap text-center text-[clamp(28px,8.4vw,38px)] font-medium leading-[1.04] tracking-normal text-white md:text-5xl lg:text-8xl"
         >
           <span ref={textTargetRef} data-typewriter-text>
             {titleText}
@@ -94,7 +94,7 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
 
       <nav className="mx-0 flex w-full max-w-full flex-nowrap items-center overflow-x-auto border-b border-white/50 bg-transparent scrollbar-none transition-all duration-300">
         {tabs
-          .filter((tab) => hasPermission(tab.permission))
+          .filter((tab) => !tab.permission || hasPermission(tab.permission))
           .map((tab) => {
             const active = currentPath === tab.path;
             return (
@@ -114,7 +114,7 @@ export default function PricetagLayout({ children }: { children: React.ReactNode
       </nav>
 
       {/* Main Content Card Panel */}
-      <main className="min-h-fit w-full animate-fade-in text-cu-ink md:rounded-2xl md:border md:border-white/5 md:bg-white md:p-8 md:shadow-2xl">
+      <main key={currentPath} className="cu-pricetag-route-transition min-h-fit w-full text-cu-ink md:rounded-2xl md:border md:border-white/5 md:bg-white md:p-8 md:shadow-2xl">
         {children}
       </main>
     </div>

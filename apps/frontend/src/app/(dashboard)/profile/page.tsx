@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { apiFetch, ApiError, ValidationError } from "@/lib/api";
 import { User, useAuth } from "@/providers/auth-provider";
@@ -74,6 +74,14 @@ export default function ProfilePage() {
   const [avatarStatus, setAvatarStatus] = useState<string | null>(null);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
+  const [cropSource, setCropSource] = useState<string | null>(null);
+  const [cropFileName, setCropFileName] = useState("avatar.jpg");
+  const [cropFileType, setCropFileType] = useState("image/jpeg");
+  const [cropZoom, setCropZoom] = useState(1);
+  const [cropOffsetX, setCropOffsetX] = useState(0);
+  const [cropOffsetY, setCropOffsetY] = useState(0);
+  const cropImageRef = useRef<HTMLImageElement | null>(null);
+  const cropDragRef = useRef<{ x: number; y: number; offsetX: number; offsetY: number } | null>(null);
 
   // Password change state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -254,11 +262,112 @@ export default function ProfilePage() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setAvatar(file);
-      setAvatarPreview(URL.createObjectURL(file));
+      setCropSource(URL.createObjectURL(file));
+      setCropFileName(file.name);
+      setCropFileType(file.type || "image/jpeg");
+      setCropZoom(1);
+      setCropOffsetX(0);
+      setCropOffsetY(0);
       setAvatarStatus(null);
       setAvatarError(null);
     }
+    e.target.value = "";
+  };
+
+  const updateCropZoom = (nextZoom: number) => {
+    setCropZoom(Math.min(3, Math.max(1, nextZoom)));
+  };
+
+  const nudgeCropZoom = (delta: number) => {
+    setCropZoom((currentZoom) => Math.min(3, Math.max(1, currentZoom + delta)));
+  };
+
+  const updateCropOffset = (nextX: number, nextY: number) => {
+    setCropOffsetX(Math.min(100, Math.max(-100, nextX)));
+    setCropOffsetY(Math.min(100, Math.max(-100, nextY)));
+  };
+
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    cropDragRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      offsetX: cropOffsetX,
+      offsetY: cropOffsetY,
+    };
+  };
+
+  const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = cropDragRef.current;
+    if (!drag) return;
+
+    updateCropOffset(
+      drag.offsetX + (event.clientX - drag.x) / 1.6,
+      drag.offsetY + (event.clientY - drag.y) / 1.6
+    );
+  };
+
+  const handleCropPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (cropDragRef.current) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    cropDragRef.current = null;
+  };
+
+  const handleCropWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    nudgeCropZoom(event.deltaY > 0 ? -0.08 : 0.08);
+  };
+
+  const closeAvatarCrop = () => {
+    setCropSource(null);
+    setCropZoom(1);
+    setCropOffsetX(0);
+    setCropOffsetY(0);
+  };
+
+  const applyAvatarCrop = async () => {
+    const image = cropImageRef.current;
+    if (!image || !cropSource) return;
+
+    const outputSize = 512;
+    const canvas = document.createElement("canvas");
+    canvas.width = outputSize;
+    canvas.height = outputSize;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const naturalWidth = image.naturalWidth;
+    const naturalHeight = image.naturalHeight;
+    const baseScale = Math.max(outputSize / naturalWidth, outputSize / naturalHeight);
+    const finalScale = baseScale * cropZoom;
+    const drawWidth = naturalWidth * finalScale;
+    const drawHeight = naturalHeight * finalScale;
+    const maxOffsetX = Math.max(0, (drawWidth - outputSize) / 2);
+    const maxOffsetY = Math.max(0, (drawHeight - outputSize) / 2);
+    const drawX = (outputSize - drawWidth) / 2 + (cropOffsetX / 100) * maxOffsetX;
+    const drawY = (outputSize - drawHeight) / 2 + (cropOffsetY / 100) * maxOffsetY;
+
+    context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, cropFileType === "image/png" ? "image/png" : "image/jpeg", 0.92);
+    });
+
+    if (!blob) {
+      setAvatarError("Crop avatar gagal diproses.");
+      return;
+    }
+
+    const extension = cropFileType === "image/png" ? "png" : "jpg";
+    const croppedFile = new File([blob], cropFileName.replace(/\.[^.]+$/, `.${extension}`), {
+      type: blob.type,
+    });
+
+    setAvatar(croppedFile);
+    setAvatarPreview(URL.createObjectURL(blob));
+    closeAvatarCrop();
   };
 
   // Submit Profile & Display Preferences
@@ -488,16 +597,21 @@ export default function ProfilePage() {
                   <label className="block text-sm font-semibold text-cu-ink" htmlFor="profile-whatsapp">
                     Nomor WhatsApp
                   </label>
-                  <input
-                    id="profile-whatsapp"
-                    className="block w-full mt-1.5 rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-cu-focus"
-                    type="text"
-                    value={whatsappNumber}
-                    onChange={(e) => setWhatsappNumber(e.target.value.replace(/\D/g, ""))}
-                    placeholder="Contoh: 628123456789"
-                  />
+                  <div className="mt-1.5 flex h-10 w-full overflow-hidden rounded-lg border border-cu-line bg-cu-surface transition focus-within:border-cu-focus focus-within:ring-1 focus-within:ring-cu-focus">
+                    <span className="flex shrink-0 items-center border-r border-cu-line bg-cu-panel-soft px-3 text-sm font-semibold text-cu-muted">
+                      +62
+                    </span>
+                    <input
+                      id="profile-whatsapp"
+                      className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm text-cu-ink outline-none"
+                      type="text"
+                      value={whatsappNumber}
+                      onChange={(e) => setWhatsappNumber(e.target.value.replace(/\D/g, ""))}
+                      placeholder="8123456789"
+                    />
+                  </div>
                   <p className="mt-1.5 text-[10px] text-cu-muted">
-                    Diawali kode negara 62 (tanpa + atau spasi). Digunakan untuk notifikasi/OTP WhatsApp.
+                    Masukkan nomor tanpa angka 0 di depan. Digunakan untuk notifikasi/OTP WhatsApp.
                   </p>
                 </div>
 
@@ -524,7 +638,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
 
-                <div className="pt-4">
+                <div className="pb-12 pt-4 lg:pb-0">
                   <button
                     type="submit"
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-ink bg-cu-ink px-5 text-sm font-medium leading-none text-cu-surface transition duration-200 hover:border-cu-ink-hover hover:bg-cu-ink-hover focus:outline-none focus:ring-2 focus:ring-cu-focus focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
@@ -568,6 +682,114 @@ export default function ProfilePage() {
                   {avatarStatus && <p className="text-xs text-cu-success font-medium">{avatarStatus}</p>}
                 </div>
               </form>
+
+              {cropSource && (
+                <div className="fixed inset-0 z-[220] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+                  <div role="dialog" aria-modal="true" aria-label="Atur crop foto profil" className="w-full max-w-[430px] overflow-hidden rounded-[28px] border border-white/20 bg-white shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+                    <div className="flex items-center justify-between gap-3 border-b border-cu-line/70 px-5 py-4">
+                      <div>
+                        <h3 className="text-base font-semibold text-cu-ink">Atur Crop Foto</h3>
+                        <p className="mt-0.5 text-xs text-cu-muted">Drag gambar, scroll untuk zoom, lalu gunakan hasilnya.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={closeAvatarCrop}
+                        className="inline-flex size-9 items-center justify-center rounded-full border border-cu-line bg-white text-cu-ink transition hover:bg-cu-panel-soft"
+                        aria-label="Tutup crop avatar"
+                      >
+                        <MaterialIcon name="close" size="sm" />
+                      </button>
+                    </div>
+
+                    <div className="p-5">
+                      <div
+                        className="relative mx-auto aspect-square w-full max-w-[320px] touch-none overflow-hidden rounded-full border border-cu-line bg-[#f4f6f8] shadow-inner cursor-grab active:cursor-grabbing"
+                        onPointerDown={handleCropPointerDown}
+                        onPointerMove={handleCropPointerMove}
+                        onPointerUp={handleCropPointerUp}
+                        onPointerCancel={handleCropPointerUp}
+                        onWheel={handleCropWheel}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          ref={cropImageRef}
+                          src={cropSource}
+                          alt="Preview crop avatar"
+                          draggable={false}
+                          className="size-full select-none object-cover"
+                          style={{
+                            transform: `translate(${cropOffsetX * 0.35}px, ${cropOffsetY * 0.35}px) scale(${cropZoom})`,
+                            transformOrigin: "center",
+                          }}
+                        />
+                        <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-black/10" />
+                        <div
+                          className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/45 bg-black/55 p-1 text-white backdrop-blur-md"
+                          onPointerDown={(event) => event.stopPropagation()}
+                          onPointerMove={(event) => event.stopPropagation()}
+                          onPointerUp={(event) => event.stopPropagation()}
+                          onWheel={(event) => event.stopPropagation()}
+                        >
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              nudgeCropZoom(-0.12);
+                            }}
+                            className="inline-flex size-8 items-center justify-center rounded-full transition hover:bg-white/15"
+                            aria-label="Perkecil foto"
+                          >
+                            <MaterialIcon name="remove" size="xs" />
+                          </button>
+                          <span className="min-w-10 text-center text-[11px] font-semibold">{cropZoom.toFixed(1)}x</span>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              nudgeCropZoom(0.12);
+                            }}
+                            className="inline-flex size-8 items-center justify-center rounded-full transition hover:bg-white/15"
+                            aria-label="Perbesar foto"
+                          >
+                            <MaterialIcon name="add" size="xs" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-between rounded-2xl bg-cu-panel-soft px-4 py-3 text-xs text-cu-muted">
+                        <span>Seluruh lingkaran ini adalah hasil avatar.</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateCropZoom(1);
+                            updateCropOffset(0, 0);
+                          }}
+                          className="font-semibold text-cu-ink transition hover:text-cu-info"
+                        >
+                          Reset
+                        </button>
+                      </div>
+
+                      <div className="mt-5 flex gap-3">
+                        <button
+                          type="button"
+                          onClick={closeAvatarCrop}
+                          className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-cu-line bg-white text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+                        >
+                          Batal
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void applyAvatarCrop()}
+                          className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-cu-ink text-sm font-semibold text-white transition hover:bg-cu-ink-hover"
+                        >
+                          Gunakan Foto
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

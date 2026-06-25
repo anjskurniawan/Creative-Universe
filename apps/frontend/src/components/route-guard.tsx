@@ -52,26 +52,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   }, [user, isLoading, isAuthenticated, currentPath, router]);
 
   if (isLoading) {
-    return (
-      <div style={{ 
-        minHeight: "100vh", 
-        display: "flex", 
-        flexDirection: "column", 
-        alignItems: "center", 
-        justifyContent: "center", 
-        backgroundColor: "hsl(var(--background))" 
-      }}>
-        <div className="spinner" style={{ 
-          color: "hsl(var(--primary))", 
-          width: "2.5rem", 
-          height: "2.5rem", 
-          borderWidth: "3px" 
-        }}></div>
-        <p style={{ marginTop: "1rem", color: "hsl(var(--muted-foreground))", fontWeight: 500, fontSize: "0.9rem" }}>
-          Memuat sesi...
-        </p>
-      </div>
-    );
+    return null;
   }
 
   const currentIsGuestPath = isGuestPath(currentPath);

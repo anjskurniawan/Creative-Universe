@@ -465,9 +465,71 @@
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.cu-toast-enter {
+  animation: toastEnter 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cu-toast-exit {
+  animation: toastExit 0.28s ease-in both;
+}
+
+.cu-pricetag-route-transition {
+  animation: pricetagRouteIn 0.26s cubic-bezier(0.2, 0, 0, 1) both;
+  will-change: opacity, transform;
+}
+
+.cu-result-status-pop {
+  animation: resultStatusPop 0.42s cubic-bezier(0.2, 1.2, 0.2, 1) both;
+}
+
+.cu-result-status-ring {
+  animation: resultStatusRing 1.6s ease-out infinite;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes pricetagRouteIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes resultStatusPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes resultStatusRing {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.86);
+  }
+  75% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.45);
+  }
 }
 
 @keyframes slideUp {
@@ -478,6 +540,38 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastExit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cu-pricetag-route-transition,
+  .cu-result-status-pop,
+  .cu-result-status-ring,
+  .cu-toast-enter,
+  .cu-toast-exit {
+    animation: none;
   }
 }
 

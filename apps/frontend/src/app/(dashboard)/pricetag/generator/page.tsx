@@ -19,8 +19,15 @@ import ExcelJS from "exceljs";
 
 type Tab = "single" | "checklist" | "bulk";
 
+const formatPricePlaceholder = (value: number) => new Intl.NumberFormat("id-ID").format(value);
+const onlyDigits = (value: string) => value.replace(/\D/g, "");
+const formatPriceInput = (value: string) => {
+  const digits = onlyDigits(value);
+  return digits ? new Intl.NumberFormat("id-ID").format(Number(digits)) : "";
+};
+
 export default function PricetagGeneratorPage() {
-  const { user, hasPermission, hasRole } = useAuth();
+  const { user, hasRole } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -77,6 +84,7 @@ export default function PricetagGeneratorPage() {
   const [isChecklistSuccess, setIsChecklistSuccess] = useState(false);
   const [activeBatch, setActiveBatch] = useState<PricetagBatch | null>(null);
   const [visualPercent, setVisualPercent] = useState(0);
+  const completedBatchNotificationIdsRef = useRef<Set<number>>(new Set());
 
   const percent = activeBatch && activeBatch.total_items > 0
     ? Math.round((activeBatch.processed_items / activeBatch.total_items) * 100)
@@ -97,6 +105,18 @@ export default function PricetagGeneratorPage() {
 
     return () => clearInterval(interval);
   }, [activeBatch]);
+
+  useEffect(() => {
+    if (!activeBatch || activeBatch.status !== "completed") return;
+    if (completedBatchNotificationIdsRef.current.has(activeBatch.id)) return;
+
+    completedBatchNotificationIdsRef.current.add(activeBatch.id);
+    pushLocalNotification(
+      `${activeBatch.batch_name} selesai dibuat. ${activeBatch.processed_items}/${activeBatch.total_items} label berhasil diproses.`,
+      "/pricetag/history",
+      user?.id
+    );
+  }, [activeBatch, user?.id]);
 
   // Trickle progress visual smoothing
   useEffect(() => {
@@ -166,7 +186,7 @@ export default function PricetagGeneratorPage() {
             setWizardProductName(prod.name);
             setWizardProductId(prod.id);
             setSelectedProduct(prod);
-            setWizardDiscountPrice(String(prod.discount_price ?? 0));
+            setWizardDiscountPrice("");
             setWizardStep(4);
           })
           .catch((err) => {
@@ -260,7 +280,7 @@ export default function PricetagGeneratorPage() {
             // Auto skip to step 3
             setWizardProductId(singleVar.id);
             setSelectedProduct(singleVar);
-            setWizardDiscountPrice(String(singleVar.discount_price ?? 0));
+            setWizardDiscountPrice("");
             setWizardCategoryId(singleVar.category.id);
             setWizardCategoryName(singleVar.category.name);
             setWizardStep(3);
@@ -281,7 +301,7 @@ export default function PricetagGeneratorPage() {
   const handleSelectVariant = (prod: PricetagProduct) => {
     setWizardProductId(prod.id);
     setSelectedProduct(prod);
-    setWizardDiscountPrice(String(prod.discount_price ?? 0));
+    setWizardDiscountPrice("");
     setWizardCategoryId(prod.category.id);
     setWizardCategoryName(prod.category.name);
     setWizardStep(3);
@@ -510,9 +530,10 @@ export default function PricetagGeneratorPage() {
   };
 
   const handleChecklistPriceChange = (prodId: number, value: string) => {
+    const digits = onlyDigits(value);
     setChecklistPrices((prev) => ({
       ...prev,
-      [prodId]: value,
+      [prodId]: digits,
     }));
   };
 
@@ -798,10 +819,6 @@ export default function PricetagGeneratorPage() {
     }
   };
 
-  if (!hasPermission("access-pricetag")) {
-    return <AccessDenied />;
-  }
-
   const displayedChecklistProducts = showOnlySelected
     ? Object.values(selectedProductsData)
     : checklistProducts;
@@ -1012,45 +1029,60 @@ export default function PricetagGeneratorPage() {
 
             {wizardStep === 3 && selectedProduct && (
               <form onSubmit={handleGenerateSingle} className="rounded-[36px] bg-white p-4">
-                <div className="rounded-[24px] border border-[#b9bbb9] px-5 py-4">
-                  <h3 className="text-[18px] font-semibold leading-tight text-[#303431]">Detail Pricetag</h3>
-                  <div className="mt-5 space-y-2 text-[#303431]">
-                    <MobileDetailRow label="Kategori" value={wizardCategoryName} />
-                    <MobileDetailRow label="Produk" value={selectedProduct.name} />
-                    <MobileDetailRow label="Varian" value={selectedProduct.variant_name || " "} />
-                    <MobileDetailRow label="Harga normal" value={formatRupiah(selectedProduct.normal_price)} />
-                    <MobileDetailRow label="Harga diskon terakhir" value={formatRupiah(selectedProduct.discount_price)} />
+                <div className="overflow-hidden rounded-[24px] border border-[#c9c9c9] bg-white">
+                  <div className="flex min-h-[60px] w-full items-center justify-between gap-2 px-5 text-left text-[#2c2c2c]">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="size-2 shrink-0 rounded-full bg-[#dddddd]" />
+                      <p className="min-w-0 truncate text-[13px] font-semibold leading-tight">{selectedProduct.name}</p>
+                    </div>
+                    <MaterialIcon name="expand_more" size="md" className="shrink-0 text-[#2c2c2c]" />
                   </div>
 
-                  <label htmlFor="mobileWizardDiscountPrice" className="mt-8 block text-[13px] font-bold text-black">
-                    Harga promo / diskon
-                  </label>
-                  <div className="mt-2 flex h-[46px] items-center rounded-[14px] border border-[#aeb0ae] px-4">
-                    <span className="border-r border-[#aeb0ae] pr-3 text-[18px] font-semibold text-[#8f9690]">Rp</span>
-                    <input
-                      id="mobileWizardDiscountPrice"
-                      type="number"
-                      min="0"
-                      value={wizardDiscountPrice}
-                      onChange={(event) => setWizardDiscountPrice(event.target.value)}
-                      className="h-full min-w-0 flex-1 border-0 bg-transparent pl-3 text-[18px] font-medium text-[#303431] outline-none placeholder:text-[#8f9690] focus:ring-0"
-                      placeholder="0"
-                      required
-                    />
+                  <div className="space-y-3 border-t border-[#E3E4E3] bg-[#f8f9fb] p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-medium leading-tight text-[#8a8a8a]">Kategori</span>
+                      <span className="break-words text-right text-[12px] font-semibold text-[#303431]">{wizardCategoryName}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-medium leading-tight text-[#8a8a8a]">Varian</span>
+                      <span className="break-words text-right text-[12px] font-semibold text-[#303431]">{selectedProduct.variant_name || " "}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] font-medium leading-tight text-[#8a8a8a]">Harga normal</span>
+                      <span className="text-right text-[12px] font-semibold text-[#303431]">{formatRupiah(selectedProduct.normal_price)}</span>
+                    </div>
+                    <div className="border-t border-[#E3E4E3] pt-3">
+                      <label htmlFor="mobileWizardDiscountPrice" className="text-[10px] font-medium leading-tight text-[#8a8a8a]">
+                        Harga diskon
+                      </label>
+                      <div className="relative mt-1">
+                        <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-semibold text-[#777B78]">Rp</span>
+                        <input
+                          id="mobileWizardDiscountPrice"
+                          type="text"
+                          inputMode="numeric"
+                          value={formatPriceInput(wizardDiscountPrice)}
+                          onChange={(event) => setWizardDiscountPrice(onlyDigits(event.target.value))}
+                          className="block h-[46px] w-full rounded-full border border-[#C7C9C8] bg-white pl-10 pr-4 text-sm text-[#303431] outline-none placeholder:text-[#8f9690] focus:border-[#2da3ff]"
+                          placeholder={formatPricePlaceholder(selectedProduct.discount_price ?? 0)}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isGenerating || isWizardDiscountInvalid}
+                      className={`flex h-[46px] w-full items-center justify-center rounded-full text-[16px] font-bold transition ${
+                        isWizardDiscountInvalid
+                          ? "cursor-not-allowed bg-[#b7b7b7] text-white"
+                          : "bg-black text-white disabled:opacity-50"
+                      }`}
+                    >
+                      Lanjutkan
+                    </button>
                   </div>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={isGenerating || isWizardDiscountInvalid}
-                  className={`mt-4 flex h-[46px] w-full items-center justify-center rounded-full text-[16px] font-bold transition ${
-                    isWizardDiscountInvalid
-                      ? "cursor-not-allowed bg-[#b7b7b7] text-white"
-                      : "bg-black text-white disabled:opacity-50"
-                  }`}
-                >
-                  Lanjutkan
-                </button>
               </form>
             )}
 
@@ -1254,13 +1286,13 @@ export default function PricetagGeneratorPage() {
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-semibold text-cu-muted">Rp</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       id="wizardDiscountPrice"
-                      min="0"
-                      value={wizardDiscountPrice}
-                      onChange={(e) => setWizardDiscountPrice(e.target.value)}
+                      value={formatPriceInput(wizardDiscountPrice)}
+                      onChange={(e) => setWizardDiscountPrice(onlyDigits(e.target.value))}
                       className="block w-full rounded-full border border-cu-line bg-cu-surface py-2.5 pl-9 pr-3 text-sm text-cu-ink focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
-                      placeholder="0"
+                      placeholder={formatPricePlaceholder(selectedProduct.discount_price ?? 0)}
                       required
                     />
                   </div>
@@ -1375,83 +1407,98 @@ export default function PricetagGeneratorPage() {
       {activeTab === "checklist" && (
         <div className="space-y-6">
           {isChecklistSuccess ? (
-            <div className="rounded-2xl border border-cu-line bg-cu-surface p-6 sm:p-12 shadow-sm max-w-xl mx-auto text-center">
-              <div className="flex flex-col items-center justify-center space-y-5">
-                <div className="relative flex items-center justify-center">
-                  {activeBatch?.status === "completed" ? (
-                    <>
-                      <span className="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-success opacity-20"></span>
-                      <div className="size-16 rounded-full bg-cu-success-soft text-cu-success flex items-center justify-center shadow-sm relative z-10">
-                        <MaterialIcon name="check" size="lg" />
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <span className="animate-ping absolute inline-flex h-12 w-12 rounded-full bg-cu-info opacity-20"></span>
-                      <div className="size-16 rounded-full bg-cu-info-soft text-cu-info flex items-center justify-center shadow-sm relative z-10">
-                        <MaterialIcon name="settings" className="animate-spin" size="lg" />
-                      </div>
-                    </>
-                  )}
+            <div className="rounded-[36px] bg-white p-4 text-[#303431] lg:mx-auto lg:max-w-xl">
+              <div className="overflow-hidden rounded-[24px] border border-[#c9c9c9] bg-white">
+                <div className="flex min-h-[60px] items-center justify-between gap-3 px-5">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className={`size-2 shrink-0 rounded-full ${activeBatch?.status === "completed" ? "bg-[#269556]" : "bg-[#2da3ff]"}`} />
+                    <p className="min-w-0 truncate text-[13px] font-semibold leading-tight">
+                      {activeBatch?.status === "completed" ? "Pembuatan Label Selesai" : "Antrean Pembuatan Label"}
+                    </p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-[11px] font-bold leading-none ${
+                    activeBatch?.status === "completed"
+                      ? "bg-[#e7f5ee] text-[#1f8f52]"
+                      : "bg-[#d8efff] text-[#1476b8]"
+                  }`}>
+                    {activeBatch?.status === "completed" ? "Selesai" : "Memproses"}
+                  </span>
                 </div>
 
-                <div className="space-y-2">
-                  <h3 className="text-lg font-bold text-cu-ink">
-                    {activeBatch?.status === "completed" ? "Pembuatan Label Selesai!" : "Antrean Pembuatan Label Dimulai!"}
-                  </h3>
-                  <p className="text-xs text-cu-muted">
-                    {activeBatch?.status === "completed"
-                      ? "Semua label promo untuk batch ini berhasil dibuat."
-                      : "Label promo sedang diproses. Silakan tunggu hingga progress mencapai 100%."}
-                  </p>
-                  
+                <div className="space-y-4 border-t border-[#E3E4E3] bg-[#f8f9fb] p-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`relative flex size-12 shrink-0 items-center justify-center rounded-full ${
+                      activeBatch?.status === "completed"
+                        ? "bg-[#e7f5ee] text-[#269556]"
+                        : "bg-[#d8efff] text-[#2da3ff]"
+                    }`}>
+                      {activeBatch?.status !== "completed" && <span className="absolute size-full rounded-full border border-[#2da3ff]/30 animate-ping" />}
+                      <MaterialIcon
+                        name={activeBatch?.status === "completed" ? "check" : "settings"}
+                        size="md"
+                        weight={600}
+                        className={`relative ${activeBatch?.status === "completed" ? "" : "animate-spin"}`}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-[16px] font-bold leading-tight text-[#303431]">
+                        {activeBatch?.status === "completed" ? "Label selesai dibuat" : "Label sedang diproses"}
+                      </h3>
+                      <p className="mt-1 text-[11px] font-medium leading-snug text-[#8a8a8a]">
+                        {activeBatch?.status === "completed"
+                          ? "Semua label promo untuk batch ini berhasil dibuat."
+                          : "Sistem sedang memproses antrean label promo."}
+                      </p>
+                    </div>
+                  </div>
+
                   {activeBatch && (
-                    <div className="w-full max-w-xs mx-auto mt-4 pt-2 space-y-1">
-                      <div className="flex justify-between text-[10px] font-bold text-cu-muted">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-[10px] font-semibold leading-tight text-[#8a8a8a]">
                         <span>{activeBatch.processed_items} / {activeBatch.total_items} selesai</span>
                         <span>{visualPercent}%</span>
                       </div>
-                      <div className="h-1.5 w-full rounded-full bg-cu-line overflow-hidden">
+                      <div className="h-2 overflow-hidden rounded-full bg-[#E3E4E3]">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
-                            activeBatch.status === "failed" ? "bg-cu-danger" : "bg-cu-success"
+                            activeBatch.status === "failed" ? "bg-cu-danger" : "bg-[#269556]"
                           }`}
-                          style={{ width: `${visualPercent}%` }}
+                          style={{ width: `${Math.max(8, visualPercent)}%` }}
                         />
                       </div>
-                      <div className="text-[10px] text-center mt-1 font-medium capitalize">
-                        Status: <span className={activeBatch.status === "completed" ? "text-cu-success font-bold" : "text-cu-info animate-pulse"}>
+                      <p className="text-center text-[10px] font-medium capitalize text-[#8a8a8a]">
+                        Status: <span className={activeBatch.status === "completed" ? "font-bold text-[#1f8f52]" : "text-[#1476b8] animate-pulse"}>
                           {activeBatch.status === "processing" ? "Memproses" : activeBatch.status === "pending" ? "Mengantre" : activeBatch.status}
                         </span>
-                      </div>
+                      </p>
                     </div>
                   )}
-                </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 w-full justify-center pt-4 border-t border-cu-line/40">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsChecklistSuccess(false);
-                      setVisualPercent(0);
-                      setActiveBatch(null);
-                      setSelectedVariants([]);
-                      setSelectedProductsData({});
-                      setChecklistPrices({});
-                      setChecklistBatchName("");
-                    }}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-full border border-cu-line bg-cu-surface px-5 py-2 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
-                  >
-                    <MaterialIcon name="replay" size="xs" />
-                    Buat Label Baru
-                  </button>
-                  <Link
-                    href="/pricetag/history"
-                    className="flex items-center justify-center gap-1.5 rounded-full bg-cu-ink px-5 py-2 text-sm font-semibold text-cu-surface transition hover:bg-cu-ink-hover shadow-sm"
-                  >
-                    <MaterialIcon name="history" size="xs" />
-                    Lihat Riwayat
-                  </Link>
+                  <div className="grid gap-2 border-t border-[#E3E4E3] pt-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsChecklistSuccess(false);
+                        setVisualPercent(0);
+                        setActiveBatch(null);
+                        setSelectedVariants([]);
+                        setSelectedProductsData({});
+                        setChecklistPrices({});
+                        setChecklistBatchName("");
+                      }}
+                      className="inline-flex h-[46px] items-center justify-center gap-1.5 rounded-full border border-[#c9c9c9] bg-white px-4 text-[13px] font-bold text-[#303431]"
+                    >
+                      <MaterialIcon name="replay" size="xs" weight={500} />
+                      Buat Label Baru
+                    </button>
+                    <Link
+                      href="/pricetag/history"
+                      className="inline-flex h-[46px] items-center justify-center gap-1.5 rounded-full bg-black px-4 text-[13px] font-bold text-white"
+                    >
+                      <MaterialIcon name="history" size="xs" weight={500} />
+                      Lihat Riwayat
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1672,9 +1719,6 @@ export default function PricetagGeneratorPage() {
                             >
                               <div className="flex min-w-0 items-center gap-1">
                                 <span className={`size-2 shrink-0 rounded-full ${isChecked ? "bg-[#139300]" : "bg-[#dddddd]"}`} />
-                                <span className="flex size-9 shrink-0 items-center justify-center">
-                                  <MaterialIcon name="sell" size="md" />
-                                </span>
                                 <p className="min-w-0 truncate text-[13px] font-semibold leading-tight">{product.name}</p>
                               </div>
                               <MaterialIcon
@@ -1706,10 +1750,10 @@ export default function PricetagGeneratorPage() {
                                     <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-xs font-semibold text-[#777B78]">Rp</span>
                                     <input
                                       id={`checklist-price-${product.id}`}
-                                      type="number"
-                                      min="0"
-                                      placeholder={product.discount_price ? String(product.discount_price) : "Harga..."}
-                                      value={checklistPrices[product.id] ?? ""}
+                                      type="text"
+                                      inputMode="numeric"
+                                      placeholder={formatPricePlaceholder(product.discount_price ?? 0)}
+                                      value={formatPriceInput(checklistPrices[product.id] ?? "")}
                                       onChange={(event) => handleChecklistPriceChange(product.id, event.target.value)}
                                       className="block h-[46px] w-full rounded-full border border-[#C7C9C8] bg-white pl-10 pr-4 text-sm text-[#303431] focus:border-[#2da3ff] focus:outline-none"
                                     />
@@ -1792,10 +1836,10 @@ export default function PricetagGeneratorPage() {
                                     <div className="relative max-w-[150px] ml-auto">
                                       <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 text-xs font-semibold text-cu-muted">Rp</span>
                                       <input
-                                        type="number"
-                                        min="0"
-                                        placeholder={p.discount_price ? String(p.discount_price) : "Harga..."}
-                                        value={checklistPrices[p.id] ?? ""}
+                                        type="text"
+                                        inputMode="numeric"
+                                        placeholder={formatPricePlaceholder(p.discount_price ?? 0)}
+                                        value={formatPriceInput(checklistPrices[p.id] ?? "")}
                                         onChange={(e) => handleChecklistPriceChange(p.id, e.target.value)}
                                         className="block w-full rounded-full border border-cu-line bg-cu-surface py-1 pl-8 pr-3 text-right text-sm text-cu-ink focus:border-cu-border-hover focus:outline-none focus:ring-1 focus:ring-cu-border-hover"
                                       />
@@ -2288,29 +2332,56 @@ function MobileGeneratorMessage({ icon, text }: { icon?: string; text: string })
   );
 }
 
-function MobileDetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="grid grid-cols-[1fr_1.25fr] gap-3 text-[13px] leading-snug">
-      <span className="text-[#303431]/80">{label}</span>
-      <span className="break-words text-right font-bold">{value}</span>
-    </div>
-  );
-}
-
 function MobileProcessCard({ visualPercent }: { visualPercent: number }) {
+  const progress = Math.max(12, visualPercent);
+
   return (
-    <div className="rounded-[28px] bg-white px-14 py-10 text-[#303431]">
-      <div className="mx-auto size-32 rounded-full bg-[#269556]" />
-      <div className="mx-auto mt-8 h-2 max-w-[480px] overflow-hidden rounded-full bg-[#e3e3e3]">
-        <div
-          className="h-full rounded-full bg-[#269556] transition-all duration-300"
-          style={{ width: `${Math.max(12, visualPercent)}%` }}
-        />
+    <div className="rounded-[36px] bg-white p-4 text-[#303431]">
+      <div className="overflow-hidden rounded-[24px] border border-[#c9c9c9] bg-white">
+        <div className="flex min-h-[60px] items-center justify-between gap-3 px-5">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="size-2 shrink-0 rounded-full bg-[#269556]" />
+            <p className="min-w-0 truncate text-[13px] font-semibold leading-tight">Membuat Gambar Label</p>
+          </div>
+          <span className="rounded-full bg-[#e7f5ee] px-3 py-1 text-[11px] font-bold leading-none text-[#1f8f52]">
+            {visualPercent}%
+          </span>
+        </div>
+
+        <div className="space-y-4 border-t border-[#E3E4E3] bg-[#f8f9fb] p-4">
+          <div className="flex items-center gap-3">
+            <div className="relative flex size-12 shrink-0 items-center justify-center rounded-full bg-[#e7f5ee] text-[#269556]">
+              <span className="absolute size-full rounded-full border border-[#269556]/25 animate-ping" />
+              <MaterialIcon name="settings" size="md" className="relative animate-spin" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-[16px] font-bold leading-tight text-[#303431]">Sedang menyusun label</h3>
+              <p className="mt-1 text-[11px] font-medium leading-snug text-[#8a8a8a]">
+                Sistem sedang menyiapkan layout promo dan file pricetag.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-[10px] font-semibold leading-tight text-[#8a8a8a]">
+              <span>Proses pembuatan</span>
+              <span>{visualPercent}%</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-[#E3E4E3]">
+              <div
+                className="h-full rounded-full bg-[#269556] transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="rounded-[18px] border border-[#E3E4E3] bg-white px-4 py-3">
+            <p className="text-[12px] font-medium leading-snug text-[#303431]">
+              Harap tunggu sebentar. Halaman akan otomatis berpindah setelah proses selesai.
+            </p>
+          </div>
+        </div>
       </div>
-      <h3 className="mt-8 text-[30px] font-bold leading-tight">Sedang Menyusun Gambar Label</h3>
-      <p className="mt-3 text-[22px] leading-snug">
-        Sistem Creative Universe sedang menyusun layout promo dan menghasilkan pricetag. Harap tunggu ...
-      </p>
     </div>
   );
 }
@@ -2330,53 +2401,96 @@ function MobileResultCard({
   generatedDownloadUrl?: string | null;
   onReset?: () => void;
 }) {
-  return (
-    <div className="rounded-[28px] bg-white px-12 py-10 text-center text-[#303431]">
-      <div className={`mx-auto size-32 rounded-full ${success ? "bg-[#269556]" : "bg-[#9f2424]"}`} />
-      <h3 className="mt-8 text-[30px] font-bold leading-tight">{title}</h3>
-      {description && <p className="mt-3 text-[20px] leading-snug">{description}</p>}
+  const tone = success
+    ? {
+        dot: "bg-[#269556]",
+        soft: "bg-[#e7f5ee]",
+        text: "text-[#1f8f52]",
+        icon: "check",
+        label: "Selesai",
+      }
+    : {
+        dot: "bg-[#9f2424]",
+        soft: "bg-[#fdeeee]",
+        text: "text-[#9f2424]",
+        icon: "close",
+        label: "Gagal",
+      };
 
-      <div className="mx-auto mt-8 flex max-w-[464px] flex-col gap-4">
-        {success ? (
-          <>
-            {generatedViewUrl && (
+  return (
+    <div className="rounded-[36px] bg-white p-4 text-[#303431]">
+      <div className="overflow-hidden rounded-[24px] border border-[#c9c9c9] bg-white">
+        <div className="flex min-h-[60px] items-center justify-between gap-3 px-5">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className={`size-2 shrink-0 rounded-full ${tone.dot}`} />
+            <p className="min-w-0 truncate text-[13px] font-semibold leading-tight">{title}</p>
+          </div>
+          <span className={`rounded-full px-3 py-1 text-[11px] font-bold leading-none ${tone.soft} ${tone.text}`}>
+            {tone.label}
+          </span>
+        </div>
+
+        <div className="space-y-4 border-t border-[#E3E4E3] bg-[#f8f9fb] p-4">
+          <div className="flex items-center gap-3">
+            <div className={`relative flex size-12 shrink-0 items-center justify-center rounded-full ${tone.soft} ${tone.text} cu-result-status-pop`}>
+              {success && <span className="absolute size-full rounded-full border border-[#269556]/30 cu-result-status-ring" />}
+              <MaterialIcon name={tone.icon} size="md" weight={600} className="relative" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-[16px] font-bold leading-tight text-[#303431]">{title}</h3>
+              <p className="mt-1 text-[11px] font-medium leading-snug text-[#8a8a8a]">
+                {description ?? "File pricetag sudah selesai dibuat dan siap digunakan."}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-2">
+            {success ? (
+              <>
+                {generatedViewUrl && (
+                  <a
+                    href={generatedViewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-[46px] items-center justify-center gap-1.5 rounded-full bg-black px-4 text-[13px] font-bold text-white"
+                  >
+                    <MaterialIcon name="visibility" size="xs" weight={500} />
+                    Lihat
+                  </a>
+                )}
+                {generatedDownloadUrl && (
+                  <a
+                    href={generatedDownloadUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-[46px] items-center justify-center gap-1.5 rounded-full border border-[#c9c9c9] bg-white px-4 text-[13px] font-bold text-[#303431]"
+                  >
+                    <MaterialIcon name="download" size="xs" weight={500} />
+                    Download
+                  </a>
+                )}
+                {onReset && (
+                  <button
+                    type="button"
+                    onClick={onReset}
+                    className="inline-flex h-[46px] items-center justify-center gap-1.5 rounded-full bg-[#269556] px-4 text-[13px] font-bold text-white"
+                  >
+                    <MaterialIcon name="add" size="xs" weight={500} />
+                    Buat Lagi
+                  </button>
+                )}
+              </>
+            ) : (
               <a
-                href={generatedViewUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-[78px] items-center justify-center rounded-full bg-black text-[30px] font-bold text-white"
+                href="mailto:"
+                className="inline-flex h-[46px] items-center justify-center gap-1.5 rounded-full bg-black px-4 text-[13px] font-bold text-white"
               >
-                Lihat
+                <MaterialIcon name="support_agent" size="xs" weight={500} />
+                Hubungi Admin
               </a>
             )}
-            {generatedDownloadUrl && (
-              <a
-                href={generatedDownloadUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-[78px] items-center justify-center rounded-full bg-black text-[30px] font-bold text-white"
-              >
-                Download
-              </a>
-            )}
-            {onReset && (
-              <button
-                type="button"
-                onClick={onReset}
-                className="flex h-[78px] items-center justify-center rounded-full bg-[#269556] text-[30px] font-bold text-white"
-              >
-                Buat Lagi
-              </button>
-            )}
-          </>
-        ) : (
-          <a
-            href="mailto:"
-            className="flex h-[78px] items-center justify-center rounded-full bg-black text-[30px] font-bold text-white"
-          >
-            Contact
-          </a>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -2402,18 +2516,6 @@ function Pagination({ page, lastPage, onPage }: { page: number; lastPage: number
       >
         Berikutnya
       </button>
-    </div>
-  );
-}
-
-function AccessDenied() {
-  return (
-    <div className="rounded-2xl border border-cu-danger/20 bg-cu-danger-soft p-8 text-center max-w-lg mx-auto mt-12">
-      <MaterialIcon name="lock" size="lg" className="mx-auto text-cu-danger" />
-      <h1 className="mt-3 text-lg font-semibold">Akses ditolak</h1>
-      <p className="mt-1 text-sm text-cu-muted">
-        Anda tidak memiliki permission <code>access-pricetag</code> yang diperlukan untuk membuka modul ini.
-      </p>
     </div>
   );
 }
