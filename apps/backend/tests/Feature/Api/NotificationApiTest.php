@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Core\User;
+use App\Notifications\Odds\OddsWorkflowNotification;
 use App\Notifications\Core\TestNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Broadcast;
@@ -31,6 +32,27 @@ class NotificationApiTest extends TestCase
             ->assertJsonPath('data.notifications.0.url', '/dashboard');
 
         $response->assertJsonMissing(['message' => 'Notifikasi milik user lain']);
+    }
+
+    public function test_odds_notification_is_stored_immediately_and_preserves_task_url(): void
+    {
+        $user = User::factory()->create([]);
+
+        $user->notify(new OddsWorkflowNotification(
+            'task_created',
+            'Brief baru perlu diperiksa',
+            'Client mengirim brief ODDS baru untuk Anda.',
+            null,
+            '/odds/detail?id=123'
+        ));
+
+        $this->assertSame(1, $user->notifications()->count());
+
+        $this->actingAs($user)
+            ->getJson('/api/v1/notifications')
+            ->assertOk()
+            ->assertJsonPath('data.notifications.0.message', 'Client mengirim brief ODDS baru untuk Anda.')
+            ->assertJsonPath('data.notifications.0.url', '/odds/detail?id=123');
     }
 
     public function test_user_can_mark_owned_notification_as_read(): void

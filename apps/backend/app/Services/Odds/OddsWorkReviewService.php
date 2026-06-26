@@ -104,7 +104,6 @@ class OddsWorkReviewService
                 'finished_at' => now(),
             ]);
             $task->currentQueue?->update(['queue_status' => 'completed', 'completed_at' => now()]);
-            $this->timeLogs->start($task, 'review_waiting', $designerId, 'Waiting SPV/client review');
             activity('odds')->performedOn($task)->event('task_finished')->log('Task work submitted');
 
             if ($requiresSpvReview) {
@@ -125,8 +124,6 @@ class OddsWorkReviewService
             if ($task->status !== TaskStatusEnum::SPV_REVIEW->value) {
                 throw ValidationException::withMessages(['task_id' => 'Review SPV hanya bisa dilakukan saat status spv_review.']);
             }
-
-            $this->timeLogs->stopOpen($task, 'review_waiting');
 
             $result = $task->results()->latest('version_number')->first();
             $decision = $data['decision'];
@@ -165,8 +162,6 @@ class OddsWorkReviewService
             if ($task->status !== TaskStatusEnum::CLIENT_REVIEW->value) {
                 throw ValidationException::withMessages(['task_id' => 'Review client hanya bisa dilakukan saat status client_review.']);
             }
-
-            $this->timeLogs->stopOpen($task, 'review_waiting');
 
             $result = $task->results()->latest('version_number')->first();
             $decision = $data['decision'];
@@ -228,7 +223,6 @@ class OddsWorkReviewService
                 throw ValidationException::withMessages(['task_id' => 'Rating hanya bisa diberikan saat status client_review.']);
             }
 
-            $this->timeLogs->stopOpen($task, 'review_waiting');
             $task->reviews()->create([
                 'result_id' => $task->results()->latest('version_number')->value('id'),
                 'reviewer_id' => $reviewerId,

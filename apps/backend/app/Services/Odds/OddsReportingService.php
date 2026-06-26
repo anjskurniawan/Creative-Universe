@@ -19,27 +19,32 @@ class OddsReportingService
         $rating = $task->reviews()->where('review_type', 'client')->whereNotNull('rating')->latest()->value('rating');
         $score = $task->status === 'done' ? (float) data_get($task->category_snapshot, 'score_weight', 1) : 0;
 
-        return DesignerDailyReport::updateOrCreate(
-            [
+        $report = DesignerDailyReport::query()
+            ->where('task_id', $task->id)
+            ->whereDate('report_date', $doneAt->toDateString())
+            ->first() ?? new DesignerDailyReport([
                 'report_date' => $doneAt->toDateString(),
                 'task_id' => $task->id,
-            ],
-            [
-                'designer_id' => $task->assigned_designer_id,
-                'category_id' => $task->category_id,
-                'output_done' => $task->status === 'done',
-                'active_work_duration_seconds' => $this->timeLogs->duration($task, 'work'),
-                'revision_duration_seconds' => $this->timeLogs->duration($task, 'revision'),
-                'review_waiting_duration_seconds' => $this->timeLogs->duration($task, 'review_waiting'),
-                'revision_count' => $task->revisions()->count(),
-                'overdue' => $doneAt->greaterThan($task->deadline),
-                'quality_issue_flag' => $task->quality_issue_flag,
-                'rating' => $rating,
-                'final_status' => $task->status,
-                'done_at' => $doneAt,
-                'score' => $score,
-            ]
-        );
+            ]);
+
+        $report->fill([
+            'designer_id' => $task->assigned_designer_id,
+            'category_id' => $task->category_id,
+            'output_done' => $task->status === 'done',
+            'active_work_duration_seconds' => $this->timeLogs->duration($task, 'work'),
+            'revision_duration_seconds' => $this->timeLogs->duration($task, 'revision'),
+            'review_waiting_duration_seconds' => 0,
+            'revision_count' => $task->revisions()->count(),
+            'overdue' => $doneAt->greaterThan($task->deadline),
+            'quality_issue_flag' => $task->quality_issue_flag,
+            'rating' => $rating,
+            'final_status' => $task->status,
+            'done_at' => $doneAt,
+            'score' => $score,
+        ]);
+        $report->save();
+
+        return $report;
     }
 
     public function recalculateRankings(?Carbon $date = null): void
@@ -67,23 +72,27 @@ class OddsReportingService
                 ->get();
 
             foreach ($rows as $row) {
-                DesignerRanking::updateOrCreate(
-                    [
+                $ranking = DesignerRanking::query()
+                    ->where('period_type', $periodType)
+                    ->where('designer_id', $row->designer_id)
+                    ->whereDate('period_start', $start->toDateString())
+                    ->first() ?? new DesignerRanking([
                         'period_type' => $periodType,
                         'period_start' => $start->toDateString(),
                         'designer_id' => $row->designer_id,
-                    ],
-                    [
-                        'period_end' => $end->toDateString(),
-                        'total_output' => (int) $row->total_output,
-                        'total_score' => (float) $row->total_score,
-                        'total_work_duration_seconds' => (int) $row->total_work_duration_seconds,
-                        'total_revision_duration_seconds' => (int) $row->total_revision_duration_seconds,
-                        'total_revision_count' => (int) $row->total_revision_count,
-                        'overdue_count' => (int) $row->overdue_count,
-                        'average_rating' => $row->average_rating ? round((float) $row->average_rating, 2) : null,
-                    ]
-                );
+                    ]);
+
+                $ranking->fill([
+                    'period_end' => $end->toDateString(),
+                    'total_output' => (int) $row->total_output,
+                    'total_score' => (float) $row->total_score,
+                    'total_work_duration_seconds' => (int) $row->total_work_duration_seconds,
+                    'total_revision_duration_seconds' => (int) $row->total_revision_duration_seconds,
+                    'total_revision_count' => (int) $row->total_revision_count,
+                    'overdue_count' => (int) $row->overdue_count,
+                    'average_rating' => $row->average_rating ? round((float) $row->average_rating, 2) : null,
+                ]);
+                $ranking->save();
             }
         }
     }

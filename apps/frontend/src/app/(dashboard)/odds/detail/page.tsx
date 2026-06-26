@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
+import { OddsRichTextEditor, RichTextViewer, stripRichText } from "@/components/odds-rich-text-editor";
 import { useAuth } from "@/providers/auth-provider";
 import {
   OddsTask,
@@ -15,6 +16,7 @@ import {
   getOddsTask,
   oddsError,
   rateOddsTask,
+  requestOddsCancel,
   returnOddsBrief,
   spvReviewOddsTask,
   startOddsTask,
@@ -32,11 +34,11 @@ function badgeClass(status: string) {
   return "bg-cu-panel-soft text-cu-muted border-cu-border";
 }
 
-function durationSeconds(log: { started_at: string; stopped_at: string | null; duration_seconds: number }) {
+function durationSeconds(log: { started_at: string; stopped_at: string | null; duration_seconds: number }, nowMs = Date.now()) {
   if (log.stopped_at) return log.duration_seconds;
   const started = new Date(log.started_at).getTime();
   if (Number.isNaN(started)) return log.duration_seconds;
-  return Math.max(0, Math.floor((Date.now() - started) / 1000));
+  return Math.max(0, Math.floor((nowMs - started) / 1000));
 }
 
 function formatDuration(totalSeconds: number) {
@@ -64,6 +66,7 @@ function DetailContent() {
   const [resultNotes, setResultNotes] = useState("");
   const [assetUrl, setAssetUrl] = useState("");
   const [rating, setRating] = useState("5");
+  const [timerNow, setTimerNow] = useState(() => Date.now());
 
   const canReviewBrief = hasPermission("review-odds-briefs");
   const canStart = hasPermission("start-odds-tasks");
@@ -103,6 +106,16 @@ function DetailContent() {
       window.clearInterval(interval);
     };
   }, [loadTask]);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setTimerNow(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, []);
 
   const run = async (label: string, action: () => Promise<unknown>, message: string) => {
     setBusy(label);
@@ -151,10 +164,10 @@ function DetailContent() {
     ? undefined
     : latestResult;
   const timeLogs = task.time_logs ?? task.timeLogs ?? [];
+  const designerTimeLogs = timeLogs.filter((log) => ["work", "revision"].includes(log.log_type));
   const timerTotals = {
-    work: timeLogs.filter((log) => log.log_type === "work").reduce((total, log) => total + durationSeconds(log), 0),
-    revision: timeLogs.filter((log) => log.log_type === "revision").reduce((total, log) => total + durationSeconds(log), 0),
-    review: timeLogs.filter((log) => log.log_type === "review_waiting").reduce((total, log) => total + durationSeconds(log), 0),
+    work: designerTimeLogs.filter((log) => log.log_type === "work").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
+    revision: designerTimeLogs.filter((log) => log.log_type === "revision").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
   };
   const outputTitle = isVisibleLeaderRevisionTask ? "Output Revisi SPV" : isClientRevisionTask ? "Output Revisi Client" : "Output";
   const outputNotice = isVisibleLeaderRevisionTask
@@ -176,14 +189,22 @@ function DetailContent() {
   const canSpvBriefAction = canSpvReview && ["submitted", "brief_revision_requested"].includes(task.status);
   const canSpvResultReview = canSpvReview && task.status === "spv_review";
   const canClientResultReview = canClientReview && isRequester && task.status === "client_review";
-  const canShowNoteInput = canReturnBrief || canSpvBriefAction || canSpvResultReview || canClientResultReview;
+  const canRequestCancel = canClientReview && isRequester && !["done", "cancelled", "cancelled_by_spv"].includes(task.status);
+  const normalRevisionLimit = task.category?.normal_revision_limit ?? 2;
+  const isLastNormalRevisionChance = canClientResultReview
+    && !task.extra_revision_used_at
+    && task.normal_revision_count + 1 >= normalRevisionLimit;
+  const isUrgentFinalRevisionChance = canClientResultReview
+    && Boolean(task.extra_revision_used_at)
+    && !task.urgent_revision_used_at;
+  const canShowNoteInput = canReturnBrief || canSpvBriefAction || canSpvResultReview || canClientResultReview || canRequestCancel;
   const showOutputSection = Boolean(visibleLatestResult) || canSubmitOutput;
   const showRevisionSection = visibleRevisions.length > 0;
 
   const saveBrief = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!canEditBrief) return;
-    if (!briefText.trim()) return;
+    if (!stripRichText(briefText)) return;
     void run("brief", () => updateOddsBrief(task.id, briefText), "Brief diperbarui.");
   };
 
@@ -253,20 +274,16 @@ function DetailContent() {
               </div>
             )}
             <form onSubmit={saveBrief} className="space-y-3">
-              <textarea
-                value={briefText}
-                onChange={(event) => setBriefText(event.target.value)}
-                readOnly={!canEditBrief}
-                rows={8}
-                className={`w-full resize-y rounded-lg border border-cu-border px-3 py-2 text-sm outline-none focus:border-cu-info ${
-                  canEditBrief ? "bg-white" : "bg-cu-panel-soft text-cu-muted"
-                }`}
-              />
+              {canEditBrief ? (
+                <OddsRichTextEditor value={briefText} onChange={setBriefText} />
+              ) : (
+                <RichTextViewer html={briefText} />
+              )}
               {canEditBrief ? (
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    disabled={busy === "brief"}
+                    disabled={busy === "brief" || !stripRichText(briefText)}
                     className="inline-flex h-10 items-center gap-2 rounded-lg border border-cu-border px-4 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft disabled:opacity-50"
                   >
                     <MaterialIcon name="save" size="sm" />
@@ -387,17 +404,24 @@ function DetailContent() {
             <InfoRow label="Normal revisi" value={String(task.normal_revision_count)} />
             {!isClientSideView && <InfoRow label="Leader revisi" value={String(task.leader_revision_count)} />}
             {!isClientSideView && (
-              <InfoRow label="Quality issue" value={task.quality_issue_flag ? "Ya" : "Tidak"} />
+              <>
+                <InfoRow label="Quality issue" value={task.quality_issue_flag ? "Ya" : "Tidak"} />
+                <p className="mt-3 rounded-lg border border-cu-border bg-cu-panel-soft px-3 py-2 text-xs leading-5 text-cu-muted">
+                  Quality issue adalah flag internal saat revisi SPV melewati batas wajar. Dipakai untuk audit, reporting, dan ranking kualitas desainer.
+                </p>
+              </>
             )}
           </section>
 
           {!isClientSideView && (
             <section className="rounded-lg border border-cu-border bg-white p-5">
               <h2 className="mb-4 text-lg font-semibold text-cu-ink">Time Logging</h2>
-              <div className="grid grid-cols-3 gap-2">
+              <p className="mb-3 text-sm text-cu-muted">
+                Timer hanya mencatat proses pengerjaan desainer: task awal, revisi SPV, dan revisi client.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
                 <TimerTile label="Work" value={formatDuration(timerTotals.work)} />
                 <TimerTile label="Revisi" value={formatDuration(timerTotals.revision)} />
-                <TimerTile label="Review" value={formatDuration(timerTotals.review)} />
               </div>
               {task.quality_issue_flag && (
                 <p className="mt-3 rounded-lg border border-cu-warning/20 bg-cu-warning/10 px-3 py-2 text-sm text-cu-warning">
@@ -405,16 +429,16 @@ function DetailContent() {
                 </p>
               )}
               <div className="mt-3 space-y-2">
-                {timeLogs.slice(-5).reverse().map((log) => (
+                {designerTimeLogs.slice(-5).reverse().map((log) => (
                   <div key={log.id} className="flex items-center justify-between rounded-lg border border-cu-border px-3 py-2 text-xs">
                     <div>
                       <p className="font-semibold capitalize text-cu-ink">{statusLabel(log.log_type)}</p>
                       <p className="text-cu-muted">{log.stopped_at ? "Selesai" : "Berjalan"}</p>
                     </div>
-                    <span className="font-medium text-cu-muted">{formatDuration(durationSeconds(log))}</span>
+                    <span className="font-medium text-cu-muted">{formatDuration(durationSeconds(log, timerNow))}</span>
                   </div>
                 ))}
-                {timeLogs.length === 0 && <p className="rounded-lg border border-dashed border-cu-border px-3 py-3 text-sm text-cu-muted">Belum ada timer.</p>}
+                {designerTimeLogs.length === 0 && <p className="rounded-lg border border-dashed border-cu-border px-3 py-3 text-sm text-cu-muted">Belum ada timer pengerjaan desainer.</p>}
               </div>
             </section>
           )}
@@ -482,6 +506,13 @@ function DetailContent() {
                   <p className="rounded-lg border border-cu-border bg-cu-panel-soft px-3 py-2 text-sm text-cu-muted">
                     Jika hasil sudah sesuai, pilih rating lalu approve. Jika belum sesuai, isi catatan dan minta revisi.
                   </p>
+                  {(isLastNormalRevisionChance || isUrgentFinalRevisionChance) && (
+                    <p className="rounded-lg border border-cu-warning/30 bg-cu-warning/10 px-3 py-2 text-sm text-cu-warning">
+                      {isUrgentFinalRevisionChance
+                        ? "Ini kesempatan urgent final revision. Jika setelah ini masih revisi, task akan dikunci selesai dan request berikutnya perlu diajukan dari awal."
+                        : "Ini kesempatan revisi normal terakhir. Jika masih revisi setelah ini, request akan masuk extra revision dan perlu persetujuan SPV."}
+                    </p>
+                  )}
                   <div className="grid grid-cols-[1fr_auto] gap-2">
                     <select
                       value={rating}
@@ -510,7 +541,17 @@ function DetailContent() {
                 </>
               )}
 
-              {!canEditBrief && !canReturnBrief && !canAcceptBrief && !canSpvBriefAction && !canStartTask && !canSubmitOutput && !canSpvResultReview && !canClientResultReview && (
+              {canRequestCancel && (
+                <ActionButton
+                  icon="cancel"
+                  label="Cancel Task"
+                  danger
+                  disabled={!note || !!busy}
+                  onClick={() => run("clientCancel", () => requestOddsCancel(task.id, note), "Permintaan cancel diproses.")}
+                />
+              )}
+
+              {!canEditBrief && !canReturnBrief && !canAcceptBrief && !canSpvBriefAction && !canStartTask && !canSubmitOutput && !canSpvResultReview && !canClientResultReview && !canRequestCancel && (
                 <p className="rounded-lg border border-dashed border-cu-border px-3 py-3 text-sm text-cu-muted">
                   Belum ada aksi untuk role ini pada status task sekarang.
                 </p>

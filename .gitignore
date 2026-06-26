@@ -100,3 +100,4 @@ apps/backend/database/*.sqlite
 tmp/migration-backups/*
 /tmp/migration-backups/
 !**/tmp/migration-backups/.gitignore
+apps/backend/nul

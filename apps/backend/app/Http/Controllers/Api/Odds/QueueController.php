@@ -17,6 +17,8 @@ class QueueController extends BaseApiController
 
     public function index(Request $request): JsonResponse
     {
+        $this->queue->refreshEstimates($request->user()->can('view-all-odds-tasks') ? null : $request->user()->id);
+
         $query = TaskQueue::query()->with(['task', 'designer:id,name,email,username']);
 
         if (! $request->user()->can('view-all-odds-tasks')) {

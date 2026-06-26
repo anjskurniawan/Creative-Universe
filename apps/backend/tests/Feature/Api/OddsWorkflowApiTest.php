@@ -84,6 +84,18 @@ class OddsWorkflowApiTest extends TestCase
             'value' => ['count' => 1],
             'is_active' => true,
         ]);
+
+        SystemRule::create([
+            'key' => 'client_review_timeout_days',
+            'value' => ['days' => 3],
+            'is_active' => true,
+        ]);
+
+        SystemRule::create([
+            'key' => 'no_response_hours',
+            'value' => ['hours' => 24],
+            'is_active' => true,
+        ]);
     }
 
     public function test_user_without_odds_access_is_forbidden(): void
@@ -243,10 +255,9 @@ class OddsWorkflowApiTest extends TestCase
             'log_type' => 'work',
         ]);
         $this->assertNotNull(DB::table('odds_task_time_logs')->where('task_id', $taskId)->where('log_type', 'work')->value('stopped_at'));
-        $this->assertDatabaseHas('odds_task_time_logs', [
+        $this->assertDatabaseMissing('odds_task_time_logs', [
             'task_id' => $taskId,
             'log_type' => 'review_waiting',
-            'stopped_at' => null,
         ]);
         $this->assertDatabaseHas('activity_log', [
             'subject_type' => Task::class,
@@ -278,8 +289,6 @@ class OddsWorkflowApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.status', 'client_review');
 
-        $this->assertNotNull(DB::table('odds_task_time_logs')->where('task_id', $taskId)->where('log_type', 'review_waiting')->value('stopped_at'));
-
         $this->actingAs($this->client)
             ->postJson("/api/v1/odds/tasks/{$taskId}/client-review", [
                 'decision' => 'approved',
@@ -299,6 +308,7 @@ class OddsWorkflowApiTest extends TestCase
             'task_id' => $taskId,
             'designer_id' => $this->designer->id,
             'output_done' => true,
+            'review_waiting_duration_seconds' => 0,
         ]);
         $this->assertDatabaseHas('odds_designer_rankings', [
             'period_type' => 'daily',
@@ -512,7 +522,7 @@ class OddsWorkflowApiTest extends TestCase
             ->assertJsonPath('data.status', 'in_progress');
     }
 
-    public function test_revision_quota_extra_revision_and_urgent_rejection_auto_done(): void
+    public function test_revision_quota_extra_urgent_final_lock_and_auto_done(): void
     {
         $task = Task::create([
             'task_number' => 'ODDS-TEST-REV',
@@ -533,6 +543,33 @@ class OddsWorkflowApiTest extends TestCase
             'workload_point' => 2,
         ]);
 
+        $rejectedExtraId = $this->actingAs($this->client)
+            ->postJson("/api/v1/odds/tasks/{$task->id}/revisions", ['notes' => 'Minta extra pertama'])
+            ->assertCreated()
+            ->assertJsonPath('data.revision_type', 'extra')
+            ->assertJsonPath('data.status', 'pending_spv')
+            ->json('data.id');
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/revisions/{$rejectedExtraId}/extra-review", [
+                'decision' => 'rejected',
+                'note' => 'Tidak disetujui',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'rejected');
+
+        $this->assertDatabaseHas('odds_tasks', [
+            'id' => $task->id,
+            'status' => 'revision_rejected_by_spv',
+        ]);
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $task->id,
+            'event' => 'extra_revision_rejected',
+        ]);
+
+        $task->update(['status' => 'client_review']);
+
         $extraId = $this->actingAs($this->client)
             ->postJson("/api/v1/odds/tasks/{$task->id}/revisions", ['notes' => 'Minta extra'])
             ->assertCreated()
@@ -544,8 +581,78 @@ class OddsWorkflowApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.status', 'approved');
 
+        $this->assertDatabaseHas('odds_tasks', [
+            'id' => $task->id,
+            'task_type' => 'extra_revision',
+            'status' => 'queued',
+        ]);
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $task->id,
+            'event' => 'extra_revision_approved',
+        ]);
+
+        $task->update(['status' => 'client_review']);
+
+        $urgentApprovedId = $this->actingAs($this->client)
+            ->postJson("/api/v1/odds/tasks/{$task->id}/revisions", ['notes' => 'Minta urgent'])
+            ->assertCreated()
+            ->assertJsonPath('data.revision_type', 'urgent_final')
+            ->json('data.id');
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/revisions/{$urgentApprovedId}/urgent-review", ['decision' => 'approved'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'approved');
+
+        $this->assertDatabaseHas('odds_tasks', [
+            'id' => $task->id,
+            'task_type' => 'urgent_revision',
+            'status' => 'queued',
+        ]);
+
+        DB::table('odds_tasks')->where('id', $task->id)->update([
+            'status' => 'client_review',
+            'task_type' => 'urgent_revision',
+            'updated_at' => now(),
+        ]);
+
+        $this->actingAs($this->client)
+            ->postJson("/api/v1/odds/tasks/{$task->id}/client-review", [
+                'decision' => 'revision',
+                'notes' => 'Masih revisi setelah urgent',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'done');
+
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $task->id,
+            'event' => 'auto_done',
+        ]);
+
+        $rejectedUrgentTask = Task::create([
+            'task_number' => 'ODDS-TEST-URGENT-REJECT',
+            'category_id' => $this->category->id,
+            'category_snapshot' => [
+                'name' => $this->category->name,
+                'score_weight' => 2,
+                'normal_revision_limit' => 0,
+                'workload_point' => 2,
+                'sla_days' => 3,
+            ],
+            'requester_id' => $this->client->id,
+            'assigned_designer_id' => $this->designer->id,
+            'design_purpose' => 'Banner urgent reject',
+            'brief_text' => 'Brief',
+            'deadline' => now()->addDays(2),
+            'status' => 'client_review',
+            'workload_point' => 2,
+            'extra_revision_used_at' => now(),
+        ]);
+
         $urgent = TaskRevision::create([
-            'task_id' => $task->id,
+            'task_id' => $rejectedUrgentTask->id,
             'requested_by' => $this->client->id,
             'assigned_to' => $this->designer->id,
             'revision_type' => 'urgent_final',
@@ -560,13 +667,41 @@ class OddsWorkflowApiTest extends TestCase
             ->assertJsonPath('data.status', 'rejected');
 
         $this->assertDatabaseHas('odds_tasks', [
-            'id' => $task->id,
+            'id' => $rejectedUrgentTask->id,
             'status' => 'done',
+        ]);
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $rejectedUrgentTask->id,
+            'event' => 'urgent_revision_rejected',
         ]);
     }
 
     public function test_cancel_after_work_requires_spv_review(): void
     {
+        $notStarted = Task::create([
+            'task_number' => 'ODDS-TEST-CANCEL-DIRECT',
+            'category_id' => $this->category->id,
+            'category_snapshot' => ['name' => $this->category->name, 'score_weight' => 2],
+            'requester_id' => $this->client->id,
+            'assigned_designer_id' => $this->designer->id,
+            'design_purpose' => 'Banner direct cancel',
+            'brief_text' => 'Brief',
+            'deadline' => now()->addDays(2),
+            'status' => 'submitted',
+        ]);
+
+        $this->actingAs($this->client)
+            ->postJson("/api/v1/odds/tasks/{$notStarted->id}/cancel-requests", ['reason' => 'Belum jadi dibuat'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'cancelled');
+
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $notStarted->id,
+            'event' => 'task_cancelled',
+        ]);
+
         $task = Task::create([
             'task_number' => 'ODDS-TEST-CANCEL',
             'category_id' => $this->category->id,
@@ -589,6 +724,26 @@ class OddsWorkflowApiTest extends TestCase
         $this->assertDatabaseHas('odds_task_cancel_requests', ['id' => $cancelId, 'status' => 'pending']);
 
         $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/cancel-requests/{$cancelId}/review", [
+                'decision' => 'rejected',
+                'note' => 'Tetap lanjut',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'rejected');
+
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $task->id,
+            'event' => 'cancel_rejected',
+        ]);
+
+        $cancelId = $this->actingAs($this->client)
+            ->postJson("/api/v1/odds/tasks/{$task->id}/cancel-requests", ['reason' => 'Campaign batal final'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'pending')
+            ->json('data.id');
+
+        $this->actingAs($this->manager)
             ->postJson("/api/v1/odds/cancel-requests/{$cancelId}/review", ['decision' => 'approved'])
             ->assertOk()
             ->assertJsonPath('data.status', 'approved');
@@ -601,6 +756,46 @@ class OddsWorkflowApiTest extends TestCase
 
     public function test_scheduler_commands_run(): void
     {
+        $overdueTask = Task::create([
+            'task_number' => 'ODDS-TEST-OVERDUE',
+            'category_id' => $this->category->id,
+            'category_snapshot' => ['name' => $this->category->name, 'score_weight' => 2],
+            'requester_id' => $this->client->id,
+            'assigned_designer_id' => $this->designer->id,
+            'design_purpose' => 'Overdue banner',
+            'brief_text' => 'Brief',
+            'deadline' => now()->subDay(),
+            'status' => 'in_progress',
+        ]);
+
+        $clientTimeoutTask = Task::create([
+            'task_number' => 'ODDS-TEST-TIMEOUT',
+            'category_id' => $this->category->id,
+            'category_snapshot' => ['name' => $this->category->name, 'score_weight' => 2],
+            'requester_id' => $this->client->id,
+            'assigned_designer_id' => $this->designer->id,
+            'design_purpose' => 'Timeout banner',
+            'brief_text' => 'Brief',
+            'deadline' => now()->addDay(),
+            'status' => 'client_review',
+            'updated_at' => now()->subDays(4),
+        ]);
+        DB::table('odds_tasks')->where('id', $clientTimeoutTask->id)->update(['updated_at' => now()->subDays(4)]);
+
+        $noResponseTask = Task::create([
+            'task_number' => 'ODDS-TEST-NORESPONSE',
+            'category_id' => $this->category->id,
+            'category_snapshot' => ['name' => $this->category->name, 'score_weight' => 2],
+            'requester_id' => $this->client->id,
+            'assigned_designer_id' => $this->designer->id,
+            'design_purpose' => 'No response banner',
+            'brief_text' => 'Brief',
+            'deadline' => now()->addDay(),
+            'status' => 'submitted',
+            'updated_at' => now()->subHours(25),
+        ]);
+        DB::table('odds_tasks')->where('id', $noResponseTask->id)->update(['updated_at' => now()->subHours(25)]);
+
         DesignerDailyReport::create([
             'report_date' => now()->toDateString(),
             'designer_id' => $this->designer->id,
@@ -615,10 +810,37 @@ class OddsWorkflowApiTest extends TestCase
         Artisan::call('odds:recalculate-rankings');
 
         $this->assertSame(0, Artisan::output() === '' ? 0 : 0);
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $overdueTask->id,
+            'event' => 'task_overdue',
+        ]);
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $noResponseTask->id,
+            'event' => 'no_response_reminder',
+        ]);
+        $this->assertDatabaseHas('odds_tasks', [
+            'id' => $clientTimeoutTask->id,
+            'status' => 'done',
+        ]);
         $this->assertDatabaseHas('odds_designer_rankings', [
             'period_type' => 'daily',
             'designer_id' => $this->designer->id,
         ]);
+        $this->assertDatabaseHas('odds_designer_rankings', [
+            'period_type' => 'monthly',
+            'designer_id' => $this->designer->id,
+        ]);
+        $this->assertDatabaseHas('odds_designer_rankings', [
+            'period_type' => 'yearly',
+            'designer_id' => $this->designer->id,
+        ]);
+
+        $this->actingAs($this->manager)
+            ->getJson('/api/v1/odds/reports/summary')
+            ->assertOk()
+            ->assertJsonPath('data.ai_insight', 'Insight AI bersifat ringkasan pendukung, bukan sumber kebenaran laporan.');
     }
 
     private function createTask(): int

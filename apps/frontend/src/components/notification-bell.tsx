@@ -34,6 +34,7 @@ interface NotificationBellProps {
 
 const TOAST_VISIBLE_MS = 6000;
 const TOAST_EXIT_MS = 280;
+const NOTIFICATION_POLL_MS = 2000;
 
 async function requestNotifications(): Promise<NotificationPayload> {
   return apiFetch<NotificationPayload>("/notifications");
@@ -95,7 +96,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     };
 
     void loadNotifications();
-    const interval = window.setInterval(loadNotifications, 10000);
+    const interval = window.setInterval(loadNotifications, NOTIFICATION_POLL_MS);
 
     return () => {
       active = false;

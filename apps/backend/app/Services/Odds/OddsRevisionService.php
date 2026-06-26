@@ -48,7 +48,7 @@ class OddsRevisionService
                 $task->increment('leader_revision_count');
                 $this->queue->enqueue($task, TaskTypeEnum::LEADER_REVISION->value, $task->assigned_designer_id);
             } else {
-                $this->notifications->send($task->assignedDesigner, $type.'_requested', 'Revision ODDS butuh review SPV', $data['notes'], $task);
+                $this->notifications->sendToRoles(['Manajer', 'SPV'], $type.'_requested', 'Revision ODDS butuh review SPV', $data['notes'], $task);
             }
 
             activity('odds')->performedOn($task)->event($type.'_revision_requested')->log($data['notes']);
@@ -96,10 +96,14 @@ class OddsRevisionService
                 }
             } elseif ($urgent) {
                 $revision->update(['status' => 'rejected', 'approved_by' => $reviewerId, 'approved_at' => now()]);
+                $this->notifications->send($task->requester, 'urgent_revision_rejected', 'Urgent revision ditolak', $note ?? 'Urgent revision ditolak SPV.', $task);
+                activity('odds')->performedOn($task)->event('urgent_revision_rejected')->log($note ?? 'Urgent revision rejected');
                 $this->autoDone($task, 'Urgent revision rejected. Task auto done.');
             } else {
                 $revision->update(['status' => 'rejected', 'approved_by' => $reviewerId, 'approved_at' => now()]);
                 $task->update(['status' => TaskStatusEnum::REVISION_REJECTED_BY_SPV->value]);
+                $this->notifications->send($task->requester, 'extra_revision_rejected', 'Extra revision ditolak', $note ?? 'Extra revision ditolak SPV.', $task);
+                activity('odds')->performedOn($task)->event('extra_revision_rejected')->log($note ?? 'Extra revision rejected');
             }
 
             return $revision->refresh();
@@ -115,6 +119,8 @@ class OddsRevisionService
         ]);
 
         activity('odds')->performedOn($task)->event('auto_done')->log($reason);
+        $this->notifications->send($task->requester, 'task_auto_done', 'Task ODDS otomatis selesai', $reason, $task);
+        $this->notifications->send($task->assignedDesigner, 'task_auto_done', 'Task ODDS otomatis selesai', $reason, $task);
         $this->reporting->fillDailyReport($task->refresh());
         $this->reporting->recalculateRankings();
 

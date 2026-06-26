@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Odds\Task;
 use App\Services\Odds\OddsBriefReviewService;
 use App\Services\Odds\OddsEscalationService;
+use App\Services\Odds\OddsQueueService;
 use App\Services\Odds\OddsTaskIntakeService;
 use App\Services\Odds\OddsWorkReviewService;
 use Illuminate\Http\JsonResponse;
@@ -20,13 +21,14 @@ class TaskController extends BaseApiController
         private OddsTaskIntakeService $intake,
         private OddsBriefReviewService $briefs,
         private OddsWorkReviewService $workReviews,
-        private OddsEscalationService $escalations
+        private OddsEscalationService $escalations,
+        private OddsQueueService $queue
     ) {}
 
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue']);
+        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'revisions', 'cancelRequests']);
 
         if (! $user->can('view-all-odds-tasks')) {
             $query->where(function ($inner) use ($user) {
@@ -53,6 +55,9 @@ class TaskController extends BaseApiController
     public function show(Request $request, Task $task): JsonResponse
     {
         $this->authorizeTaskView($request, $task);
+        if ($task->assigned_designer_id) {
+            $this->queue->refreshEstimates($task->assigned_designer_id);
+        }
 
         return $this->sendResponse(
             $task->load([
@@ -190,7 +195,7 @@ class TaskController extends BaseApiController
             'design_purpose' => ['required', 'string', 'max:255'],
             'brief_text' => ['required', 'string'],
             'reference_visual' => ['nullable', 'string'],
-            'deadline' => ['nullable', 'date', 'after:now'],
+            'deadline' => ['nullable', 'date', 'after_or_equal:today'],
             'important_matrix' => ['nullable', 'string', 'max:20'],
             'attachment_notes' => ['nullable', 'string'],
             'attachments' => ['sometimes', 'array'],

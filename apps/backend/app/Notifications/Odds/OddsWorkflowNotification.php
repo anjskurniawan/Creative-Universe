@@ -4,14 +4,10 @@ namespace App\Notifications\Odds;
 
 use App\Models\Odds\Task;
 use App\Notifications\Channels\FonnteChannel;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class OddsWorkflowNotification extends Notification implements ShouldQueue
+class OddsWorkflowNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(
         public string $event,
         public string $title,

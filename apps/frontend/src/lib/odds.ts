@@ -83,17 +83,35 @@ export interface OddsTaskResult {
 export interface OddsTaskRevision {
   id: number;
   task_id: number;
+  result_id?: number | null;
+  requested_by?: number;
+  assigned_to?: number | null;
   revision_type: "normal" | "extra" | "urgent_final" | "leader";
   notes: string;
   status: string;
   is_urgent_final: boolean;
+  approved_by?: number | null;
+  approved_at?: string | null;
+  task?: OddsTask;
+}
+
+export interface OddsTaskCancelRequest {
+  id: number;
+  task_id: number;
+  requested_by: number;
+  reason: string;
+  status: string;
+  reviewed_by: number | null;
+  reviewed_at: string | null;
+  review_note: string | null;
+  task?: OddsTask;
 }
 
 export interface OddsTaskTimeLog {
   id: number;
   task_id: number;
   designer_id: number | null;
-  log_type: "work" | "revision" | "review_waiting" | string;
+  log_type: "work" | "revision" | string;
   started_at: string;
   stopped_at: string | null;
   duration_seconds: number;
@@ -117,6 +135,8 @@ export interface OddsTask {
   leader_revision_count: number;
   quality_issue_flag?: boolean;
   quality_issue_note?: string | null;
+  extra_revision_used_at?: string | null;
+  urgent_revision_used_at?: string | null;
   normal_revision_count: number;
   created_at: string;
   category?: OddsCategory;
@@ -130,6 +150,8 @@ export interface OddsTask {
   brief?: OddsTaskBrief;
   results?: OddsTaskResult[];
   revisions?: OddsTaskRevision[];
+  cancel_requests?: OddsTaskCancelRequest[];
+  cancelRequests?: OddsTaskCancelRequest[];
   time_logs?: OddsTaskTimeLog[];
   timeLogs?: OddsTaskTimeLog[];
 }
@@ -475,11 +497,49 @@ export async function requestOddsCancel(id: string | number, reason: string): Pr
   });
 }
 
+export async function reviewOddsExtraRevision(
+  id: string | number,
+  decision: "approved" | "rejected",
+  note?: string
+): Promise<OddsTaskRevision> {
+  return apiFetch<OddsTaskRevision>(`/odds/revisions/${id}/extra-review`, {
+    method: "POST",
+    body: JSON.stringify({ decision, note }),
+  });
+}
+
+export async function reviewOddsUrgentRevision(
+  id: string | number,
+  decision: "approved" | "rejected",
+  note?: string
+): Promise<OddsTaskRevision> {
+  return apiFetch<OddsTaskRevision>(`/odds/revisions/${id}/urgent-review`, {
+    method: "POST",
+    body: JSON.stringify({ decision, note }),
+  });
+}
+
+export async function reviewOddsCancelRequest(
+  id: string | number,
+  decision: "approved" | "rejected",
+  note?: string
+): Promise<OddsTaskCancelRequest> {
+  return apiFetch<OddsTaskCancelRequest>(`/odds/cancel-requests/${id}/review`, {
+    method: "POST",
+    body: JSON.stringify({ decision, note }),
+  });
+}
+
+export async function getOddsDailyReports(): Promise<OddsDailyReport[]> {
+  const page = await apiFetch<OddsPagination<OddsDailyReport>>("/odds/reports/daily?per_page=20");
+  return normalizePage(page).data;
+}
+
 export async function getOddsReportSummary(): Promise<OddsReportSummary> {
   return apiFetch<OddsReportSummary>("/odds/reports/summary");
 }
 
-export async function getOddsRankings(): Promise<OddsRanking[]> {
-  const page = await apiFetch<OddsPagination<OddsRanking>>("/odds/rankings?period_type=daily&per_page=10");
+export async function getOddsRankings(periodType: "daily" | "monthly" | "yearly" = "daily"): Promise<OddsRanking[]> {
+  const page = await apiFetch<OddsPagination<OddsRanking>>(`/odds/rankings?period_type=${periodType}&per_page=10`);
   return normalizePage(page).data;
 }

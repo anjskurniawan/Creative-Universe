@@ -7,8 +7,13 @@ import { useAuth } from "@/providers/auth-provider";
 import {
   OddsAssignableUser,
   OddsCategory,
+  OddsDailyReport,
   OddsDesignerProfile,
+  OddsRanking,
+  OddsReportSummary,
   OddsTask,
+  OddsTaskCancelRequest,
+  OddsTaskRevision,
   OddsSystemRule,
   createOddsCategory,
   createOddsDesignerProfile,
@@ -19,10 +24,16 @@ import {
   getOddsAssignableUsers,
   getOddsConfigCategories,
   getOddsConfigDesignerProfiles,
+  getOddsDailyReports,
+  getOddsRankings,
+  getOddsReportSummary,
   getOddsSystemRules,
   getOddsTasks,
   formatOddsDate,
   oddsError,
+  reviewOddsCancelRequest,
+  reviewOddsExtraRevision,
+  reviewOddsUrgentRevision,
   statusLabel,
   updateOddsCategory,
   updateOddsDesignerProfile,
@@ -93,7 +104,17 @@ const statusOptions = [
   { value: "off", label: "OFF" },
 ] as const;
 
-type ConfigSection = "categories" | "designers" | "rules" | "spv_review" | "client_review" | "all_tasks";
+type ConfigSection =
+  | "categories"
+  | "designers"
+  | "rules"
+  | "spv_review"
+  | "client_review"
+  | "special_revisions"
+  | "cancel_requests"
+  | "reports"
+  | "rankings"
+  | "all_tasks";
 
 const configSections: Array<{
   id: ConfigSection;
@@ -132,6 +153,30 @@ const configSections: Array<{
     description: "Hasil sudah lolos SPV.",
   },
   {
+    id: "special_revisions",
+    label: "Extra / Urgent",
+    icon: "priority_high",
+    description: "Approval revisi tambahan.",
+  },
+  {
+    id: "cancel_requests",
+    label: "Cancel",
+    icon: "cancel",
+    description: "Review permintaan batal.",
+  },
+  {
+    id: "reports",
+    label: "Reports",
+    icon: "monitoring",
+    description: "Daily report dan insight.",
+  },
+  {
+    id: "rankings",
+    label: "Rankings",
+    icon: "leaderboard",
+    description: "Ranking desainer.",
+  },
+  {
     id: "all_tasks",
     label: "Semua Task",
     icon: "assignment",
@@ -146,7 +191,12 @@ export default function OddsPage() {
   const canShowConfigSections = canManageConfig && canManageUsers;
   const canReviewSpv = hasPermission("review-odds-spv");
   const canViewAllTasks = hasPermission("view-all-odds-tasks");
-  const canUseControl = canManageConfig || canReviewSpv || canViewAllTasks;
+  const canApproveExtra = hasPermission("approve-odds-extra-revisions");
+  const canApproveUrgent = hasPermission("approve-odds-urgent-revisions");
+  const canManageEscalations = hasPermission("manage-odds-escalations");
+  const canViewReports = hasPermission("view-odds-reports");
+  const canViewRankings = hasPermission("view-odds-rankings");
+  const canUseControl = canManageConfig || canReviewSpv || canViewAllTasks || canApproveExtra || canApproveUrgent || canManageEscalations || canViewReports || canViewRankings;
   const canCreateTask = hasPermission("create-odds-tasks");
   const canViewAssignedTasks = hasPermission("view-assigned-odds-tasks");
 
@@ -155,6 +205,11 @@ export default function OddsPage() {
   const [rules, setRules] = useState<OddsSystemRule[]>([]);
   const [assignableUsers, setAssignableUsers] = useState<OddsAssignableUser[]>([]);
   const [tasks, setTasks] = useState<OddsTask[]>([]);
+  const [dailyReports, setDailyReports] = useState<OddsDailyReport[]>([]);
+  const [reportSummary, setReportSummary] = useState<OddsReportSummary | null>(null);
+  const [rankings, setRankings] = useState<OddsRanking[]>([]);
+  const [rankingPeriod, setRankingPeriod] = useState<"daily" | "monthly" | "yearly">("daily");
+  const [reviewNote, setReviewNote] = useState("");
   const [categoryForm, setCategoryForm] = useState<CategoryForm>(emptyCategoryForm);
   const [designerForm, setDesignerForm] = useState<DesignerForm>(emptyDesignerForm);
   const [ruleForm, setRuleForm] = useState<RuleForm>(emptyRuleForm);
@@ -197,14 +252,30 @@ export default function OddsPage() {
 
   const spvReviewTasks = useMemo(() => tasks.filter((task) => task.status === "spv_review"), [tasks]);
   const clientReviewTasks = useMemo(() => tasks.filter((task) => task.status === "client_review"), [tasks]);
+  const specialRevisionRequests = useMemo(() => {
+    return tasks.flatMap((task) => (task.revisions ?? []).map((revision) => ({ ...revision, task })))
+      .filter((revision) => revision.status === "pending_spv" && ["extra", "urgent_final"].includes(revision.revision_type));
+  }, [tasks]);
+  const cancelRequests = useMemo(() => {
+    return tasks.flatMap((task) => (task.cancel_requests ?? task.cancelRequests ?? []).map((request) => ({ ...request, task })))
+      .filter((request) => request.status === "pending");
+  }, [tasks]);
   const visibleConfigSections = useMemo(() => {
-    return configSections.filter((section) => (
-      canShowConfigSections || !["categories", "designers", "rules"].includes(section.id)
-    ));
-  }, [canShowConfigSections]);
+    return configSections.filter((section) => {
+      if (["categories", "designers", "rules"].includes(section.id)) return canShowConfigSections;
+      if (section.id === "spv_review") return canReviewSpv;
+      if (section.id === "client_review") return canReviewSpv || canViewAllTasks;
+      if (section.id === "special_revisions") return canApproveExtra || canApproveUrgent;
+      if (section.id === "cancel_requests") return canManageEscalations;
+      if (section.id === "reports") return canViewReports;
+      if (section.id === "rankings") return canViewRankings;
+      return canViewAllTasks || canReviewSpv;
+    });
+  }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports]);
   const effectiveActiveSection = visibleConfigSections.some((section) => section.id === activeSection)
     ? activeSection
     : visibleConfigSections[0]?.id ?? "all_tasks";
+  const activeSectionMeta = visibleConfigSections.find((section) => section.id === effectiveActiveSection);
 
   const loadConfig = useCallback(async (silent = false) => {
     if (!canUseControl) {
@@ -216,25 +287,35 @@ export default function OddsPage() {
     setError(null);
     try {
       const taskPagePromise = getOddsTasks();
+      const reportPromise = canViewReports ? Promise.all([getOddsDailyReports(), getOddsReportSummary()]) : Promise.resolve<[OddsDailyReport[], OddsReportSummary | null]>([[], null]);
+      const rankingPromise = canViewRankings ? getOddsRankings(rankingPeriod) : Promise.resolve<OddsRanking[]>([]);
 
       if (!canShowConfigSections) {
-        const taskPage = await taskPagePromise;
+        const [taskPage, [reportList, summary], rankingList] = await Promise.all([taskPagePromise, reportPromise, rankingPromise]);
         setTasks(taskPage.data);
+        setDailyReports(reportList);
+        setReportSummary(summary);
+        setRankings(rankingList);
         return;
       }
 
-      const [categoryList, profileList, ruleList, userList, taskPage] = await Promise.all([
+      const [categoryList, profileList, ruleList, userList, taskPage, [reportList, summary], rankingList] = await Promise.all([
         getOddsConfigCategories(),
         getOddsConfigDesignerProfiles(),
         getOddsSystemRules(),
         getOddsAssignableUsers(),
         taskPagePromise,
+        reportPromise,
+        rankingPromise,
       ]);
 
       setCategories(categoryList);
       setDesignerProfiles(profileList);
       setRules(ruleList);
       setTasks(taskPage.data);
+      setDailyReports(reportList);
+      setReportSummary(summary);
+      setRankings(rankingList);
       setAssignableUsers(userList);
       setDesignerForm((prev) => ({
         ...prev,
@@ -245,7 +326,7 @@ export default function OddsPage() {
     } finally {
       if (!silent) setLoading(false);
     }
-  }, [canShowConfigSections, canUseControl]);
+  }, [canShowConfigSections, canUseControl, canViewRankings, canViewReports, rankingPeriod]);
 
   const loadWorkspace = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -474,6 +555,41 @@ export default function OddsPage() {
     }));
   };
 
+  const runOperationalAction = async (label: string, action: () => Promise<unknown>, message: string) => {
+    resetMessages();
+    setSaving(label);
+    try {
+      await action();
+      setNotice(message);
+      setReviewNote("");
+      await loadConfig();
+    } catch (err) {
+      setError(oddsError(err));
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const reviewSpecialRevision = (revision: OddsTaskRevision, decision: "approved" | "rejected") => {
+    const action = revision.revision_type === "urgent_final"
+      ? () => reviewOddsUrgentRevision(revision.id, decision, reviewNote || undefined)
+      : () => reviewOddsExtraRevision(revision.id, decision, reviewNote || undefined);
+
+    void runOperationalAction(
+      `revision-${revision.id}-${decision}`,
+      action,
+      decision === "approved" ? "Revisi tambahan disetujui." : "Revisi tambahan ditolak."
+    );
+  };
+
+  const reviewCancel = (request: OddsTaskCancelRequest, decision: "approved" | "rejected") => {
+    void runOperationalAction(
+      `cancel-${request.id}-${decision}`,
+      () => reviewOddsCancelRequest(request.id, decision, reviewNote || undefined),
+      decision === "approved" ? "Cancel disetujui." : "Cancel ditolak."
+    );
+  };
+
   if (!canUseControl) {
     return (
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 py-6">
@@ -512,58 +628,111 @@ export default function OddsPage() {
           </div>
         )}
 
-        <section className="grid gap-4 md:grid-cols-4">
-          <MetricTile icon="pending_actions" label="Aktif" value={taskMetrics.active} />
-          <MetricTile icon="assignment" label="Submitted" value={taskMetrics.submitted} />
-          <MetricTile icon="rate_review" label="Review" value={taskMetrics.review} />
-          <MetricTile icon="task_alt" label="Done" value={taskMetrics.done} />
-        </section>
-
-        <section className="rounded-lg border border-cu-border bg-white p-4">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-base font-semibold text-cu-ink">
-                {canViewAssignedTasks ? "Task Ditugaskan" : "Daftar Request"}
-              </h2>
+        <main className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <aside className="self-start rounded-lg border border-cu-border bg-white p-3 lg:sticky lg:top-24 lg:col-span-3">
+            <div className="mb-3 px-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">ODDS Menu</p>
               <p className="mt-1 text-sm text-cu-muted">
-                {canViewAssignedTasks
-                  ? "Task yang masuk ke assignment designer."
-                  : "Request ODDS yang pernah kamu buat."}
+                {canViewAssignedTasks ? "Workspace task desainer." : "Workspace request client."}
               </p>
             </div>
-            <span className="rounded-full border border-cu-border px-2.5 py-1 text-xs text-cu-muted">{tasks.length} task</span>
-          </div>
-          <DataTable
-            loading={loading}
-            empty={canCreateTask ? "Belum ada request. Klik Request untuk membuat permintaan." : "Belum ada task ditugaskan."}
-            headers={["Task", "Kategori", "Designer", "Status", "Deadline", ""]}
-            rows={tasks.map((task) => {
-              const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
-
-              return [
-                <div key={`task-title-${task.id}`}>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-cu-ink">{task.design_purpose}</p>
-                    <TaskTypePill taskType={task.task_type} />
-                  </div>
-                  <p className="mt-1 text-xs text-cu-muted">{task.task_number}</p>
-                </div>,
-                task.category?.name ?? "-",
-                assignedDesigner?.name ?? "-",
-                <StatusBadge key={`status-${task.id}`} status={task.status} />,
-                formatOddsDate(task.deadline, true),
+            <nav className="space-y-1">
+              <button type="button" className="flex w-full items-start gap-3 rounded-lg bg-cu-info px-3 py-3 text-left text-white">
+                <MaterialIcon name={canViewAssignedTasks ? "assignment_ind" : "request_page"} size="sm" className="mt-0.5 shrink-0" />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center justify-between gap-2 text-sm font-semibold">
+                    {canViewAssignedTasks ? "Task Ditugaskan" : "Daftar Request"}
+                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white">{tasks.length}</span>
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-white/80">
+                    {canViewAssignedTasks ? "Task yang masuk ke assignment." : "Request ODDS yang pernah dibuat."}
+                  </span>
+                </span>
+              </button>
+            </nav>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <MiniMetric icon="pending_actions" label="Aktif" value={taskMetrics.active} />
+              <MiniMetric icon="assignment" label="Submit" value={taskMetrics.submitted} />
+              <MiniMetric icon="rate_review" label="Review" value={taskMetrics.review} />
+              <MiniMetric icon="task_alt" label="Done" value={taskMetrics.done} />
+            </div>
+            <div className="mt-4 grid gap-2">
+              <button
+                type="button"
+                onClick={() => void loadWorkspace()}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-cu-border px-3 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+              >
+                <MaterialIcon name="refresh" size="sm" />
+                Refresh
+              </button>
+              {canCreateTask && (
                 <Link
-                  key={`open-${task.id}`}
-                  href={`/odds/detail?id=${task.id}`}
-                  className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-border text-cu-ink transition hover:bg-cu-panel-soft"
-                  aria-label="Buka detail task"
+                  href="/odds/new"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-cu-info px-4 text-sm font-semibold text-white transition hover:bg-blue-600"
                 >
-                  <MaterialIcon name="open_in_new" size="sm" />
-                </Link>,
-              ];
-            })}
-          />
-        </section>
+                  <MaterialIcon name="add" size="sm" />
+                  Request Baru
+                </Link>
+              )}
+            </div>
+          </aside>
+
+          <div className="min-w-0 lg:col-span-9">
+            <div className="mb-4 rounded-lg border border-cu-border bg-white px-4 py-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">Active Section</p>
+                  <h2 className="mt-1 text-lg font-semibold text-cu-ink">
+                    {canViewAssignedTasks ? "Task Ditugaskan" : "Daftar Request"}
+                  </h2>
+                </div>
+                <span className="rounded-full border border-cu-border px-2.5 py-1 text-xs text-cu-muted">{tasks.length} task</span>
+              </div>
+            </div>
+            <section className="rounded-lg border border-cu-border bg-white p-4">
+              <div className="mb-4">
+                <h2 className="text-base font-semibold text-cu-ink">
+                  {canViewAssignedTasks ? "Task Ditugaskan" : "Daftar Request"}
+                </h2>
+                <p className="mt-1 text-sm text-cu-muted">
+                  {canViewAssignedTasks
+                    ? "Task yang masuk ke assignment designer."
+                    : "Request ODDS yang pernah kamu buat."}
+                </p>
+              </div>
+              <DataTable
+                loading={loading}
+                empty={canCreateTask ? "Belum ada request. Klik Request untuk membuat permintaan." : "Belum ada task ditugaskan."}
+                headers={["Task", "Kategori", "Designer", "Status", "Deadline", ""]}
+                rows={tasks.map((task) => {
+                  const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
+
+                  return [
+                    <div key={`task-title-${task.id}`}>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold text-cu-ink">{task.design_purpose}</p>
+                        <TaskTypePill taskType={task.task_type} />
+                      </div>
+                      <p className="mt-1 text-xs text-cu-muted">{task.task_number}</p>
+                    </div>,
+                    task.category?.name ?? "-",
+                    assignedDesigner?.name ?? "-",
+                    <StatusBadge key={`status-${task.id}`} status={task.status} />,
+                    formatOddsDate(task.deadline, true),
+                    <Link
+                      key={`open-${task.id}`}
+                      href={`/odds/detail?id=${task.id}`}
+                      className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-border text-cu-ink transition hover:bg-cu-panel-soft"
+                      aria-label="Buka detail task"
+                    >
+                      <MaterialIcon name="open_in_new" size="sm" />
+                    </Link>,
+                  ];
+                })}
+              />
+            </section>
+          </div>
+        </main>
       </div>
     );
   }
@@ -598,8 +767,8 @@ export default function OddsPage() {
         </div>
       )}
 
-      <main className="grid gap-6 lg:grid-cols-[18rem_1fr]">
-        <aside className="self-start rounded-lg border border-cu-border bg-white p-3 lg:sticky lg:top-24">
+      <main className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <aside className="self-start rounded-lg border border-cu-border bg-white p-3 lg:sticky lg:top-24 lg:col-span-3">
           <div className="mb-3 px-2">
             <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">ODDS Control</p>
             <p className="mt-1 text-sm text-cu-muted">Pilih konfigurasi atau review operasional.</p>
@@ -616,7 +785,15 @@ export default function OddsPage() {
                       ? spvReviewTasks.length
                       : section.id === "client_review"
                         ? clientReviewTasks.length
-                        : tasks.length;
+                        : section.id === "special_revisions"
+                          ? specialRevisionRequests.length
+                          : section.id === "cancel_requests"
+                            ? cancelRequests.length
+                            : section.id === "reports"
+                              ? dailyReports.length
+                              : section.id === "rankings"
+                                ? rankings.length
+                                : tasks.length;
 
               return (
                 <button
@@ -651,9 +828,21 @@ export default function OddsPage() {
           </nav>
         </aside>
 
-        <div className="min-w-0">
+        <div className="min-w-0 lg:col-span-9">
+          <div className="mb-4 rounded-lg border border-cu-border bg-white px-4 py-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">Active Section</p>
+                <h2 className="mt-1 text-lg font-semibold text-cu-ink">{activeSectionMeta?.label ?? "ODDS"}</h2>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-cu-muted">
+                {activeSectionMeta && <MaterialIcon name={activeSectionMeta.icon} size="sm" className="text-cu-info" />}
+                <span>{activeSectionMeta?.description ?? "Monitoring ODDS."}</span>
+              </div>
+            </div>
+          </div>
       {effectiveActiveSection === "categories" && (
-      <section className="grid gap-6 xl:grid-cols-[24rem_1fr]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
         <ConfigPanel title={categoryForm.id ? "Edit Kategori" : "Tambah Kategori"} icon="category">
           <form onSubmit={submitCategory} className="space-y-3">
             <TextField
@@ -729,7 +918,7 @@ export default function OddsPage() {
       )}
 
       {effectiveActiveSection === "designers" && (
-      <section className="grid gap-6 xl:grid-cols-[24rem_1fr]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
         <ConfigPanel title={designerForm.id ? "Edit Profil Desainer" : "Tambah Profil Desainer"} icon="groups">
           <form onSubmit={submitDesignerProfile} className="space-y-3">
             <label className="block">
@@ -845,7 +1034,7 @@ export default function OddsPage() {
       )}
 
       {effectiveActiveSection === "rules" && (
-      <section className="grid gap-6 xl:grid-cols-[24rem_1fr]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
         <ConfigPanel title={ruleForm.id ? "Edit Rule" : "Tambah Rule"} icon="rule">
           <form onSubmit={submitRule} className="space-y-3">
             <TextField
@@ -934,6 +1123,163 @@ export default function OddsPage() {
         </ConfigPanel>
       )}
 
+      {effectiveActiveSection === "special_revisions" && (
+        <ConfigPanel title="Approval Extra / Urgent Revision" icon="priority_high">
+          <p className="mb-4 text-sm text-cu-muted">
+            Revisi normal yang melewati kuota akan masuk ke sini untuk keputusan SPV/Manajer.
+          </p>
+          <textarea
+            value={reviewNote}
+            onChange={(event) => setReviewNote(event.target.value)}
+            rows={3}
+            placeholder="Catatan keputusan"
+            className="mb-4 w-full resize-y rounded-lg border border-cu-border px-3 py-2 text-sm outline-none focus:border-cu-info"
+          />
+          <DataTable
+            loading={loading}
+            empty="Belum ada extra atau urgent revision yang menunggu review."
+            headers={["Task", "Tipe", "Catatan", "Client", "Designer", "Aksi"]}
+            rows={specialRevisionRequests.map((revision) => {
+              const task = revision.task;
+              const assignedDesigner = task?.assigned_designer ?? task?.assignedDesigner;
+
+              return [
+                <div key={`special-task-${revision.id}`}>
+                  <p className="font-semibold text-cu-ink">{task?.design_purpose ?? `Task #${revision.task_id}`}</p>
+                  <p className="mt-1 text-xs text-cu-muted">{task?.task_number ?? "-"}</p>
+                </div>,
+                <StatusBadge key={`revision-type-${revision.id}`} status={revision.revision_type} />,
+                revision.notes,
+                task?.requester?.name ?? "-",
+                assignedDesigner?.name ?? "-",
+                <DecisionButtons
+                  key={`revision-actions-${revision.id}`}
+                  disabled={Boolean(saving)}
+                  approveLabel="ACC"
+                  rejectLabel="Tolak"
+                  onApprove={() => reviewSpecialRevision(revision, "approved")}
+                  onReject={() => reviewSpecialRevision(revision, "rejected")}
+                />,
+              ];
+            })}
+          />
+        </ConfigPanel>
+      )}
+
+      {effectiveActiveSection === "cancel_requests" && (
+        <ConfigPanel title="Review Cancel Request" icon="cancel">
+          <p className="mb-4 text-sm text-cu-muted">
+            Cancel sebelum task dikerjakan langsung batal. Cancel setelah work dimulai perlu keputusan SPV/Manajer.
+          </p>
+          <textarea
+            value={reviewNote}
+            onChange={(event) => setReviewNote(event.target.value)}
+            rows={3}
+            placeholder="Catatan keputusan"
+            className="mb-4 w-full resize-y rounded-lg border border-cu-border px-3 py-2 text-sm outline-none focus:border-cu-info"
+          />
+          <DataTable
+            loading={loading}
+            empty="Belum ada cancel request yang menunggu review."
+            headers={["Task", "Alasan", "Client", "Designer", "Status", "Aksi"]}
+            rows={cancelRequests.map((request) => {
+              const task = request.task;
+              const assignedDesigner = task?.assigned_designer ?? task?.assignedDesigner;
+
+              return [
+                <div key={`cancel-task-${request.id}`}>
+                  <p className="font-semibold text-cu-ink">{task?.design_purpose ?? `Task #${request.task_id}`}</p>
+                  <p className="mt-1 text-xs text-cu-muted">{task?.task_number ?? "-"}</p>
+                </div>,
+                request.reason,
+                task?.requester?.name ?? "-",
+                assignedDesigner?.name ?? "-",
+                <StatusBadge key={`cancel-status-${request.id}`} status={request.status} />,
+                <DecisionButtons
+                  key={`cancel-actions-${request.id}`}
+                  disabled={Boolean(saving)}
+                  approveLabel="ACC"
+                  rejectLabel="Tolak"
+                  onApprove={() => reviewCancel(request, "approved")}
+                  onReject={() => reviewCancel(request, "rejected")}
+                />,
+              ];
+            })}
+          />
+        </ConfigPanel>
+      )}
+
+      {effectiveActiveSection === "reports" && (
+        <div className="space-y-6">
+          <section className="grid gap-4 md:grid-cols-5">
+            <MetricTile icon="task_alt" label="Output" value={reportSummary?.total_output ?? 0} />
+            <MetricTile icon="score" label="Score" value={Math.round(Number(reportSummary?.total_score ?? 0))} />
+            <MetricTile icon="history" label="Revisi" value={reportSummary?.revision_count ?? 0} />
+            <MetricTile icon="warning" label="Overdue" value={reportSummary?.overdue_count ?? 0} />
+            <MetricTile icon="report" label="Quality" value={reportSummary?.quality_issue_count ?? 0} />
+          </section>
+          <p className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-3 text-sm leading-6 text-cu-muted">
+            Quality menghitung task yang terkena quality issue, yaitu revisi SPV melewati batas wajar. Angka ini dipakai untuk audit internal,
+            evaluasi proses, dan ranking desainer.
+          </p>
+          <ConfigPanel title="AI Insight Placeholder" icon="auto_awesome">
+            <p className="text-sm leading-6 text-cu-muted">
+              {reportSummary?.ai_insight ?? "Insight AI belum tersedia."}
+            </p>
+          </ConfigPanel>
+          <ConfigPanel title="Daily Report" icon="monitoring">
+            <DataTable
+              loading={loading}
+              empty="Belum ada daily report."
+              headers={["Tanggal", "Designer", "Output", "Revisi", "Overdue", "Quality", "Rating", "Score"]}
+              rows={dailyReports.map((report) => [
+                formatOddsDate(report.report_date),
+                report.designer?.name ?? `Designer #${report.designer_id}`,
+                report.output_done ? "Ya" : "Tidak",
+                String(report.revision_count),
+                report.overdue ? "Ya" : "Tidak",
+                report.quality_issue_flag ? "Ya" : "Tidak",
+                report.rating ? String(report.rating) : "-",
+                String(report.score),
+              ])}
+            />
+          </ConfigPanel>
+        </div>
+      )}
+
+      {effectiveActiveSection === "rankings" && (
+        <ConfigPanel title="Ranking Designer" icon="leaderboard">
+          <div className="mb-4 flex flex-wrap gap-2">
+            {(["daily", "monthly", "yearly"] as const).map((period) => (
+              <button
+                key={period}
+                type="button"
+                onClick={() => setRankingPeriod(period)}
+                className={`h-9 rounded-lg border px-3 text-sm font-semibold capitalize ${
+                  rankingPeriod === period
+                    ? "border-cu-info bg-cu-info text-white"
+                    : "border-cu-border text-cu-ink hover:bg-cu-panel-soft"
+                }`}
+              >
+                {period}
+              </button>
+            ))}
+          </div>
+          <DataTable
+            loading={loading}
+            empty="Belum ada ranking."
+            headers={["Designer", "Periode", "Output", "Score", "Rating"]}
+            rows={rankings.map((ranking) => [
+              ranking.designer?.name ?? `Designer #${ranking.designer_id}`,
+              `${formatOddsDate(ranking.period_start)} - ${formatOddsDate(ranking.period_end)}`,
+              String(ranking.total_output),
+              String(ranking.total_score),
+              ranking.average_rating ? String(ranking.average_rating) : "-",
+            ])}
+          />
+        </ConfigPanel>
+      )}
+
       {effectiveActiveSection === "all_tasks" && (
         <ConfigPanel title="Monitoring Semua Task" icon="assignment">
           <p className="mb-4 text-sm text-cu-muted">
@@ -972,6 +1318,18 @@ function MetricTile({ icon, label, value }: { icon: string; label: string; value
         <MaterialIcon name={icon} size="sm" className="text-cu-info" />
       </div>
       <p className="mt-3 text-2xl font-semibold text-cu-ink">{value}</p>
+    </div>
+  );
+}
+
+function MiniMetric({ icon, label, value }: { icon: string; label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-3 py-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-cu-muted">{label}</span>
+        <MaterialIcon name={icon} size="xs" className="text-cu-info" />
+      </div>
+      <p className="mt-1 text-lg font-semibold text-cu-ink">{value}</p>
     </div>
   );
 }
@@ -1153,6 +1511,43 @@ function RowActions({ disabled, onEdit, onDelete }: { disabled: boolean; onEdit:
         aria-label="Hapus"
       >
         <MaterialIcon name="delete" size="sm" />
+      </button>
+    </div>
+  );
+}
+
+function DecisionButtons({
+  disabled,
+  approveLabel,
+  rejectLabel,
+  onApprove,
+  onReject,
+}: {
+  disabled: boolean;
+  approveLabel: string;
+  rejectLabel: string;
+  onApprove: () => void;
+  onReject: () => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onApprove}
+        className="inline-flex h-9 items-center gap-1 rounded-lg border border-cu-success/20 bg-cu-success/10 px-3 text-sm font-semibold text-cu-success transition hover:bg-cu-success/15 disabled:opacity-50"
+      >
+        <MaterialIcon name="check" size="xs" />
+        {approveLabel}
+      </button>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onReject}
+        className="inline-flex h-9 items-center gap-1 rounded-lg border border-cu-danger/20 bg-cu-danger/10 px-3 text-sm font-semibold text-cu-danger transition hover:bg-cu-danger/15 disabled:opacity-50"
+      >
+        <MaterialIcon name="close" size="xs" />
+        {rejectLabel}
       </button>
     </div>
   );

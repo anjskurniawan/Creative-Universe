@@ -30,7 +30,12 @@ class NotificationResource extends JsonResource
         }
 
         $path = parse_url($url, PHP_URL_PATH);
+        $query = parse_url($url, PHP_URL_QUERY);
 
-        return is_string($path) && str_starts_with($path, '/') ? $path : null;
+        if (! is_string($path) || ! str_starts_with($path, '/')) {
+            return null;
+        }
+
+        return is_string($query) && $query !== '' ? "{$path}?{$query}" : $path;
     }
 }

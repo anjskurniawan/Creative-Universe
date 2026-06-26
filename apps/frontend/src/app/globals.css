@@ -913,4 +913,59 @@
   }
 }
 
+.prose-odds h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-cu-ink);
+}
+
+.prose-odds h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-cu-ink);
+}
+
+.prose-odds p {
+  margin: 0 0 0.75rem;
+}
+
+.prose-odds ul,
+.prose-odds ol {
+  margin: 0 0 0.75rem 1.25rem;
+  padding: 0;
+}
+
+.prose-odds ul {
+  list-style: disc;
+}
+
+.prose-odds ol {
+  list-style: decimal;
+}
+
+.prose-odds li {
+  margin: 0.25rem 0;
+}
+
+.prose-odds blockquote {
+  margin: 0 0 0.75rem;
+  border-left: 3px solid var(--color-cu-info);
+  padding-left: 0.75rem;
+  color: var(--color-cu-muted);
+}
+
+.prose-odds a {
+  color: var(--color-cu-info);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.rich-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--color-cu-muted);
+  pointer-events: none;
+}
+
 }

@@ -53,6 +53,15 @@ class OddsDefaultSeeder extends Seeder
         );
 
         SystemRule::firstOrCreate(
+            ['key' => 'no_response_hours'],
+            [
+                'value' => ['hours' => 24],
+                'description' => 'Batas tidak ada respons sebelum sistem mengirim reminder ODDS.',
+                'is_active' => true,
+            ]
+        );
+
+        SystemRule::firstOrCreate(
             ['key' => 'leader_revision_quality_issue_limit'],
             [
                 'value' => ['count' => 2],
