@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Core\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,13 +25,15 @@ class DatabaseSeeder extends Seeder
                 'username' => 'root',
                 'password' => 'admin',
                 'role' => 'Root',
+                'local_login' => true,
             ],
             [
                 'name' => 'Manajer',
                 'email' => 'manajer@creativeuniverse.test',
                 'username' => 'manajer',
-                'password' => 'password',
+                'password' => 'admin',
                 'role' => 'Manajer',
+                'local_login' => true,
             ],
             [
                 'name' => 'CEO',
@@ -40,18 +43,20 @@ class DatabaseSeeder extends Seeder
                 'role' => 'CEO',
             ],
             [
-                'name' => 'Supervisor',
-                'email' => 'supervisor@creativeuniverse.test',
-                'username' => 'supervisor',
-                'password' => 'password',
-                'role' => 'Supervisor',
+                'name' => 'SPV',
+                'email' => 'spv@creativeuniverse.test',
+                'username' => 'spv',
+                'password' => 'admin',
+                'role' => 'SPV',
+                'local_login' => true,
             ],
             [
                 'name' => 'Designer',
                 'email' => 'designer@creativeuniverse.test',
                 'username' => 'designer',
-                'password' => 'password',
+                'password' => 'admin',
                 'role' => 'Designer',
+                'local_login' => true,
             ],
             [
                 'name' => 'Videographer',
@@ -64,8 +69,9 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Client',
                 'email' => 'client@creativeuniverse.test',
                 'username' => 'client',
-                'password' => 'password',
+                'password' => 'admin',
                 'role' => 'Client',
+                'local_login' => true,
             ],
             [
                 'name' => 'Leader Retail',
@@ -83,6 +89,9 @@ class DatabaseSeeder extends Seeder
             ],
         ];
 
+        $hasIsActiveColumn = Schema::hasColumn('users', 'is_active');
+        $hasApprovedAtColumn = Schema::hasColumn('users', 'approved_at');
+
         foreach ($defaultUsers as $item) {
             $user = User::where('email', $item['email'])
                 ->orWhere('username', $item['username'])
@@ -95,6 +104,20 @@ class DatabaseSeeder extends Seeder
                     'username' => $item['username'],
                     'password' => bcrypt($item['password']),
                 ]);
+            }
+
+            $profileUpdates = [];
+            if ($hasIsActiveColumn && ! $user->is_active) {
+                $profileUpdates['is_active'] = true;
+            }
+            if ($hasApprovedAtColumn && ! $user->approved_at) {
+                $profileUpdates['approved_at'] = now();
+            }
+            if ($item['local_login'] ?? false) {
+                $profileUpdates['password'] = bcrypt($item['password']);
+            }
+            if ($profileUpdates !== []) {
+                $user->forceFill($profileUpdates)->save();
             }
 
             if (! $user->hasRole($item['role'])) {
@@ -117,9 +140,8 @@ class DatabaseSeeder extends Seeder
         // 3. Seed data test Pricetag Generator
         $this->call(PricetagTestDataSeeder::class);
 
-        // 4. Seed data awal ODDS
+        // 4. Seed permission dan default config ODDS
         $this->call(OddsPermissionSeeder::class);
-        $this->call(OddsDesignCategorySeeder::class);
-        $this->call(OddsTestSeeder::class);
+        $this->call(OddsDefaultSeeder::class);
     }
 }

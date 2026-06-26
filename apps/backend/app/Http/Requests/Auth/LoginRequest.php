@@ -21,6 +21,8 @@ use Illuminate\Validation\ValidationException;
  */
 class LoginRequest extends FormRequest
 {
+    private const LOCAL_LOGIN_USERNAMES = ['root', 'manajer', 'spv', 'supervisor', 'designer', 'client'];
+
     public function authorize(): bool
     {
         return true;
@@ -57,8 +59,8 @@ class LoginRequest extends FormRequest
         $username = $this->input('username');
         $password = $this->input('password');
 
-        if ($username === 'root') {
-            // Login lokal khusus root
+        if (in_array($username, self::LOCAL_LOGIN_USERNAMES, true)) {
+            // Login lokal untuk akun default internal.
             if (! Auth::attempt(['username' => $username, 'password' => $password], $this->boolean('remember'))) {
                 RateLimiter::hit($this->throttleKey());
 

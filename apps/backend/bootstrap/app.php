@@ -34,6 +34,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
 
+        $middleware->redirectGuestsTo(fn () => null);
+
         $middleware->validateCsrfTokens(except: [
             '_cmd/*',
         ]);
@@ -52,6 +54,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->shouldRenderJsonWhen(function ($request, Throwable $e) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
+
         // SRD v6.2 Seksi 9.1 — Global Exception Handler
         $exceptions->render(function (Throwable $e, $request) {
             if ($request->is('api/*') || $request->expectsJson()) {

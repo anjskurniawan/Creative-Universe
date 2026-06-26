@@ -51,6 +51,7 @@ class RolePermissionSeeder extends Seeder
         $manajer = Role::firstOrCreate(['name' => 'Manajer']);
         $ceo = Role::firstOrCreate(['name' => 'CEO']);
         $supervisor = Role::firstOrCreate(['name' => 'Supervisor']);
+        $spv = Role::firstOrCreate(['name' => 'SPV']);
         $designer = Role::firstOrCreate(['name' => 'Designer']);
         $videographer = Role::firstOrCreate(['name' => 'Videographer']);
         $client = Role::firstOrCreate(['name' => 'Client']);
@@ -78,6 +79,12 @@ class RolePermissionSeeder extends Seeder
 
         // Supervisor: akses core & pricetag
         $supervisor->syncPermissions([
+            'access-core',
+            'access-pricetag',
+        ]);
+
+        // SPV: alias operasional untuk Supervisor
+        $spv->syncPermissions([
             'access-core',
             'access-pricetag',
         ]);

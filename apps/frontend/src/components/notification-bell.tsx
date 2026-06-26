@@ -95,8 +95,11 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     };
 
     void loadNotifications();
+    const interval = window.setInterval(loadNotifications, 10000);
+
     return () => {
       active = false;
+      window.clearInterval(interval);
     };
   }, []);
 

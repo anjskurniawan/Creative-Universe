@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schedule;
+use App\Services\Odds\OddsEscalationService;
+use App\Services\Odds\OddsReportingService;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -66,12 +68,35 @@ Artisan::command('clean:stale-records', function () {
     $this->info('No stale record pruning target registered yet.');
 })->purpose('Reserved hook for sub-app stale record pruning');
 
+Artisan::command('odds:check-sla', function (OddsEscalationService $service) {
+    $summary = $service->runSchedulerChecks();
+
+    $this->info('ODDS SLA checks completed: '.json_encode($summary));
+})->purpose('Check ODDS overdue, no response, and client timeout conditions');
+
+Artisan::command('odds:generate-reports', function (OddsReportingService $service) {
+    \App\Models\Odds\Task::where('status', 'done')
+        ->whereDate('done_at', now()->toDateString())
+        ->each(fn ($task) => $service->fillDailyReport($task));
+
+    $this->info('ODDS daily reports generated.');
+})->purpose('Generate ODDS daily designer reports');
+
+Artisan::command('odds:recalculate-rankings', function (OddsReportingService $service) {
+    $service->recalculateRankings();
+
+    $this->info('ODDS rankings recalculated.');
+})->purpose('Recalculate ODDS daily, monthly, and yearly rankings');
+
 Schedule::command('clean:activity-log')->monthly();
 Schedule::command('clean:notifications')->monthly();
 Schedule::command('clean:failed-jobs')->daily();
 Schedule::command('auth:clear-resets')->daily();
 Schedule::command('clean:temp-uploads')->daily();
 Schedule::command('clean:stale-records')->monthly();
+Schedule::command('odds:check-sla')->hourly();
+Schedule::command('odds:generate-reports')->dailyAt('23:50');
+Schedule::command('odds:recalculate-rankings')->dailyAt('23:55');
 
 // SRD v6.3 Seksi 11 — cPanel Cron Job Queue runner
 Schedule::command('queue:work --stop-when-empty')->everyMinute();

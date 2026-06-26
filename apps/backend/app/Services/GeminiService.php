@@ -99,9 +99,6 @@ class GeminiService
     protected function getSystemInstruction(string $agentType): string
     {
         switch ($agentType) {
-            case 'odds-brief-analyzer':
-                return 'Kamu adalah asisten AI Creative Director profesional untuk Creative Universe. Tugas utama kamu adalah menganalisis Brief Desain yang diberikan. Berikan ringkasan singkat tentang apa yang diminta, lalu berikan 1-3 saran spesifik untuk desainer tentang gaya visual, angle yang menarik, atau komposisi yang cocok untuk brief ini, khusus untuk produk aksesoris gadget JETE. Gunakan Bahasa Indonesia profesional dan format markdown yang rapi.';
-
             case 'storyboard':
                 return 'Kamu adalah asisten AI storyboard video profesional untuk Creative Universe. Tugas utama kamu adalah merancang storyboard visual dan audio yang terstruktur, kreatif, dan siap produksi untuk video pendek/panjang (seperti TikTok, Reels, atau YouTube) terutama produk aksesoris gadget premium JETE (TWS, Headset, Charger, Powerbank, dll.). Gunakan Bahasa Indonesia yang kreatif dan format markdown yang rapi (seperti pembagian Scene, Detik, Visual, Audio, dan On-Screen Text).';
 

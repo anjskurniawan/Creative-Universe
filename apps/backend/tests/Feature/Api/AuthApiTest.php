@@ -46,6 +46,80 @@ class AuthApiTest extends TestCase
         $this->assertTrue(Auth::check());
     }
 
+    public function test_default_designer_and_client_can_login_locally(): void
+    {
+        $designer = User::factory()->create([
+            'name' => 'Designer',
+            'username' => 'designer',
+            'email' => 'designer@creativeuniverse.test',
+            'password' => bcrypt('admin'),
+        ]);
+        $designer->assignRole('Designer');
+
+        $client = User::factory()->create([
+            'name' => 'Client',
+            'username' => 'client',
+            'email' => 'client@creativeuniverse.test',
+            'password' => bcrypt('admin'),
+        ]);
+        $client->assignRole('Client');
+
+        $this->postJson('/api/v1/auth/login', [
+            'username' => 'designer',
+            'password' => 'admin',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.username', 'designer')
+            ->assertJsonPath('data.roles.0', 'Designer');
+
+        Auth::guard('web')->logout();
+
+        $this->postJson('/api/v1/auth/login', [
+            'username' => 'client',
+            'password' => 'admin',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.username', 'client')
+            ->assertJsonPath('data.roles.0', 'Client');
+    }
+
+    public function test_default_manager_and_spv_can_login_locally(): void
+    {
+        $manager = User::factory()->create([
+            'name' => 'Manajer',
+            'username' => 'manajer',
+            'email' => 'manajer@creativeuniverse.test',
+            'password' => bcrypt('admin'),
+        ]);
+        $manager->assignRole('Manajer');
+
+        $spv = User::factory()->create([
+            'name' => 'SPV',
+            'username' => 'spv',
+            'email' => 'spv@creativeuniverse.test',
+            'password' => bcrypt('admin'),
+        ]);
+        $spv->assignRole('SPV');
+
+        $this->postJson('/api/v1/auth/login', [
+            'username' => 'manajer',
+            'password' => 'admin',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.username', 'manajer')
+            ->assertJsonPath('data.roles.0', 'Manajer');
+
+        Auth::guard('web')->logout();
+
+        $this->postJson('/api/v1/auth/login', [
+            'username' => 'spv',
+            'password' => 'admin',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.username', 'spv')
+            ->assertJsonPath('data.roles.0', 'SPV');
+    }
+
     /**
      * Test invalid login credentials return 422 standard validation envelope.
      */
@@ -94,6 +168,17 @@ class AuthApiTest extends TestCase
     public function test_unauthenticated_me_returns_401(): void
     {
         $response = $this->getJson('/api/v1/auth/me');
+
+        $response->assertStatus(401);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Silakan login terlebih dahulu.',
+        ]);
+    }
+
+    public function test_unauthenticated_api_request_without_json_accept_returns_401(): void
+    {
+        $response = $this->get('/api/v1/odds/tasks');
 
         $response->assertStatus(401);
         $response->assertJson([
