@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MaterialIcon } from "@/components/material-icon";
+
 import { normalizePathname } from "@/lib/routes";
 import { useAuth } from "@/providers/auth-provider";
 import { gsap } from "gsap";

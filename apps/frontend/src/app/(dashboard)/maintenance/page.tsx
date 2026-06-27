@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 import { apiFetch } from "@/lib/api";
 import { useAuth } from "@/providers/auth-provider";
@@ -31,7 +31,7 @@ export default function MaintenancePage() {
   // ----------------------------------------------------
   // Load System Status
   // ----------------------------------------------------
-  const loadSystemStatus = async (silent = false) => {
+  const loadSystemStatus = useCallback(async (silent = false) => {
     if (!hasPermission("run-artisan")) return;
     if (!silent) setIsLoading(true);
     setError(null);
@@ -46,11 +46,11 @@ export default function MaintenancePage() {
     } finally {
       if (!silent) setIsLoading(false);
     }
-  };
+  }, [hasPermission]);
 
   useEffect(() => {
     queueMicrotask(() => void loadSystemStatus());
-  }, [hasPermission]);
+  }, [loadSystemStatus]);
 
   if (!hasPermission("run-artisan")) {
     return <AccessDenied />;

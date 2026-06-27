@@ -12,7 +12,6 @@ use App\Services\Odds\OddsTaskIntakeService;
 use App\Services\Odds\OddsWorkReviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class TaskController extends BaseApiController

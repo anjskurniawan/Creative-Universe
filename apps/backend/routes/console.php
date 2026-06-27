@@ -1,12 +1,13 @@
 <?php
 
+use App\Models\Odds\Task;
+use App\Services\Odds\OddsEscalationService;
+use App\Services\Odds\OddsReportingService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schedule;
-use App\Services\Odds\OddsEscalationService;
-use App\Services\Odds\OddsReportingService;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -75,7 +76,7 @@ Artisan::command('odds:check-sla', function (OddsEscalationService $service) {
 })->purpose('Check ODDS overdue, no response, and client timeout conditions');
 
 Artisan::command('odds:generate-reports', function (OddsReportingService $service) {
-    \App\Models\Odds\Task::where('status', 'done')
+    Task::where('status', 'done')
         ->whereDate('done_at', now()->toDateString())
         ->each(fn ($task) => $service->fillDailyReport($task));
 

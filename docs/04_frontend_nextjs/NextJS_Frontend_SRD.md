@@ -1,5 +1,5 @@
 ---
-status: DRAFT
+status: ACTIVE
 version: 1.1
 revised: 2026-06-20
 depends_on: ../03_backend_api/Laravel_REST_API_SRD.md

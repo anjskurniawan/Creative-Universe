@@ -23,7 +23,7 @@ class OddsConfigService
 
         if (! $category) {
             $payload['created_by'] = $userId;
-            $category = new Category();
+            $category = new Category;
         }
 
         $category->fill($payload)->save();
@@ -46,7 +46,7 @@ class OddsConfigService
 
         if (! $profile) {
             $payload['created_by'] = $userId;
-            $profile = new DesignerProfile();
+            $profile = new DesignerProfile;
         }
 
         $profile->fill($payload)->save();
@@ -68,7 +68,7 @@ class OddsConfigService
 
         if (! $rule) {
             $payload['created_by'] = $userId;
-            $rule = new SystemRule();
+            $rule = new SystemRule;
         }
 
         $rule->fill($payload)->save();

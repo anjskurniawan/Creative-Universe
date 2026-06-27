@@ -5,6 +5,7 @@ namespace App\Services\Odds;
 use App\Enums\Odds\TaskStatusEnum;
 use App\Enums\Odds\TaskTypeEnum;
 use App\Models\Core\AssetLink;
+use App\Models\Odds\DesignerProfile;
 use App\Models\Odds\SystemRule;
 use App\Models\Odds\Task;
 use App\Models\Odds\TaskResult;
@@ -31,7 +32,7 @@ class OddsWorkReviewService
             $this->queue->assertIsNext($task, $designerId);
 
             $profile = $task->assignedDesigner
-                ? \App\Models\Odds\DesignerProfile::where('user_id', $designerId)->first()
+                ? DesignerProfile::where('user_id', $designerId)->first()
                 : null;
             $active = Task::where('assigned_designer_id', $designerId)->where('status', TaskStatusEnum::IN_PROGRESS->value)->count();
             if ($profile && $active >= $profile->max_active_tasks) {

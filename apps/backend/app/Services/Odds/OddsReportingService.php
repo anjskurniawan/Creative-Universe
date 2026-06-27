@@ -6,7 +6,6 @@ use App\Models\Odds\DesignerDailyReport;
 use App\Models\Odds\DesignerRanking;
 use App\Models\Odds\Task;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class OddsReportingService
 {

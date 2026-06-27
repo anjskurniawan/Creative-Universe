@@ -83,7 +83,11 @@ export default function DocsMenu() {
   const toggleCategory = useCallback((id: string) => {
     setExpandedCategories((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   }, []);
@@ -91,7 +95,11 @@ export default function DocsMenu() {
   const toggleSub = useCallback((key: string) => {
     setExpandedSubs((prev) => {
       const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
       return next;
     });
   }, []);

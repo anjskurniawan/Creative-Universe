@@ -72,7 +72,7 @@ export default function PricetagDatabasePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [appliedSearch, hasPermission, page, tab]);
+  }, [appliedSearch, hasPermission, page, tab, notify]);
 
   useEffect(() => { queueMicrotask(() => void loadData()); }, [loadData]);
 

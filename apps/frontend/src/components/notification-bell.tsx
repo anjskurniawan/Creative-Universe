@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { apiFetch } from "@/lib/api";
 import { getEchoClient } from "@/lib/echo";
 import {
@@ -63,7 +63,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
   const knownNotificationIdsRef = useRef<Set<string>>(new Set());
   const didHydrateNotificationsRef = useRef(false);
 
-  const applyPayload = (payload: NotificationPayload) => {
+  const applyPayload = useCallback((payload: NotificationPayload) => {
     const mergedNotifications = mergeNotifications(payload.notifications, userId);
     const nextIds = new Set(mergedNotifications.map((item) => item.id));
     const newestUnread = mergedNotifications.find(
@@ -79,7 +79,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     didHydrateNotificationsRef.current = true;
     setNotifications(mergedNotifications);
     setUnreadCount(mergedNotifications.filter((item) => !item.is_read).length);
-  };
+  }, [userId]);
 
   useEffect(() => {
     let active = true;
@@ -102,7 +102,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
       active = false;
       window.clearInterval(interval);
     };
-  }, []);
+  }, [applyPayload]);
 
   useEffect(() => {
     const echo = getEchoClient();
@@ -120,7 +120,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
       channel.stopListeningForNotification(refresh);
       echo.leave(channelName);
     };
-  }, [userId]);
+  }, [userId, applyPayload]);
 
   useEffect(() => {
     const refreshLocalNotifications = async () => {
@@ -139,7 +139,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     return () => {
       window.removeEventListener(LOCAL_NOTIFICATIONS_UPDATED_EVENT, refreshLocalNotifications);
     };
-  }, [userId]);
+  }, [userId, applyPayload]);
 
   useEffect(() => {
     if (!toastNotification) return;

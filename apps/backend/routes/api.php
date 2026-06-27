@@ -6,13 +6,13 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\MaintenanceController;
 use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\OtpPasswordController;
 use App\Http\Controllers\Api\Odds\ConfigController as OddsConfigController;
 use App\Http\Controllers\Api\Odds\EscalationController as OddsEscalationController;
 use App\Http\Controllers\Api\Odds\QueueController as OddsQueueController;
 use App\Http\Controllers\Api\Odds\ReportController as OddsReportController;
 use App\Http\Controllers\Api\Odds\RevisionController as OddsRevisionController;
 use App\Http\Controllers\Api\Odds\TaskController as OddsTaskController;
+use App\Http\Controllers\Api\OtpPasswordController;
 use App\Http\Controllers\Api\PricetagCategoryController;
 use App\Http\Controllers\Api\PricetagGenerationController;
 use App\Http\Controllers\Api\PricetagImportController;
@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProfileSessionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\V1\ChatController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,13 +51,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // User Protected Routes
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::post('/ai/chat', [AIAgentController::class, 'chat'])->middleware('can:access-core');
-    
+
     // Private Chat Routes
     Route::prefix('chat')->group(function () {
-        Route::get('/conversations', [\App\Http\Controllers\Api\V1\ChatController::class, 'getConversations']);
-        Route::get('/conversations/{id}/messages', [\App\Http\Controllers\Api\V1\ChatController::class, 'getMessages']);
-        Route::post('/messages', [\App\Http\Controllers\Api\V1\ChatController::class, 'sendMessage']);
-        Route::get('/contacts', [\App\Http\Controllers\Api\V1\ChatController::class, 'getContacts']);
+        Route::get('/conversations', [ChatController::class, 'getConversations']);
+        Route::get('/conversations/{id}/messages', [ChatController::class, 'getMessages']);
+        Route::post('/messages', [ChatController::class, 'sendMessage']);
+        Route::get('/contacts', [ChatController::class, 'getContacts']);
     });
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::patch('/profile', [ProfileController::class, 'update']);

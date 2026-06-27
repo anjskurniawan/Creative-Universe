@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\MessageSent;
 use App\Http\Controllers\Controller;
+use App\Models\Core\Conversation;
+use App\Models\Core\User;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
@@ -10,18 +13,19 @@ class ChatController extends Controller
     public function getConversations()
     {
         $user = auth()->user();
-        
+
         $conversations = $user->conversations()
-            ->with(['users' => function($q) use ($user) {
+            ->with(['users' => function ($q) use ($user) {
                 $q->where('users.id', '!=', $user->id);
             }])
-            ->with(['messages' => function($q) {
+            ->with(['messages' => function ($q) {
                 $q->latest()->limit(1);
             }])
             ->get()
             ->map(function ($conv) {
                 $partner = $conv->users->first();
                 $lastMessage = $conv->messages->first();
+
                 return [
                     'id' => $conv->id,
                     'partner' => $partner ? [
@@ -89,16 +93,16 @@ class ChatController extends Controller
             })
             ->first();
 
-        if (!$conversation) {
+        if (! $conversation) {
             // Check roles auth
             $allowedRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Root'];
             $isStaff = $user->hasAnyRole($allowedRoles);
-            
+
             // For now, if not staff, we'll just allow creating if the receiver is Designer
             // Real odds checking can be implemented later
-            if (!$isStaff) {
-                $receiver = \App\Models\Core\User::findOrFail($receiverId);
-                if (!$receiver->hasRole('Designer')) {
+            if (! $isStaff) {
+                $receiver = User::findOrFail($receiverId);
+                if (! $receiver->hasRole('Designer')) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Anda hanya diizinkan untuk mengirim pesan ke Designer terkait tiket Anda.',
@@ -106,7 +110,7 @@ class ChatController extends Controller
                 }
             }
 
-            $conversation = \App\Models\Core\Conversation::create();
+            $conversation = Conversation::create();
             $conversation->users()->attach([$user->id, $receiverId]);
         }
 
@@ -115,7 +119,7 @@ class ChatController extends Controller
             'body' => $request->body,
         ]);
 
-        broadcast(new \App\Events\MessageSent($message))->toOthers();
+        broadcast(new MessageSent($message))->toOthers();
 
         return response()->json([
             'status' => 'success',
@@ -127,16 +131,16 @@ class ChatController extends Controller
     {
         $user = auth()->user();
         $allowedRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Root'];
-        
+
         if ($user->hasAnyRole($allowedRoles)) {
-            $contacts = \App\Models\Core\User::whereHas('roles', function($q) use ($allowedRoles) {
+            $contacts = User::whereHas('roles', function ($q) use ($allowedRoles) {
                 $q->whereIn('name', $allowedRoles);
             })->where('id', '!=', $user->id)
-            ->select('id', 'name', 'avatar_path')
-            ->get();
+                ->select('id', 'name', 'avatar_path')
+                ->get();
         } else {
             // User biasa hanya melihat designer
-            $contacts = \App\Models\Core\User::role('Designer')
+            $contacts = User::role('Designer')
                 ->select('id', 'name', 'avatar_path')
                 ->get();
         }

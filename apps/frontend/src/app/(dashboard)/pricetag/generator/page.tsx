@@ -2,7 +2,7 @@
 
 import React, { FormEvent, useCallback, useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
 import { apiFetch } from "@/lib/api";
 import { pushLocalNotification } from "@/lib/local-notifications";
@@ -28,7 +28,6 @@ const formatPriceInput = (value: string) => {
 
 export default function PricetagGeneratorPage() {
   const { user, hasRole } = useAuth();
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Tab State
@@ -42,7 +41,6 @@ export default function PricetagGeneratorPage() {
   // Tab 1: Wizard Single State
   // ----------------------------------------------------
   const [wizardStep, setWizardStep] = useState(1);
-  const [wizardCategoryId, setWizardCategoryId] = useState<number | null>(null);
   const [wizardCategoryName, setWizardCategoryName] = useState("");
 
   const [wizardProductSearch, setWizardProductSearch] = useState("");
@@ -51,7 +49,6 @@ export default function PricetagGeneratorPage() {
 
   const [wizardVariantSearch, setWizardVariantSearch] = useState("");
   const [variantsList, setVariantsList] = useState<PricetagProduct[]>([]);
-  const [wizardProductId, setWizardProductId] = useState<number | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<PricetagProduct | null>(null);
 
   const [wizardDiscountPrice, setWizardDiscountPrice] = useState<string>("");
@@ -70,7 +67,6 @@ export default function PricetagGeneratorPage() {
   const [checklistProducts, setChecklistProducts] = useState<PricetagProduct[]>([]);
   const [checklistPage, setChecklistPage] = useState(1);
   const [checklistLastPage, setChecklistLastPage] = useState(1);
-  const [checklistTotal, setChecklistTotal] = useState(0);
   const [checklistIsLoading, setChecklistIsLoading] = useState(false);
   const [isChecklistDesktop, setIsChecklistDesktop] = useState(false);
 
@@ -79,16 +75,12 @@ export default function PricetagGeneratorPage() {
   const [showOnlySelected, setShowOnlySelected] = useState(false);
   const [expandedChecklistProductId, setExpandedChecklistProductId] = useState<number | null>(null);
   const [checklistPrices, setChecklistPrices] = useState<Record<number, string>>({});
-  const [checklistBatchName, setChecklistBatchName] = useState("");
   const [isSubmittingChecklist, setIsSubmittingChecklist] = useState(false);
   const [isChecklistSuccess, setIsChecklistSuccess] = useState(false);
   const [activeBatch, setActiveBatch] = useState<PricetagBatch | null>(null);
   const [visualPercent, setVisualPercent] = useState(0);
   const completedBatchNotificationIdsRef = useRef<Set<number>>(new Set());
 
-  const percent = activeBatch && activeBatch.total_items > 0
-    ? Math.round((activeBatch.processed_items / activeBatch.total_items) * 100)
-    : 0;
 
   useEffect(() => {
     if (!activeBatch) return;
@@ -175,16 +167,12 @@ export default function PricetagGeneratorPage() {
     if (productIdParam) {
       const prodId = Number(productIdParam);
       if (!isNaN(prodId)) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsGenerating(true);
+        queueMicrotask(() => setIsGenerating(true));
         apiFetch<PricetagProduct>(`/pricetag/products/${prodId}`)
           .then((prod) => {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setActiveTab("single");
-            setWizardCategoryId(prod.category.id);
             setWizardCategoryName(prod.category.name);
             setWizardProductName(prod.name);
-            setWizardProductId(prod.id);
             setSelectedProduct(prod);
             setWizardDiscountPrice("");
             setWizardStep(4);
@@ -278,17 +266,14 @@ export default function PricetagGeneratorPage() {
           const singleVar = list[0];
           if (singleVar.variant_name === " " || !singleVar.variant_name) {
             // Auto skip to step 3
-            setWizardProductId(singleVar.id);
             setSelectedProduct(singleVar);
             setWizardDiscountPrice("");
-            setWizardCategoryId(singleVar.category.id);
             setWizardCategoryName(singleVar.category.name);
             setWizardStep(3);
             return;
           }
         }
         if (list.length > 0) {
-          setWizardCategoryId(list[0].category.id);
           setWizardCategoryName(list[0].category.name);
         }
         setVariantsList(list);
@@ -299,10 +284,8 @@ export default function PricetagGeneratorPage() {
   };
 
   const handleSelectVariant = (prod: PricetagProduct) => {
-    setWizardProductId(prod.id);
     setSelectedProduct(prod);
     setWizardDiscountPrice("");
-    setWizardCategoryId(prod.category.id);
     setWizardCategoryName(prod.category.name);
     setWizardStep(3);
   };
@@ -421,7 +404,6 @@ export default function PricetagGeneratorPage() {
       setChecklistCategories(result.data);
       setChecklistProducts([]);
       setChecklistLastPage(1);
-      setChecklistTotal(result.meta.total);
     } catch (err) {
       notify(pricetagError(err));
     } finally {
@@ -439,7 +421,6 @@ export default function PricetagGeneratorPage() {
     if (!checklistAppliedSearch.trim() && !checklistCategory) {
       setChecklistProducts([]);
       setChecklistLastPage(1);
-      setChecklistTotal(0);
       setChecklistIsLoading(false);
       return;
     }
@@ -483,7 +464,6 @@ export default function PricetagGeneratorPage() {
       }
 
       setChecklistLastPage(isChecklistDesktop ? firstPage.meta.last_page : 1);
-      setChecklistTotal(firstPage.meta.total);
     } catch (err) {
       notify(pricetagError(err));
     } finally {
@@ -1482,9 +1462,8 @@ export default function PricetagGeneratorPage() {
                         setVisualPercent(0);
                         setActiveBatch(null);
                         setSelectedVariants([]);
-                        setSelectedProductsData({});
+                         setSelectedProductsData({});
                         setChecklistPrices({});
-                        setChecklistBatchName("");
                       }}
                       className="inline-flex h-[46px] items-center justify-center gap-1.5 rounded-full border border-[#c9c9c9] bg-white px-4 text-[13px] font-bold text-[#303431]"
                     >

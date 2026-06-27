@@ -6,10 +6,8 @@ use App\Models\Core\User;
 use App\Models\Odds\Category;
 use App\Models\Odds\DesignerDailyReport;
 use App\Models\Odds\DesignerProfile;
-use App\Models\Odds\DesignerRanking;
 use App\Models\Odds\SystemRule;
 use App\Models\Odds\Task;
-use App\Models\Odds\TaskCancelRequest;
 use App\Models\Odds\TaskRevision;
 use App\Notifications\Odds\OddsWorkflowNotification;
 use Database\Seeders\OddsPermissionSeeder;
@@ -25,10 +23,15 @@ class OddsWorkflowApiTest extends TestCase
     use RefreshDatabase;
 
     private User $root;
+
     private User $manager;
+
     private User $spv;
+
     private User $designer;
+
     private User $client;
+
     private Category $category;
 
     protected function setUp(): void

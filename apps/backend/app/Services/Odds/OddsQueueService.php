@@ -194,6 +194,7 @@ class OddsQueueService
             $availableToday = 17 - $cursor->hour;
             if ($availableToday <= 0) {
                 $cursor = $this->nextWorkingHour($cursor->addDay()->setTime(9, 0));
+
                 continue;
             }
 

@@ -1,5 +1,5 @@
 ---
-status: DRAFT
+status: ACTIVE
 version: 1.0
 revised: 2026-06-20
 inherits:

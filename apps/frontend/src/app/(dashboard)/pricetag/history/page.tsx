@@ -9,7 +9,6 @@ import {
   formatRupiah,
   pricetagError,
   PricetagBatch,
-  PricetagBatchItem,
   PricetagPage,
 } from "@/lib/pricetag";
 import { useAuth } from "@/providers/auth-provider";
@@ -48,7 +47,7 @@ export default function PricetagHistoryPage() {
     pushLocalNotification(message, "/pricetag/history", user?.id);
   }, [user]);
 
-  const loadBatchDetail = async (id: number, silent = false) => {
+  const loadBatchDetail = useCallback(async (id: number, silent = false) => {
     if (!silent) setIsLoadingDetail(true);
     try {
       const res = await apiFetch<PricetagBatch>(`/pricetag/batches/${id}`);
@@ -59,7 +58,7 @@ export default function PricetagHistoryPage() {
     } finally {
       if (!silent) setIsLoadingDetail(false);
     }
-  };
+  }, [notify]);
 
   // ----------------------------------------------------
   // Load History Batches
@@ -80,7 +79,7 @@ export default function PricetagHistoryPage() {
     } finally {
       if (!silent) setIsLoading(false);
     }
-  }, [page, isMobile]);
+  }, [page, isMobile, notify]);
 
   useEffect(() => {
     queueMicrotask(() => void loadBatches());
@@ -116,7 +115,7 @@ export default function PricetagHistoryPage() {
         echo.leave(`pricetag-batch.${batch.id}`);
       });
     };
-  }, [batches, loadBatches, selectedBatchId]);
+  }, [batches, loadBatches, selectedBatchId, loadBatchDetail]);
 
   // ----------------------------------------------------
   // Polling Fallback (5 seconds)
@@ -138,7 +137,7 @@ export default function PricetagHistoryPage() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [batches, loadBatches, selectedBatchId]);
+  }, [batches, loadBatches, selectedBatchId, loadBatchDetail]);
 
   const openDetail = (id: number) => {
     setSelectedBatchId(id);

@@ -36,9 +36,10 @@ class PricetagTestDataSeeder extends Seeder
         $userId = $admin ? $admin->id : 1;
 
         // 2. Read and parse CSV file
-        $csvPath = base_path('../../DB Produk Sementara.csv');
+        $csvPath = database_path('seeders/data/DB Produk Sementara.csv');
         if (! file_exists($csvPath)) {
             $this->command->error("CSV file not found at: {$csvPath}");
+            $this->command->error('Please place the CSV file in apps/backend/database/seeders/data/ to run this seeder.');
 
             return;
         }

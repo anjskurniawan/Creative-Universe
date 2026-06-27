@@ -3,8 +3,8 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Core\User;
-use App\Notifications\Odds\OddsWorkflowNotification;
 use App\Notifications\Core\TestNotification;
+use App\Notifications\Odds\OddsWorkflowNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
