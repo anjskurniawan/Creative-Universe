@@ -16,7 +16,9 @@ export interface User {
   email: string;
   whatsapp_number: string | null;
   avatar_url: string | null;
-  is_active: boolean;
+  is_onboarded: boolean;
+  division_id: number | null;
+  position_id: number | null;
   roles: string[];
   permissions: string[];
   settings: Record<string, unknown> | null;

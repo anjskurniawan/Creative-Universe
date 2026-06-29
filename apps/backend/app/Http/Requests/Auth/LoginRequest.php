@@ -89,6 +89,7 @@ class LoginRequest extends FormRequest
                         'name' => $username,
                         'email' => $username.'@creative.doran.id', // Placeholder email
                         'password' => Hash::make(Str::random(16)), // Password acak
+                        'is_onboarded' => false,
                     ]);
 
                     // Assign default role 'Client'

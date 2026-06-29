@@ -221,6 +221,10 @@ function LoginCard() {
   }
 
   function resolveRedirectTarget(loggedInUser: Awaited<ReturnType<typeof login>>) {
+    if (!loggedInUser.is_onboarded) {
+      return "/onboarding";
+    }
+
     const requestedRedirect = safeInternalRedirect(searchParams.get("redirect"));
 
     if (requestedRedirect && !isGuestPath(requestedRedirect)) {

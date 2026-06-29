@@ -39,6 +39,9 @@ class User extends Authenticatable
         'password',
         'avatar_path',
         'settings',
+        'is_onboarded',
+        'division_id',
+        'position_id',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -53,6 +56,7 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
             'settings' => 'array',
+            'is_onboarded' => 'boolean',
         ];
     }
 
@@ -115,6 +119,16 @@ class User extends Authenticatable
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class);
+    }
+
+    public function position(): BelongsTo
+    {
+        return $this->belongsTo(Position::class);
     }
 
     // ──────────────────────────────────────────────

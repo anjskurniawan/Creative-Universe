@@ -47,6 +47,9 @@ Route::post('/auth/password/reset', [OtpPasswordController::class, 'resetPasswor
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
+    
+    Route::get('/onboarding/data', [\App\Http\Controllers\Api\OnboardingController::class, 'data']);
+    Route::post('/onboarding/submit', [\App\Http\Controllers\Api\OnboardingController::class, 'submit']);
 
     // User Protected Routes
     Route::get('/dashboard', [DashboardController::class, 'index']);

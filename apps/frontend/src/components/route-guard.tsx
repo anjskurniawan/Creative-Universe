@@ -24,22 +24,27 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
     if (isAuthenticated) {
       // User is logged in
-      if (currentIsGuestPath) {
+      if (currentIsGuestPath || (!user?.is_onboarded && currentPath !== "/onboarding")) {
         let targetPath = "/";
-        const configuredTarget = typeof user?.settings?.redirect_to === "string"
-          ? safeInternalRedirect(user.settings.redirect_to)
-          : null;
 
-        if (
-          configuredTarget &&
-          !isGuestPath(configuredTarget)
-        ) {
-          targetPath = configuredTarget;
-        } else if (
-          user?.roles.includes("Root") || 
-          user?.roles.includes("root")
-        ) {
-          targetPath = "/dashboard";
+        if (!user?.is_onboarded) {
+          targetPath = "/onboarding";
+        } else {
+          const configuredTarget = typeof user?.settings?.redirect_to === "string"
+            ? safeInternalRedirect(user.settings.redirect_to)
+            : null;
+
+          if (
+            configuredTarget &&
+            !isGuestPath(configuredTarget)
+          ) {
+            targetPath = configuredTarget;
+          } else if (
+            user?.roles.includes("Root") || 
+            user?.roles.includes("root")
+          ) {
+            targetPath = "/dashboard";
+          }
         }
         router.replace(targetPath);
       }
@@ -60,7 +65,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
 
   // Prevent flashing of children components before redirect executes
   if (isAuthenticated) {
-    if (currentIsGuestPath) {
+    if (currentIsGuestPath || (!user?.is_onboarded && currentPath !== "/onboarding")) {
       return null;
     }
   } else {

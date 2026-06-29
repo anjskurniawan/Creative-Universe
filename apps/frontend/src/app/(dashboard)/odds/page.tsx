@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
 import { useAuth } from "@/providers/auth-provider";
 import {
@@ -184,7 +185,7 @@ const configSections: Array<{
   },
 ];
 
-export default function OddsPage() {
+function OddsPageContent() {
   const { hasPermission, user } = useAuth();
   const canManageConfig = hasPermission("manage-odds-config");
   const canManageUsers = hasPermission("manage-users");
@@ -217,9 +218,37 @@ export default function OddsPage() {
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<ConfigSection>(
-    canShowConfigSections ? "categories" : "spv_review"
-  );
+  const visibleConfigSections = useMemo(() => {
+    return configSections.filter((section) => {
+      if (["categories", "designers", "rules"].includes(section.id)) return canShowConfigSections;
+      if (section.id === "spv_review") return canReviewSpv;
+      if (section.id === "client_review") return canReviewSpv || canViewAllTasks;
+      if (section.id === "special_revisions") return canApproveExtra || canApproveUrgent;
+      if (section.id === "cancel_requests") return canManageEscalations;
+      if (section.id === "reports") return canViewReports;
+      if (section.id === "rankings") return canViewRankings;
+      return canViewAllTasks || canReviewSpv;
+    });
+  }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports]);
+
+  const searchParams = useSearchParams();
+  const activeSectionParam = searchParams.get("section") as ConfigSection | null;
+  const activeSection = useMemo(() => {
+    if (activeSectionParam && visibleConfigSections.some((s) => s.id === activeSectionParam)) {
+      return activeSectionParam;
+    }
+    return canShowConfigSections ? "categories" : "spv_review";
+  }, [activeSectionParam, canShowConfigSections, visibleConfigSections]);
+
+  const effectiveActiveSection = useMemo(() => {
+    return visibleConfigSections.some((section) => section.id === activeSection)
+      ? activeSection
+      : visibleConfigSections[0]?.id ?? "all_tasks";
+  }, [visibleConfigSections, activeSection]);
+
+  const activeSectionMeta = useMemo(() => {
+    return visibleConfigSections.find((section) => section.id === effectiveActiveSection);
+  }, [visibleConfigSections, effectiveActiveSection]);
 
   const categoryNameById = useMemo(() => {
     return new Map(categories.map((category) => [String(category.id), category.name]));
@@ -260,22 +289,7 @@ export default function OddsPage() {
     return tasks.flatMap((task) => (task.cancel_requests ?? task.cancelRequests ?? []).map((request) => ({ ...request, task })))
       .filter((request) => request.status === "pending");
   }, [tasks]);
-  const visibleConfigSections = useMemo(() => {
-    return configSections.filter((section) => {
-      if (["categories", "designers", "rules"].includes(section.id)) return canShowConfigSections;
-      if (section.id === "spv_review") return canReviewSpv;
-      if (section.id === "client_review") return canReviewSpv || canViewAllTasks;
-      if (section.id === "special_revisions") return canApproveExtra || canApproveUrgent;
-      if (section.id === "cancel_requests") return canManageEscalations;
-      if (section.id === "reports") return canViewReports;
-      if (section.id === "rankings") return canViewRankings;
-      return canViewAllTasks || canReviewSpv;
-    });
-  }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports]);
-  const effectiveActiveSection = visibleConfigSections.some((section) => section.id === activeSection)
-    ? activeSection
-    : visibleConfigSections[0]?.id ?? "all_tasks";
-  const activeSectionMeta = visibleConfigSections.find((section) => section.id === effectiveActiveSection);
+
 
   const loadConfig = useCallback(async (silent = false) => {
     if (!canUseControl) {
@@ -592,243 +606,125 @@ export default function OddsPage() {
 
   if (!canUseControl) {
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 py-6">
-        <header className="flex flex-col gap-3 border-b border-cu-border pb-5 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-6">
+        <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between border-b border-cu-border pb-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">ODDS</p>
-            <h1 className="mt-1 text-2xl font-semibold text-cu-ink md:text-3xl">
+            <h1 className="text-2xl font-bold text-slate-800">
               {canViewAssignedTasks ? "Workspace Designer" : "Request Saya"}
             </h1>
-            <p className="mt-1 text-sm text-cu-muted">Role aktif: {user?.roles.join(", ") || "-"}</p>
+            <p className="mt-1 text-xs text-slate-500 font-medium">Role aktif: {user?.roles.join(", ") || "-"}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div>
             <button
               type="button"
               onClick={() => void loadWorkspace()}
-              className="inline-flex h-10 items-center gap-2 rounded-lg border border-cu-border px-3 text-sm font-medium text-cu-ink transition hover:bg-cu-panel-soft"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#d4d4d8] bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
             >
               <MaterialIcon name="refresh" size="sm" />
               Refresh
             </button>
-            {canCreateTask && (
-              <Link
-                href="/odds/new"
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-cu-info px-4 text-sm font-semibold text-white transition hover:bg-blue-600"
-              >
-                <MaterialIcon name="add" size="sm" />
-                Request
-              </Link>
-            )}
           </div>
         </header>
 
         {error && (
-          <div className="rounded-lg border border-cu-danger/20 bg-cu-danger/10 px-4 py-3 text-sm text-cu-danger">
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-medium text-red-700">
             {error}
           </div>
         )}
 
-        <main className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          <aside className="self-start rounded-lg border border-cu-border bg-white p-3 lg:sticky lg:top-24 lg:col-span-3">
-            <div className="mb-3 px-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">ODDS Menu</p>
-              <p className="mt-1 text-sm text-cu-muted">
-                {canViewAssignedTasks ? "Workspace task desainer." : "Workspace request client."}
-              </p>
-            </div>
-            <nav className="space-y-1">
-              <button type="button" className="flex w-full items-start gap-3 rounded-lg bg-cu-info px-3 py-3 text-left text-white">
-                <MaterialIcon name={canViewAssignedTasks ? "assignment_ind" : "request_page"} size="sm" className="mt-0.5 shrink-0" />
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center justify-between gap-2 text-sm font-semibold">
-                    {canViewAssignedTasks ? "Task Ditugaskan" : "Daftar Request"}
-                    <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white">{tasks.length}</span>
-                  </span>
-                  <span className="mt-1 block text-xs leading-5 text-white/80">
-                    {canViewAssignedTasks ? "Task yang masuk ke assignment." : "Request ODDS yang pernah dibuat."}
-                  </span>
-                </span>
-              </button>
-            </nav>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <MiniMetric icon="pending_actions" label="Aktif" value={taskMetrics.active} />
-              <MiniMetric icon="assignment" label="Submit" value={taskMetrics.submitted} />
-              <MiniMetric icon="rate_review" label="Review" value={taskMetrics.review} />
-              <MiniMetric icon="task_alt" label="Done" value={taskMetrics.done} />
-            </div>
-            <div className="mt-4 grid gap-2">
-              <button
-                type="button"
-                onClick={() => void loadWorkspace()}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-cu-border px-3 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
-              >
-                <MaterialIcon name="refresh" size="sm" />
-                Refresh
-              </button>
-              {canCreateTask && (
-                <Link
-                  href="/odds/new"
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-cu-info px-4 text-sm font-semibold text-white transition hover:bg-blue-600"
-                >
-                  <MaterialIcon name="add" size="sm" />
-                  Request Baru
-                </Link>
-              )}
-            </div>
-          </aside>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <MiniMetric icon="pending_actions" label="Aktif" value={taskMetrics.active} />
+          <MiniMetric icon="assignment" label="Submit" value={taskMetrics.submitted} />
+          <MiniMetric icon="rate_review" label="Review" value={taskMetrics.review} />
+          <MiniMetric icon="task_alt" label="Done" value={taskMetrics.done} />
+        </div>
 
-          <div className="min-w-0 lg:col-span-9">
-            <div className="mb-4 rounded-lg border border-cu-border bg-white px-4 py-3">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">Active Section</p>
-                  <h2 className="mt-1 text-lg font-semibold text-cu-ink">
-                    {canViewAssignedTasks ? "Task Ditugaskan" : "Daftar Request"}
-                  </h2>
-                </div>
-                <span className="rounded-full border border-cu-border px-2.5 py-1 text-xs text-cu-muted">{tasks.length} task</span>
-              </div>
-            </div>
-            <section className="rounded-lg border border-cu-border bg-white p-4">
-              <div className="mb-4">
-                <h2 className="text-base font-semibold text-cu-ink">
-                  {canViewAssignedTasks ? "Task Ditugaskan" : "Daftar Request"}
-                </h2>
-                <p className="mt-1 text-sm text-cu-muted">
-                  {canViewAssignedTasks
-                    ? "Task yang masuk ke assignment designer."
-                    : "Request ODDS yang pernah kamu buat."}
-                </p>
-              </div>
-              <DataTable
-                loading={loading}
-                empty={canCreateTask ? "Belum ada request. Klik Request untuk membuat permintaan." : "Belum ada task ditugaskan."}
-                headers={["Task", "Kategori", "Designer", "Status", "Deadline", ""]}
-                rows={tasks.map((task) => {
-                  const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
-
-                  return [
-                    <div key={`task-title-${task.id}`}>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-semibold text-cu-ink">{task.design_purpose}</p>
-                        <TaskTypePill taskType={task.task_type} />
-                      </div>
-                      <p className="mt-1 text-xs text-cu-muted">{task.task_number}</p>
-                    </div>,
-                    task.category?.name ?? "-",
-                    assignedDesigner?.name ?? "-",
-                    <StatusBadge key={`status-${task.id}`} status={task.status} />,
-                    formatOddsDate(task.deadline, true),
-                    <Link
-                      key={`open-${task.id}`}
-                      href={`/odds/detail?id=${task.id}`}
-                      className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-border text-cu-ink transition hover:bg-cu-panel-soft"
-                      aria-label="Buka detail task"
-                    >
-                      <MaterialIcon name="open_in_new" size="sm" />
-                    </Link>,
-                  ];
-                })}
-              />
-            </section>
+        <section className="space-y-4">
+          <div>
+            <h2 className="text-base font-bold text-slate-800">
+              {canViewAssignedTasks ? "Tugas Hari Ini" : "Daftar Request"}
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-500 font-medium">
+              {canViewAssignedTasks
+                ? "Task yang masuk ke assignment designer."
+                : "Request ODDS yang pernah kamu buat."}
+            </p>
           </div>
-        </main>
+          {canViewAssignedTasks && (
+            <div className="flex flex-col gap-4 mt-2 mb-8">
+              {tasks.map((task, idx) => (
+                <DummyDesignerCard key={task.id} task={task} type={(idx % 3 + 1) as 1 | 2 | 3} />
+              ))}
+            </div>
+          )}
+          
+          <DataTable
+            loading={loading}
+            empty={canCreateTask ? "Belum ada request. Klik Request Baru di sidebar untuk membuat permintaan." : "Belum ada task ditugaskan."}
+            headers={["Task", "Kategori", "Designer", "Status", "Deadline", ""]}
+            rows={tasks.map((task) => {
+              const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
+
+              return [
+                <div key={`task-title-${task.id}`}>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-slate-800 text-sm">{task.design_purpose}</p>
+                    <TaskTypePill taskType={task.task_type} />
+                  </div>
+                  <p className="mt-1 text-[11px] text-slate-500 font-mono font-medium">{task.task_number}</p>
+                </div>,
+                task.category?.name ?? "-",
+                assignedDesigner?.name ?? "-",
+                <StatusBadge key={`status-${task.id}`} status={task.status} />,
+                formatOddsDate(task.deadline, true),
+                <Link
+                  key={`open-${task.id}`}
+                  href={`/odds/detail?id=${task.id}`}
+                  className="inline-flex size-8 items-center justify-center rounded-lg border border-[#e4e4e7] bg-white text-slate-700 transition hover:bg-slate-50 hover:border-slate-300"
+                  aria-label="Buka detail task"
+                >
+                  <MaterialIcon name="open_in_new" size="sm" />
+                </Link>,
+              ];
+            })}
+          />
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 py-6">
-      <header className="flex flex-col gap-3 border-b border-cu-border pb-5 md:flex-row md:items-end md:justify-between">
+    <div className="flex flex-col gap-6">
+      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between border-b border-cu-border pb-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">ODDS</p>
-          <h1 className="mt-1 text-2xl font-semibold text-cu-ink md:text-3xl">
+          <h1 className="text-2xl font-bold text-slate-800">
             {canShowConfigSections ? "Konfigurasi ODDS" : "Review ODDS"}
           </h1>
-          <p className="mt-1 text-sm text-cu-muted">Role aktif: {user?.roles.join(", ") || "-"}</p>
+          <p className="mt-1 text-xs text-slate-500 font-medium">Role aktif: {user?.roles.join(", ") || "-"}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => void loadConfig()}
-          className="inline-flex h-10 items-center gap-2 self-start rounded-lg border border-cu-border px-3 text-sm font-medium text-cu-ink transition hover:bg-cu-panel-soft md:self-auto"
-        >
-          <MaterialIcon name="refresh" size="sm" />
-          Refresh
-        </button>
+        <div>
+          <button
+            type="button"
+            onClick={() => void loadConfig()}
+            className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#d4d4d8] bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+          >
+            <MaterialIcon name="refresh" size="sm" />
+            Refresh
+          </button>
+        </div>
       </header>
 
       {(error || notice) && (
         <div
-          className={`rounded-lg border px-4 py-3 text-sm ${
-            error ? "border-cu-danger/20 bg-cu-danger/10 text-cu-danger" : "border-cu-success/20 bg-cu-success/10 text-cu-success"
+          className={`rounded-xl border px-4 py-3 text-xs font-medium ${
+            error ? "border-red-200 bg-red-50 text-red-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"
           }`}
         >
           {error || notice}
         </div>
       )}
 
-      <main className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <aside className="self-start rounded-lg border border-cu-border bg-white p-3 lg:sticky lg:top-24 lg:col-span-3">
-          <div className="mb-3 px-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">ODDS Control</p>
-            <p className="mt-1 text-sm text-cu-muted">Pilih konfigurasi atau review operasional.</p>
-          </div>
-          <nav className="space-y-1">
-            {visibleConfigSections.map((section) => {
-              const count = section.id === "categories"
-                ? categories.length
-                : section.id === "designers"
-                  ? designerProfiles.length
-                  : section.id === "rules"
-                    ? rules.length
-                    : section.id === "spv_review"
-                      ? spvReviewTasks.length
-                      : section.id === "client_review"
-                        ? clientReviewTasks.length
-                        : section.id === "special_revisions"
-                          ? specialRevisionRequests.length
-                          : section.id === "cancel_requests"
-                            ? cancelRequests.length
-                            : section.id === "reports"
-                              ? dailyReports.length
-                              : section.id === "rankings"
-                                ? rankings.length
-                                : tasks.length;
-
-              return (
-                <button
-                  key={section.id}
-                  type="button"
-                  onClick={() => setActiveSection(section.id)}
-                  className={`flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition ${
-                    effectiveActiveSection === section.id
-                      ? "bg-cu-info text-white"
-                      : "text-cu-ink hover:bg-cu-panel-soft"
-                  }`}
-                >
-                  <MaterialIcon name={section.icon} size="sm" className="mt-0.5 shrink-0" />
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center justify-between gap-2 text-sm font-semibold">
-                      {section.label}
-                      <span className={`rounded-full px-2 py-0.5 text-xs ${
-                        effectiveActiveSection === section.id ? "bg-white/20 text-white" : "bg-cu-panel-soft text-cu-muted"
-                      }`}>
-                        {count}
-                      </span>
-                    </span>
-                    <span className={`mt-1 block text-xs leading-5 ${
-                      effectiveActiveSection === section.id ? "text-white/80" : "text-cu-muted"
-                    }`}>
-                      {section.description}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
-        </aside>
-
-        <div className="min-w-0 lg:col-span-9">
+      <div className="min-w-0">
           <div className="mb-4 rounded-lg border border-cu-border bg-white px-4 py-3">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -1292,9 +1188,16 @@ export default function OddsPage() {
           />
         </ConfigPanel>
       )}
-        </div>
-      </main>
+      </div>
     </div>
+  );
+}
+
+export default function OddsPage() {
+  return (
+    <Suspense fallback={<div className="flex h-32 items-center justify-center text-sm text-cu-muted">Memuat ODDS...</div>}>
+      <OddsPageContent />
+    </Suspense>
   );
 }
 
@@ -1549,6 +1452,91 @@ function DecisionButtons({
         <MaterialIcon name="close" size="xs" />
         {rejectLabel}
       </button>
+    </div>
+  );
+}
+
+function DummyDesignerCard({ task, type }: { task: OddsTask; type: 1 | 2 | 3 }) {
+  const createdDate = task.created_at || task.createdAt ? new Date(task.created_at || task.createdAt) : null;
+  const isCreatedDateValid = createdDate && !isNaN(createdDate.getTime());
+  const dayLabel = isCreatedDateValid ? createdDate.toLocaleDateString("en-US", { weekday: "long" }) : "Day";
+  const createdDateStr = isCreatedDateValid ? createdDate.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-";
+  const createdTimeStr = isCreatedDateValid ? createdDate.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }).replace(".", ":") : "-";
+
+  const requesterName = task.requester?.name || "Anjas";
+  const categoryDivision = task.category?.name || "";
+
+  const deadlineDate = task.deadline ? new Date(task.deadline) : null;
+  const isDeadlineValid = deadlineDate && !isNaN(deadlineDate.getTime());
+  const deadlineDay = isDeadlineValid ? deadlineDate.toLocaleDateString("en-US", { weekday: "long" }) : "Monday";
+  const deadlineDateStr = isDeadlineValid ? deadlineDate.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-";
+
+  const statusLabelText = task.status ? statusLabel(task.status) : "Belum Dikerjakan";
+
+  return (
+    <div className="flex bg-[#f4f4f5] rounded-[1.5rem] overflow-hidden items-stretch shadow-sm">
+      <div className="bg-[#5b5b5b] text-white flex items-center justify-center w-8 shrink-0 shadow-sm z-10 relative">
+        <span className="origin-center -rotate-90 uppercase tracking-widest text-[9px] font-bold whitespace-nowrap">
+          {task.important_matrix || "Quadrant"}
+        </span>
+      </div>
+      
+      <div className="flex-1 flex flex-wrap items-center justify-between px-6 py-4 gap-6">
+        {/* Info Columns Group (Satu Kesatuan) */}
+        <div className="flex items-center gap-10 md:gap-14 flex-1 min-w-0">
+          <div className="flex flex-col shrink-0">
+            <span className="text-xs text-slate-600 font-medium">{dayLabel}</span>
+            <span className="text-[10px] text-slate-500">{createdDateStr}</span>
+            <span className="text-2xl font-bold text-slate-800 leading-tight mt-0.5">{createdTimeStr}</span>
+          </div>
+
+          <div className="flex flex-col shrink-0">
+            <span className="font-bold text-slate-800 text-[13px] leading-snug">{requesterName}</span>
+            <span className="text-xs text-slate-500">{categoryDivision}</span>
+          </div>
+
+          <div className="flex flex-col shrink-0 min-w-[150px] max-w-[240px]">
+            <span className="font-bold text-slate-800 text-sm truncate">{task.design_purpose}</span>
+            <Link href={`/odds/detail?id=${task.id}`} className="text-xs text-blue-500 hover:underline">
+              Lihat detail brief
+            </Link>
+          </div>
+
+          <div className="flex flex-col shrink-0">
+            <span className="font-bold text-slate-800 text-[13px] leading-snug">{deadlineDay}</span>
+            <span className="text-[10px] text-slate-500">{deadlineDateStr}</span>
+            <span className="text-[10px] text-slate-400">{statusLabelText}</span>
+          </div>
+        </div>
+
+        {/* Actions & Status Group */}
+        <div className="flex items-center gap-6 shrink-0">
+          <div className="flex items-center gap-3 text-slate-800">
+            <MaterialIcon name="palette" size="sm" />
+            <MaterialIcon name="help_outline" size="sm" />
+            <MaterialIcon name={type === 2 ? "pause_circle" : "play_circle"} size="sm" />
+            <MaterialIcon name="link" size="sm" />
+          </div>
+
+          <div className="bg-[#5b5b5b] p-2 rounded-2xl flex flex-col items-center justify-center w-40 shrink-0 gap-1">
+            {type === 2 && (
+              <span className="text-white font-mono text-lg font-medium">01 : 02 : 44</span>
+            )}
+            {type === 3 && (
+              <div className="flex text-white gap-0.5 pt-0.5 pb-1">
+                <MaterialIcon name="star_border" size="sm" />
+                <MaterialIcon name="star_border" size="sm" />
+                <MaterialIcon name="star_border" size="sm" />
+                <MaterialIcon name="star_border" size="sm" />
+                <MaterialIcon name="star_border" size="sm" />
+              </div>
+            )}
+            <div className="bg-[#d4d4d8] w-full py-1.5 rounded-xl text-center text-xs font-bold text-slate-700 shadow-inner">
+              {type === 1 ? "Belum Dikerjakan" : type === 2 ? "Sedang Dikerjakan" : "Selesai"}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

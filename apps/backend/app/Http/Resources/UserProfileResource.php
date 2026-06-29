@@ -29,6 +29,9 @@ class UserProfileResource extends JsonResource
             'username' => $this->username,
             'email' => $this->email,
             'whatsapp_number' => $this->whatsapp_number,
+            'is_onboarded' => $this->is_onboarded,
+            'division_id' => $this->division_id,
+            'position_id' => $this->position_id,
             'avatar_url' => $this->avatar_path
                 ? Storage::disk('public')->url($this->avatar_path)
                 : null,

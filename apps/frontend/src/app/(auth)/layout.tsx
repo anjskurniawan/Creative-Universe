@@ -2,12 +2,18 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  if (pathname === "/onboarding" || pathname.startsWith("/onboarding/")) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-cu-surface font-sans text-cu-ink antialiased px-4 py-8">
