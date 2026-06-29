@@ -370,10 +370,8 @@ export default function PricetagGeneratorPage() {
     setWizardStep(1);
     setWizardProductSearch("");
     setProductsList([]);
-    setWizardCategoryId(null);
     setWizardCategoryName("");
     setWizardProductName(null);
-    setWizardProductId(null);
     setSelectedProduct(null);
     setWizardDiscountPrice("");
     setGeneratedViewUrl(null);

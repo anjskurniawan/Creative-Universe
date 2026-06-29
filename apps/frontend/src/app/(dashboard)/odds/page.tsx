@@ -1457,7 +1457,7 @@ function DecisionButtons({
 }
 
 function DummyDesignerCard({ task, type }: { task: OddsTask; type: 1 | 2 | 3 }) {
-  const createdDate = task.created_at || task.createdAt ? new Date(task.created_at || task.createdAt) : null;
+  const createdDate = task.created_at ? new Date(task.created_at) : null;
   const isCreatedDateValid = createdDate && !isNaN(createdDate.getTime());
   const dayLabel = isCreatedDateValid ? createdDate.toLocaleDateString("en-US", { weekday: "long" }) : "Day";
   const createdDateStr = isCreatedDateValid ? createdDate.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-";
