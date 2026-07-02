@@ -19,6 +19,7 @@ class OddsWorkReviewService
         private OddsTimeLogService $timeLogs,
         private OddsRevisionService $revisions,
         private OddsReportingService $reporting,
+        private OddsTaskConversationService $conversations,
         private OddsNotificationService $notifications
     ) {}
 
@@ -239,6 +240,7 @@ class OddsWorkReviewService
             ]);
 
             activity('odds')->performedOn($task)->event('task_done')->log('Task rated and done');
+            $this->conversations->closeForTask($task->refresh(), 'Task selesai dan rating masuk.');
             $this->notifications->send($task->assignedDesigner, 'task_done', 'Task ODDS selesai', 'Task selesai dan rating masuk.', $task);
             $this->reporting->fillDailyReport($task->refresh());
             $this->reporting->recalculateRankings();

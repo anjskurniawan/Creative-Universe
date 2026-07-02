@@ -12,6 +12,7 @@ class OddsBriefReviewService
     public function __construct(
         private OddsConfigService $config,
         private OddsQueueService $queue,
+        private OddsTaskConversationService $conversations,
         private OddsNotificationService $notifications
     ) {}
 
@@ -73,6 +74,7 @@ class OddsBriefReviewService
         $task->update(['updated_by' => $reviewerId]);
         activity('odds')->performedOn($task)->event('brief_accepted')->log('Designer accepted brief');
         $queue = $this->queue->enqueue($task);
+        $this->conversations->openForTask($queue->task->refresh());
 
         return $queue->task->refresh()->load(['brief', 'currentQueue', 'assignedDesigner']);
     }
@@ -82,6 +84,7 @@ class OddsBriefReviewService
         $task->update(['updated_by' => $reviewerId]);
         activity('odds')->performedOn($task)->event('brief_forced_continue')->log('SPV forced brief into queue');
         $this->queue->enqueue($task);
+        $this->conversations->openForTask($task->refresh());
 
         return $task->refresh()->load(['currentQueue', 'assignedDesigner']);
     }
@@ -96,6 +99,7 @@ class OddsBriefReviewService
         ]);
 
         activity('odds')->performedOn($task)->event('task_cancelled')->log($reason);
+        $this->conversations->closeForTask($task->refresh(), 'Task dibatalkan SPV.');
         $this->notifications->send($task->requester, 'task_cancelled', 'Task ODDS dibatalkan SPV', $reason, $task);
 
         return $task->refresh();

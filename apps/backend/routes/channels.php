@@ -7,7 +7,9 @@
  * hanya user yang berhak dapat subscribe.
  */
 
+use App\Models\Core\Conversation;
 use App\Models\Core\User;
+use App\Models\Odds\Task;
 use App\Models\Pricetag\PricetagBatch;
 use Illuminate\Support\Facades\Broadcast;
 
@@ -26,5 +28,20 @@ Broadcast::channel('pricetag-batch.{batchId}', function (User $user, int $batchI
 });
 
 Broadcast::channel('conversation.{conversationId}', function (User $user, int $conversationId): bool {
-    return $user->conversations()->where('conversation_id', $conversationId)->exists();
+    if ($user->conversations()->where('conversation_id', $conversationId)->exists()) {
+        return true;
+    }
+
+    $conversation = Conversation::find($conversationId);
+
+    if (
+        ! $conversation
+        || $conversation->context_type !== Conversation::CONTEXT_ODDS_TASK
+        || ! $conversation->context_id
+    ) {
+        return false;
+    }
+
+    return $user->can('view-all-odds-tasks')
+        && Task::query()->whereKey($conversation->context_id)->exists();
 });

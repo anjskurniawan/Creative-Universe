@@ -14,6 +14,7 @@ class OddsRevisionService
     public function __construct(
         private OddsQueueService $queue,
         private OddsReportingService $reporting,
+        private OddsTaskConversationService $conversations,
         private OddsNotificationService $notifications
     ) {}
 
@@ -119,6 +120,7 @@ class OddsRevisionService
         ]);
 
         activity('odds')->performedOn($task)->event('auto_done')->log($reason);
+        $this->conversations->closeForTask($task->refresh(), $reason);
         $this->notifications->send($task->requester, 'task_auto_done', 'Task ODDS otomatis selesai', $reason, $task);
         $this->notifications->send($task->assignedDesigner, 'task_auto_done', 'Task ODDS otomatis selesai', $reason, $task);
         $this->reporting->fillDailyReport($task->refresh());

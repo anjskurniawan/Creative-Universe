@@ -2,18 +2,23 @@
 
 namespace App\Services\Odds;
 
+use App\Enums\Odds\DesignerAvailabilityEnum;
 use App\Enums\Odds\TaskStatusEnum;
 use App\Models\Core\User;
+use App\Models\Odds\DesignerProfile;
 use App\Models\Odds\SystemRule;
 use App\Models\Odds\Task;
 use App\Models\Odds\TaskCancelRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class OddsEscalationService
 {
     public function __construct(
         private OddsQueueService $queue,
         private OddsRevisionService $revisions,
+        private OddsTimeLogService $timeLogs,
+        private OddsTaskConversationService $conversations,
         private OddsNotificationService $notifications
     ) {}
 
@@ -76,6 +81,7 @@ class OddsEscalationService
                 'cancelled_at' => now(),
             ]);
             activity('odds')->performedOn($task)->event('task_cancelled')->log($reason);
+            $this->conversations->closeForTask($task->refresh(), 'Task dibatalkan client sebelum dimulai.');
             $this->notifications->send($task->assignedDesigner, 'task_cancelled', 'Task ODDS dibatalkan', $reason, $task);
 
             return $task->refresh();
@@ -110,6 +116,7 @@ class OddsEscalationService
                     'cancelled_at' => now(),
                 ]);
                 activity('odds')->performedOn($request->task)->event('task_cancelled')->log($request->reason);
+                $this->conversations->closeForTask($request->task->refresh(), 'Task dibatalkan setelah request cancel disetujui.');
                 $this->notifications->send($request->task->requester, 'cancel_approved', 'Cancel ODDS disetujui', $request->reason, $request->task);
                 $this->notifications->send($request->task->assignedDesigner, 'cancel_approved', 'Task ODDS dibatalkan', $request->reason, $request->task);
             } else {
@@ -123,14 +130,88 @@ class OddsEscalationService
 
     public function reassign(Task $task, int $designerId, int $reviewerId): Task
     {
-        $task->update([
-            'assigned_designer_id' => $designerId,
-            'updated_by' => $reviewerId,
-        ]);
-        $this->queue->enqueue($task, $task->task_type, $designerId);
-        activity('odds')->performedOn($task)->event('task_reassigned')->log('Task reassigned');
+        return DB::transaction(function () use ($task, $designerId, $reviewerId) {
+            if (in_array($task->status, [
+                TaskStatusEnum::DONE->value,
+                TaskStatusEnum::CANCELLED->value,
+                TaskStatusEnum::CANCELLED_BY_SPV->value,
+            ], true)) {
+                throw ValidationException::withMessages([
+                    'task_id' => 'Task yang sudah selesai atau dibatalkan tidak bisa direassign.',
+                ]);
+            }
 
-        return $task->refresh()->load(['assignedDesigner', 'currentQueue']);
+            if ((int) $task->assigned_designer_id === $designerId) {
+                throw ValidationException::withMessages([
+                    'designer_id' => 'Task ini sudah diassign ke desainer tersebut.',
+                ]);
+            }
+
+            $profile = DesignerProfile::query()
+                ->where('user_id', $designerId)
+                ->where('is_active', true)
+                ->first();
+
+            if (! $profile || $profile->status === DesignerAvailabilityEnum::OFF->value) {
+                throw ValidationException::withMessages([
+                    'designer_id' => 'Desainer tujuan tidak aktif atau sedang off.',
+                ]);
+            }
+
+            $this->assertDesignerCanTakeTask($task, $profile);
+
+            $oldDesigner = $task->assignedDesigner;
+            $oldDesignerId = $task->assigned_designer_id;
+            $oldStatus = $task->status;
+            $taskType = $task->task_type;
+
+            if ($oldStatus === TaskStatusEnum::IN_PROGRESS->value) {
+                $this->timeLogs->stopOpen($task, 'work');
+                $this->timeLogs->stopOpen($task, 'revision');
+            }
+
+            $task->queueEntries()
+                ->whereIn('queue_status', ['queued', 'ready_to_start'])
+                ->update([
+                    'queue_status' => 'reassigned',
+                    'completed_at' => now(),
+                ]);
+
+            if ($this->shouldRequeueAfterReassign($oldStatus)) {
+                $task->revisions()
+                    ->whereNull('completed_at')
+                    ->whereIn('status', ['open', 'queued', 'approved'])
+                    ->latest('id')
+                    ->first()
+                    ?->update(['assigned_to' => $designerId]);
+            }
+
+            $task->update([
+                'assigned_designer_id' => $designerId,
+                'updated_by' => $reviewerId,
+            ]);
+
+            if ($this->shouldRequeueAfterReassign($oldStatus)) {
+                $this->queue->enqueue($task->refresh(), $taskType, $designerId);
+            }
+
+            $task->refresh()->load(['requester', 'assignedDesigner', 'currentQueue']);
+            $this->conversations->syncParticipants($task);
+            $this->queue->refreshEstimates($oldDesignerId);
+            $this->queue->refreshEstimates($designerId);
+
+            activity('odds')->performedOn($task)->event('task_reassigned')->log(sprintf(
+                'Task reassigned from %s to %s',
+                $oldDesigner?->name ?? 'unassigned',
+                $task->assignedDesigner?->name ?? 'unknown'
+            ));
+
+            $this->notifications->send($oldDesigner, 'task_reassigned_from', 'Task ODDS dipindahkan', 'Task dipindahkan ke desainer lain.', $task);
+            $this->notifications->send($task->assignedDesigner, 'task_reassigned_to', 'Task ODDS baru dialihkan ke Anda', 'Task ODDS dialihkan dan perlu ditindaklanjuti.', $task);
+            $this->notifications->send($task->requester, 'task_reassigned', 'Designer ODDS diperbarui', 'Task dialihkan ke '.$task->assignedDesigner?->name.'.', $task);
+
+            return $task->refresh()->load(['assignedDesigner', 'currentQueue']);
+        });
     }
 
     public function extendDeadline(Task $task, string $deadline, ?string $note, int $reviewerId): Task
@@ -165,5 +246,37 @@ class OddsEscalationService
             TaskStatusEnum::SPV_REVIEW->value => User::role(['Manajer', 'SPV'])->get()->each(fn (User $user) => $this->notifications->send($user, 'no_response_reminder', 'Reminder review ODDS', 'Output menunggu review SPV.', $task)),
             default => null,
         };
+    }
+
+    private function shouldRequeueAfterReassign(string $status): bool
+    {
+        return in_array($status, [
+            TaskStatusEnum::QUEUED->value,
+            TaskStatusEnum::READY_TO_START->value,
+            TaskStatusEnum::IN_PROGRESS->value,
+        ], true);
+    }
+
+    private function assertDesignerCanTakeTask(Task $task, DesignerProfile $profile): void
+    {
+        $specializations = $profile->specializations ?? [];
+        $categoryName = $task->category_snapshot['name'] ?? null;
+
+        if (
+            $specializations !== []
+            && ! in_array($task->category_id, $specializations, true)
+            && ! in_array((string) $task->category_id, $specializations, true)
+            && ! in_array($categoryName, $specializations, true)
+        ) {
+            throw ValidationException::withMessages([
+                'designer_id' => 'Desainer tujuan tidak cocok dengan kategori task ini.',
+            ]);
+        }
+
+        if ($task->workload_point > $profile->daily_capacity_points) {
+            throw ValidationException::withMessages([
+                'designer_id' => 'Workload task melebihi daily capacity desainer tujuan.',
+            ]);
+        }
     }
 }

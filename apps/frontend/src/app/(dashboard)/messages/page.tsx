@@ -14,6 +14,7 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState("");
   const [contacts, setContacts] = useState<Record<string, unknown>[]>([]);
   const [showContacts, setShowContacts] = useState(false);
+  const [conversationFilter, setConversationFilter] = useState<"active" | "history">("active");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const fetchUser = useCallback(async () => {
@@ -121,7 +122,8 @@ export default function MessagesPage() {
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !activeConversation?.partner) return;
+    if (!newMessage.trim() || !activeConversation) return;
+    if (activeConversation.can_send === false || activeConversation.status === "closed") return;
 
     const tempMessage = {
       id: Date.now(),
@@ -143,12 +145,13 @@ export default function MessagesPage() {
 
     try {
       const partner = activeConversation.partner as Record<string, unknown>;
+      const payload = typeof activeConversation.id === "number"
+        ? { conversation_id: activeConversation.id, body: bodyToSend }
+        : { receiver_id: partner?.id, body: bodyToSend };
+
       await apiFetch("/chat/messages", {
         method: "POST",
-        body: JSON.stringify({
-          receiver_id: partner.id,
-          body: bodyToSend,
-        })
+        body: JSON.stringify(payload)
       });
       // the real message might not need to be refetched if we just wait for echo or rely on optimistic UI
     } catch (error) {
@@ -171,12 +174,25 @@ export default function MessagesPage() {
       const tempConv = {
         id: "temp_" + contact.id, // Will be replaced upon first message or fetching
         partner: contact,
-        last_message: null
+        last_message: null,
+        context_type: "direct",
+        status: "open",
+        can_send: true,
       };
       setActiveConversation(tempConv);
       setMessages([]);
     }
   };
+
+  const visibleConversations = conversations.filter((conversation) => {
+    const isHistory = conversation.status === "closed";
+    return conversationFilter === "history" ? isHistory : !isHistory;
+  });
+  const activeCount = conversations.filter((conversation) => conversation.status !== "closed").length;
+  const historyCount = conversations.filter((conversation) => conversation.status === "closed").length;
+  const activeTask = activeConversation?.task as Record<string, unknown> | null | undefined;
+  const activeIsTaskRoom = activeConversation?.context_type === "odds_task";
+  const activeCanSend = activeConversation ? activeConversation.can_send !== false && activeConversation.status !== "closed" : false;
 
   return (
     <div className="flex h-[calc(100vh-5rem)] w-full overflow-hidden rounded-2xl border border-cu-line bg-cu shadow-sm">
@@ -192,6 +208,33 @@ export default function MessagesPage() {
             <MaterialIcon name="add" size="sm" />
           </button>
         </div>
+
+        {!showContacts && (
+          <div className="grid grid-cols-2 gap-2 border-b border-cu-line px-4 py-3">
+            <button
+              type="button"
+              onClick={() => setConversationFilter("active")}
+              className={`h-9 rounded-lg text-sm font-semibold transition ${
+                conversationFilter === "active"
+                  ? "bg-cu-info text-white"
+                  : "border border-cu-line bg-white text-cu-muted hover:text-cu-ink"
+              }`}
+            >
+              Aktif ({activeCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setConversationFilter("history")}
+              className={`h-9 rounded-lg text-sm font-semibold transition ${
+                conversationFilter === "history"
+                  ? "bg-cu-info text-white"
+                  : "border border-cu-line bg-white text-cu-muted hover:text-cu-ink"
+              }`}
+            >
+              Riwayat ({historyCount})
+            </button>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto cu-popup-scrollbar-light">
           {showContacts ? (
@@ -222,9 +265,18 @@ export default function MessagesPage() {
             </div>
           ) : (
             <div>
-              {conversations.map((conv) => {
+              {visibleConversations.map((conv) => {
                 const partner = conv.partner as Record<string, unknown>;
                 const lastMessage = conv.last_message as Record<string, unknown>;
+                const task = conv.task as Record<string, unknown> | null | undefined;
+                const isTaskRoom = conv.context_type === "odds_task";
+                const isClosed = conv.status === "closed";
+                const title = isTaskRoom
+                  ? `${task?.task_number ?? "Task ODDS"}`
+                  : partner?.name as string;
+                const subtitle = isTaskRoom
+                  ? task?.design_purpose as string
+                  : lastMessage?.body as string;
                 return (
                   <button
                     key={conv.id as React.Key}
@@ -233,10 +285,14 @@ export default function MessagesPage() {
                       activeConversation?.id === conv.id
                         ? "border-[#0088FF] bg-black/5 dark:bg-white/5"
                         : "border-transparent hover:bg-black/5 dark:hover:bg-white/5"
-                    }`}
+                      }`}
                   >
                     <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-cu-panel-soft shadow-sm">
-                      {partner?.avatar ? (
+                      {isTaskRoom ? (
+                        <div className="flex h-full w-full items-center justify-center text-cu-info">
+                          <MaterialIcon name="assignment" size="md" />
+                        </div>
+                      ) : partner?.avatar ? (
                         <Image src={partner.avatar as string} alt={partner.name as string} fill className="object-cover" />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-lg font-bold text-cu-muted">
@@ -246,26 +302,28 @@ export default function MessagesPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="truncate font-medium text-cu-ink">{partner?.name as string}</p>
+                        <p className="truncate font-medium text-cu-ink">{title}</p>
                         {lastMessage && (
                           <span className="text-xs text-cu-muted">
                             {new Date(lastMessage.created_at as string).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         )}
                       </div>
-                      {lastMessage && (
-                        <p className="truncate text-sm text-cu-muted">
-                          {lastMessage.sender_id === user?.id ? "Anda: " : ""}
-                          {lastMessage.body as string}
-                        </p>
-                      )}
+                      <p className="truncate text-sm text-cu-muted">
+                        {isClosed ? "Riwayat - " : ""}
+                        {lastMessage
+                          ? `${lastMessage.sender_id === user?.id ? "Anda: " : ""}${lastMessage.body as string}`
+                          : subtitle}
+                      </p>
                     </div>
                   </button>
                 );
               })}
-              {conversations.length === 0 && (
+              {visibleConversations.length === 0 && (
                 <div className="px-5 py-8 text-center text-sm text-cu-muted">
-                  Belum ada percakapan. Klik ikon + untuk memulai obrolan.
+                  {conversationFilter === "history"
+                    ? "Belum ada riwayat chat task."
+                    : "Belum ada percakapan aktif. Klik ikon + untuk memulai obrolan."}
                 </div>
               )}
             </div>
@@ -280,7 +338,11 @@ export default function MessagesPage() {
             {/* Chat Header */}
             <div className="flex items-center gap-3 border-b border-cu-line px-6 py-4 shadow-sm">
               <div className="relative h-10 w-10 overflow-hidden rounded-full bg-cu-panel-soft">
-                {(activeConversation.partner as Record<string, unknown>)?.avatar ? (
+                {activeIsTaskRoom ? (
+                  <div className="flex h-full w-full items-center justify-center text-cu-info">
+                    <MaterialIcon name="assignment" size="sm" />
+                  </div>
+                ) : (activeConversation.partner as Record<string, unknown>)?.avatar ? (
                   <Image src={(activeConversation.partner as Record<string, unknown>).avatar as string} alt={(activeConversation.partner as Record<string, unknown>).name as string} fill className="object-cover" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center font-bold text-cu-muted">
@@ -289,8 +351,17 @@ export default function MessagesPage() {
                 )}
               </div>
               <div>
-                <h3 className="font-bold text-cu-ink">{(activeConversation.partner as Record<string, unknown>)?.name as string}</h3>
-                {((activeConversation.partner as Record<string, unknown>)?.roles as string[])?.length > 0 && (
+                <h3 className="font-bold text-cu-ink">
+                  {activeIsTaskRoom
+                    ? `${activeTask?.task_number ?? "Task ODDS"}`
+                    : (activeConversation.partner as Record<string, unknown>)?.name as string}
+                </h3>
+                {activeIsTaskRoom ? (
+                  <p className="text-xs text-cu-muted">
+                    {activeTask?.design_purpose as string}
+                    {activeConversation.status === "closed" ? " - Riwayat" : ""}
+                  </p>
+                ) : ((activeConversation.partner as Record<string, unknown>)?.roles as string[])?.length > 0 && (
                   <p className="text-xs text-cu-muted">{((activeConversation.partner as Record<string, unknown>).roles as string[]).join(", ")}</p>
                 )}
               </div>
@@ -328,22 +399,28 @@ export default function MessagesPage() {
 
             {/* Chat Input */}
             <div className="border-t border-cu-line bg-white p-4 dark:bg-[#0c0d0f]">
-              <form onSubmit={sendMessage} className="flex items-center gap-3">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Ketik pesan Anda..."
-                  className="flex-1 rounded-full border border-cu-line bg-[#f8f9fc] px-6 py-3 text-sm text-cu-ink focus:border-[#0088FF] focus:outline-none focus:ring-1 focus:ring-[#0088FF] dark:bg-[#151618]"
-                />
-                <button
-                  type="submit"
-                  disabled={!newMessage.trim()}
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0088FF] text-white transition-transform hover:scale-105 hover:bg-[#0070d6] disabled:opacity-50 disabled:hover:scale-100"
-                >
-                  <MaterialIcon name="send" size="sm" />
-                </button>
-              </form>
+              {activeCanSend ? (
+                <form onSubmit={sendMessage} className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Ketik pesan Anda..."
+                    className="flex-1 rounded-full border border-cu-line bg-[#f8f9fc] px-6 py-3 text-sm text-cu-ink focus:border-[#0088FF] focus:outline-none focus:ring-1 focus:ring-[#0088FF] dark:bg-[#151618]"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newMessage.trim()}
+                    className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0088FF] text-white transition-transform hover:scale-105 hover:bg-[#0070d6] disabled:opacity-50 disabled:hover:scale-100"
+                  >
+                    <MaterialIcon name="send" size="sm" />
+                  </button>
+                </form>
+              ) : (
+                <p className="rounded-xl border border-cu-line bg-[#f8f9fc] px-4 py-3 text-sm text-cu-muted">
+                  Room ini hanya dapat dilihat sebagai riwayat.
+                </p>
+              )}
             </div>
           </>
         ) : (

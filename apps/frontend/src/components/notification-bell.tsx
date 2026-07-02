@@ -29,7 +29,7 @@ interface NotificationPayload {
 
 interface NotificationBellProps {
   userId: number;
-  variant?: "light" | "dark" | "transparent-dark";
+  variant?: "light" | "dark";
 }
 
 const TOAST_VISIBLE_MS = 6000;
@@ -257,29 +257,12 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
     }
   };
 
-  const buttonClass =
-    variant === "dark"
-      ? "text-white hover:bg-white/10 focus:ring-white/30"
-      : variant === "transparent-dark"
-      ? `text-cu-ink hover:bg-white/45 hover:backdrop-blur-md focus:ring-white/30 transition-all duration-200 ${isOpen ? "bg-white/45 backdrop-blur-md" : ""}`
-      : "text-cu-ink hover:bg-cu-panel-soft focus:ring-cu-focus/25";
+  const isDark = variant === "dark";
+  const buttonClass = isDark
+    ? "text-white hover:bg-white/10 focus:ring-white/30"
+    : "text-cu-ink hover:bg-cu-panel-soft focus:ring-cu-focus/25";
 
-  const badgeBorderClass = variant === "dark" ? "border-[#0a0a0a]" : "border-cu-surface";
-
-  const dropdownClass =
-    variant === "dark"
-      ? "border-white/15 bg-[#111214]/98 backdrop-blur-xl shadow-2xl text-white"
-      : "border-cu-line bg-cu-surface shadow-xl text-cu-ink";
-
-  const dividerClass = variant === "dark" ? "border-white/10" : "border-cu-line";
-  const titleClass = variant === "dark" ? "text-white" : "text-cu-ink";
-  const mutedClass = variant === "dark" ? "text-white/65" : "text-cu-muted";
-  const scrollbarClass = variant === "dark" ? "cu-popup-scrollbar-dark" : "cu-popup-scrollbar-light";
-
-  const itemHoverClass = variant === "dark" ? "hover:bg-white/5" : "hover:bg-cu-panel-soft";
-
-  const unreadItemClass =
-    variant === "dark" ? "bg-blue-400/15" : "bg-cu-info-soft";
+  const badgeBorderClass = isDark ? "border-black" : "border-white";
 
   const dismissToast = () => {
     setIsToastLeaving(true);
@@ -307,25 +290,25 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
           className={`fixed left-4 right-4 top-[4.75rem] z-[140] rounded-[20px] border p-3 shadow-2xl sm:left-auto sm:right-6 sm:w-80 ${
             isToastLeaving ? "cu-toast-exit" : "cu-toast-enter"
           } ${
-            variant === "dark"
+            isDark
               ? "border-white/15 bg-[#111214]/95 text-white backdrop-blur-xl"
               : "border-cu-line bg-white text-cu-ink"
           }`}
         >
           <div className="flex items-start gap-3">
-            <div className={`flex size-10 shrink-0 items-center justify-center rounded-full ${variant === "dark" ? "bg-white/10 text-white" : "bg-cu-info-soft text-cu-info"}`}>
+            <div className={`flex size-10 shrink-0 items-center justify-center rounded-full ${isDark ? "bg-white/10 text-white" : "bg-cu-info-soft text-cu-info"}`}>
               <MaterialIcon name={getNotificationIcon(toastNotification)} size="sm" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[11px] font-bold uppercase tracking-wide opacity-70">Notifikasi Baru</p>
               <p className="mt-0.5 line-clamp-2 text-sm font-semibold leading-snug">{toastNotification.message}</p>
-              <p className={`mt-1 text-[11px] ${variant === "dark" ? "text-white/55" : "text-cu-muted"}`}>Baru saja</p>
+              <p className={`mt-1 text-[11px] ${isDark ? "text-white/55" : "text-cu-muted"}`}>Baru saja</p>
             </div>
             <button
               type="button"
               onClick={dismissToast}
               className={`inline-flex size-8 shrink-0 items-center justify-center rounded-full transition ${
-                variant === "dark" ? "hover:bg-white/10" : "hover:bg-cu-panel-soft"
+                isDark ? "hover:bg-white/10" : "hover:bg-cu-panel-soft"
               }`}
               aria-label="Tutup notifikasi"
             >
@@ -338,7 +321,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
       <button
         onClick={() => setIsOpen(!isOpen)}
         type="button"
-        className={`relative inline-flex size-9 sm:size-10 items-center justify-center rounded-full transition-colors focus:outline-none focus:ring-2 cursor-pointer ${buttonClass}`}
+        className={`relative inline-flex size-9 items-center justify-center rounded-full p-1 transition-colors focus:outline-none focus:ring-2 cursor-pointer ${buttonClass}`}
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
@@ -357,80 +340,55 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
       </button>
 
       {isOpen && (
-        <div
-          className={`fixed left-4 right-4 top-[4.5rem] sm:absolute sm:left-auto sm:right-0 sm:top-auto z-50 mt-2 sm:w-80 overflow-hidden rounded-xl border p-2 ${dropdownClass} animate-slide-up`}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between gap-3 px-2 py-2.5">
-            <div className="flex min-w-0 items-center gap-3">
-              <MaterialIcon name="notifications" size="sm" className={mutedClass} />
-              <div className="min-w-0">
-                <h3 className={`text-sm font-semibold ${titleClass}`}>Notifikasi</h3>
-                <p className={`mt-0.5 truncate text-xs ${mutedClass}`}>
-                  {unreadCount > 0 ? `${unreadCount} belum dibaca` : "Semua sudah dibaca"}
-                </p>
-              </div>
-            </div>
-            {unreadCount > 0 && (
-              <button
-                type="button"
-                onClick={markAllAsRead}
-                className={`shrink-0 rounded-lg px-2 py-1.5 text-xs font-medium transition-colors cursor-pointer ${variant === "dark" ? "text-blue-300 hover:bg-white/10 hover:text-blue-200" : "text-cu-info hover:bg-cu-panel-soft hover:text-cu-info-hover"}`}
-              >
-                Tandai semua
-              </button>
-            )}
-          </div>
+        <div className={notificationDropdownPanelClass(isDark)}>
+          <NotificationDropdownHeader
+            title="Notifications"
+            subtitle={`${unreadCount} unread ${unreadCount === 1 ? "notification" : "notifications"}`}
+            isDark={isDark}
+          />
 
-          <div className={`mx-2 border-t ${dividerClass}`} />
-
-          {/* List content */}
-          <div role="menu" aria-label="Daftar notifikasi" className={`max-h-80 space-y-0.5 overflow-y-scroll p-2 ${scrollbarClass}`}>
+          <div role="menu" aria-label="Daftar notifikasi" className="flex max-h-[394px] w-full flex-col gap-2 overflow-y-auto py-2">
             {error && <div className="p-3 text-xs text-cu-danger text-center">{error}</div>}
             
             {isLoading ? (
-              <div className={`px-4 py-8 text-center text-xs ${mutedClass}`}>
-                Memuat notifikasi...
+              <div className="px-4 py-8 text-center text-xs text-[#9ca3af]">
+                Loading notifications...
               </div>
             ) : notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <MaterialIcon
                   size="lg"
-                  className={`cu-icon-notifications-off mx-auto mb-2 ${variant === "dark" ? "text-white/35" : "text-cu-soft"}`}
+                  className={`cu-icon-notifications-off mx-auto mb-2 ${isDark ? "text-white/35" : "text-cu-soft"}`}
                 />
-                <p className={`text-sm ${mutedClass}`}>
-                  Belum ada notifikasi
+                <p className={`text-sm ${isDark ? "text-[#6b7280]" : "text-[#898787]"}`}>
+                  No notifications yet.
                 </p>
               </div>
             ) : (
-              notifications.map((notification) => {
+              notifications.slice(0, 5).map((notification, index) => {
                 const isUnread = !notification.is_read;
                 const relativeTime = getRelativeTime(notification.created_at);
 
                 const content = (
-                  <div className="flex items-start gap-3">
-                    <div className="min-w-0 flex-1">
+                  <div className={notificationItemClass(isDark, index === 0)}>
+                    <NotificationStatusDot unread={isUnread} isDark={isDark} />
+                    <div className={`flex min-w-0 flex-1 flex-col gap-0.5 overflow-hidden ${isUnread ? "" : isDark ? "text-[#6b7280]" : "text-[#898787]"}`}>
                       <p
-                        className={`text-sm text-left ${
-                          variant === "dark" ? "text-white/95" : "text-cu-ink"
-                        } ${isUnread ? "font-medium" : ""}`}
+                        className={`line-clamp-2 w-full text-left text-sm font-semibold leading-[19px] ${
+                          isUnread ? (isDark ? "text-[#f9fafb]" : "text-[#121212]") : ""
+                        }`}
                       >
                         {notification.message}
                       </p>
                       <p
-                        className={`mt-1 text-xs text-left ${
-                          variant === "dark" ? "text-white/60" : "text-cu-muted"
+                        className={`w-full truncate text-left text-xs leading-4 ${
+                          isUnread ? (isDark ? "text-[#9ca3af]" : "text-[#898787]") : ""
                         }`}
                       >
                         {relativeTime}
                       </p>
                     </div>
-                    {isUnread && (
-                      <span
-                        className="mt-1.5 size-3 shrink-0 rounded-full bg-cu-info animate-pulse"
-                        title="Belum dibaca"
-                      />
-                    )}
+                    <NotificationAvatar initials={getNotificationInitials(notification)} isDark={isDark} muted={!isUnread} />
                   </div>
                 );
 
@@ -443,9 +401,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
                         void markAsRead(notification);
                         setIsOpen(false);
                       }}
-                      className={`block rounded-lg px-3 py-2.5 transition-colors focus:outline-none ${itemHoverClass} ${
-                        isUnread ? unreadItemClass : ""
-                      }`}
+                      className="block focus:outline-none"
                       role="menuitem"
                     >
                       {content}
@@ -457,9 +413,7 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
                       key={notification.id}
                       type="button"
                       onClick={() => void markAsRead(notification)}
-                      className={`block w-full rounded-lg border-0 bg-transparent px-3 py-2.5 text-left transition-colors cursor-pointer focus:outline-none ${itemHoverClass} ${
-                        isUnread ? unreadItemClass : ""
-                      }`}
+                      className="block w-full border-0 bg-transparent text-left cursor-pointer focus:outline-none"
                       role="menuitem"
                     >
                       {content}
@@ -469,8 +423,95 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
               })
             )}
           </div>
+
+          {notifications.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                if (unreadCount > 0) void markAllAsRead();
+                setIsOpen(false);
+              }}
+              className={notificationFooterActionClass(isDark)}
+              role="menuitem"
+            >
+              <NotificationStatusDot unread isDark={isDark} />
+              <span>View all notifications</span>
+            </button>
+          )}
         </div>
       )}
     </div>
   );
+}
+
+function NotificationDropdownHeader({ title, subtitle, isDark }: { title: string; subtitle: string; isDark: boolean }) {
+  return (
+    <div className={`flex h-16 w-full shrink-0 items-center overflow-hidden rounded-xl border px-3 py-2.5 ${isDark ? "border-[#1f2937]" : "border-[#f2f2f2]"}`}>
+      <div className="flex min-w-0 flex-1 flex-col gap-1 overflow-hidden">
+        <p className={`w-full truncate text-sm font-semibold leading-5 ${isDark ? "text-[#f9fafb]" : "text-[#121212]"}`}>
+          {title}
+        </p>
+        <p className="w-full truncate text-xs leading-4 text-[#9ca3af]">
+          {subtitle}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function NotificationStatusDot({ unread, isDark }: { unread: boolean; isDark: boolean }) {
+  return (
+    <span className="flex size-5 shrink-0 items-center justify-center">
+      <span className={`size-2 rounded-full ${unread ? (isDark ? "bg-white" : "bg-[#121212]") : isDark ? "bg-[#1f2937]" : "bg-[#d1d5db]"}`} />
+    </span>
+  );
+}
+
+function NotificationAvatar({ initials, isDark, muted = false }: { initials: string; isDark: boolean; muted?: boolean }) {
+  const className = muted
+    ? isDark
+      ? "bg-[#0a0d12] text-[#6b7280]"
+      : "bg-[#f2f2f2] text-[#121212]"
+    : isDark
+      ? "bg-white text-black"
+      : "bg-[#121212] text-white";
+
+  return (
+    <span className={`flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-medium leading-4 ${className}`}>
+      {initials}
+    </span>
+  );
+}
+
+function notificationDropdownPanelClass(isDark: boolean) {
+  return `fixed left-4 right-4 top-[4.75rem] z-[110] mt-2 flex max-h-[calc(100dvh-5.5rem)] w-auto flex-col items-start overflow-hidden rounded-2xl p-1.5 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:w-[280px] ${
+    isDark ? "bg-black text-[#f9fafb]" : "border-[0.5px] border-[#f2f2f2] bg-white text-[#121212]"
+  }`;
+}
+
+function notificationItemClass(isDark: boolean, highlighted: boolean) {
+  return `flex min-h-14 w-full shrink-0 items-center gap-2.5 overflow-hidden rounded-xl px-2.5 py-2 transition-colors ${
+    highlighted
+      ? isDark
+        ? "bg-[#0a0d12]"
+        : "bg-[#f2f2f2]"
+      : isDark
+        ? "hover:bg-[#0a0d12]"
+        : "hover:bg-[#f2f2f2]"
+  }`;
+}
+
+function notificationFooterActionClass(isDark: boolean) {
+  return `flex h-10 w-full shrink-0 cursor-pointer items-center gap-2.5 overflow-hidden rounded-xl border-0 bg-transparent px-2.5 text-left text-sm font-medium leading-5 transition-colors focus:outline-none ${
+    isDark ? "text-[#f9fafb] hover:bg-[#0a0d12]" : "text-[#121212] hover:bg-[#f2f2f2]"
+  }`;
+}
+
+function getNotificationInitials(notification: NotificationItem) {
+  const message = notification.message.toLowerCase();
+  if (message.includes("kevin")) return "KD";
+  if (message.includes("mark")) return "MK";
+  if (message.includes("bot") || message.includes("report")) return "CB";
+  if (message.includes("creative")) return "CU";
+  return "UN";
 }

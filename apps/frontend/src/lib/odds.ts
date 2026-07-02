@@ -13,6 +13,9 @@ export interface OddsUser {
   name: string;
   email?: string;
   username?: string;
+  avatar?: string | null;
+  avatar_path?: string | null;
+  roles?: string[];
 }
 
 export interface OddsCategory {
@@ -215,6 +218,43 @@ export interface SubmitResultInput {
   }>;
 }
 
+export interface OddsChatMessage {
+  id: number | string;
+  conversation_id?: number;
+  sender_id: number;
+  body: string;
+  read_at?: string | null;
+  created_at: string;
+  sender?: OddsUser;
+}
+
+export interface OddsTaskConversation {
+  id: number;
+  context_type: "direct" | "odds_task" | string;
+  context_id: number | null;
+  status: "open" | "closed" | string;
+  closed_at: string | null;
+  closed_reason: string | null;
+  can_send: boolean;
+  partner: OddsUser | null;
+  participants: OddsUser[];
+  task: {
+    id: number;
+    task_number: string;
+    design_purpose: string;
+    status: string;
+    requester_id: number;
+    assigned_designer_id: number | null;
+  } | null;
+  last_message: {
+    body: string;
+    created_at: string;
+    is_read: boolean;
+    sender_id: number;
+  } | null;
+  updated_at: string;
+}
+
 function normalizePage<T>(payload: OddsPagination<T> | T[]): OddsPagination<T> {
   return Array.isArray(payload) ? { data: payload } : payload;
 }
@@ -389,6 +429,23 @@ export async function getOddsTask(id: string | number): Promise<OddsTask> {
   return apiFetch<OddsTask>(`/odds/tasks/${id}`);
 }
 
+export async function getOddsTaskConversation(id: string | number): Promise<OddsTaskConversation | null> {
+  return apiFetch<OddsTaskConversation | null>(`/odds/tasks/${id}/conversation`);
+}
+
+export async function getConversationMessages(id: string | number): Promise<OddsChatMessage[]> {
+  const res = await apiFetch<{ data: OddsChatMessage[] }>(`/chat/conversations/${id}/messages`);
+  return res.data ?? [];
+}
+
+export async function sendConversationMessage(id: string | number, body: string): Promise<OddsChatMessage> {
+  const res = await apiFetch<{ data: OddsChatMessage }>("/chat/messages", {
+    method: "POST",
+    body: JSON.stringify({ conversation_id: Number(id), body }),
+  });
+  return res.data;
+}
+
 export async function createOddsTask(input: CreateOddsTaskInput): Promise<OddsTask> {
   return apiFetch<OddsTask>("/odds/tasks", {
     method: "POST",
@@ -494,6 +551,13 @@ export async function requestOddsCancel(id: string | number, reason: string): Pr
   return apiFetch<unknown>(`/odds/tasks/${id}/cancel-requests`, {
     method: "POST",
     body: JSON.stringify({ reason }),
+  });
+}
+
+export async function reassignOddsTask(id: string | number, designerId: number): Promise<OddsTask> {
+  return apiFetch<OddsTask>(`/odds/tasks/${id}/reassign`, {
+    method: "POST",
+    body: JSON.stringify({ designer_id: designerId }),
   });
 }
 

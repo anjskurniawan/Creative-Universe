@@ -71,13 +71,13 @@ export default function DashboardLayout({
         isDarkPage ? "bg-[#0a0a0a]" : "bg-white text-cu-ink"
       }`}
     >
-      {/* Navbar mengikuti alur halaman pada sub-app Pricetag. */}
+      {/* Navbar mengikuti dua tema UI utama: light dan dark. */}
       {isAIAgentPage ? (
         <div className="absolute top-0 left-0 w-full z-[100]">
-          <Navbar variant={isAiAgentDark ? "transparent" : "transparent-dark"} sticky={false} />
+          <Navbar variant={isAiAgentDark ? "dark" : "light"} sticky={false} />
         </div>
       ) : (
-        <Navbar variant={isDarkPage ? "transparent" : "light"} sticky={!isDarkPage} />
+        <Navbar variant={isDarkPage ? "dark" : "light"} sticky={!isDarkPage} />
       )}
 
       {/* Main Page Content */}

@@ -6,7 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class Conversation extends Model
 {
-    protected $fillable = [];
+    public const CONTEXT_DIRECT = 'direct';
+
+    public const CONTEXT_ODDS_TASK = 'odds_task';
+
+    public const STATUS_OPEN = 'open';
+
+    public const STATUS_CLOSED = 'closed';
+
+    protected $fillable = [
+        'context_type',
+        'context_id',
+        'status',
+        'closed_at',
+        'closed_reason',
+    ];
+
+    protected $casts = [
+        'closed_at' => 'datetime',
+    ];
 
     public function users()
     {

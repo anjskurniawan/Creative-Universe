@@ -8,6 +8,7 @@ use App\Models\Odds\Task;
 use App\Services\Odds\OddsBriefReviewService;
 use App\Services\Odds\OddsEscalationService;
 use App\Services\Odds\OddsQueueService;
+use App\Services\Odds\OddsTaskConversationService;
 use App\Services\Odds\OddsTaskIntakeService;
 use App\Services\Odds\OddsWorkReviewService;
 use Illuminate\Http\JsonResponse;
@@ -21,7 +22,8 @@ class TaskController extends BaseApiController
         private OddsBriefReviewService $briefs,
         private OddsWorkReviewService $workReviews,
         private OddsEscalationService $escalations,
-        private OddsQueueService $queue
+        private OddsQueueService $queue,
+        private OddsTaskConversationService $conversations
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -64,6 +66,16 @@ class TaskController extends BaseApiController
                 'results.assetLinks', 'reviews', 'revisions', 'timeLogs', 'skipRequests', 'cancelRequests', 'assetLinks',
             ]),
             'Detail task ODDS berhasil diambil.'
+        );
+    }
+
+    public function conversation(Request $request, Task $task): JsonResponse
+    {
+        $this->authorizeTaskView($request, $task);
+
+        return $this->sendResponse(
+            $this->conversations->payloadForTask($task, $request->user()),
+            'Conversation task ODDS berhasil diambil.'
         );
     }
 

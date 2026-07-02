@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Core\Conversation;
 use App\Models\Core\User;
 use App\Models\Odds\Category;
 use App\Models\Odds\DesignerDailyReport;
@@ -523,6 +524,225 @@ class OddsWorkflowApiTest extends TestCase
             ->postJson("/api/v1/odds/tasks/{$taskId}/start")
             ->assertOk()
             ->assertJsonPath('data.status', 'in_progress');
+    }
+
+    public function test_manager_can_reassign_in_progress_task_to_active_designer(): void
+    {
+        $newDesigner = User::factory()->create(['name' => 'Designer Baru']);
+        $newDesigner->assignRole('Designer');
+        DesignerProfile::create([
+            'user_id' => $newDesigner->id,
+            'status' => 'available',
+            'specializations' => [$this->category->id],
+            'daily_capacity_points' => 8,
+            'max_active_tasks' => 3,
+            'assignment_priority' => 2,
+            'is_active' => true,
+        ]);
+
+        $taskId = $this->createTask();
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/brief/force-continue")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'queued');
+
+        $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/start")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'in_progress');
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/reassign", [
+                'designer_id' => $newDesigner->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'queued')
+            ->assertJsonPath('data.assigned_designer.id', $newDesigner->id);
+
+        $this->assertDatabaseHas('odds_tasks', [
+            'id' => $taskId,
+            'assigned_designer_id' => $newDesigner->id,
+            'status' => 'queued',
+        ]);
+        $this->assertDatabaseHas('odds_task_queue', [
+            'task_id' => $taskId,
+            'designer_id' => $this->designer->id,
+            'queue_status' => 'reassigned',
+        ]);
+        $this->assertDatabaseHas('odds_task_queue', [
+            'task_id' => $taskId,
+            'designer_id' => $newDesigner->id,
+            'queue_status' => 'queued',
+        ]);
+        $this->assertNotNull(DB::table('odds_task_time_logs')->where('task_id', $taskId)->where('log_type', 'work')->value('stopped_at'));
+        $this->assertDatabaseHas('activity_log', [
+            'subject_type' => Task::class,
+            'subject_id' => $taskId,
+            'event' => 'task_reassigned',
+        ]);
+
+        $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/start")
+            ->assertUnprocessable();
+
+        $this->actingAs($newDesigner)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/start")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'in_progress');
+    }
+
+    public function test_odds_task_conversation_lifecycle_follows_accept_reassign_and_done(): void
+    {
+        $newDesigner = User::factory()->create(['name' => 'Designer Chat Baru']);
+        $newDesigner->assignRole('Designer');
+        DesignerProfile::create([
+            'user_id' => $newDesigner->id,
+            'status' => 'available',
+            'specializations' => [$this->category->id],
+            'daily_capacity_points' => 8,
+            'max_active_tasks' => 3,
+            'assignment_priority' => 2,
+            'is_active' => true,
+        ]);
+
+        $taskId = $this->createTask();
+
+        $this->actingAs($this->client)
+            ->getJson("/api/v1/odds/tasks/{$taskId}/conversation")
+            ->assertOk()
+            ->assertJsonPath('data', null);
+
+        $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/brief/accept")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'queued');
+
+        $conversationId = $this->actingAs($this->client)
+            ->getJson("/api/v1/odds/tasks/{$taskId}/conversation")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'open')
+            ->assertJsonPath('data.can_send', true)
+            ->json('data.id');
+
+        $this->assertDatabaseHas('conversations', [
+            'id' => $conversationId,
+            'context_type' => Conversation::CONTEXT_ODDS_TASK,
+            'context_id' => $taskId,
+            'status' => Conversation::STATUS_OPEN,
+        ]);
+        $this->assertDatabaseHas('conversation_user', [
+            'conversation_id' => $conversationId,
+            'user_id' => $this->client->id,
+        ]);
+        $this->assertDatabaseHas('conversation_user', [
+            'conversation_id' => $conversationId,
+            'user_id' => $this->designer->id,
+        ]);
+
+        $this->actingAs($this->client)
+            ->postJson('/api/v1/chat/messages', [
+                'conversation_id' => $conversationId,
+                'body' => 'Halo, brief sudah final.',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.body', 'Halo, brief sudah final.');
+
+        $this->actingAs($this->manager)
+            ->getJson("/api/v1/odds/tasks/{$taskId}/conversation")
+            ->assertOk()
+            ->assertJsonPath('data.can_send', false);
+
+        $this->actingAs($this->manager)
+            ->getJson("/api/v1/chat/conversations/{$conversationId}/messages")
+            ->assertOk()
+            ->assertJsonCount(1, 'data');
+
+        $this->actingAs($this->manager)
+            ->postJson('/api/v1/chat/messages', [
+                'conversation_id' => $conversationId,
+                'body' => 'Manager hanya riwayat.',
+            ])
+            ->assertUnprocessable();
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/reassign", [
+                'designer_id' => $newDesigner->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.assigned_designer.id', $newDesigner->id);
+
+        $this->assertDatabaseMissing('conversation_user', [
+            'conversation_id' => $conversationId,
+            'user_id' => $this->designer->id,
+        ]);
+        $this->assertDatabaseHas('conversation_user', [
+            'conversation_id' => $conversationId,
+            'user_id' => $newDesigner->id,
+        ]);
+
+        $this->actingAs($this->designer)
+            ->getJson("/api/v1/chat/conversations/{$conversationId}/messages")
+            ->assertForbidden();
+
+        $this->actingAs($newDesigner)
+            ->postJson('/api/v1/chat/messages', [
+                'conversation_id' => $conversationId,
+                'body' => 'Saya lanjutkan task ini.',
+            ])
+            ->assertOk();
+
+        $this->actingAs($newDesigner)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/start")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'in_progress');
+
+        $this->actingAs($newDesigner)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/results", [
+                'result_notes' => 'Output final',
+                'assets' => [
+                    ['provider' => 'google_drive', 'label' => 'Preview', 'url' => 'https://drive.google.com/file/d/chat-final'],
+                ],
+            ])
+            ->assertCreated();
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/spv-review", [
+                'decision' => 'approved',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'client_review');
+
+        $this->actingAs($this->client)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/client-review", [
+                'decision' => 'approved',
+            ])
+            ->assertOk();
+
+        $this->actingAs($this->client)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/rating", [
+                'rating' => 5,
+                'feedback' => 'Sesuai.',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'done');
+
+        $this->assertDatabaseHas('conversations', [
+            'id' => $conversationId,
+            'status' => Conversation::STATUS_CLOSED,
+        ]);
+
+        $this->actingAs($this->client)
+            ->getJson("/api/v1/chat/conversations/{$conversationId}/messages")
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
+
+        $this->actingAs($this->client)
+            ->postJson('/api/v1/chat/messages', [
+                'conversation_id' => $conversationId,
+                'body' => 'Tidak bisa kirim setelah done.',
+            ])
+            ->assertUnprocessable();
     }
 
     public function test_revision_quota_extra_urgent_final_lock_and_auto_done(): void

@@ -5,17 +5,21 @@ import { Suspense, useCallback, useEffect, useMemo, useState, type FormEvent } f
 import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
 import { OddsRichTextEditor, RichTextViewer, stripRichText } from "@/components/odds-rich-text-editor";
+import { OddsTaskChat } from "@/components/odds-task-chat";
 import { useAuth } from "@/providers/auth-provider";
 import {
+  OddsDesignerProfile,
   OddsTask,
   acceptOddsBrief,
   cancelOddsBrief,
   clientReviewOddsTask,
   forceContinueOddsTask,
+  getOddsDesignerProfiles,
   formatOddsDate,
   getOddsTask,
   oddsError,
   rateOddsTask,
+  reassignOddsTask,
   requestOddsCancel,
   returnOddsBrief,
   spvReviewOddsTask,
@@ -67,12 +71,15 @@ function DetailContent() {
   const [assetUrl, setAssetUrl] = useState("");
   const [rating, setRating] = useState("5");
   const [timerNow, setTimerNow] = useState(() => Date.now());
+  const [designerProfiles, setDesignerProfiles] = useState<OddsDesignerProfile[]>([]);
+  const [reassignDesignerId, setReassignDesignerId] = useState("");
 
   const canReviewBrief = hasPermission("review-odds-briefs");
   const canStart = hasPermission("start-odds-tasks");
   const canSubmit = hasPermission("submit-odds-results");
   const canSpvReview = hasPermission("review-odds-spv");
   const canClientReview = hasPermission("review-odds-client");
+  const canManageEscalations = hasPermission("manage-odds-escalations");
 
   const latestResult = useMemo(() => {
     return [...(task?.results ?? [])].sort((a, b) => b.version_number - a.version_number)[0];
@@ -117,6 +124,23 @@ function DetailContent() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!canManageEscalations) return;
+    let active = true;
+
+    void getOddsDesignerProfiles()
+      .then((profiles) => {
+        if (active) setDesignerProfiles(profiles);
+      })
+      .catch(() => {
+        if (active) setDesignerProfiles([]);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [canManageEscalations]);
+
   const run = async (label: string, action: () => Promise<unknown>, message: string) => {
     setBusy(label);
     setError(null);
@@ -127,6 +151,7 @@ function DetailContent() {
       setNote("");
       setResultNotes("");
       setAssetUrl("");
+      setReassignDesignerId("");
       await loadTask();
     } catch (err) {
       setError(oddsError(err));
@@ -190,6 +215,8 @@ function DetailContent() {
   const canSpvResultReview = canSpvReview && task.status === "spv_review";
   const canClientResultReview = canClientReview && isRequester && task.status === "client_review";
   const canRequestCancel = canClientReview && isRequester && !["done", "cancelled", "cancelled_by_spv"].includes(task.status);
+  const canReassignTask = canManageEscalations && !["done", "cancelled", "cancelled_by_spv"].includes(task.status);
+  const reassignTargets = designerProfiles.filter((profile) => profile.status !== "off" && profile.user_id !== assignedDesigner?.id);
   const normalRevisionLimit = task.category?.normal_revision_limit ?? 2;
   const isLastNormalRevisionChance = canClientResultReview
     && !task.extra_revision_used_at
@@ -413,6 +440,8 @@ function DetailContent() {
             )}
           </section>
 
+          <OddsTaskChat taskId={task.id} userId={user?.id} />
+
           {!isClientSideView && (
             <section className="rounded-lg border border-cu-border bg-white p-5">
               <h2 className="mb-4 text-lg font-semibold text-cu-ink">Time Logging</h2>
@@ -494,6 +523,35 @@ function DetailContent() {
                 </p>
               )}
 
+              {canReassignTask && (
+                <div className="rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-cu-ink">
+                    <MaterialIcon name="swap_horiz" size="sm" />
+                    Reassign Designer
+                  </div>
+                  <div className="mt-3 grid gap-2">
+                    <select
+                      value={reassignDesignerId}
+                      onChange={(event) => setReassignDesignerId(event.target.value)}
+                      className="h-10 rounded-lg border border-cu-border bg-white px-3 text-sm text-cu-ink outline-none focus:border-cu-info"
+                    >
+                      <option value="">{reassignTargets.length ? "Pilih desainer" : "Tidak ada desainer tersedia"}</option>
+                      {reassignTargets.map((profile) => (
+                        <option key={profile.id} value={profile.user_id}>
+                          {profile.user?.name ?? `Designer #${profile.user_id}`} ({statusLabel(profile.status)})
+                        </option>
+                      ))}
+                    </select>
+                    <ActionButton
+                      icon="swap_horiz"
+                      label="Reassign Task"
+                      disabled={!reassignDesignerId || !!busy}
+                      onClick={() => run("reassign", () => reassignOddsTask(task.id, Number(reassignDesignerId)), "Task berhasil direassign.")}
+                    />
+                  </div>
+                </div>
+              )}
+
               {canSpvResultReview && (
                 <div className="grid grid-cols-2 gap-2">
                   <ActionButton icon="check" label="SPV ACC" disabled={!!busy} onClick={() => run("spvOk", () => spvReviewOddsTask(task.id, "approved", note || undefined), "SPV approve.")} />
@@ -551,7 +609,7 @@ function DetailContent() {
                 />
               )}
 
-              {!canEditBrief && !canReturnBrief && !canAcceptBrief && !canSpvBriefAction && !canStartTask && !canSubmitOutput && !canSpvResultReview && !canClientResultReview && !canRequestCancel && (
+              {!canEditBrief && !canReturnBrief && !canAcceptBrief && !canSpvBriefAction && !canStartTask && !canSubmitOutput && !canSpvResultReview && !canClientResultReview && !canRequestCancel && !canReassignTask && (
                 <p className="rounded-lg border border-dashed border-cu-border px-3 py-3 text-sm text-cu-muted">
                   Belum ada aksi untuk role ini pada status task sekarang.
                 </p>

@@ -47,7 +47,7 @@ Route::post('/auth/password/reset', [OtpPasswordController::class, 'resetPasswor
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me', [AuthController::class, 'me']);
-    
+
     Route::get('/onboarding/data', [\App\Http\Controllers\Api\OnboardingController::class, 'data']);
     Route::post('/onboarding/submit', [\App\Http\Controllers\Api\OnboardingController::class, 'submit']);
 
@@ -158,6 +158,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/tasks', [OddsTaskController::class, 'index']);
         Route::post('/tasks', [OddsTaskController::class, 'store'])->middleware('can:create-odds-tasks');
         Route::get('/tasks/{task}', [OddsTaskController::class, 'show']);
+        Route::get('/tasks/{task}/conversation', [OddsTaskController::class, 'conversation']);
         Route::patch('/tasks/{task}/brief', [OddsTaskController::class, 'updateBrief'])->middleware('can:create-odds-tasks');
 
         Route::post('/tasks/{task}/brief/return', [OddsTaskController::class, 'returnBrief'])->middleware('can:review-odds-briefs');
