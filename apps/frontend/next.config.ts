@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
         source: "/sanctum/csrf-cookie",
         destination: "http://creativeuniverse.test/sanctum/csrf-cookie",
       },
+      {
+        source: "/broadcasting/auth",
+        destination: "http://creativeuniverse.test/broadcasting/auth",
+      },
+      {
+        source: "/broadcasting/auth/",
+        destination: "http://creativeuniverse.test/broadcasting/auth",
+      },
     ];
   },
 };

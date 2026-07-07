@@ -25,6 +25,7 @@ export default function DashboardLayout({
   const isUsersPage = pathname?.startsWith("/users");
 
   const isAIAgentPage = pathname?.startsWith("/ai-agent");
+  const isMessagesPage = pathname?.startsWith("/messages");
 
   // Track if AI Agent page is in dark mode
   const [isAiAgentDark, setIsAiAgentDark] = React.useState(() => {
@@ -51,6 +52,9 @@ export default function DashboardLayout({
     if (isAIAgentPage) {
       return "w-full flex-1 flex flex-col relative z-10 pt-0 pb-0 px-0";
     }
+    if (isMessagesPage) {
+      return "w-full mx-auto px-6 md:px-16 py-4 h-[calc(100vh-72px)] overflow-hidden relative z-10 flex flex-col";
+    }
     if (isFullWidthPage) {
       return `w-full mx-auto ${isDarkPage ? "pt-16" : "pt-0"} pb-8 px-6 md:px-16 relative z-10`;
     }
@@ -67,7 +71,9 @@ export default function DashboardLayout({
 
   return (
     <div
-      className={`min-h-screen antialiased font-sans flex flex-col transition-colors duration-300 ${
+      className={`${
+        isMessagesPage ? "h-screen overflow-hidden" : "min-h-screen"
+      } antialiased font-sans flex flex-col transition-colors duration-300 ${
         isDarkPage ? "bg-[#0a0a0a]" : "bg-white text-cu-ink"
       }`}
     >

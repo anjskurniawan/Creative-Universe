@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
 import { OddsRichTextEditor, RichTextViewer, stripRichText } from "@/components/odds-rich-text-editor";
@@ -62,6 +62,7 @@ function DetailContent() {
   const [task, setTask] = useState<OddsTask | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const busyRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -92,7 +93,7 @@ function DetailContent() {
     try {
       const data = await getOddsTask(id);
       setTask(data);
-      setBriefText(data.brief?.content ?? data.brief_text ?? "");
+      setBriefText(stripRichText(data.brief?.content ?? data.brief_text ?? ""));
     } catch (err) {
       setError(oddsError(err));
     } finally {
@@ -142,6 +143,8 @@ function DetailContent() {
   }, [canManageEscalations]);
 
   const run = async (label: string, action: () => Promise<unknown>, message: string) => {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusy(label);
     setError(null);
     setNotice(null);
@@ -156,6 +159,7 @@ function DetailContent() {
     } catch (err) {
       setError(oddsError(err));
     } finally {
+      busyRef.current = false;
       setBusy(null);
     }
   };
@@ -266,9 +270,9 @@ function DetailContent() {
             <h1 className="mt-1 break-words text-2xl font-semibold text-cu-ink md:text-3xl">{task.design_purpose}</h1>
             <div className="mt-2 flex flex-wrap gap-2 text-sm text-cu-muted">
               <span>{task.category?.name ?? "-"}</span>
-              <span>·</span>
+              <span aria-hidden="true">&middot;</span>
               <span>{assignedDesigner?.name ?? "Belum ada desainer"}</span>
-              <span>·</span>
+              <span aria-hidden="true">&middot;</span>
               <span>{formatOddsDate(task.deadline, true)}</span>
             </div>
           </div>
@@ -358,7 +362,7 @@ function DetailContent() {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-cu-ink">Versi {visibleLatestResult.version_number}</p>
-                    <p className="text-sm text-cu-muted">{visibleLatestResult.status} · {formatOddsDate(visibleLatestResult.submitted_at, true)}</p>
+                    <p className="text-sm text-cu-muted">{visibleLatestResult.status} &middot; {formatOddsDate(visibleLatestResult.submitted_at, true)}</p>
                   </div>
                   <span className="rounded-full border border-cu-border px-2.5 py-1 text-xs text-cu-muted">v{visibleLatestResult.version_number}</span>
                 </div>
@@ -440,7 +444,7 @@ function DetailContent() {
             )}
           </section>
 
-          <OddsTaskChat taskId={task.id} userId={user?.id} />
+          <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} />
 
           {!isClientSideView && (
             <section className="rounded-lg border border-cu-border bg-white p-5">

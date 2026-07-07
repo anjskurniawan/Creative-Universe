@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import * as THREE from "three";
 import { gsap } from "gsap";
 import { useAuth } from "@/providers/auth-provider";
 import { isGuestPath, safeInternalRedirect } from "@/lib/routes";
@@ -12,7 +13,8 @@ type MobileStep = "username" | "password";
 const LOGIN_ERROR_MESSAGE =
   "Username dan Password yang anda masukan tidak sesuai dengan database Pasti Sukses. Periksa kembali data anda";
 
-const MOBILE_BRAND_TEXT = "Creative Universe";
+const LOGIN_CAMERA_Z = 8;
+const LOGIN_PARTICLE_OPACITY = 0.78;
 
 function LoginErrorAlert({ message }: { message: string }) {
   const isDefaultMessage = message === LOGIN_ERROR_MESSAGE;
@@ -36,84 +38,167 @@ function LoginErrorAlert({ message }: { message: string }) {
   );
 }
 
-function MobileAnimatedBrand() {
-  const textTargetRef = useRef<HTMLSpanElement>(null);
-  const cursorRef = useRef<HTMLSpanElement>(null);
+function LoginParticleBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const textTarget = textTargetRef.current;
-    const cursor = cursorRef.current;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    if (!textTarget || !cursor) return;
+    const hero = canvas.closest("[data-login-hero]") as HTMLElement | null;
+    if (!hero) return;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (reducedMotion) {
-      textTarget.textContent = MOBILE_BRAND_TEXT;
-      cursor.style.opacity = "0";
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      canvas.style.display = "none";
       return;
     }
 
-    const splitCharacters = (text: string) => {
-      if ("Segmenter" in Intl) {
-        const segmenter = new Intl.Segmenter("id", {
-          granularity: "grapheme",
-        });
+    const particleCount = 1200;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const hues = new Float32Array(particleCount);
 
-        return Array.from(segmenter.segment(text), ({ segment }) => segment);
-      }
+    for (let i = 0; i < particleCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 16 - 8;
+      velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
 
-      return Array.from(text);
-    };
+      hues[i] = i / particleCount;
+      const color = new THREE.Color();
+      color.setHSL(hues[i], 0.9, 0.6);
+      colors[i * 3] = color.r;
+      colors[i * 3 + 1] = color.g;
+      colors[i * 3 + 2] = color.b;
+    }
 
-    const characters = splitCharacters(MOBILE_BRAND_TEXT);
-    const progress = { count: 0 };
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
-    textTarget.textContent = "";
-    gsap.set(cursor, { opacity: 1 });
+    const textureCanvas = document.createElement("canvas");
+    textureCanvas.width = 64;
+    textureCanvas.height = 64;
+    const context = textureCanvas.getContext("2d");
+    if (context) {
+      const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+      gradient.addColorStop(0.4, "rgba(255, 255, 255, 0.8)");
+      gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+      context.fillStyle = gradient;
+      context.beginPath();
+      context.arc(32, 32, 32, 0, Math.PI * 2);
+      context.fill();
+    }
 
-    const blink = gsap.to(cursor, {
-      opacity: 0.2,
-      duration: 0.55,
-      repeat: -1,
-      yoyo: true,
-      ease: "power1.inOut",
+    const texture = new THREE.CanvasTexture(textureCanvas);
+    const material = new THREE.PointsMaterial({
+      size: 0.28,
+      vertexColors: true,
+      map: texture,
+      transparent: true,
+      opacity: LOGIN_PARTICLE_OPACITY,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
     });
 
-    const typewriterTween = gsap.to(progress, {
-      count: characters.length,
-      duration: 1.5,
-      ease: "none",
-      onUpdate: () => {
-        textTarget.textContent = characters
-          .slice(0, Math.round(progress.count))
-          .join("");
-      },
-      onComplete: () => {
-        textTarget.textContent = MOBILE_BRAND_TEXT;
-      },
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    let renderer: THREE.WebGLRenderer;
+
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        premultipliedAlpha: false,
+        powerPreference: "high-performance",
+      });
+    } catch (error) {
+      console.warn("WebGL not supported:", error);
+      geometry.dispose();
+      material.dispose();
+      texture.dispose();
+      return;
+    }
+
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    camera.position.set(0, 0, 1.2);
+
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
+
+    const updateSize = () => {
+      const bounds = hero.getBoundingClientRect();
+      const width = Math.max(1, Math.round(bounds.width || window.innerWidth));
+      const height = Math.max(1, Math.round(bounds.height || window.innerHeight));
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(width, height, false);
+    };
+
+    const renderParticles = (time: number) => {
+      const positionAttribute = geometry.getAttribute("position") as THREE.BufferAttribute;
+      const colorAttribute = geometry.getAttribute("color") as THREE.BufferAttribute;
+      const color = new THREE.Color();
+
+      for (let i = 0; i < particleCount; i++) {
+        let x = positionAttribute.getX(i) + velocities[i * 3];
+        let y = positionAttribute.getY(i) + velocities[i * 3 + 1];
+        let z = positionAttribute.getZ(i) + velocities[i * 3 + 2];
+
+        if (x < -12) x = 12;
+        if (x > 12) x = -12;
+        if (y < -12) y = 12;
+        if (y > 12) y = -12;
+        if (z < -16) z = 0;
+        if (z > 0) z = -16;
+
+        positionAttribute.setXYZ(i, x, y, z);
+        hues[i] = (hues[i] + 0.0006) % 1;
+        color.setHSL(hues[i], 0.9, 0.6);
+        colorAttribute.setXYZ(i, color.r, color.g, color.b);
+      }
+
+      positionAttribute.needsUpdate = true;
+      colorAttribute.needsUpdate = true;
+      points.rotation.y = time * 0.02;
+      points.rotation.x = time * 0.01;
+      renderer.render(scene, camera);
+    };
+
+    updateSize();
+    window.addEventListener("resize", updateSize, { passive: true });
+    gsap.ticker.add(renderParticles);
+    const cameraTween = gsap.to(camera.position, {
+      z: LOGIN_CAMERA_Z,
+      duration: 1.35,
+      ease: "power2.out",
     });
 
     return () => {
-      blink.kill();
-      typewriterTween.kill();
+      cameraTween.kill();
+      gsap.ticker.remove(renderParticles);
+      window.removeEventListener("resize", updateSize);
+      scene.remove(points);
+      geometry.dispose();
+      material.dispose();
+      texture.dispose();
+      renderer.dispose();
     };
   }, []);
 
   return (
-    <div className="pointer-events-none absolute left-1/2 top-[21%] z-10 flex w-full -translate-x-1/2 justify-center px-8 md:hidden">
-      <h2
-        aria-label={MOBILE_BRAND_TEXT}
-        className="text-center text-[22px] font-medium leading-[28px] tracking-[-0.03em] text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
-      >
-        <span ref={textTargetRef}>{MOBILE_BRAND_TEXT}</span>
-        <span
-          ref={cursorRef}
-          aria-hidden="true"
-          className="ml-1 inline-block h-5 w-[2px] bg-white align-[-3px] opacity-0"
-        />
-        <noscript>{MOBILE_BRAND_TEXT}</noscript>
-      </h2>
+    <div className="pointer-events-none absolute inset-0 z-0">
+      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 size-full" />
+      <div aria-hidden="true" className="cu-landing-readability absolute inset-0" />
+      <div aria-hidden="true" className="cu-landing-fade absolute inset-x-0 bottom-0 h-40" />
     </div>
   );
 }
@@ -155,7 +240,11 @@ function EyeOffIcon() {
   );
 }
 
-function LoginCard() {
+interface LoginCardProps {
+  whiteOverlayRef: React.RefObject<HTMLDivElement | null>;
+}
+
+function LoginCard({ whiteOverlayRef }: LoginCardProps) {
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -269,7 +358,44 @@ function LoginCard() {
 
     try {
       const loggedInUser = await login({ username, password });
-      router.push(resolveRedirectTarget(loggedInUser));
+      const redirectTarget = resolveRedirectTarget(loggedInUser);
+      const shouldPlayUniverseTransition = redirectTarget === "/";
+
+      if (!shouldPlayUniverseTransition) {
+        router.push(redirectTarget);
+        return;
+      }
+
+      const whiteOverlay = whiteOverlayRef.current;
+
+      if (!whiteOverlay) {
+        router.push(redirectTarget);
+        return;
+      }
+
+      if (typeof document !== "undefined") {
+        document.body.classList.add("transitioning-universe");
+      }
+
+      gsap.killTweensOf(whiteOverlay);
+      gsap.set(whiteOverlay, { opacity: 0 });
+
+      // Animasi masuk universe (layar menjadi putih perlahan)
+      const tl = gsap.timeline({
+        onComplete: () => {
+          if (typeof document !== "undefined") {
+            document.body.classList.remove("transitioning-universe");
+          }
+          router.push(redirectTarget);
+        }
+      });
+
+      tl.to(whiteOverlay, {
+        opacity: 1,
+        duration: 1.2,
+        ease: "power2.inOut",
+      });
+
     } catch (err: unknown) {
       if (err instanceof ValidationError) {
         setFieldErrors(err.errors);
@@ -286,13 +412,7 @@ function LoginCard() {
     <div className="relative z-10 w-full rounded-t-[32px] bg-white px-8 pb-14 pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10">
       <div className="mb-[25px] flex items-start justify-between gap-3 md:mb-[14px]">
         <h1 className="text-[40px] font-medium leading-[48px] tracking-[-0.03em] text-black">
-          <span className="md:hidden">Masuk</span>
-
-          <span className="hidden md:inline">
-            Sign in to
-            <br />
-            Creative Universe
-          </span>
+          Masuk
         </h1>
 
         {isPasswordStep && (
@@ -443,20 +563,66 @@ function LoginCard() {
 }
 
 export default function LoginPage() {
-  return (
-    <main className="min-h-screen bg-[url('https://i.pinimg.com/1200x/2a/68/ff/2a68ffb5bc0ea3d310d7ad3708f6282e.jpg')] bg-cover bg-center bg-no-repeat font-sans text-[#232925]">
-      <div className="relative flex min-h-screen w-full items-end justify-center px-0 pt-10 md:items-center md:px-5 md:py-10">
-        <div className="absolute inset-0 bg-black/25" />
+  const cardRef = useRef<HTMLDivElement>(null);
+  const whiteOverlayRef = useRef<HTMLDivElement>(null);
 
-        <MobileAnimatedBrand />
+  useEffect(() => {
+    const tweens: gsap.core.Tween[] = [];
 
-        <Suspense
-          fallback={
-            <div className="relative z-10 min-h-[368px] w-full rounded-t-[32px] bg-white px-8 pb-14 pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10" />
+    if (whiteOverlayRef.current) {
+      tweens.push(
+        gsap.to(whiteOverlayRef.current, {
+          opacity: 0,
+          duration: 0.85,
+          ease: "power2.out",
+        })
+      );
+    }
+
+    if (cardRef.current) {
+      tweens.push(
+        gsap.fromTo(
+          cardRef.current,
+          {
+            y: 140,
+            opacity: 0,
+            filter: "blur(12px)",
+          },
+          {
+            y: 0,
+            opacity: 1,
+            filter: "blur(0px)",
+            duration: 0.9,
+            ease: "power2.out",
           }
-        >
-          <LoginCard />
-        </Suspense>
+        )
+      );
+    }
+
+    return () => {
+      tweens.forEach((tween) => tween.kill());
+    };
+  }, []);
+
+  return (
+    <main
+      data-login-hero
+      className="relative min-h-screen overflow-hidden bg-cu-surface font-sans text-[#232925]"
+    >
+      <LoginParticleBackground />
+
+      <div
+        className="relative flex min-h-screen w-full items-end justify-center px-0 pt-10 md:items-center md:px-5 md:py-10 z-10"
+      >
+        <div ref={cardRef} className="w-full flex justify-center z-10">
+          <Suspense
+            fallback={
+              <div className="relative z-10 min-h-[368px] w-full rounded-t-[32px] bg-white px-8 pb-14 pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10" />
+            }
+          >
+            <LoginCard whiteOverlayRef={whiteOverlayRef} />
+          </Suspense>
+        </div>
 
         <div className="pointer-events-none absolute bottom-8 left-1/2 z-10 hidden w-full -translate-x-1/2 flex-col items-center md:flex">
           <div className="mb-6 flex items-center justify-center gap-4">
@@ -475,9 +641,13 @@ export default function LoginPage() {
             />
           </div>
 
-          <p className="text-center text-xs text-white">Creative Universe | 2026</p>
         </div>
       </div>
+      {/* Full-screen white transition overlay */}
+      <div
+        ref={whiteOverlayRef}
+        className="fixed inset-0 bg-white opacity-100 pointer-events-none z-[9999]"
+      />
     </main>
   );
 }

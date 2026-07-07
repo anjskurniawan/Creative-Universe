@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
+import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-card";
 import { useAuth } from "@/providers/auth-provider";
 import {
   OddsAssignableUser,
@@ -650,44 +651,54 @@ function OddsPageContent() {
                 : "Request ODDS yang pernah kamu buat."}
             </p>
           </div>
-          {canViewAssignedTasks && (
-            <div className="flex flex-col gap-4 mt-2 mb-8">
-              {tasks.map((task, idx) => (
-                <DummyDesignerCard key={task.id} task={task} type={(idx % 3 + 1) as 1 | 2 | 3} />
-              ))}
-            </div>
-          )}
-          
-          <DataTable
-            loading={loading}
-            empty={canCreateTask ? "Belum ada request. Klik Request Baru di sidebar untuk membuat permintaan." : "Belum ada task ditugaskan."}
-            headers={["Task", "Kategori", "Designer", "Status", "Deadline", ""]}
-            rows={tasks.map((task) => {
-              const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
+          {canViewAssignedTasks ? (
+            loading ? (
+              <div className="rounded-lg border border-dashed border-cu-border px-4 py-8 text-center text-sm text-cu-muted">
+                Memuat task designer...
+              </div>
+            ) : tasks.length > 0 ? (
+              <div className="mt-2 flex flex-col gap-4">
+                {tasks.map((task) => (
+                  <OddsDesignerTaskRowCard key={task.id} task={task} />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-dashed border-cu-border px-4 py-8 text-center text-sm text-cu-muted">
+                Belum ada task ditugaskan.
+              </div>
+            )
+          ) : (
+            <DataTable
+              loading={loading}
+              empty={canCreateTask ? "Belum ada request. Klik Request Baru di sidebar untuk membuat permintaan." : "Belum ada task ditugaskan."}
+              headers={["Task", "Kategori", "Designer", "Status", "Deadline", ""]}
+              rows={tasks.map((task) => {
+                const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
 
-              return [
-                <div key={`task-title-${task.id}`}>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold text-slate-800 text-sm">{task.design_purpose}</p>
-                    <TaskTypePill taskType={task.task_type} />
-                  </div>
-                  <p className="mt-1 text-[11px] text-slate-500 font-mono font-medium">{task.task_number}</p>
-                </div>,
-                task.category?.name ?? "-",
-                assignedDesigner?.name ?? "-",
-                <StatusBadge key={`status-${task.id}`} status={task.status} />,
-                formatOddsDate(task.deadline, true),
-                <Link
-                  key={`open-${task.id}`}
-                  href={`/odds/detail?id=${task.id}`}
-                  className="inline-flex size-8 items-center justify-center rounded-lg border border-[#e4e4e7] bg-white text-slate-700 transition hover:bg-slate-50 hover:border-slate-300"
-                  aria-label="Buka detail task"
-                >
-                  <MaterialIcon name="open_in_new" size="sm" />
-                </Link>,
-              ];
-            })}
-          />
+                return [
+                  <div key={`task-title-${task.id}`}>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold text-slate-800 text-sm">{task.design_purpose}</p>
+                      <TaskTypePill taskType={task.task_type} />
+                    </div>
+                    <p className="mt-1 text-[11px] text-slate-500 font-mono font-medium">{task.task_number}</p>
+                  </div>,
+                  task.category?.name ?? "-",
+                  assignedDesigner?.name ?? "-",
+                  <StatusBadge key={`status-${task.id}`} status={task.status} />,
+                  formatOddsDate(task.deadline, true),
+                  <Link
+                    key={`open-${task.id}`}
+                    href={`/odds/detail?id=${task.id}`}
+                    className="inline-flex size-8 items-center justify-center rounded-lg border border-[#e4e4e7] bg-white text-slate-700 transition hover:bg-slate-50 hover:border-slate-300"
+                    aria-label="Buka detail task"
+                  >
+                    <MaterialIcon name="open_in_new" size="sm" />
+                  </Link>,
+                ];
+              })}
+            />
+          )}
         </section>
       </div>
     );
@@ -728,7 +739,7 @@ function OddsPageContent() {
           <div className="mb-4 rounded-lg border border-cu-border bg-white px-4 py-3">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">Active Section</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">Area aktif</p>
                 <h2 className="mt-1 text-lg font-semibold text-cu-ink">{activeSectionMeta?.label ?? "ODDS"}</h2>
               </div>
               <div className="flex items-center gap-2 text-sm text-cu-muted">
@@ -1118,11 +1129,11 @@ function OddsPageContent() {
             Quality menghitung task yang terkena quality issue, yaitu revisi SPV melewati batas wajar. Angka ini dipakai untuk audit internal,
             evaluasi proses, dan ranking desainer.
           </p>
-          <ConfigPanel title="AI Insight Placeholder" icon="auto_awesome">
-            <p className="text-sm leading-6 text-cu-muted">
-              {reportSummary?.ai_insight ?? "Insight AI belum tersedia."}
-            </p>
-          </ConfigPanel>
+          {reportSummary?.ai_insight && (
+            <ConfigPanel title="Insight Audit" icon="auto_awesome">
+              <p className="text-sm leading-6 text-cu-muted">{reportSummary.ai_insight}</p>
+            </ConfigPanel>
+          )}
           <ConfigPanel title="Daily Report" icon="monitoring">
             <DataTable
               loading={loading}
@@ -1452,91 +1463,6 @@ function DecisionButtons({
         <MaterialIcon name="close" size="xs" />
         {rejectLabel}
       </button>
-    </div>
-  );
-}
-
-function DummyDesignerCard({ task, type }: { task: OddsTask; type: 1 | 2 | 3 }) {
-  const createdDate = task.created_at ? new Date(task.created_at) : null;
-  const isCreatedDateValid = createdDate && !isNaN(createdDate.getTime());
-  const dayLabel = isCreatedDateValid ? createdDate.toLocaleDateString("en-US", { weekday: "long" }) : "Day";
-  const createdDateStr = isCreatedDateValid ? createdDate.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-";
-  const createdTimeStr = isCreatedDateValid ? createdDate.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }).replace(".", ":") : "-";
-
-  const requesterName = task.requester?.name || "Anjas";
-  const categoryDivision = task.category?.name || "";
-
-  const deadlineDate = task.deadline ? new Date(task.deadline) : null;
-  const isDeadlineValid = deadlineDate && !isNaN(deadlineDate.getTime());
-  const deadlineDay = isDeadlineValid ? deadlineDate.toLocaleDateString("en-US", { weekday: "long" }) : "Monday";
-  const deadlineDateStr = isDeadlineValid ? deadlineDate.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-";
-
-  const statusLabelText = task.status ? statusLabel(task.status) : "Belum Dikerjakan";
-
-  return (
-    <div className="flex bg-[#f4f4f5] rounded-[1.5rem] overflow-hidden items-stretch shadow-sm">
-      <div className="bg-[#5b5b5b] text-white flex items-center justify-center w-8 shrink-0 shadow-sm z-10 relative">
-        <span className="origin-center -rotate-90 uppercase tracking-widest text-[9px] font-bold whitespace-nowrap">
-          {task.important_matrix || "Quadrant"}
-        </span>
-      </div>
-      
-      <div className="flex-1 flex flex-wrap items-center justify-between px-6 py-4 gap-6">
-        {/* Info Columns Group (Satu Kesatuan) */}
-        <div className="flex items-center gap-10 md:gap-14 flex-1 min-w-0">
-          <div className="flex flex-col shrink-0">
-            <span className="text-xs text-slate-600 font-medium">{dayLabel}</span>
-            <span className="text-[10px] text-slate-500">{createdDateStr}</span>
-            <span className="text-2xl font-bold text-slate-800 leading-tight mt-0.5">{createdTimeStr}</span>
-          </div>
-
-          <div className="flex flex-col shrink-0">
-            <span className="font-bold text-slate-800 text-[13px] leading-snug">{requesterName}</span>
-            <span className="text-xs text-slate-500">{categoryDivision}</span>
-          </div>
-
-          <div className="flex flex-col shrink-0 min-w-[150px] max-w-[240px]">
-            <span className="font-bold text-slate-800 text-sm truncate">{task.design_purpose}</span>
-            <Link href={`/odds/detail?id=${task.id}`} className="text-xs text-blue-500 hover:underline">
-              Lihat detail brief
-            </Link>
-          </div>
-
-          <div className="flex flex-col shrink-0">
-            <span className="font-bold text-slate-800 text-[13px] leading-snug">{deadlineDay}</span>
-            <span className="text-[10px] text-slate-500">{deadlineDateStr}</span>
-            <span className="text-[10px] text-slate-400">{statusLabelText}</span>
-          </div>
-        </div>
-
-        {/* Actions & Status Group */}
-        <div className="flex items-center gap-6 shrink-0">
-          <div className="flex items-center gap-3 text-slate-800">
-            <MaterialIcon name="palette" size="sm" />
-            <MaterialIcon name="help_outline" size="sm" />
-            <MaterialIcon name={type === 2 ? "pause_circle" : "play_circle"} size="sm" />
-            <MaterialIcon name="link" size="sm" />
-          </div>
-
-          <div className="bg-[#5b5b5b] p-2 rounded-2xl flex flex-col items-center justify-center w-40 shrink-0 gap-1">
-            {type === 2 && (
-              <span className="text-white font-mono text-lg font-medium">01 : 02 : 44</span>
-            )}
-            {type === 3 && (
-              <div className="flex text-white gap-0.5 pt-0.5 pb-1">
-                <MaterialIcon name="star_border" size="sm" />
-                <MaterialIcon name="star_border" size="sm" />
-                <MaterialIcon name="star_border" size="sm" />
-                <MaterialIcon name="star_border" size="sm" />
-                <MaterialIcon name="star_border" size="sm" />
-              </div>
-            )}
-            <div className="bg-[#d4d4d8] w-full py-1.5 rounded-xl text-center text-xs font-bold text-slate-700 shadow-inner">
-              {type === 1 ? "Belum Dikerjakan" : type === 2 ? "Sedang Dikerjakan" : "Selesai"}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

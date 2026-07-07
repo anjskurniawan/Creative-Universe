@@ -12,14 +12,49 @@ class OnboardingDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $creative = Division::firstOrCreate(['name' => 'Creative']);
-        $creative->positions()->firstOrCreate(['name' => 'Designer']);
-        $creative->positions()->firstOrCreate(['name' => 'Videographer']);
+        $divisionNames = [
+            'Accounting',
+            'Audit',
+            'Business Development',
+            'Creative',
+            'Direktur',
+            'Doran Care',
+            'Finance',
+            'General Affair',
+            'Gudang',
+            'HRD',
+            'Keamanan',
+            'Kebersihan',
+            'Live Streamer',
+            'Marketing Digital',
+            'Marketing Event',
+            'PA of CEO',
+            'Pajak',
+            'Pengiriman',
+            'Product Development',
+            'Programmer',
+            'Retail',
+            'Sales Corporate',
+            'Sales Online',
+            'Sales Souvenir',
+            'Sales Tradisional',
+            'SPG DG Mall',
+            'SPG DG Street',
+            'SPG JETE',
+            'SPG JETE Gramedia',
+            'Teknisi IT',
+            'Transportasi',
+            'XSpots',
+        ];
 
-        $marketing = Division::firstOrCreate(['name' => 'Marketing']);
-        $marketing->positions()->firstOrCreate(['name' => 'Staff Marketing']);
+        foreach ($divisionNames as $divisionName) {
+            Division::firstOrCreate(['name' => $divisionName]);
+        }
 
-        $produkManager = Division::firstOrCreate(['name' => 'Produk Manager']);
-        $produkManager->positions()->firstOrCreate(['name' => 'Staff Produk']);
+        $creative = Division::firstWhere('name', 'Creative');
+        $creative?->positions()->firstOrCreate(['name' => 'Manajer']);
+        $creative?->positions()->firstOrCreate(['name' => 'SPV']);
+        $creative?->positions()->firstOrCreate(['name' => 'Designer']);
+        $creative?->positions()->firstOrCreate(['name' => 'Videographer']);
     }
 }

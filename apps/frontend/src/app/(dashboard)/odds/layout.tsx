@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
@@ -13,7 +13,14 @@ import {
   OddsTask,
 } from "@/lib/odds";
 
-export default function OddsLayout({ children }: { children: React.ReactNode }) {
+type OddsMenuItem = {
+  id: string;
+  label: string;
+  icon: string;
+  href: string;
+};
+
+export default function OddsLayout({ children }: { children: ReactNode }) {
   const { hasPermission } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -39,6 +46,7 @@ export default function OddsLayout({ children }: { children: React.ReactNode }) 
     try {
       const taskPage = await getOddsTasks();
       const newCounts: Record<string, number> = {
+        workspace: taskPage.data.length,
         all_tasks: taskPage.data.length,
         spv_review: taskPage.data.filter((t: OddsTask) => t.status === "spv_review").length,
         client_review: taskPage.data.filter((t: OddsTask) => t.status === "client_review").length,
@@ -76,103 +84,26 @@ export default function OddsLayout({ children }: { children: React.ReactNode }) 
 
   const activeSection = searchParams.get("section");
 
-  // Define sidebar menu config based on permissions
-  // Define sidebar menu config based on permissions
-  const menuItems = React.useMemo(() => {
-    const items: Array<{
-      id: string;
-      label: string;
-      icon: string;
-      href: string;
-      isDummy?: boolean;
-    }> = [];
+  const menuItems = useMemo<OddsMenuItem[]>(() => {
+    const items: OddsMenuItem[] = [];
 
-    // Regular users: Designer or Client Workspace
     if (!canShowConfigSections && !canReviewSpv && !canViewAllTasks) {
       if (canViewAssignedTasks) {
-        items.push(
-          {
-            id: "workspace",
-            label: "Tugas Hari Ini",
-            icon: "today",
-            href: "/odds",
-          },
-          {
-            id: "pr_dummy",
-            label: "PR Belum Selesai",
-            icon: "pending_actions",
-            href: "#",
-            isDummy: true,
-          },
-          {
-            id: "monthly_dummy",
-            label: "Tugas Bulan Ini",
-            icon: "calendar_month",
-            href: "#",
-            isDummy: true,
-          },
-          {
-            id: "perf_dummy",
-            label: "Recap Performa",
-            icon: "query_stats",
-            href: "#",
-            isDummy: true,
-          },
-          {
-            id: "guidelines_dummy",
-            label: "Panduan ODDS",
-            icon: "menu_book",
-            href: "#",
-            isDummy: true,
-          },
-          {
-            id: "help_dummy",
-            label: "Pusat Bantuan",
-            icon: "help_outline",
-            href: "#",
-            isDummy: true,
-          }
-        );
+        items.push({
+          id: "workspace",
+          label: "Tugas Hari Ini",
+          icon: "today",
+          href: "/odds",
+        });
       } else {
-        items.push(
-          {
-            id: "workspace",
-            label: "Daftar Request",
-            icon: "request_page",
-            href: "/odds",
-          },
-          {
-            id: "calendar_dummy",
-            label: "Kalender Kerja",
-            icon: "calendar_today",
-            href: "#",
-            isDummy: true,
-          },
-          {
-            id: "catalog_dummy",
-            label: "Katalog Desain",
-            icon: "auto_stories",
-            href: "#",
-            isDummy: true,
-          },
-          {
-            id: "guidelines_dummy",
-            label: "Panduan ODDS",
-            icon: "menu_book",
-            href: "#",
-            isDummy: true,
-          },
-          {
-            id: "help_dummy",
-            label: "Pusat Bantuan",
-            icon: "help_outline",
-            href: "#",
-            isDummy: true,
-          }
-        );
+        items.push({
+          id: "workspace",
+          label: "Daftar Request",
+          icon: "request_page",
+          href: "/odds",
+        });
       }
     } else {
-      // Admin / SPV / Manager sections
       if (canShowConfigSections) {
         items.push(
           { id: "categories", label: "Kategori", icon: "category", href: "/odds?section=categories" },
@@ -215,20 +146,15 @@ export default function OddsLayout({ children }: { children: React.ReactNode }) 
     canViewAssignedTasks,
   ]);
 
-  // Determine if a section is active
   const isSectionActive = (item: typeof menuItems[0]) => {
-    if (item.isDummy) {
-      return false;
-    }
     if (pathname === "/odds/new" || pathname === "/odds/detail") {
       return false;
     }
-    if (!activeSection) {
-      // Default active section
-      const defaultSection = canShowConfigSections ? "categories" : "spv_review";
-      return item.id === defaultSection || (item.id === "workspace" && !canShowConfigSections && !canReviewSpv && !canViewAllTasks);
+    if (activeSection) {
+      return item.id === activeSection;
     }
-    return item.id === activeSection;
+
+    return item.id === menuItems[0]?.id;
   };
 
   return (

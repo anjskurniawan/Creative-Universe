@@ -14,11 +14,10 @@ import {
   oddsError,
 } from "@/lib/odds";
 
-type RequestType = "design" | "video";
-type RequestStep = "type" | "category" | "designer" | "brief" | "validation";
+type RequestStep = "category" | "designer" | "brief" | "validation";
 
 type TaskForm = {
-  request_type: RequestType;
+  request_type: "design";
   category_id: string;
   preferred_designer_id: string;
   design_purpose: string;
@@ -47,12 +46,6 @@ const steps: Array<{
   icon: string;
   description: string;
 }> = [
-  {
-    id: "type",
-    label: "Jenis Request",
-    icon: "tune",
-    description: "Pilih desain atau video.",
-  },
   {
     id: "category",
     label: "Kategori",
@@ -87,7 +80,7 @@ export default function NewOddsTaskPage() {
   const [categories, setCategories] = useState<OddsCategory[]>([]);
   const [designerProfiles, setDesignerProfiles] = useState<OddsDesignerProfile[]>([]);
   const [form, setForm] = useState<TaskForm>(emptyForm);
-  const [activeStep, setActiveStep] = useState<RequestStep>("type");
+  const [activeStep, setActiveStep] = useState<RequestStep>("category");
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -137,22 +130,15 @@ export default function NewOddsTaskPage() {
     return recommendDesigner(selectableDesigners, selectedCategory);
   }, [selectableDesigners, selectedCategory]);
 
-  const canContinueAfterType = form.request_type === "design";
   const briefPlainText = stripRichText(form.brief_text);
   const canSubmit =
-    form.request_type === "design"
-    && Boolean(form.category_id)
+    Boolean(form.category_id)
     && Boolean(form.preferred_designer_id)
     && Boolean(form.design_purpose.trim())
     && Boolean(briefPlainText);
 
   const update = (field: keyof TaskForm, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const selectRequestType = (type: RequestType) => {
-    setForm((prev) => ({ ...prev, request_type: type }));
-    setActiveStep(type === "video" ? "type" : "category");
   };
 
   const selectCategory = (category: OddsCategory) => {
@@ -221,7 +207,7 @@ export default function NewOddsTaskPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">ODDS</p>
           <h1 className="text-2xl font-semibold text-cu-ink">Tambah Permintaan</h1>
-          <p className="mt-1 text-sm text-cu-muted">Bagian B: alur request client.</p>
+          <p className="mt-1 text-sm text-cu-muted">Alur request client untuk desain.</p>
         </div>
       </header>
 
@@ -239,16 +225,14 @@ export default function NewOddsTaskPage() {
           </div>
           <nav className="space-y-1">
             {steps.map((step) => {
-              const disabled = form.request_type === "video" && step.id !== "type";
               const complete = isStepComplete(step.id, form);
 
               return (
                 <button
                   key={step.id}
                   type="button"
-                  disabled={disabled}
                   onClick={() => setActiveStep(step.id)}
-                  className={`flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                  className={`flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition ${
                     activeStep === step.id
                       ? "bg-cu-info text-white"
                       : "text-cu-ink hover:bg-cu-panel-soft"
@@ -270,45 +254,6 @@ export default function NewOddsTaskPage() {
         </aside>
 
         <form onSubmit={submit} className="min-w-0">
-          {activeStep === "type" && (
-            <Panel title="Jenis Request" icon="tune">
-              <div className="grid gap-3 md:grid-cols-2">
-                <ChoiceButton
-                  active={form.request_type === "design"}
-                  icon="design_services"
-                  title="Desain"
-                  description="Lanjut ke kategori, rekomendasi designer, dan brief."
-                  onClick={() => selectRequestType("design")}
-                />
-                <ChoiceButton
-                  active={form.request_type === "video"}
-                  icon="videocam"
-                  title="Video"
-                  description="Alur video ditunda sementara sesuai flowchart."
-                  onClick={() => selectRequestType("video")}
-                />
-              </div>
-
-              {form.request_type === "video" && (
-                <div className="mt-4 rounded-lg border border-cu-border bg-cu-panel-soft p-4 text-sm text-cu-muted">
-                  Request video belum dibuka pada fase ini. Pilih `Desain` untuk melanjutkan request ODDS.
-                </div>
-              )}
-
-              <StepActions>
-                <button
-                  type="button"
-                  disabled={!canContinueAfterType}
-                  onClick={() => setActiveStep("category")}
-                  className="inline-flex h-10 items-center gap-2 rounded-lg bg-cu-info px-4 text-sm font-semibold text-white disabled:opacity-50"
-                >
-                  Lanjut
-                  <MaterialIcon name="arrow_forward" size="sm" />
-                </button>
-              </StepActions>
-            </Panel>
-          )}
-
           {activeStep === "category" && (
             <Panel title="Kategori Desain" icon="category">
               <div className="grid gap-3 md:grid-cols-2">
@@ -347,7 +292,6 @@ export default function NewOddsTaskPage() {
                 </div>
               )}
               <StepActions>
-                <button type="button" onClick={() => setActiveStep("type")} className={secondaryButtonClass}>Kembali</button>
                 <button
                   type="button"
                   disabled={!form.category_id}
@@ -540,11 +484,6 @@ export default function NewOddsTaskPage() {
             <Panel title="Validasi Submit" icon="verified">
               <div className="grid gap-3 md:grid-cols-2">
                 <ValidationCard
-                  ok={form.request_type === "design"}
-                  title="Jenis request"
-                  description={form.request_type === "design" ? "Desain bisa diproses." : "Video masih ditunda sementara."}
-                />
-                <ValidationCard
                   ok={Boolean(selectedCategory)}
                   title="Kategori aktif"
                   description={selectedCategory ? `${selectedCategory.name} akan disnapshot saat submit.` : "Kategori belum dipilih."}
@@ -646,8 +585,6 @@ function selectedDesignerName(userId: string, profiles: OddsDesignerProfile[]): 
 }
 
 function isStepComplete(step: RequestStep, form: TaskForm): boolean {
-  if (step === "type") return form.request_type === "design";
-  if (form.request_type === "video") return false;
   if (step === "category") return Boolean(form.category_id);
   if (step === "designer") return Boolean(form.preferred_designer_id);
   if (step === "brief") return Boolean(form.design_purpose.trim()) && Boolean(stripRichText(form.brief_text));
@@ -666,36 +603,6 @@ function Panel({ title, icon, children }: { title: string; icon: string; childre
       </div>
       {children}
     </section>
-  );
-}
-
-function ChoiceButton({
-  active,
-  icon,
-  title,
-  description,
-  onClick,
-}: {
-  active: boolean;
-  icon: string;
-  title: string;
-  description: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-lg border p-4 text-left transition ${
-        active ? "border-cu-info bg-blue-50" : "border-cu-border bg-white hover:bg-cu-panel-soft"
-      }`}
-    >
-      <div className="flex items-center gap-2">
-        <MaterialIcon name={icon} size="sm" className={active ? "text-cu-info" : "text-cu-muted"} />
-        <h3 className="font-semibold text-cu-ink">{title}</h3>
-      </div>
-      <p className="mt-2 text-sm leading-6 text-cu-muted">{description}</p>
-    </button>
   );
 }
 

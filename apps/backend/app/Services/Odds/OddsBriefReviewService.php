@@ -5,6 +5,7 @@ namespace App\Services\Odds;
 use App\Enums\Odds\TaskStatusEnum;
 use App\Models\Core\User;
 use App\Models\Odds\Task;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class OddsBriefReviewService
@@ -59,34 +60,42 @@ class OddsBriefReviewService
 
     public function acceptBrief(Task $task, int $reviewerId): Task
     {
-        if ($task->status !== TaskStatusEnum::SUBMITTED->value) {
-            throw ValidationException::withMessages([
-                'task_id' => 'Brief hanya bisa diterima saat status submitted.',
-            ]);
-        }
+        return DB::transaction(function () use ($task, $reviewerId) {
+            $task = Task::query()->whereKey($task->id)->lockForUpdate()->firstOrFail();
 
-        if ($task->assigned_designer_id !== $reviewerId) {
-            throw ValidationException::withMessages([
-                'task_id' => 'Task ini bukan assignment desainer tersebut.',
-            ]);
-        }
+            if ($task->status !== TaskStatusEnum::SUBMITTED->value) {
+                throw ValidationException::withMessages([
+                    'task_id' => 'Brief hanya bisa diterima saat status submitted.',
+                ]);
+            }
 
-        $task->update(['updated_by' => $reviewerId]);
-        activity('odds')->performedOn($task)->event('brief_accepted')->log('Designer accepted brief');
-        $queue = $this->queue->enqueue($task);
-        $this->conversations->openForTask($queue->task->refresh());
+            if ($task->assigned_designer_id !== $reviewerId) {
+                throw ValidationException::withMessages([
+                    'task_id' => 'Task ini bukan assignment desainer tersebut.',
+                ]);
+            }
 
-        return $queue->task->refresh()->load(['brief', 'currentQueue', 'assignedDesigner']);
+            $task->update(['updated_by' => $reviewerId]);
+            activity('odds')->performedOn($task)->event('brief_accepted')->log('Designer accepted brief');
+            $queue = $this->queue->enqueue($task);
+            $this->conversations->openForTask($queue->task->refresh());
+
+            return $queue->task->refresh()->load(['brief', 'currentQueue', 'assignedDesigner']);
+        });
     }
 
     public function forceContinue(Task $task, int $reviewerId): Task
     {
-        $task->update(['updated_by' => $reviewerId]);
-        activity('odds')->performedOn($task)->event('brief_forced_continue')->log('SPV forced brief into queue');
-        $this->queue->enqueue($task);
-        $this->conversations->openForTask($task->refresh());
+        return DB::transaction(function () use ($task, $reviewerId) {
+            $task = Task::query()->whereKey($task->id)->lockForUpdate()->firstOrFail();
 
-        return $task->refresh()->load(['currentQueue', 'assignedDesigner']);
+            $task->update(['updated_by' => $reviewerId]);
+            activity('odds')->performedOn($task)->event('brief_forced_continue')->log('SPV forced brief into queue');
+            $this->queue->enqueue($task);
+            $this->conversations->openForTask($task->refresh());
+
+            return $task->refresh()->load(['currentQueue', 'assignedDesigner']);
+        });
     }
 
     public function cancelBySpv(Task $task, string $reason, int $reviewerId): Task

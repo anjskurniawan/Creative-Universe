@@ -6,6 +6,12 @@ self.__BUILD_MANIFEST = {
       },
       {
         "source": "/sanctum/csrf-cookie"
+      },
+      {
+        "source": "/broadcasting/auth"
+      },
+      {
+        "source": "/broadcasting/auth/"
       }
     ],
     "beforeFiles": [],

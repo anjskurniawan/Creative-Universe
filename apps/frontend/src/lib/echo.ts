@@ -33,9 +33,13 @@ export function getEchoClient(): Echo<"pusher"> | null {
     key,
     cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "ap1",
     forceTLS: true,
-    authEndpoint: "/broadcasting/auth",
+    authEndpoint: "/broadcasting/auth/",
     auth: {
-      headers: csrfToken ? { "X-XSRF-TOKEN": csrfToken } : {},
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        ...(csrfToken ? { "X-XSRF-TOKEN": csrfToken } : {}),
+      },
     },
   });
 

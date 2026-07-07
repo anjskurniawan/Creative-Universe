@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 import { getEchoClient } from "@/lib/echo";
@@ -21,10 +22,20 @@ function formatChatTime(value: string | null | undefined): string {
 }
 
 function participantNames(conversation: OddsTaskConversation): string {
-  return conversation.participants.map((participant) => participant.name).join(", ");
+  const names = conversation.participants.map((participant) => participant.name).filter(Boolean);
+
+  return names.length > 0 ? names.join(", ") : "Belum ada peserta";
 }
 
-export function OddsTaskChat({ taskId, userId }: { taskId: string | number; userId?: number | null }) {
+export function OddsTaskChat({
+  taskId,
+  userId,
+  taskStatus,
+}: {
+  taskId: string | number;
+  userId?: number | null;
+  taskStatus?: string | null;
+}) {
   const [conversation, setConversation] = useState<OddsTaskConversation | null>(null);
   const [messages, setMessages] = useState<OddsChatMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -33,8 +44,8 @@ export function OddsTaskChat({ taskId, userId }: { taskId: string | number; user
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const loadConversation = useCallback(async () => {
-    setLoading(true);
+  const loadConversation = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setError(null);
     try {
       const nextConversation = await getOddsTaskConversation(taskId);
@@ -47,7 +58,7 @@ export function OddsTaskChat({ taskId, userId }: { taskId: string | number; user
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memuat chat task.");
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [taskId]);
 
@@ -59,7 +70,7 @@ export function OddsTaskChat({ taskId, userId }: { taskId: string | number; user
     return () => {
       window.clearTimeout(timer);
     };
-  }, [loadConversation]);
+  }, [loadConversation, taskStatus]);
 
   useEffect(() => {
     if (!conversation?.id) return;
@@ -68,14 +79,14 @@ export function OddsTaskChat({ taskId, userId }: { taskId: string | number; user
     if (!echo) return;
 
     const channel = echo.private(`conversation.${conversation.id}`);
-    channel.listen("MessageSent", (event: { message: OddsChatMessage }) => {
+    channel.listen(".message.sent", (event: { message: OddsChatMessage }) => {
       if (event.message.sender_id !== userId) {
         setMessages((prev) => [...prev, event.message]);
       }
     });
 
     return () => {
-      channel.stopListening("MessageSent");
+      channel.stopListening(".message.sent");
       echo.leave(`conversation.${conversation.id}`);
     };
   }, [conversation?.id, userId]);
@@ -86,7 +97,7 @@ export function OddsTaskChat({ taskId, userId }: { taskId: string | number; user
 
   const submitMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!conversation?.can_send || !draft.trim()) return;
+    if (!conversation?.can_send || !draft.trim() || sending) return;
 
     const body = draft.trim();
     setDraft("");
@@ -115,23 +126,58 @@ export function OddsTaskChat({ taskId, userId }: { taskId: string | number; user
             <p className="mt-1 text-xs text-cu-muted">{participantNames(conversation)}</p>
           )}
         </div>
-        {conversation && (
-          <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
-            conversation.status === "closed"
-              ? "border-cu-border bg-cu-panel-soft text-cu-muted"
-              : "border-cu-success/20 bg-cu-success/10 text-cu-success"
-          }`}>
-            {conversation.status === "closed" ? "Riwayat" : "Aktif"}
-          </span>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {conversation && (
+            <Link
+              href={`/messages?conversation=${conversation.id}`}
+              className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-border text-cu-ink transition hover:bg-cu-panel-soft"
+              aria-label="Buka chat penuh"
+              title="Buka chat penuh"
+            >
+              <MaterialIcon name="open_in_new" size="sm" />
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => void loadConversation()}
+            className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-border text-cu-ink transition hover:bg-cu-panel-soft"
+            aria-label="Refresh chat task"
+            title="Refresh chat task"
+          >
+            <MaterialIcon name="refresh" size="sm" />
+          </button>
+          {conversation && (
+            <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
+              conversation.status === "closed"
+                ? "border-cu-border bg-cu-panel-soft text-cu-muted"
+                : "border-cu-success/20 bg-cu-success/10 text-cu-success"
+            }`}>
+              {conversation.status === "closed" ? "Riwayat" : "Aktif"}
+            </span>
+          )}
+        </div>
       </div>
 
       {loading ? (
         <p className="rounded-lg border border-dashed border-cu-border px-3 py-4 text-sm text-cu-muted">Memuat chat task...</p>
       ) : !conversation ? (
-        <p className="rounded-lg border border-dashed border-cu-border px-3 py-4 text-sm text-cu-muted">
-          Room chat dibuat otomatis setelah brief diterima dan task masuk antrean.
-        </p>
+        <div className="rounded-lg border border-dashed border-cu-border px-3 py-4">
+          {error ? (
+            <p className="text-sm text-cu-danger">{error}</p>
+          ) : (
+            <p className="text-sm text-cu-muted">
+              Room chat dibuat otomatis setelah brief diterima dan task masuk antrean.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={() => void loadConversation()}
+            className="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-cu-border bg-white px-3 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+          >
+            <MaterialIcon name="sync" size="sm" />
+            Cek Room Chat
+          </button>
+        </div>
       ) : (
         <>
           {conversation.status === "closed" && (

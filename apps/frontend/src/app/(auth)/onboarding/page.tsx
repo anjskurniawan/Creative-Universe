@@ -5,90 +5,7 @@ import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { useAuth } from "@/providers/auth-provider";
 import { apiFetch, ValidationError } from "@/lib/api";
-
-const MOBILE_BRAND_TEXT = "Creative Universe";
-
-function MobileAnimatedBrand() {
-  const textTargetRef = useRef<HTMLSpanElement>(null);
-  const cursorRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    const textTarget = textTargetRef.current;
-    const cursor = cursorRef.current;
-
-    if (!textTarget || !cursor) return;
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (reducedMotion) {
-      textTarget.textContent = MOBILE_BRAND_TEXT;
-      cursor.style.opacity = "0";
-      return;
-    }
-
-    const splitCharacters = (text: string) => {
-      if ("Segmenter" in Intl) {
-        const segmenter = new Intl.Segmenter("id", {
-          granularity: "grapheme",
-        });
-
-        return Array.from(segmenter.segment(text), ({ segment }) => segment);
-      }
-
-      return Array.from(text);
-    };
-
-    const characters = splitCharacters(MOBILE_BRAND_TEXT);
-    const progress = { count: 0 };
-
-    textTarget.textContent = "";
-    gsap.set(cursor, { opacity: 1 });
-
-    const blink = gsap.to(cursor, {
-      opacity: 0.2,
-      duration: 0.55,
-      repeat: -1,
-      yoyo: true,
-      ease: "power1.inOut",
-    });
-
-    const typewriterTween = gsap.to(progress, {
-      count: characters.length,
-      duration: 1.5,
-      ease: "none",
-      onUpdate: () => {
-        textTarget.textContent = characters
-          .slice(0, Math.round(progress.count))
-          .join("");
-      },
-      onComplete: () => {
-        textTarget.textContent = MOBILE_BRAND_TEXT;
-      },
-    });
-
-    return () => {
-      blink.kill();
-      typewriterTween.kill();
-    };
-  }, []);
-
-  return (
-    <div className="pointer-events-none absolute left-1/2 top-[21%] z-10 flex w-full -translate-x-1/2 justify-center px-8 md:hidden">
-      <h2
-        aria-label={MOBILE_BRAND_TEXT}
-        className="text-center text-[22px] font-medium leading-[28px] tracking-[-0.03em] text-white drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
-      >
-        <span ref={textTargetRef}>{MOBILE_BRAND_TEXT}</span>
-        <span
-          ref={cursorRef}
-          aria-hidden="true"
-          className="ml-1 inline-block h-5 w-[2px] bg-white align-[-3px] opacity-0"
-        />
-        <noscript>{MOBILE_BRAND_TEXT}</noscript>
-      </h2>
-    </div>
-  );
-}
+import { AuthParticleBackground } from "@/components/auth-particle-background";
 
 interface Position {
   id: number;
@@ -157,7 +74,7 @@ function OnboardingSelect({
         <div
           role="listbox"
           aria-labelledby={id}
-          className="absolute left-0 right-0 top-[calc(100%+6px)] z-30 max-h-[180px] overflow-y-auto rounded-[8px] border border-[#909692] bg-white py-1 shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
+          className="absolute left-0 right-0 top-[calc(100%+6px)] z-30 max-h-[148px] overflow-y-auto overscroll-contain rounded-[8px] border border-[#909692] bg-white py-1 shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
         >
           {options.map((option) => (
             <button
@@ -194,9 +111,10 @@ function OnboardingCard() {
   const [error, setError] = useState<string | null>(null);
 
   // Form states
-  const [name, setName] = useState(user?.name || "");
+  const [name, setName] = useState("");
   const [divisionId, setDivisionId] = useState("");
   const [positionId, setPositionId] = useState("");
+  const [positionName, setPositionName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
 
   const [divisions, setDivisions] = useState<Division[]>([]);
@@ -225,7 +143,8 @@ function OnboardingCard() {
 
   // Compute available positions based on selected division
   const currentDivision = divisions.find((d) => d.id.toString() === divisionId);
-  const availablePositions = currentDivision?.positions || [];
+  const isCreativeDivision = currentDivision?.name === "Creative";
+  const availablePositions = isCreativeDivision ? currentDivision?.positions || [] : [];
   const divisionOptions = divisions.map((division) => ({
     value: division.id.toString(),
     label: division.name,
@@ -239,7 +158,7 @@ function OnboardingCard() {
 
   const isNameFilled = name.trim() !== "";
   const isDivisionFilled = divisionId !== "";
-  const isPositionFilled = positionId !== "";
+  const isPositionFilled = isCreativeDivision ? positionId !== "" : positionName.trim() !== "";
   const isWhatsappFilled = whatsapp.trim() !== "";
 
   const canProceed = () => {
@@ -275,14 +194,27 @@ function OnboardingCard() {
     setError(null);
 
     try {
+      const payload: {
+        name: string;
+        division_id: number;
+        whatsapp_number: string;
+        position_id?: number;
+        position_name?: string;
+      } = {
+        name,
+        division_id: parseInt(divisionId),
+        whatsapp_number: whatsapp,
+      };
+
+      if (isCreativeDivision) {
+        payload.position_id = parseInt(positionId);
+      } else {
+        payload.position_name = positionName.trim();
+      }
+
       await apiFetch("/onboarding/submit", {
         method: "POST",
-        body: JSON.stringify({
-          name,
-          division_id: parseInt(divisionId),
-          position_id: parseInt(positionId),
-          whatsapp_number: whatsapp,
-        }),
+        body: JSON.stringify(payload),
       });
 
       // Refresh user context so it has is_onboarded = true
@@ -303,7 +235,7 @@ function OnboardingCard() {
 
   if (isLoadingData) {
     return (
-      <div className="relative z-10 flex min-h-[368px] w-full items-center justify-center rounded-t-[32px] bg-white px-8 pb-14 pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10">
+      <div className="relative z-10 flex min-h-[368px] w-full items-center justify-center rounded-t-[32px] bg-white px-8 pb-[20vh] pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10">
         <svg
           className="h-8 w-8 animate-spin text-[#0088FF]"
           xmlns="http://www.w3.org/2000/svg"
@@ -317,7 +249,7 @@ function OnboardingCard() {
   }
 
   return (
-    <div className="relative z-10 w-full rounded-t-[32px] bg-white px-8 pb-14 pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10">
+    <div className="relative z-10 w-full rounded-t-[32px] bg-white px-8 pb-[20vh] pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10">
       <div className="mb-[25px] flex items-start justify-between gap-3 md:mb-[14px]">
         <h1 className="text-[32px] font-medium leading-[40px] tracking-[-0.03em] text-black">
           Lengkapi Profil
@@ -396,6 +328,7 @@ function OnboardingCard() {
             onChange={(value) => {
               setDivisionId(value);
               setPositionId("");
+              setPositionName("");
               setError(null);
             }}
           />
@@ -403,18 +336,42 @@ function OnboardingCard() {
 
         {/* Step 3: Jabatan */}
         <div className={`relative w-full ${step === 3 ? "block" : "hidden"}`}>
-          <OnboardingSelect
-            id="position"
-            label="Jabatan"
-            placeholder="Pilih Jabatan..."
-            value={positionId}
-            options={positionOptions}
-            disabled={isSubmitting || !divisionId}
-            onChange={(value) => {
-              setPositionId(value);
-              setError(null);
-            }}
-          />
+          {isCreativeDivision ? (
+            <OnboardingSelect
+              id="position"
+              label="Jabatan"
+              placeholder="Pilih Jabatan..."
+              value={positionId}
+              options={positionOptions}
+              disabled={isSubmitting || !divisionId}
+              onChange={(value) => {
+                setPositionId(value);
+                setError(null);
+              }}
+            />
+          ) : (
+            <div className="relative h-[60px] w-full">
+              <input
+                id="position_name"
+                name="position_name"
+                type="text"
+                placeholder=" "
+                disabled={isSubmitting || !divisionId}
+                value={positionName}
+                onChange={(e) => {
+                  setPositionName(e.target.value);
+                  setError(null);
+                }}
+                className="peer h-full w-full rounded-[8px] border border-[#909692] bg-white px-4 pt-[18px] text-[16px] font-medium leading-[24px] text-[#232925] outline-none transition-colors duration-200 placeholder-transparent disabled:cursor-not-allowed disabled:opacity-70 focus:border-[#0088FF]"
+              />
+              <label
+                htmlFor="position_name"
+                className="pointer-events-none absolute left-4 top-[11px] translate-y-0 text-[13px] font-medium leading-[14px] text-[#909692] transition-all duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-[16px] peer-placeholder-shown:leading-[24px] peer-focus:top-[11px] peer-focus:translate-y-0 peer-focus:text-[13px] peer-focus:leading-[14px]"
+              >
+                Jabatan
+              </label>
+            </div>
+          )}
         </div>
 
         {/* Step 4: No Whatsapp */}
@@ -488,41 +445,63 @@ function OnboardingCard() {
 }
 
 export default function OnboardingPage() {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+
+    const cardTween = gsap.fromTo(
+      cardRef.current,
+      {
+        y: 140,
+        opacity: 0,
+        filter: "blur(12px)",
+      },
+      {
+        y: 0,
+        opacity: 1,
+        filter: "blur(0px)",
+        duration: 0.9,
+        ease: "power2.out",
+      }
+    );
+
+    return () => {
+      cardTween.kill();
+    };
+  }, []);
+
   return (
-    <main className="min-h-screen bg-[url('https://i.pinimg.com/1200x/2a/68/ff/2a68ffb5bc0ea3d310d7ad3708f6282e.jpg')] bg-cover bg-center bg-no-repeat font-sans text-[#232925]">
-      <div className="relative flex min-h-screen w-full items-end justify-center px-0 pt-10 md:items-center md:px-5 md:py-10">
-        <div className="absolute inset-0 bg-black/25" />
+    <main className="relative min-h-screen overflow-hidden bg-cu-surface font-sans text-[#232925]">
+      <AuthParticleBackground />
 
-        <MobileAnimatedBrand />
+      <div className="relative z-10 flex min-h-screen w-full items-end justify-center px-0 pt-10 md:items-center md:px-5 md:py-10">
+        <div ref={cardRef} className="w-full flex justify-center z-10">
+          <Suspense
+            fallback={
+              <div className="relative z-10 min-h-[368px] w-full rounded-t-[32px] bg-white px-8 pb-[20vh] pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10" />
+            }
+          >
+            <OnboardingCard />
+          </Suspense>
+        </div>
 
-        <Suspense
-          fallback={
-            <div className="relative z-10 min-h-[368px] w-full rounded-t-[32px] bg-white px-8 pb-14 pt-8 shadow-2xl md:max-w-[430px] md:rounded-[28px] md:px-9 md:py-10" />
-          }
-        >
-          <OnboardingCard />
-        </Suspense>
-
-        <div className="pointer-events-none absolute bottom-[clamp(20px,4vh,32px)] left-1/2 z-10 hidden w-full -translate-x-1/2 flex-col items-center md:flex">
-          <div className="mb-[clamp(12px,2.4vh,24px)] flex items-center justify-center gap-[clamp(16px,3vw,28px)]">
+        <div className="pointer-events-none absolute bottom-8 left-1/2 z-10 hidden w-full -translate-x-1/2 flex-col items-center md:flex">
+          <div className="mb-6 flex items-center justify-center gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://doran.id/wp-content/uploads/2023/03/Logo-PT-Doran-Sukses-Indonesia-white-1400x364-1.png"
               alt="Doran Sukses Indonesia Logo"
-              className="h-[clamp(28px,4.8vh,44px)] w-auto max-w-[34vw] brightness-0 invert opacity-80"
+              className="h-10 w-auto brightness-0 invert opacity-80"
             />
 
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://jete.id/wp-content/uploads/2023/04/jete-indonesia-logo.png"
               alt="JETE Logo"
-              className="h-[clamp(30px,5vh,46px)] w-auto max-w-[26vw] brightness-0 invert opacity-80"
+              className="h-10 w-auto brightness-0 invert opacity-80"
             />
           </div>
-
-          <p className="text-center text-[clamp(11px,1.5vh,14px)] leading-[1.3] text-white">
-            Creative Universe | 2026
-          </p>
         </div>
       </div>
     </main>

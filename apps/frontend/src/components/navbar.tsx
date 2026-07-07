@@ -52,11 +52,11 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
     ? "text-white hover:bg-white/10 focus-visible:ring-white/30"
     : "text-black hover:bg-black/5 focus-visible:ring-black/20";
   const panelClass = isDark
-    ? "border-white/10 bg-black text-white shadow-2xl"
-    : "border-cu-line bg-white text-cu-ink shadow-xl";
+    ? "bg-black text-[#f9fafb]"
+    : "border-[0.5px] border-[#f2f2f2] bg-white text-[#121212]";
   const popupLinkClass = isDark
-    ? "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
-    : "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-cu-ink transition-colors hover:bg-cu-panel-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-focus/30";
+    ? "group flex h-10 w-full items-center gap-2.5 rounded-xl px-2.5 text-sm font-medium leading-5 text-[#f9fafb] transition-colors hover:bg-[#0a0d12] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+    : "group flex h-10 w-full items-center gap-2.5 rounded-xl px-2.5 text-sm font-medium leading-5 text-[#121212] transition-colors hover:bg-[#f2f2f2] focus:outline-none focus-visible:ring-2 focus-visible:ring-cu-focus/30";
   const popupIconClass = isDark
     ? "text-white/55 transition-colors group-hover:text-white"
     : "text-cu-muted transition-colors group-hover:text-cu-ink";
@@ -94,8 +94,8 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
               </button>
 
               {appsOpen && (
-                <div className={`fixed left-4 right-4 top-[4.75rem] z-[110] mt-2 max-h-[calc(100dvh-5.5rem)] overflow-y-auto rounded-xl border p-2 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:w-80 ${panelClass} ${scrollbarClass} animate-slide-up`}>
-                  <ul role="menu" aria-label="Menu aplikasi" className="m-0 list-none space-y-0.5 p-2">
+                <div className={`fixed left-4 right-4 top-[4.75rem] z-[110] mt-2 max-h-[calc(100dvh-5.5rem)] overflow-hidden rounded-2xl p-1.5 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:w-[280px] ${panelClass} ${scrollbarClass} animate-slide-up`}>
+                  <ul role="menu" aria-label="Menu aplikasi" className="m-0 flex list-none flex-col gap-1 p-0">
                     <AppMenuItem href="/pricetag/search" icon="label" label="Pricetag Generator" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} />
                     <AppMenuItem href="/odds" icon="architecture" label="ODDS (One Dashboard Design System)" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} />
                     <AppMenuItem href="/ai-agent" icon="smart_toy" label="AI Agent" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} />
@@ -187,7 +187,7 @@ function AppMenuItem({
     <li>
       <Link href={href} onClick={onClick} className={className} role="menuitem">
         <MaterialIcon name={icon} size="sm" className={iconClassName} />
-        {label}
+        <span className="min-w-0 truncate">{label}</span>
       </Link>
     </li>
   );

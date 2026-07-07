@@ -25,16 +25,29 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
     if (isAuthenticated) {
       // User is logged in
       if (currentIsGuestPath || (!user?.is_onboarded && currentPath !== "/onboarding")) {
+        // Skip redirect if universe transition is running
+        if (typeof document !== "undefined" && document.body.classList.contains("transitioning-universe")) {
+          return;
+        }
+
         let targetPath = "/";
 
         if (!user?.is_onboarded) {
           targetPath = "/onboarding";
         } else {
+          const requestedRedirect = currentIsGuestPath
+            ? safeInternalRedirect(new URLSearchParams(window.location.search).get("redirect"))
+            : null;
           const configuredTarget = typeof user?.settings?.redirect_to === "string"
             ? safeInternalRedirect(user.settings.redirect_to)
             : null;
 
           if (
+            requestedRedirect &&
+            !isGuestPath(requestedRedirect)
+          ) {
+            targetPath = requestedRedirect;
+          } else if (
             configuredTarget &&
             !isGuestPath(configuredTarget)
           ) {
@@ -66,6 +79,10 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   // Prevent flashing of children components before redirect executes
   if (isAuthenticated) {
     if (currentIsGuestPath || (!user?.is_onboarded && currentPath !== "/onboarding")) {
+      // Keep rendering if transition is active
+      if (typeof document !== "undefined" && document.body.classList.contains("transitioning-universe")) {
+        return <>{children}</>;
+      }
       return null;
     }
   } else {
