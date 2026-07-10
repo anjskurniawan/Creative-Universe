@@ -190,4 +190,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/reports/summary', [OddsReportController::class, 'summary'])->middleware('can:view-odds-reports');
         Route::get('/rankings', [OddsReportController::class, 'rankings'])->middleware('can:view-odds-rankings');
     });
+
+    // Homework Tasks Routes
+    Route::get('/homework-tasks', [\App\Http\Controllers\HomeworkTaskController::class, 'index']);
+    Route::post('/homework-tasks', [\App\Http\Controllers\HomeworkTaskController::class, 'store']);
+    Route::patch('/homework-tasks/{task}/status', [\App\Http\Controllers\HomeworkTaskController::class, 'updateStatus']);
+    Route::post('/homework-tasks/{task}/upload', [\App\Http\Controllers\HomeworkTaskController::class, 'uploadFile']);
+    Route::delete('/homework-tasks/{task}', [\App\Http\Controllers\HomeworkTaskController::class, 'destroy']);
 });

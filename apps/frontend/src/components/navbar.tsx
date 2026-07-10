@@ -96,10 +96,11 @@ export function Navbar({ variant = "light", sticky = true }: NavbarProps) {
               {appsOpen && (
                 <div className={`fixed left-4 right-4 top-[4.75rem] z-[110] mt-2 max-h-[calc(100dvh-5.5rem)] overflow-hidden rounded-2xl p-1.5 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:w-[280px] ${panelClass} ${scrollbarClass} animate-slide-up`}>
                   <ul role="menu" aria-label="Menu aplikasi" className="m-0 flex list-none flex-col gap-1 p-0">
-                    <AppMenuItem href="/pricetag/search" icon="label" label="Pricetag Generator" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} />
+                    {/* <AppMenuItem href="/pricetag/search" icon="label" label="Pricetag Generator" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} /> */}
+                    <AppMenuItem href="/task" icon="task" label="Task" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} />
                     <AppMenuItem href="/odds" icon="architecture" label="ODDS (One Dashboard Design System)" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} />
-                    <AppMenuItem href="/ai-agent" icon="smart_toy" label="AI Agent" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} />
-                    <AppMenuItem href="/assets-design" icon="brush" label="Assets Design" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} />
+                    {/* <AppMenuItem href="/ai-agent" icon="smart_toy" label="AI Agent" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} /> */}
+                    {/* <AppMenuItem href="/assets-design" icon="brush" label="Assets Design" className={popupLinkClass} iconClassName={popupIconClass} onClick={() => setAppsOpen(false)} /> */}
                   </ul>
                 </div>
               )}
@@ -309,7 +310,7 @@ function getInitials(name?: string | null) {
     .toUpperCase();
 }
 
-function CreativeUniverseLogo({ className }: { className?: string }) {
+export function CreativeUniverseLogo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 36 39" fill="currentColor" xmlns="http://www.w3.org/2000/svg" className={className} aria-hidden="true">
       <path d="M25.0636 15.0286C24.7182 14.8964 24.5179 14.4539 24.5218 14.0913L24.5506 11.4107C24.5558 10.9248 25.0279 10.5268 25.491 10.5209L28.1479 10.4872C28.62 10.4813 29.072 10.3359 29.4723 10.1116C30.5792 9.49124 30.9307 8.22895 30.7007 7.01211C30.529 6.10409 29.9109 5.38499 29.0092 5.13612C28.7073 5.05259 28.4008 4.94965 28.0699 4.94891L23.7869 4.93786C23.675 4.93761 23.5921 5.11868 23.5918 5.2339L23.5567 18.2585C23.5537 19.393 22.589 20.1993 21.5407 20.2094L20.4876 20.1843C19.8487 20.1168 19.2745 19.75 18.974 19.1562C18.8267 18.8646 18.7027 18.4793 18.7027 18.1165L18.698 2.57739L18.7674 2.05828C18.9093 0.995234 19.8425 0.0756652 20.9782 0.0719801L27.8863 0.0506062C28.8163 0.0476581 29.6947 0.213981 30.571 0.48398C31.7709 0.853479 32.8299 1.48978 33.7363 2.35506C36.6065 5.09534 36.7664 9.61334 34.1055 12.5932C33.6295 13.1263 33.0941 13.5565 32.5137 13.965C32.4618 14.0016 32.4121 14.0441 32.3887 14.0793C32.3609 14.1213 32.3811 14.2579 32.4146 14.3068L35.4577 18.7368C35.7847 19.2127 35.6711 19.8003 35.1546 20.0669C34.8237 20.2379 34.4431 20.2349 34.065 20.234L32.9716 20.231L31.5232 20.1885C30.7935 20.1123 30.2448 19.7168 29.8512 19.123L27.8457 16.0975C27.6182 15.754 27.2784 15.5152 26.9207 15.3587C26.17 15.0305 25.6747 15.2615 25.0636 15.0281V15.0286Z" />
