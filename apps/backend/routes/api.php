@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProfileSessionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\AppSettingController;
 use App\Http\Controllers\Api\V1\ChatController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // User Protected Routes
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/settings', [AppSettingController::class, 'index']);
+    Route::post('/settings', [AppSettingController::class, 'store']);
     Route::post('/ai/chat', [AIAgentController::class, 'chat'])->middleware('can:access-core');
 
     // Private Chat Routes
@@ -192,6 +195,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Homework Tasks Routes
+    Route::post('/temp-upload', [\App\Http\Controllers\HomeworkTaskController::class, 'uploadTempFile']);
     Route::get('/homework-tasks', [\App\Http\Controllers\HomeworkTaskController::class, 'index']);
     Route::post('/homework-tasks', [\App\Http\Controllers\HomeworkTaskController::class, 'store']);
     Route::patch('/homework-tasks/{task}/status', [\App\Http\Controllers\HomeworkTaskController::class, 'updateStatus']);

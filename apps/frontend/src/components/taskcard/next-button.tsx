@@ -22,10 +22,10 @@ export default function TaskCardNextButton({
   const bgClasses = isDone
     ? "bg-[#4ee546] text-white hover:bg-[#43d13c]"
     : isOff
-    ? "bg-[#d9dbde] text-[#6f7a83] hover:bg-[#cfd2d6]"
+    ? "bg-[#d7dcdd] text-white hover:bg-[#cfd2d6]"
     : isDelete
     ? "bg-[#ffb2b2] text-[#ff5b55] hover:bg-[#ff9e9e]"
-    : "bg-[#8474f9] text-white hover:bg-[#7261e3]";
+    : "bg-[#8474f9] text-[#1a1a1a] hover:bg-[#7261e3]";
 
   return (
     <button

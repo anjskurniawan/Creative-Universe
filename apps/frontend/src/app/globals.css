@@ -967,5 +967,29 @@
   color: var(--color-cu-muted);
   pointer-events: none;
 }
+}
 
+/* Custom Minimalist Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
+  margin: 16px 0; /* Menjauhkan scrollbar dari ujung (rounded corners) */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Tidak terlihat secara default */
+  border-radius: 20px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.4); /* Muncul abu-abu muda saat area di-hover */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(107, 114, 128, 0.6); /* Sedikit lebih gelap saat thumb di-hover */
 }

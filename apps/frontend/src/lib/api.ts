@@ -38,7 +38,7 @@ function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function getCookie(name: string): string | undefined {
+export function getCookie(name: string): string | undefined {
   if (typeof document === "undefined") return undefined;
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);

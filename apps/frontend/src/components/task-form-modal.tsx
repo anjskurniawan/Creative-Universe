@@ -2,15 +2,16 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { MaterialIcon } from "./material-icon";
+import { CustomDatePicker } from "./custom-date-picker";
+import FileUploadDropzone, { UploadedFile } from './file-upload-dropzone';
+import { apiFetch } from "@/lib/api";
 
 interface TaskFormModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-import { apiFetch } from "@/lib/api";
-
-interface UserOption {
+export interface UserOption {
   id: number;
   name: string;
 }
@@ -18,7 +19,10 @@ interface UserOption {
 export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
   const [taskGivenDate, setTaskGivenDate] = useState("");
   const [taskName, setTaskName] = useState("");
-  const [picVendor, setPicVendor] = useState<"Mireco" | "Fushion" | "">("");
+  const [picVendor, setPicVendor] = useState("");
+  const [vendorOptions, setVendorOptions] = useState<string[]>([]);
+  const [isVendorDropdownOpen, setIsVendorDropdownOpen] = useState(false);
+  const vendorDropdownRef = useRef<HTMLDivElement>(null);
   
   // Multi-select state
   const [assignedTo, setAssignedTo] = useState<UserOption[]>([]);
@@ -26,15 +30,16 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
   const [searchUser, setSearchUser] = useState("");
   const [usersList, setUsersList] = useState<UserOption[]>([]);
   
-  const [supportFile, setSupportFile] = useState<File | null>(null);
+  const [supportFiles, setSupportFiles] = useState<UploadedFile[]>([]);
   const [deadlineDate, setDeadlineDate] = useState("");
-  const [draftFile, setDraftFile] = useState<File | null>(null);
+  const [draftFiles, setDraftFiles] = useState<UploadedFile[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fetch users on mount
+  // Fetch users and settings on mount
   useEffect(() => {
-    async function loadUsers() {
+    async function loadData() {
       try {
         const res = await apiFetch<any>('/users?per_page=50');
         if (Array.isArray(res)) setUsersList(res);
@@ -42,9 +47,22 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
       } catch (err) {
         console.error("Gagal memuat daftar user", err);
       }
+
+      try {
+        const settings = await apiFetch<any>('/settings?keys=vendor_options');
+        if (settings && settings.vendor_options) {
+          const vendors = settings.vendor_options.split(",").map((v: string) => v.trim()).filter(Boolean);
+          setVendorOptions(vendors.length > 0 ? vendors : ["Mireco", "Fushion"]);
+        } else {
+          setVendorOptions(["Mireco", "Fushion"]);
+        }
+      } catch (err) {
+        console.error("Gagal memuat vendor options", err);
+        setVendorOptions(["Mireco", "Fushion"]);
+      }
     }
     if (isOpen) {
-      loadUsers();
+      loadData();
     }
   }, [isOpen]);
 
@@ -53,6 +71,9 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+      }
+      if (vendorDropdownRef.current && !vendorDropdownRef.current.contains(event.target as Node)) {
+        setIsVendorDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -81,21 +102,19 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
     setAssignedTo(prev => prev.filter(u => u.id !== userId));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<File | null>>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setter(e.target.files[0]);
-    } else {
-      setter(null);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskGivenDate || !taskName || !picVendor || assignedTo.length === 0 || !deadlineDate) {
       alert("Harap lengkapi semua field yang diwajibkan.");
       return;
     }
+    const isUploading = supportFiles.some(f => f.status === 'uploading') || draftFiles.some(f => f.status === 'uploading');
+    if (isUploading) {
+      alert("Harap tunggu hingga proses upload selesai.");
+      return;
+    }
     
+    setIsSubmitting(true);
     try {
       const formData = new FormData();
       formData.append("task_given_date", taskGivenDate);
@@ -105,8 +124,18 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
       assignedTo.forEach(user => {
         formData.append("assigned_to[]", String(user.id));
       });
-      if (supportFile) formData.append("support_file", supportFile);
-      if (draftFile) formData.append("draft_file", draftFile);
+      
+      // Append temporary paths
+      supportFiles.forEach(f => {
+        if (f.status === 'success' && f.tempPath) {
+          formData.append("support_file[]", f.tempPath);
+        }
+      });
+      draftFiles.forEach(f => {
+        if (f.status === 'success' && f.tempPath) {
+          formData.append("draft_file[]", f.tempPath);
+        }
+      });
 
       await apiFetch('/homework-tasks', {
         method: 'POST',
@@ -119,49 +148,49 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
       setTaskName("");
       setPicVendor("");
       setAssignedTo([]);
-      setSupportFile(null);
+      setSupportFiles([]);
       setDeadlineDate("");
-      setDraftFile(null);
+      setDraftFiles([]);
       
       onClose();
     } catch (err) {
       console.error(err);
       alert("Gagal submit tugas. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const inputClass = "w-full rounded-xl border border-[#d7dcdd] bg-white px-4 py-3 text-base tracking-[0.32px] text-[#222] outline-none placeholder:text-[#aeb6b8] focus:border-[#8474f9] focus:ring-2 focus:ring-[#8474f9]/15 transition-all";
-  const labelClass = "mb-2 block text-sm font-semibold text-[#525e61]";
+  const inputClass = "w-full rounded-xl bg-gray-50/50 border border-transparent px-4 py-3 text-base tracking-[0.32px] text-[#222] outline-none placeholder:text-[#aeb6b8] focus:bg-white focus:border-[#8474f9] focus:ring-4 focus:ring-[#8474f9]/10 transition-all hover:bg-gray-50 hover:border-gray-200";
+  const labelClass = "mb-2 block text-sm font-medium text-[#4b5563]";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-      <div 
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white p-6 sm:p-8 shadow-2xl custom-scrollbar"
-        style={{ scrollbarWidth: "thin" }}
-      >
-        <button
-          onClick={onClose}
-          className="absolute right-6 top-6 flex size-10 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition-colors hover:bg-gray-200 hover:text-gray-700"
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-md">
+      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden p-2 sm:p-4">
+        <div 
+          className="overflow-y-auto p-6 sm:p-6 custom-scrollbar w-full h-full rounded-2xl"
         >
-          <MaterialIcon name="close" size="auto" className="text-[24px]" />
-        </button>
-
-        <h2 className="mb-8 text-2xl font-bold tracking-tight text-[#222]">Tambah Tugas Baru</h2>
+          <div className="flex items-start justify-between gap-4 mb-8">
+            <h2 className="text-2xl font-bold tracking-tight text-[#111827]">Tambah Tugas Baru</h2>
+            <button
+              onClick={onClose}
+              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-50 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-800"
+            >
+              <MaterialIcon name="close" size="auto" className="text-[20px]" />
+            </button>
+          </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           
           {/* 1. Tanggal tugas diberikan */}
           <div>
             <label className={labelClass}>Tanggal tugas diberikan</label>
-            <div className="relative">
-              <input
-                type="date"
-                value={taskGivenDate}
-                onChange={(e) => setTaskGivenDate(e.target.value)}
-                className={inputClass}
-                required
-              />
-            </div>
+            <CustomDatePicker
+              value={taskGivenDate}
+              onChange={setTaskGivenDate}
+              placeholder="Pilih tanggal tugas..."
+              required
+            />
           </div>
 
           {/* 2. Nama Tugas */}
@@ -180,21 +209,38 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
           {/* 3. Pic Vendor */}
           <div>
             <label className={labelClass}>PIC Vendor</label>
-            <div className="flex gap-4">
-              {(["Mireco", "Fushion"] as const).map((vendor) => (
-                <button
-                  key={vendor}
-                  type="button"
-                  onClick={() => setPicVendor(vendor)}
-                  className={`flex-1 rounded-xl border py-3 text-base font-semibold transition-all ${
-                    picVendor === vendor
-                      ? "border-[#8474f9] bg-[#8474f9] text-white shadow-md"
-                      : "border-[#d7dcdd] bg-white text-[#525e61] hover:border-[#8474f9] hover:bg-gray-50"
-                  }`}
-                >
-                  {vendor}
-                </button>
-              ))}
+            <div className="relative" ref={vendorDropdownRef}>
+              <div 
+                className={`min-h-[52px] cursor-pointer flex flex-wrap items-center gap-2 rounded-xl border px-4 py-3 outline-none transition-all ${isVendorDropdownOpen ? "bg-white border-[#8474f9] ring-4 ring-[#8474f9]/10" : "bg-gray-50/50 border-transparent hover:bg-gray-50 hover:border-gray-200"}`}
+                onClick={() => setIsVendorDropdownOpen(!isVendorDropdownOpen)}
+              >
+                <span className={`text-base tracking-[0.32px] ${picVendor ? "text-[#222]" : "text-[#aeb6b8]"}`}>
+                  {picVendor || "Pilih vendor..."}
+                </span>
+                <MaterialIcon 
+                  name={isVendorDropdownOpen ? "expand_less" : "expand_more"} 
+                  size="auto" 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#aeb6b8] text-[24px] pointer-events-none transition-transform" 
+                />
+              </div>
+
+              {/* Dropdown Menu */}
+              {isVendorDropdownOpen && (
+                <div className="absolute left-0 right-0 top-full z-10 mt-2 max-h-48 overflow-y-auto rounded-xl border border-[#e5e7eb] bg-white shadow-lg custom-scrollbar">
+                  {vendorOptions.map((vendor) => (
+                    <div
+                      key={vendor}
+                      onClick={() => {
+                        setPicVendor(vendor);
+                        setIsVendorDropdownOpen(false);
+                      }}
+                      className="cursor-pointer px-4 py-3 text-base text-[#222] transition-colors hover:bg-[#f6faff]"
+                    >
+                      {vendor}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -202,7 +248,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
           <div ref={dropdownRef} className="relative">
             <label className={labelClass}>Assigned to</label>
             <div 
-              className={`min-h-[52px] cursor-text flex flex-wrap items-center gap-2 rounded-xl border border-[#d7dcdd] bg-white p-2 outline-none transition-all ${isDropdownOpen ? "border-[#8474f9] ring-2 ring-[#8474f9]/15" : ""}`}
+              className={`min-h-[52px] cursor-text flex flex-wrap items-center gap-2 rounded-xl border px-4 py-2 outline-none transition-all ${isDropdownOpen ? "bg-white border-[#8474f9] ring-4 ring-[#8474f9]/10" : "bg-gray-50/50 border-transparent hover:bg-gray-50 hover:border-gray-200"}`}
               onClick={() => setIsDropdownOpen(true)}
             >
               {assignedTo.map(user => (
@@ -260,70 +306,53 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
           </div>
 
           {/* 5. Upload File Pendukung */}
-          <div>
-            <label className={labelClass}>Upload File Pendukung</label>
-            <div className="relative flex items-center justify-center rounded-xl border-2 border-dashed border-[#d7dcdd] bg-gray-50 px-6 py-8 transition-colors hover:border-[#8474f9] hover:bg-[#f6faff]">
-              <input
-                type="file"
-                onChange={(e) => handleFileChange(e, setSupportFile)}
-                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-              />
-              <div className="flex flex-col items-center gap-2 text-center pointer-events-none">
-                <MaterialIcon name="upload_file" size="auto" className="text-[32px] text-[#8474f9]" />
-                <p className="text-base font-medium text-[#525e61]">
-                  {supportFile ? supportFile.name : "Klik atau seret file ke sini"}
-                </p>
-                {!supportFile && <p className="text-sm text-gray-400">PDF, DOC, XLSX, JPG, PNG up to 10MB</p>}
-              </div>
-            </div>
-          </div>
+          <FileUploadDropzone 
+            label="Upload File Pendukung"
+            description="PDF, DOC, XLSX, JPG, PNG up to 10MB"
+            maxFiles={3}
+            onFilesChange={setSupportFiles}
+          />
 
           {/* 6. Deadline Tugas diberikan */}
           <div>
             <label className={labelClass}>Deadline Tugas diberikan</label>
-            <input
-              type="date"
+            <CustomDatePicker
               value={deadlineDate}
-              onChange={(e) => setDeadlineDate(e.target.value)}
-              className={inputClass}
+              onChange={setDeadlineDate}
+              placeholder="Pilih tenggat waktu..."
               required
             />
           </div>
 
           {/* 7. Upload Draft */}
-          <div>
-            <label className={labelClass}>Upload Draft</label>
-            <div className="relative flex items-center justify-center rounded-xl border-2 border-dashed border-[#d7dcdd] bg-gray-50 px-6 py-8 transition-colors hover:border-[#8474f9] hover:bg-[#f6faff]">
-              <input
-                type="file"
-                onChange={(e) => handleFileChange(e, setDraftFile)}
-                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-              />
-              <div className="flex flex-col items-center gap-2 text-center pointer-events-none">
-                <MaterialIcon name="upload_file" size="auto" className="text-[32px] text-[#8474f9]" />
-                <p className="text-base font-medium text-[#525e61]">
-                  {draftFile ? draftFile.name : "Klik atau seret file ke sini"}
-                </p>
-                {!draftFile && <p className="text-sm text-gray-400">Desain awal atau coretan draft</p>}
-              </div>
-            </div>
-          </div>
+          <FileUploadDropzone 
+            label="Upload Draft"
+            description="Desain awal atau coretan draft up to 10MB"
+            maxFiles={3}
+            onFilesChange={setDraftFiles}
+          />
 
           {/* Keterangan & Submit */}
-          <div className="mt-4 border-t border-[#e5e7eb] pt-6">
-            <p className="mb-4 text-center text-sm font-medium text-amber-600 bg-amber-50 py-2 rounded-lg">
-              <MaterialIcon name="info" size="auto" className="inline-block mr-1 text-[16px] align-text-bottom" />
-              Pastikan semua informasi sudah benar sebelum submit
-            </p>
+          <div className="pt-4 flex items-center gap-4 border-t border-gray-100">
+            <span className="text-xs text-gray-400 font-medium">Tanda * Wajib diisi</span>
             <button
               type="submit"
-              className="w-full rounded-xl bg-[#ec4899] py-4 text-lg font-bold text-white shadow-md transition-all hover:bg-[#db2777] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[#ec4899]/30"
+              disabled={isSubmitting || supportFiles.some(f => f.status === 'uploading') || draftFiles.some(f => f.status === 'uploading')}
+              className="ml-auto flex items-center justify-center gap-2 rounded-xl bg-[#8474f9] px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-[#6c5bfa] focus:ring-4 focus:ring-[#8474f9]/20 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_8px_20px_-6px_rgba(132,116,249,0.5)]"
             >
-              Submit Tugas
+              {isSubmitting ? (
+                <>
+                  <MaterialIcon name="sync" className="animate-spin text-[24px]" size="auto" />
+                  Menyimpan...
+                </>
+              ) : (
+                "Submit Tugas"
+              )}
             </button>
           </div>
 
         </form>
+        </div>
       </div>
     </div>
   );

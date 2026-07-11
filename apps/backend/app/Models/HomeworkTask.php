@@ -16,16 +16,24 @@ class HomeworkTask extends Model
         'file_link',
         'status',
         'task_timestamps',
+        'created_by',
     ];
 
     protected $casts = [
         'task_given_date' => 'date',
         'deadline_date' => 'date',
         'task_timestamps' => 'array',
+        'support_file_path' => 'array',
+        'draft_file_path' => 'array',
     ];
 
     public function users()
     {
         return $this->belongsToMany(\App\Models\Core\User::class, 'homework_task_user');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(\App\Models\Core\User::class, 'created_by');
     }
 }

@@ -1,13 +1,43 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/side-menu";
+import { type TaskCardConfig } from "@/components/taskcard";
 import { TaskCard, type TaskCardState } from "@/components/task-card";
 import { TaskFormModal } from "@/components/task-form-modal";
 import { apiFetch } from "@/lib/api";
+import { getEchoClient } from "@/lib/echo";
+import { useAuth } from "@/providers/auth-provider";
 
 type MetricState = "Total" | "Progress" | "Mendesak" | "Done";
+
+type HomeworkTask = {
+  id: number;
+  task_name?: string | null;
+  pic_vendor?: string | null;
+  task_given_date?: string | null;
+  deadline_date?: string | null;
+  status: string;
+  task_timestamps?: Record<string, string> | null;
+  created_at?: string | null;
+  created_by?: number | null;
+  users?: unknown[];
+  support_file_path?: unknown;
+  draft_file_path?: unknown;
+  file_link?: string | null;
+};
+
+type TaskSettings = Partial<TaskCardConfig> & {
+  task_page_title?: string;
+  task_page_subtitle?: string;
+};
+
+function normalizeFileList(value: unknown): (string | null)[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  return value.map((item) => (typeof item === "string" ? item : null));
+}
 
 const TASK_CARD_STATES: TaskCardState[] = [
   "0",
@@ -30,6 +60,11 @@ const PRIMARY_MENU: SideMenuItem[] = [
   { label: "Tugas Belum Selesai", icon: "assignment_late" },
   { label: "Tugas Bulan Ini", icon: "calendar_month" },
   { label: "Rekap Performa", icon: "analytics" },
+  {
+    label: "Option Page",
+    icon: "settings",
+    href: "/task/option",
+  },
 ];
 
 const SECONDARY_MENU: SideMenuItem[] = [
@@ -181,26 +216,75 @@ export default function TaskPage() {
   const [desktopSidebarVariant, setDesktopSidebarVariant] =
     useState<SideMenuVariant>("Collaps");
   
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<HomeworkTask[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState("Semua Status");
+  const { user } = useAuth();
   const [filterVendor, setFilterVendor] = useState("Semua Vendor");
   const [sortOption, setSortOption] = useState("Tenggat Waktu Terdekat");
 
-  const fetchTasks = async () => {
+  const [pageTitle, setPageTitle] = useState("Branding Key Visual Retail");
+  const [pageSubtitle, setPageSubtitle] = useState("Kelola dan selesaikan tugas yang belum beres tepat waktu.");
+  const [taskConfig, setTaskConfig] = useState<TaskCardConfig>({});
+  const [currentTime, setCurrentTime] = useState(0);
+
+  const fetchTasks = useCallback(async () => {
     try {
-      const data = await apiFetch<any[]>('/homework-tasks');
+      const data = await apiFetch<HomeworkTask[]>('/homework-tasks');
+      setCurrentTime(new Date().getTime());
       setTasks(data);
     } catch (err) {
       console.error("Gagal memuat tugas", err);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchTasks();
+    void Promise.resolve().then(fetchTasks);
+  }, [fetchTasks]);
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await apiFetch<TaskSettings>("/settings?keys=task_page_title,task_page_subtitle,vendor_options,delete_overlay_title,delete_overlay_cancel,delete_overlay_confirm,upload_overlay_title_support,upload_overlay_title_draft,upload_overlay_cancel,upload_overlay_submit,upload_overlay_saving,submit_link_title,submit_link_desc,submit_link_placeholder,submit_link_cancel,submit_link_submit,view_link_title,view_link_desc,view_link_cancel,view_link_copy,btn_status_draft,btn_status_progress,btn_status_approve,btn_status_email,detail_status_1,detail_status_2,detail_dropdown_file,detail_dropdown_upload,detail_link_file,task_empty_state,color_done_bg,color_done_text,color_progress_bg,color_progress_text,color_delete_bg,color_delete_text,icon_file_empty,icon_file_filled");
+        if (data?.task_page_title) setPageTitle(data.task_page_title);
+        if (data?.task_page_subtitle) setPageSubtitle(data.task_page_subtitle);
+        
+        // Populate config
+        const newConfig: TaskCardConfig = {};
+        for (const key in data) {
+          if (key !== "task_page_title" && key !== "task_page_subtitle") {
+            const configKey = key as keyof TaskCardConfig;
+            newConfig[configKey] = data[configKey];
+          }
+        }
+        setTaskConfig(newConfig);
+      } catch (err) {
+        console.error("Gagal memuat pengaturan:", err);
+      }
+    }
+    loadSettings();
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const echo = getEchoClient();
+    if (!echo) return;
+
+    const channelName = `App.Models.Core.User.${user.id}`;
+    const channel = echo.private(channelName);
+    const refreshAssignedTasks = () => {
+      void fetchTasks();
+    };
+
+    channel.listen(".homework-task.assigned", refreshAssignedTasks);
+
+    return () => {
+      channel.stopListening(".homework-task.assigned");
+    };
+  }, [fetchTasks, user?.id]);
+
 
   const handleStepClick = async (taskId: number, step: string) => {
     const now = new Date();
@@ -236,14 +320,13 @@ export default function TaskPage() {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    const states: TaskCardState[] = ["0", "ACC Draft", "Progress Design", "Approval Design", "Kirim Email", "Done"];
-    const currentIndex = states.indexOf(task.status as TaskCardState);
-    if (currentIndex === states.length - 1) return; // Prevent resetting when already Done
+    const currentIndex = TASK_CARD_STATES.indexOf(task.status as TaskCardState);
+    if (currentIndex === TASK_CARD_STATES.length - 1) return; // Prevent resetting when already Done
     
     const nextIndex = currentIndex + 1;
     
     try {
-      const payload: any = { status: states[nextIndex] };
+      const payload: { status: TaskCardState; file_link?: string } = { status: TASK_CARD_STATES[nextIndex] };
       if (link) payload.file_link = link;
 
       await apiFetch(`/homework-tasks/${taskId}/status`, {
@@ -273,8 +356,8 @@ export default function TaskPage() {
     if (t.status === "Done") return false;
     if (!t.deadline_date) return false;
     const d = new Date(t.deadline_date);
-    const diff = Math.ceil((d.getTime() - Date.now()) / (1000 * 3600 * 24));
-    return diff <= 4 && diff >= 0;
+    const diff = Math.ceil((d.getTime() - currentTime) / (1000 * 3600 * 24));
+    return diff <= 1; // 1 day left, or negative (past deadline)
   }).length;
   const selesai = tasks.filter(t => t.status === "Done").length;
 
@@ -285,7 +368,10 @@ export default function TaskPage() {
     { state: "Done" as MetricState, title: "Selesai", value: selesai, icon: "check_circle" },
   ];
 
-  const vendorOptions = ["Semua Vendor", ...Array.from(new Set(tasks.map(t => t.pic_vendor).filter(Boolean)))];
+  const vendorOptions = [
+    "Semua Vendor",
+    ...Array.from(new Set(tasks.map(t => t.pic_vendor).filter((vendor): vendor is string => Boolean(vendor)))),
+  ];
   
   const filteredTasks = [...tasks].filter((task) => {
     if (searchQuery) {
@@ -295,14 +381,18 @@ export default function TaskPage() {
       if (!matchName && !matchVendor) return false;
     }
     
-    if (filterStatus === "Belum Selesai" && task.status === "Done") return false;
-    if (filterStatus === "Selesai" && task.status !== "Done") return false;
-    if (filterStatus === "In Progress" && (task.status === "0" || task.status === "Done")) return false;
-
     if (filterVendor !== "Semua Vendor" && task.pic_vendor !== filterVendor) return false;
 
     return true;
   }).sort((a, b) => {
+    // 1. Send "Done" tasks to the bottom
+    const aDone = a.status === "Done" ? 1 : 0;
+    const bDone = b.status === "Done" ? 1 : 0;
+    if (aDone !== bDone) {
+      return aDone - bDone;
+    }
+
+    // 2. Then apply the chosen sort option
     if (sortOption === "Terbaru Ditambahkan") {
       return new Date(b.created_at || b.task_given_date || 0).getTime() - new Date(a.created_at || a.task_given_date || 0).getTime();
     }
@@ -327,105 +417,107 @@ export default function TaskPage() {
       <SideMenu
         variant={desktopSidebarVariant}
         primaryItems={PRIMARY_MENU}
-        secondaryItems={SECONDARY_MENU}
+      secondaryItems={SECONDARY_MENU}
         onVariantChange={setDesktopSidebarVariant}
         className="hidden lg:flex"
       />
 
-      <main className="min-w-0 overflow-hidden px-4 py-8 sm:px-8 lg:pl-12 lg:pr-16">
-        <div className="w-full">
-          <header className="min-h-[140px] gap-6 2xl:flex 2xl:items-center 2xl:justify-between">
-            <div className="w-full max-w-[590px] shrink-0">
-              <h1 className="text-[44px] font-semibold leading-[52px] tracking-[-0.96px] text-[#222] sm:text-[48px] sm:leading-[60px]">
-                Homework Task Reminder
-              </h1>
-              <p className="text-base leading-5 tracking-[0.32px] text-[#6b7280]">
-                Kelola dan selesaikan tugas yang belum beres tepat waktu.
-              </p>
-            </div>
+      <main className="min-w-0 flex flex-col h-screen overflow-hidden px-4 sm:px-8 lg:pl-12 lg:pr-16">
+        <div className="w-full shrink-0 pt-8 pb-4">
+          <div>
+            <header className="min-h-[140px] gap-6 2xl:flex 2xl:items-center 2xl:justify-between">
+              <div className="w-full max-w-[590px] shrink-0">
+                <h1 className="text-[44px] font-semibold leading-[52px] tracking-[-0.96px] text-[#222] sm:text-[48px] sm:leading-[60px]">
+                  {pageTitle}
+                </h1>
+                <p className="mt-3 text-base leading-5 tracking-[0.32px] text-[#6b7280]">
+                  {pageSubtitle}
+                </p>
+              </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-[15px] 2xl:mt-0 2xl:w-[996px] 2xl:justify-end">
-              <AddTaskButton onClick={() => setIsModalOpen(true)} />
-              {dynamicMetrics.map((metric) => (
-                <MetricCard key={metric.state} {...metric} />
-              ))}
-            </div>
-          </header>
+              <div className="mt-8 flex flex-wrap items-center gap-[15px] 2xl:mt-0 2xl:w-[996px] 2xl:justify-end">
+                <AddTaskButton onClick={() => setIsModalOpen(true)} />
+                {dynamicMetrics.map((metric) => (
+                  <MetricCard key={metric.state} {...metric} />
+                ))}
+              </div>
+            </header>
 
-          <section
-            aria-label="Filter tugas"
-            className="mt-4 flex flex-wrap items-center gap-[9px]"
-          >
-            <label className="relative block h-14 w-full max-w-[599px]">
-              <span className="sr-only">Cari tugas, proyek, atau lokasi ...</span>
-              <MaterialIcon
-                name="search"
-                size="auto"
-                weight={300}
-                filled={false}
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[24px] leading-none text-[#525e61]"
+            <section
+              aria-label="Filter tugas"
+              className="mt-4 flex flex-wrap items-center gap-[9px]"
+            >
+              <label className="relative block h-14 w-full max-w-[599px]">
+                <span className="sr-only">Cari tugas, proyek, atau lokasi ...</span>
+                <MaterialIcon
+                  name="search"
+                  size="auto"
+                  weight={300}
+                  filled={false}
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[24px] leading-none text-[#525e61]"
+                />
+                <input
+                  type="search"
+                  placeholder="Cari tugas, proyek, atau lokasi ..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-14 w-full rounded-xl border border-[#d7dcdd] bg-white py-4 pl-[50px] pr-4 text-base tracking-[0.32px] text-[#222] outline-none placeholder:text-[#aeb6b8] focus:border-[#8474f9] focus:ring-2 focus:ring-[#8474f9]/15"
+                />
+              </label>
+
+              <ToolbarDropdown 
+                icon="storefront" 
+                label="Vendor" 
+                options={vendorOptions}
+                value={filterVendor}
+                onChange={setFilterVendor}
               />
-              <input
-                type="search"
-                placeholder="Cari tugas, proyek, atau lokasi ..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 w-full rounded-xl border border-[#d7dcdd] bg-white py-4 pl-[50px] pr-4 text-base tracking-[0.32px] text-[#222] outline-none placeholder:text-[#aeb6b8] focus:border-[#8474f9] focus:ring-2 focus:ring-[#8474f9]/15"
+              <ToolbarDropdown 
+                icon="sort" 
+                label="Urutkan" 
+                options={["Tenggat Waktu Terdekat", "Tenggat Waktu Terjauh", "Terbaru Ditambahkan"]}
+                value={sortOption}
+                onChange={setSortOption}
               />
-            </label>
+            </section>
+          </div>
+        </div>
 
-            <ToolbarDropdown 
-              icon="filter_alt" 
-              label="Status" 
-              options={["Semua Status", "Belum Selesai", "In Progress", "Selesai"]}
-              value={filterStatus}
-              onChange={setFilterStatus}
-            />
-            <ToolbarDropdown 
-              icon="storefront" 
-              label="Vendor" 
-              options={vendorOptions}
-              value={filterVendor}
-              onChange={setFilterVendor}
-            />
-            <ToolbarDropdown 
-              icon="sort" 
-              label="Urutkan" 
-              options={["Tenggat Waktu Terdekat", "Tenggat Waktu Terjauh", "Terbaru Ditambahkan"]}
-              value={sortOption}
-              onChange={setSortOption}
-            />
-          </section>
-
-          <section
-            aria-label="Task Card"
-            className="mt-4 flex flex-col items-stretch gap-3 w-full"
-          >
+        <section
+          aria-label="Task Card"
+          className="flex-1 overflow-y-auto w-full pb-20 pr-2 -mr-2 no-scrollbar"
+        >
+          <div className="flex flex-col items-stretch gap-3">
             {filteredTasks.map((task) => (
               <TaskCard 
                 key={task.id}
                 id={task.id}
+                currentUser={user}
+                createdBy={task.created_by ?? undefined}
                 state={task.status as TaskCardState} 
                 timestamps={task.task_timestamps || {}}
-                title={task.task_name}
-                picVendor={task.pic_vendor}
-                givenDate={task.task_given_date}
-                deadlineDate={task.deadline_date}
+                title={task.task_name ?? undefined}
+                picVendor={task.pic_vendor ?? undefined}
+                givenDate={task.task_given_date ?? undefined}
+                deadlineDate={task.deadline_date ?? undefined}
                 assignedUsers={task.users}
-                supportFileUrl={task.support_file_path}
-                draftFileUrl={task.draft_file_path}
+                supportFileUrl={normalizeFileList(task.support_file_path)}
+                draftFileUrl={normalizeFileList(task.draft_file_path)}
                 fileLink={task.file_link}
                 onStepClick={(step) => handleStepClick(task.id, step)}
                 onNextClick={(link) => handleNextClick(task.id, link)}
                 onDeleteConfirm={() => handleDelete(task.id)}
                 onRefresh={fetchTasks}
+                config={taskConfig}
               />
             ))}
             {filteredTasks.length === 0 && (
-              <div className="py-12 text-center text-gray-500">Belum ada tugas yang sesuai.</div>
+              <div className="py-12 text-center text-gray-500">
+                {taskConfig.task_empty_state || "Belum ada tugas yang sesuai."}
+              </div>
             )}
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
 
       <TaskFormModal 

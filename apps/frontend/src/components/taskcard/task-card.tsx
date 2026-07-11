@@ -8,12 +8,18 @@ import TaskCardLoadingBar from "./loading-bar";
 import TaskCardDetailStatus from "./detail-status";
 import TaskCardDetail from "./detail";
 import TaskCardButtonStatus from "./button-status";
+import TaskCardDeleteOverlay from "./delete-overlay";
+import TaskCardSubmitLinkOverlay from "./submit-link-overlay";
+import TaskCardViewLinkOverlay from "./view-link-overlay";
+import TaskCardUploadOverlay from "./upload-overlay";
+import { apiFetch } from "@/lib/api";
 import { MaterialIcon } from "@/components/material-icon";
 import { 
   type TaskCardButtonStatusType, 
   type TaskCardNextButtonState,
   type TaskCardButtonStatusState,
-  type TaskCardDetailStatusState
+  type TaskCardDetailStatusState,
+  type TaskCardConfig
 } from "./index";
 
 export type TaskCardState =
@@ -64,11 +70,14 @@ export type TaskCardProps = {
   givenDate?: string;
   deadlineDate?: string;
   assignedUsers?: any[];
-  supportFileUrl?: string | null;
-  draftFileUrl?: string | null;
+  supportFileUrl?: (string | null)[];
+  draftFileUrl?: (string | null)[];
   fileLink?: string | null;
   id?: number;
   onRefresh?: () => void;
+  config?: TaskCardConfig;
+  currentUser?: any;
+  createdBy?: number;
 };
 
 export default function TaskCard({ 
@@ -83,16 +92,20 @@ export default function TaskCard({
   givenDate,
   deadlineDate = "13/07/2026",
   assignedUsers = [],
-  supportFileUrl,
-  draftFileUrl,
+  supportFileUrl = [null, null, null],
+  draftFileUrl = [null, null, null],
   fileLink,
   id,
   onRefresh,
+  config = {},
+  currentUser,
+  createdBy,
 }: TaskCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmittingFile, setIsSubmittingFile] = useState(false);
   const [isViewingLink, setIsViewingLink] = useState(false);
   const [uploadingDocType, setUploadingDocType] = useState<"support_file" | "draft_file" | null>(null);
+  const [uploadFileIndex, setUploadFileIndex] = useState<number | null>(null);
   const [uploadFileObj, setUploadFileObj] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [inputFileLink, setInputFileLink] = useState("");
@@ -105,6 +118,10 @@ export default function TaskCard({
   }, [timestamps]);
 
   const getNextAllowedStep = (): TaskCardButtonStatusState | null => {
+    if (currentUser && createdBy && currentUser.id !== createdBy && !['Root', 'Manajer', 'SPV'].some(role => currentUser.roles?.some((r: any) => r.name === role))) {
+      return null;
+    }
+    
     if (state === "0") return "ACC Draft";
     if (state === "ACC Draft") return "Progress";
     if (state === "Progress Design") return "Approve";
@@ -114,7 +131,7 @@ export default function TaskCard({
 
   const handleStepClick = (stepName: TaskCardButtonStatusState) => {
     if (stepName !== getNextAllowedStep()) {
-      return; // Safeguard: sequential step flow
+      return; // Safeguard: sequential step flow or unauthorized
     }
 
     const now = new Date();
@@ -193,43 +210,75 @@ export default function TaskCard({
     }
   }
 
-  // Calculate Days Left (Deadline - Given Date)
+  // Format given Date
+  let formattedGivenDate = givenDate;
+  if (givenDate && givenDate.includes("-")) {
+    const d = new Date(givenDate);
+    if (!isNaN(d.getTime())) {
+      formattedGivenDate = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    }
+  }
+
+  // Calculate Days Left (Deadline - Today)
   let daysLeftText = "Count Down";
-  if (deadlineDate && givenDate) {
-    const dLine = new Date(deadlineDate);
-    const dGiven = new Date(givenDate);
-    if (!isNaN(dLine.getTime()) && !isNaN(dGiven.getTime())) {
-      const diffTime = dLine.getTime() - dGiven.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      daysLeftText = `${diffDays} Days Left`;
+  if (deadlineDate) {
+    // If it's DD/MM/YYYY from mock, we might need to parse manually, but API gives YYYY-MM-DD
+    let dLine: Date;
+    if (deadlineDate.includes("/")) {
+      const [dd, mm, yyyy] = deadlineDate.split("/");
+      dLine = new Date(`${yyyy}-${mm}-${dd}`);
+    } else {
+      dLine = new Date(deadlineDate);
+    }
+
+    if (!isNaN(dLine.getTime())) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      dLine.setHours(0, 0, 0, 0);
+      
+      const diffTime = dLine.getTime() - today.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays < 0) {
+        daysLeftText = `Terlambat ${Math.abs(diffDays)} Hari`;
+      } else if (diffDays === 0) {
+        daysLeftText = `Hari Ini`;
+      } else {
+        daysLeftText = `${diffDays} Days Left`;
+      }
     }
   }
 
   const handleFileClick = (path: string | null | undefined, type: "support_file" | "draft_file") => {
     if (!path) {
+      if (currentUser && createdBy && currentUser.id !== createdBy && !['Root', 'Manajer', 'SPV'].some(role => currentUser.roles?.some((r: any) => r.name === role))) {
+        return;
+      }
       setUploadingDocType(type);
       return;
     }
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
     const fullUrl = `${baseUrl}/storage/${path}`;
     window.open(fullUrl, '_blank');
   };
 
   const handleUploadSubmit = async () => {
-    if (!id || !uploadingDocType || !uploadFileObj) return;
+    if (!id || !uploadingDocType || !uploadFileObj || uploadFileIndex === null) return;
     setIsUploading(true);
     try {
       const formData = new FormData();
       formData.append(uploadingDocType, uploadFileObj);
+      formData.append("file_index", uploadFileIndex.toString());
 
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      await fetch(`${baseUrl}/api/v1/homework-tasks/${id}/upload`, {
+      await apiFetch(`/homework-tasks/${id}/upload`, {
         method: "POST",
         body: formData,
-        // Don't set Content-Type header manually for FormData
       });
       
+      onRefresh?.();
+      
       setUploadingDocType(null);
+      setUploadFileIndex(null);
       setUploadFileObj(null);
       onRefresh?.();
     } catch (err) {
@@ -241,7 +290,7 @@ export default function TaskCard({
   };
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl bg-white shadow-sm border border-[#e5e7eb]">
+    <div className="relative w-full rounded-2xl bg-white shadow-sm border border-[#e5e7eb] hover:z-10 focus-within:z-10">
       {/* Main Card Content */}
       <div className={`flex flex-col xl:flex-row items-stretch xl:items-center w-full transition-all duration-300 ${isDeleting || isSubmittingFile || uploadingDocType ? "opacity-30 blur-[1px] pointer-events-none" : "opacity-100"}`}>
         {/* Task Card - Date */}
@@ -263,37 +312,63 @@ export default function TaskCard({
           >
             {/* Task Info Container */}
             <div className="flex flex-col sm:flex-row gap-4 xl:gap-4 2xl:gap-8 items-stretch sm:items-center relative flex-1 min-w-0 mr-4">
-              {/* Task Details */}
-              <div className="flex flex-col items-start relative w-full flex-1 min-w-0 xl:max-w-[379px]">
+              {/* Title */}
+              <div className="flex flex-col items-start relative flex-1 min-w-0 xl:max-w-[220px]">
                 <TaskCardTitleTask title={title} className="px-0 py-0 xl:p-[10px] w-full truncate" />
-                <div className="flex flex-wrap gap-[9px] items-center relative w-full px-[10px]">
-                  <TaskCardDetailStatus 
-                    isDone={isDone} 
-                    status="3D Gambar Kerja" 
-                    hasFile={!!supportFileUrl}
-                    onClick={() => handleFileClick(supportFileUrl, "support_file")}
-                  />
-                  <TaskCardDetailStatus 
-                    isDone={isDone} 
-                    status="Draft Final" 
-                    hasFile={!!draftFileUrl}
-                    onClick={() => handleFileClick(draftFileUrl, "draft_file")}
-                  />
-                </div>
+              </div>
+
+              {/* Files */}
+              <div className="flex flex-col gap-[7px] items-start relative shrink-0 mt-3 sm:mt-0 xl:w-[150px] px-[10px]">
+                <TaskCardDetailStatus
+                  status="3D Gambar Kerja"
+                  isDone={isDone}
+                  files={supportFileUrl}
+                  onUploadClick={(idx) => {
+                    if (!isDone) {
+                      setUploadingDocType("support_file");
+                      setUploadFileIndex(idx);
+                    }
+                  }}
+                  onViewClick={(url) => {
+                    const isAbsolute = url.startsWith('http://') || url.startsWith('https://');
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://creativeuniverse.test";
+                    window.open(isAbsolute ? url : `${baseUrl}/storage/${url}`, '_blank');
+                  }}
+                  config={config}
+                />
+                <TaskCardDetailStatus
+                  status="Draft Final"
+                  isDone={isDone}
+                  files={draftFileUrl}
+                  onUploadClick={(idx) => {
+                    if (!isDone) {
+                      setUploadingDocType("draft_file");
+                      setUploadFileIndex(idx);
+                    }
+                  }}
+                  onViewClick={(url) => {
+                    const isAbsolute = url.startsWith('http://') || url.startsWith('https://');
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://creativeuniverse.test";
+                    window.open(isAbsolute ? url : `${baseUrl}/storage/${url}`, '_blank');
+                  }}
+                  config={config}
+                />
               </div>
 
               {/* Vendor Info */}
               <div className="flex flex-col gap-[7px] items-start relative shrink-0 mt-3 sm:mt-0 xl:w-[130px]">
-                <TaskCardDetail variant="Vendor" value={picVendor} />
-                <TaskCardDetail variant="Date" value={formattedDeadline} />
-                <div 
-                  className={isDone && fileLink ? "cursor-pointer" : ""} 
-                  onClick={() => {
-                    if (isDone && fileLink) setIsViewingLink(true);
-                  }}
-                >
-                  <TaskCardDetail variant={isDone ? "Variant4" : "Count Down"} value={isDone ? undefined : daysLeftText} />
-                </div>
+                <TaskCardDetail variant="Vendor" value={picVendor} config={config} />
+                <TaskCardDetail variant="Date" value={formattedDeadline} config={config} />
+                {!isDone && (
+                  <TaskCardDetail variant="Count Down" value={daysLeftText} config={config} />
+                )}
+                {isDone && fileLink && (
+                  <TaskCardDetail 
+                    variant="Variant4" 
+                    onClick={() => setIsViewingLink(true)} 
+                    config={config}
+                  />
+                )}
               </div>
             </div>
 
@@ -313,6 +388,7 @@ export default function TaskCard({
                       type={isProgressDesignOrApprovalDesignOrKirimEmailOrDone ? "Done" : isAccDraft ? "Progress" : "Default"}
                       className={`w-full ${getNextAllowedStep() === "ACC Draft" ? "" : "pointer-events-none"}`}
                       onClick={() => handleStepClick("ACC Draft")}
+                      config={config}
                     />
                   </div>
 
@@ -327,6 +403,7 @@ export default function TaskCard({
                       type={isApprovalDesignOrKirimEmailOrDone ? "Done" : isProgressDesign ? "Progress" : "Default"}
                       className={`w-full ${getNextAllowedStep() === "Progress" ? "" : "pointer-events-none"}`}
                       onClick={() => handleStepClick("Progress")}
+                      config={config}
                     />
                   </div>
 
@@ -341,6 +418,7 @@ export default function TaskCard({
                       type={isKirimEmailOrDone ? "Done" : isApprovalDesign ? "Progress" : "Default"}
                       className={`w-full ${getNextAllowedStep() === "Approve" ? "" : "pointer-events-none"}`}
                       onClick={() => handleStepClick("Approve")}
+                      config={config}
                     />
                   </div>
 
@@ -355,6 +433,7 @@ export default function TaskCard({
                       type={isDone ? "Done" : isKirimEmail ? "Progress" : "Default"}
                       className={`w-full ${getNextAllowedStep() === "Email" ? "" : "pointer-events-none"}`}
                       onClick={() => handleStepClick("Email")}
+                      config={config}
                     />
                   </div>
                 </div>
@@ -363,16 +442,21 @@ export default function TaskCard({
               <div className="flex justify-end lg:block shrink-0">
                 <TaskCardNextButton 
                   state={nextButtonState} 
-                  className="size-[38px]" 
+                  className={`size-[38px] ${currentUser && createdBy && currentUser.id !== createdBy && !['Root', 'Manajer', 'SPV'].some(role => currentUser.roles?.some((r: any) => r.name === role)) ? "opacity-50 pointer-events-none" : ""}`}
                   onClick={() => {
+                    if (currentUser && createdBy && currentUser.id !== createdBy && !['Root', 'Manajer', 'SPV'].some(role => currentUser.roles?.some((r: any) => r.name === role))) {
+                       return;
+                    }
                     if (nextButtonState === "Delete") {
                       setIsDeleting(true);
                     } else if (nextButtonState === "On") {
                       setIsSubmittingFile(true);
+                    } else if (isDone && fileLink) {
+                      setIsViewingLink(true);
                     } else {
-                      onNextClick?.();
+                      onNextClick?.(fileLink || "");
                     }
-                  }} 
+                  }}
                 />
               </div>
             </div>
@@ -381,164 +465,60 @@ export default function TaskCard({
       </div>
 
       {/* Delete Confirmation Overlay */}
-      <div className={`absolute inset-0 z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 sm:py-0 bg-[#ff5b55] text-white transition-all duration-300 ease-out border border-[#ff5b55] rounded-2xl ${isDeleting ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"}`}>
-        <div className="flex items-center gap-3">
-          <MaterialIcon name="delete_forever" size="auto" className="text-[28px] leading-none shrink-0" />
-          <span className="text-base sm:text-lg font-medium leading-normal">Apakah Anda yakin ingin menghapus tugas ini?</span>
-        </div>
-        <div className="flex items-center gap-3 mt-4 sm:mt-0">
-          <button 
-            type="button"
-            onClick={() => setIsDeleting(false)}
-            className="px-4 py-2 text-sm font-semibold text-white bg-white/20 hover:bg-white/30 rounded-lg cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-          >
-            Batal
-          </button>
-          <button 
-            type="button"
-            onClick={() => {
-              onDeleteConfirm?.();
-              setIsDeleting(false);
-            }}
-            className="px-4 py-2 text-sm font-semibold text-[#ff5b55] bg-white hover:bg-gray-100 rounded-lg cursor-pointer transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-          >
-            Ya, Hapus
-          </button>
-        </div>
-      </div>
+      <TaskCardDeleteOverlay
+        isDeleting={isDeleting}
+        onCancel={() => setIsDeleting(false)}
+        onConfirm={() => {
+          onDeleteConfirm?.();
+          setIsDeleting(false);
+        }}
+        config={config}
+      />
 
       {/* Submit File Overlay */}
-      <div className={`absolute inset-0 z-10 flex flex-col xl:flex-row items-start xl:items-center justify-between px-6 py-4 xl:py-0 bg-[#8474f9] text-white transition-all duration-300 ease-out border border-[#8474f9] rounded-2xl ${isSubmittingFile ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"}`}>
-        <div className="flex flex-col md:flex-row md:items-center gap-4 flex-1 w-full mr-4">
-          <div className="flex items-center gap-3 shrink-0">
-            <MaterialIcon name="attach_file" size="auto" className="text-[28px] leading-none shrink-0" />
-            <span className="text-base font-semibold leading-normal">Input Link File:</span>
-          </div>
-          <div className="flex flex-col flex-1 gap-1.5 w-full">
-            <p className="text-xs text-white/80 font-normal">Masukkan link file design atau dokumen pendukung tugas</p>
-            <input 
-              type="url" 
-              placeholder="Link File Sharing" 
-              value={inputFileLink} 
-              onChange={(e) => setInputFileLink(e.target.value)} 
-              className="w-full max-w-[500px] px-3 py-1.5 bg-white text-black text-sm rounded-lg border-none outline-none focus:ring-2 focus:ring-white/50"
-            />
-          </div>
-        </div>
-        <div className="flex items-center gap-3 mt-4 xl:mt-0 shrink-0">
-          <button 
-            type="button"
-            onClick={() => {
-              setIsSubmittingFile(false);
-              setInputFileLink("");
-            }}
-            className="px-4 py-2 text-sm font-semibold text-white bg-white/20 hover:bg-white/30 rounded-lg cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-          >
-            Batal
-          </button>
-          <button 
-            type="button"
-            onClick={() => {
-              if (!inputFileLink.trim()) {
-                alert("Harap masukkan link file!");
-                return;
-              }
-              onNextClick?.(inputFileLink);
-              setIsSubmittingFile(false);
-              setInputFileLink("");
-            }}
-            className="px-4 py-2 text-sm font-semibold text-[#8474f9] bg-white hover:bg-gray-100 rounded-lg cursor-pointer transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-          >
-            Kirim
-          </button>
-        </div>
-      </div>
+      <TaskCardSubmitLinkOverlay
+        isSubmitting={isSubmittingFile}
+        inputValue={inputFileLink}
+        onInputChange={setInputFileLink}
+        onCancel={() => {
+          setIsSubmittingFile(false);
+          setInputFileLink("");
+        }}
+        onSubmit={() => {
+          if (!inputFileLink.trim()) {
+            alert("Harap masukkan link file!");
+            return;
+          }
+          onNextClick?.(inputFileLink);
+          setIsSubmittingFile(false);
+          setInputFileLink("");
+        }}
+        config={config}
+      />
 
       {/* View Link Overlay */}
-      <div className={`absolute inset-0 z-10 flex flex-col xl:flex-row items-start xl:items-center justify-between px-6 py-4 xl:py-0 bg-[#e8faea] text-[#2b9915] transition-all duration-300 ease-out border border-[#2b9915] rounded-2xl ${isViewingLink ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"}`}>
-        <div className="flex flex-col md:flex-row md:items-center gap-4 flex-1 w-full mr-4">
-          <div className="flex items-center gap-3 shrink-0">
-            <MaterialIcon name="link" size="auto" className="text-[28px] leading-none shrink-0" />
-            <span className="text-base font-semibold leading-normal">Tautan File Tersimpan:</span>
-          </div>
-          <div className="flex flex-col flex-1 gap-1.5 w-full">
-            <p className="text-xs text-[#2b9915]/80 font-normal">Tautan ini telah dilampirkan pada hasil akhir tugas.</p>
-            <div className="flex items-center w-full max-w-[500px] bg-white rounded-lg px-3 py-1.5 border border-[#2b9915]/20 shadow-sm overflow-hidden">
-              <span className="text-sm text-black truncate flex-1">{fileLink}</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 mt-4 xl:mt-0 shrink-0">
-          <button 
-            type="button"
-            onClick={() => setIsViewingLink(false)}
-            className="px-4 py-2 text-sm font-semibold text-[#2b9915] bg-[#dbf7df] hover:bg-[#c2efc9] rounded-lg cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b9915]/50"
-          >
-            Kembali
-          </button>
-          <button 
-            type="button"
-            onClick={() => {
-              if (fileLink) {
-                navigator.clipboard.writeText(fileLink);
-                alert("Link berhasil disalin!");
-              }
-            }}
-            className="px-4 py-2 text-sm font-semibold text-white bg-[#2b9915] hover:bg-[#238011] rounded-lg cursor-pointer transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2b9915]/50 flex items-center gap-2"
-          >
-            <MaterialIcon name="content_copy" size="auto" className="text-[18px]" />
-            Copy Link
-          </button>
-        </div>
-      </div>
+      <TaskCardViewLinkOverlay
+        isViewing={isViewingLink}
+        fileLink={fileLink}
+        onCancel={() => setIsViewingLink(false)}
+        config={config}
+      />
 
       {/* Upload Document Overlay */}
-      <div className={`absolute inset-0 z-10 flex flex-col xl:flex-row items-start xl:items-center justify-between px-6 py-4 xl:py-0 bg-white text-black transition-all duration-300 ease-out border border-[#e5e7eb] rounded-2xl ${uploadingDocType ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"}`}>
-        <div className="flex flex-col md:flex-row md:items-center gap-4 flex-1 w-full mr-4">
-          <div className="flex items-center gap-3 shrink-0">
-            <MaterialIcon name="upload_file" size="auto" className="text-[28px] leading-none shrink-0 text-[#8474f9]" />
-            <span className="text-base font-semibold leading-normal">Unggah {uploadingDocType === "support_file" ? "3D Gambar" : "Draft"}:</span>
-          </div>
-          <div className="flex flex-col flex-1 gap-1 w-full">
-            <input 
-              type="file" 
-              onChange={(e) => setUploadFileObj(e.target.files?.[0] || null)}
-              className="w-full text-sm text-gray-500 file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#eeebff] file:text-[#8474f9] hover:file:bg-[#e4dfff] cursor-pointer focus:outline-none"
-            />
-          </div>
-        </div>
-        <div className="flex items-center gap-3 mt-4 xl:mt-0 shrink-0">
-          <button 
-            type="button"
-            disabled={isUploading}
-            onClick={() => {
-              setUploadingDocType(null);
-              setUploadFileObj(null);
-            }}
-            className="px-4 py-1.5 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300 disabled:opacity-50"
-          >
-            Batal
-          </button>
-          <button 
-            type="button"
-            disabled={!uploadFileObj || isUploading}
-            onClick={handleUploadSubmit}
-            className="px-4 py-1.5 text-sm font-semibold text-white bg-[#8474f9] hover:bg-[#7261e3] rounded-lg cursor-pointer transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8474f9]/50 disabled:opacity-50 flex items-center gap-2"
-          >
-            {isUploading ? (
-              <>
-                <MaterialIcon name="sync" className="animate-spin text-[16px]" size="auto" />
-                <span className="leading-none">Mengunggah...</span>
-              </>
-            ) : (
-              <>
-                <MaterialIcon name="upload" className="text-[16px]" size="auto" />
-                <span className="leading-none">Unggah</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+      <TaskCardUploadOverlay
+        uploadingDocType={uploadingDocType}
+        fileIndex={uploadFileIndex}
+        isUploading={isUploading}
+        hasFile={!!uploadFileObj}
+        onFileChange={setUploadFileObj}
+        onCancel={() => {
+          setUploadingDocType(null);
+          setUploadFileIndex(null);
+          setUploadFileObj(null);
+        }}
+        onSubmit={handleUploadSubmit}
+        config={config}
+      />
     </div>
   );
 }

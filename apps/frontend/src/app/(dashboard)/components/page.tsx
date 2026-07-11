@@ -22,6 +22,10 @@ import {
   TaskCardDetailStatus,
   TaskCardDetail,
   TaskCardButtonStatus,
+  TaskCardDeleteOverlay,
+  TaskCardSubmitLinkOverlay,
+  TaskCardViewLinkOverlay,
+  TaskCardUploadOverlay,
   type TaskCardDateState,
   type TaskCardNextButtonState,
   type TaskCardLoadingBarPercentage,
@@ -81,6 +85,10 @@ export default function ComponentsPage() {
     "taskcard/detail-status",
     "taskcard/detail",
     "taskcard/button-status",
+    "taskcard/delete-overlay",
+    "taskcard/submit-link-overlay",
+    "taskcard/view-link-overlay",
+    "taskcard/upload-overlay",
     "taskcard/full-card",
   ];
 
@@ -278,6 +286,30 @@ export default function ComponentsPage() {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {item === "taskcard/delete-overlay" && (
+                <div className="ml-12 w-full max-w-[800px] h-[100px] relative rounded-xl border border-cu-line bg-white overflow-hidden">
+                  <TaskCardDeleteOverlay isDeleting={true} onCancel={() => {}} onConfirm={() => {}} />
+                </div>
+              )}
+
+              {item === "taskcard/submit-link-overlay" && (
+                <div className="ml-12 w-full max-w-[800px] h-[100px] relative rounded-xl border border-cu-line bg-white overflow-hidden">
+                  <TaskCardSubmitLinkOverlay isSubmitting={true} inputValue="" onInputChange={() => {}} onCancel={() => {}} onSubmit={() => {}} />
+                </div>
+              )}
+
+              {item === "taskcard/view-link-overlay" && (
+                <div className="ml-12 w-full max-w-[800px] h-[100px] relative rounded-xl border border-cu-line bg-white overflow-hidden">
+                  <TaskCardViewLinkOverlay isViewing={true} fileLink="https://example.com/file" onCancel={() => {}} />
+                </div>
+              )}
+
+              {item === "taskcard/upload-overlay" && (
+                <div className="ml-12 w-full max-w-[800px] h-[100px] relative rounded-xl border border-cu-line bg-white overflow-hidden">
+                  <TaskCardUploadOverlay uploadingDocType="support_file" isUploading={false} hasFile={false} onFileChange={() => {}} onCancel={() => {}} onSubmit={() => {}} />
                 </div>
               )}
 
