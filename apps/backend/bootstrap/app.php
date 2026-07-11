@@ -32,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ['middleware' => ['web', 'auth:sanctum']]
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
         $middleware->statefulApi();
 
         $middleware->redirectGuestsTo(fn () => null);
