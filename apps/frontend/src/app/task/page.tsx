@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/side-menu";
 import { type TaskCardConfig } from "@/components/taskcard";
@@ -26,6 +26,10 @@ type HomeworkTask = {
   support_file_path?: unknown;
   draft_file_path?: unknown;
   file_link?: string | null;
+};
+
+type HomeworkTaskEvent = {
+  task?: HomeworkTask;
 };
 
 type TaskSettings = Partial<TaskCardConfig> & {
@@ -228,6 +232,7 @@ export default function TaskPage() {
   const [pageSubtitle, setPageSubtitle] = useState("Kelola dan selesaikan tugas yang belum beres tepat waktu.");
   const [taskConfig, setTaskConfig] = useState<TaskCardConfig>({});
   const [currentTime, setCurrentTime] = useState(0);
+  const pendingTaskIds = useRef(new Set<number>());
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -237,6 +242,19 @@ export default function TaskPage() {
     } catch (err) {
       console.error("Gagal memuat tugas", err);
     }
+  }, []);
+
+  const mergeTask = useCallback((incomingTask: HomeworkTask) => {
+    setCurrentTime(Date.now());
+    setTasks((currentTasks) => {
+      const exists = currentTasks.some((task) => task.id === incomingTask.id);
+
+      if (!exists) return [...currentTasks, incomingTask];
+
+      return currentTasks.map((task) =>
+        task.id === incomingTask.id ? incomingTask : task
+      );
+    });
   }, []);
 
   useEffect(() => {
@@ -274,7 +292,12 @@ export default function TaskPage() {
 
     const channelName = `App.Models.Core.User.${user.id}`;
     const channel = echo.private(channelName);
-    const refreshAssignedTasks = () => {
+    const refreshAssignedTasks = (event: HomeworkTaskEvent) => {
+      if (event?.task) {
+        mergeTask(event.task);
+        return;
+      }
+
       void fetchTasks();
     };
 
@@ -285,7 +308,7 @@ export default function TaskPage() {
       channel.stopListening(".homework-task.assigned");
       channel.stopListening(".homework-task.updated");
     };
-  }, [fetchTasks, user?.id]);
+  }, [fetchTasks, mergeTask, user?.id]);
 
 
   const handleStepClick = async (taskId: number, step: string) => {
@@ -300,10 +323,11 @@ export default function TaskPage() {
     else if (step === "Email") mappedState = "Kirim Email";
 
     const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
+    if (!task || pendingTaskIds.current.has(taskId)) return;
+
+    pendingTaskIds.current.add(taskId);
 
     const newTimestamps = { ...(task.task_timestamps || {}), [step]: formatted };
-    const previousTasks = tasks;
 
     setTasks((currentTasks) =>
       currentTasks.map((currentTask) =>
@@ -314,31 +338,37 @@ export default function TaskPage() {
     );
 
     try {
-      await apiFetch(`/homework-tasks/${taskId}/status`, {
+      const savedTask = await apiFetch<HomeworkTask>(`/homework-tasks/${taskId}/status`, {
         method: 'PATCH',
         body: JSON.stringify({
           status: mappedState,
           task_timestamps: newTimestamps,
         })
       });
-      void fetchTasks();
+      mergeTask(savedTask);
     } catch (err) {
-      setTasks(previousTasks);
+      setTasks((currentTasks) =>
+        currentTasks.map((currentTask) =>
+          currentTask.id === taskId ? task : currentTask
+        )
+      );
       console.error(err);
+    } finally {
+      pendingTaskIds.current.delete(taskId);
     }
   };
 
   const handleNextClick = async (taskId: number, link?: string) => {
     const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
+    if (!task || pendingTaskIds.current.has(taskId)) return;
+
+    pendingTaskIds.current.add(taskId);
 
     const currentIndex = TASK_CARD_STATES.indexOf(task.status as TaskCardState);
     if (currentIndex === TASK_CARD_STATES.length - 1) return; // Prevent resetting when already Done
     
     const nextIndex = currentIndex + 1;
     const nextStatus = TASK_CARD_STATES[nextIndex];
-    const previousTasks = tasks;
-
     setTasks((currentTasks) =>
       currentTasks.map((currentTask) =>
         currentTask.id === taskId
@@ -351,14 +381,20 @@ export default function TaskPage() {
       const payload: { status: TaskCardState; file_link?: string } = { status: nextStatus };
       if (link) payload.file_link = link;
 
-      await apiFetch(`/homework-tasks/${taskId}/status`, {
+      const savedTask = await apiFetch<HomeworkTask>(`/homework-tasks/${taskId}/status`, {
         method: 'PATCH',
         body: JSON.stringify(payload)
       });
-      void fetchTasks();
+      mergeTask(savedTask);
     } catch (err) {
-      setTasks(previousTasks);
+      setTasks((currentTasks) =>
+        currentTasks.map((currentTask) =>
+          currentTask.id === taskId ? task : currentTask
+        )
+      );
       console.error(err);
+    } finally {
+      pendingTaskIds.current.delete(taskId);
     }
   };
 
