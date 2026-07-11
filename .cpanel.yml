@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/creativedoran/creative.doran.id/
-    - /bin/rsync -a --exclude='.git' --exclude='node_modules' --exclude='tests' /home/creativedoran/appcreative/apps/backend/ $DEPLOYPATH
+    - /bin/cp -R /home/creativedoran/appcreative/apps/backend/. $DEPLOYPATH
