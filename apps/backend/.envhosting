@@ -48,8 +48,11 @@ SESSION_LIFETIME=120
 SESSION_ENCRYPT=false
 SESSION_PATH=/
 SESSION_DOMAIN=creative.doran.id
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=lax
 
-SANCTUM_STATEFUL_DOMAINS=creative.doran.id
+SANCTUM_STATEFUL_DOMAINS=creative.doran.id,www.creative.doran.id
+ALLOWED_ORIGINS=https://creative.doran.id,https://www.creative.doran.id
 
 BROADCAST_CONNECTION=pusher
 FILESYSTEM_DISK=public
@@ -95,7 +98,7 @@ PUSHER_APP_CLUSTER=ap1
 # ------------------------------------------------------------------------------
 # 8. WEB ARTISAN SECURITY COMMANDS (HTTP Endpoint execution)
 # ------------------------------------------------------------------------------
-ARTISAN_SECRET=cr_universe_cpanel_secure_token_2026_ab99cd
+ARTISAN_SECRET=local-dev-token-change-in-production
 ARTISAN_ALLOWED_IPS=
 
 # ------------------------------------------------------------------------------

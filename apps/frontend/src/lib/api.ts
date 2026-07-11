@@ -1,4 +1,5 @@
-const API_HOST = process.env.NEXT_PUBLIC_API_URL || "";
+const configuredApiHost = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") || "";
+const API_HOST = configuredApiHost;
 const API_BASE = `${API_HOST}/api/v1`;
 
 type UnknownRecord = Record<string, unknown>;
@@ -99,6 +100,7 @@ export async function apiFetch<T = unknown>(
     const response = await fetch(url, fetchOptions);
 
     if (response.status === 419 && !isCsrfRoute) {
+      clearClientCsrfCookie();
       await refreshCsrfCookie();
 
       const retryHeaders = new Headers(fetchOptions.headers);
