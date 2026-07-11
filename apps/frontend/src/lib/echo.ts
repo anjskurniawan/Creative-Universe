@@ -27,13 +27,14 @@ export function getEchoClient(): Echo<"pusher"> | null {
 
   window.Pusher = Pusher;
 
+  const apiHost = process.env.NEXT_PUBLIC_API_URL || "";
   const csrfToken = getCookie("XSRF-TOKEN");
   echoClient = new Echo<"pusher">({
     broadcaster: "pusher",
     key,
     cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER || "ap1",
     forceTLS: true,
-    authEndpoint: "/broadcasting/auth/",
+    authEndpoint: `${apiHost}/broadcasting/auth/`,
     auth: {
       headers: {
         Accept: "application/json",
@@ -41,6 +42,28 @@ export function getEchoClient(): Echo<"pusher"> | null {
         ...(csrfToken ? { "X-XSRF-TOKEN": csrfToken } : {}),
       },
     },
+    authorizer: (channel: any) => ({
+      authorize: (socketId: string, callback: any) => {
+        const token = getCookie("XSRF-TOKEN");
+        fetch(`${apiHost}/broadcasting/auth/`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            ...(token ? { "X-XSRF-TOKEN": token } : {}),
+          },
+          body: JSON.stringify({
+            socket_id: socketId,
+            channel_name: channel.name,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => callback(null, data))
+          .catch((err) => callback(err, null));
+      },
+    }),
   });
 
   return echoClient;
