@@ -279,9 +279,11 @@ export default function TaskPage() {
     };
 
     channel.listen(".homework-task.assigned", refreshAssignedTasks);
+    channel.listen(".homework-task.updated", refreshAssignedTasks);
 
     return () => {
       channel.stopListening(".homework-task.assigned");
+      channel.stopListening(".homework-task.updated");
     };
   }, [fetchTasks, user?.id]);
 

@@ -331,7 +331,7 @@ export default function TaskCard({
                   }}
                   onViewClick={(url) => {
                     const isAbsolute = url.startsWith('http://') || url.startsWith('https://');
-                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://creativeuniverse.test";
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
                     window.open(isAbsolute ? url : `${baseUrl}/storage/${url}`, '_blank');
                   }}
                   config={config}
@@ -348,7 +348,7 @@ export default function TaskCard({
                   }}
                   onViewClick={(url) => {
                     const isAbsolute = url.startsWith('http://') || url.startsWith('https://');
-                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://creativeuniverse.test";
+                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
                     window.open(isAbsolute ? url : `${baseUrl}/storage/${url}`, '_blank');
                   }}
                   config={config}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\HomeworkTaskAssigned;
+use App\Events\HomeworkTaskUpdated;
 use Illuminate\Http\Request;
 
 class HomeworkTaskController extends Controller
@@ -124,6 +125,12 @@ class HomeworkTaskController extends Controller
             'file_link' => $validated['file_link'] ?? $task->file_link,
         ]);
 
+        // Broadcast ke semua user yang di-assign
+        $assignedUserIds = $task->users->pluck('id')->map(fn ($id) => (int) $id)->toArray();
+        if (!empty($assignedUserIds)) {
+            HomeworkTaskUpdated::dispatch($task, $assignedUserIds);
+        }
+
         return response()->json($task->load('users'));
     }
 
@@ -163,6 +170,12 @@ class HomeworkTaskController extends Controller
         }
         
         $task->save();
+
+        // Broadcast ke semua user yang di-assign
+        $assignedUserIds = $task->users->pluck('id')->map(fn ($id) => (int) $id)->toArray();
+        if (!empty($assignedUserIds)) {
+            HomeworkTaskUpdated::dispatch($task, $assignedUserIds);
+        }
 
         return response()->json($task->load('users'));
     }
