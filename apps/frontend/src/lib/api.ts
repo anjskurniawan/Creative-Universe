@@ -194,6 +194,7 @@ function normalizeValidationErrors(
 
 export function refreshCsrfCookie(): Promise<void> {
   if (!csrfRefreshPromise) {
+    clearClientCsrfCookie();
     csrfRefreshPromise = apiFetch<unknown>("/sanctum/csrf-cookie", {
       method: "GET",
       _isCsrfRoute: true,
@@ -206,4 +207,22 @@ export function refreshCsrfCookie(): Promise<void> {
   }
 
   return csrfRefreshPromise;
+}
+
+function clearClientCsrfCookie(): void {
+  if (typeof document === "undefined") return;
+
+  const hostname = window.location.hostname;
+  const cookieVariants = [
+    "XSRF-TOKEN=; Max-Age=0; path=/",
+    `XSRF-TOKEN=; Max-Age=0; path=/; domain=${hostname}`,
+  ];
+
+  if (hostname.includes(".")) {
+    cookieVariants.push(`XSRF-TOKEN=; Max-Age=0; path=/; domain=.${hostname}`);
+  }
+
+  cookieVariants.forEach((cookie) => {
+    document.cookie = cookie;
+  });
 }
