@@ -77,11 +77,16 @@ export async function apiFetch<T = unknown>(
   }
 
   const method = (requestOptions.method || "GET").toUpperCase();
-  if (method !== "GET" && method !== "HEAD") {
+  const isMutatingRequest = method !== "GET" && method !== "HEAD";
+  if (isMutatingRequest && !isCsrfRoute) {
+    // Refresh first so a stale XSRF-TOKEN after an env/key change is not reused.
+    await refreshCsrfCookie();
+
     const csrfToken = getCookie("XSRF-TOKEN");
     if (csrfToken) {
       headers.set("X-XSRF-TOKEN", csrfToken);
     }
+    headers.set("X-Requested-With", "XMLHttpRequest");
   }
 
   const fetchOptions: RequestInit = {
