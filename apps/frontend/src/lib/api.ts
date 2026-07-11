@@ -215,16 +215,21 @@ function clearClientCsrfCookie(): void {
   if (typeof document === "undefined") return;
 
   const hostname = window.location.hostname;
-  const cookieVariants = [
-    "XSRF-TOKEN=; Max-Age=0; path=/",
-    `XSRF-TOKEN=; Max-Age=0; path=/; domain=${hostname}`,
+  const cookieNames = [
+    "XSRF-TOKEN",
+    "creativeuniverse_session",
+    "creativeuniverse_20260711_session",
   ];
+  const domains = ["", hostname];
 
   if (hostname.includes(".")) {
-    cookieVariants.push(`XSRF-TOKEN=; Max-Age=0; path=/; domain=.${hostname}`);
+    domains.push(`.${hostname}`);
   }
 
-  cookieVariants.forEach((cookie) => {
-    document.cookie = cookie;
+  cookieNames.forEach((name) => {
+    domains.forEach((domain) => {
+      const domainPart = domain ? `; domain=${domain}` : "";
+      document.cookie = `${name}=; Max-Age=0; path=/${domainPart}`;
+    });
   });
 }
