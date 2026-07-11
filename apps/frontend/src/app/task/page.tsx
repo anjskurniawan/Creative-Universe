@@ -303,6 +303,15 @@ export default function TaskPage() {
     if (!task) return;
 
     const newTimestamps = { ...(task.task_timestamps || {}), [step]: formatted };
+    const previousTasks = tasks;
+
+    setTasks((currentTasks) =>
+      currentTasks.map((currentTask) =>
+        currentTask.id === taskId
+          ? { ...currentTask, status: mappedState, task_timestamps: newTimestamps }
+          : currentTask
+      )
+    );
 
     try {
       await apiFetch(`/homework-tasks/${taskId}/status`, {
@@ -312,8 +321,9 @@ export default function TaskPage() {
           task_timestamps: newTimestamps,
         })
       });
-      fetchTasks();
+      void fetchTasks();
     } catch (err) {
+      setTasks(previousTasks);
       console.error(err);
     }
   };
@@ -326,17 +336,28 @@ export default function TaskPage() {
     if (currentIndex === TASK_CARD_STATES.length - 1) return; // Prevent resetting when already Done
     
     const nextIndex = currentIndex + 1;
+    const nextStatus = TASK_CARD_STATES[nextIndex];
+    const previousTasks = tasks;
+
+    setTasks((currentTasks) =>
+      currentTasks.map((currentTask) =>
+        currentTask.id === taskId
+          ? { ...currentTask, status: nextStatus, file_link: link ?? currentTask.file_link }
+          : currentTask
+      )
+    );
     
     try {
-      const payload: { status: TaskCardState; file_link?: string } = { status: TASK_CARD_STATES[nextIndex] };
+      const payload: { status: TaskCardState; file_link?: string } = { status: nextStatus };
       if (link) payload.file_link = link;
 
       await apiFetch(`/homework-tasks/${taskId}/status`, {
         method: 'PATCH',
         body: JSON.stringify(payload)
       });
-      fetchTasks();
+      void fetchTasks();
     } catch (err) {
+      setTasks(previousTasks);
       console.error(err);
     }
   };

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Events\HomeworkTaskAssigned;
 use App\Events\HomeworkTaskUpdated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class HomeworkTaskController extends Controller
 {
@@ -99,7 +101,7 @@ class HomeworkTaskController extends Controller
 
         $task->users()->sync($validated['assigned_to']);
 
-        HomeworkTaskAssigned::dispatch($task->load('users'), array_map('intval', $validated['assigned_to']));
+        $this->broadcastTaskAssigned($task->load('users'), array_map('intval', $validated['assigned_to']));
 
         return response()->json($task->load('users'), 201);
     }
@@ -128,7 +130,7 @@ class HomeworkTaskController extends Controller
         // Broadcast ke semua user yang di-assign
         $assignedUserIds = $task->users->pluck('id')->map(fn ($id) => (int) $id)->toArray();
         if (!empty($assignedUserIds)) {
-            HomeworkTaskUpdated::dispatch($task, $assignedUserIds);
+            $this->broadcastTaskUpdated($task, $assignedUserIds);
         }
 
         return response()->json($task->load('users'));
@@ -174,7 +176,7 @@ class HomeworkTaskController extends Controller
         // Broadcast ke semua user yang di-assign
         $assignedUserIds = $task->users->pluck('id')->map(fn ($id) => (int) $id)->toArray();
         if (!empty($assignedUserIds)) {
-            HomeworkTaskUpdated::dispatch($task, $assignedUserIds);
+            $this->broadcastTaskUpdated($task, $assignedUserIds);
         }
 
         return response()->json($task->load('users'));
@@ -209,5 +211,31 @@ class HomeworkTaskController extends Controller
             'path' => $path,
             'original_name' => $originalName
         ]);
+    }
+
+    private function broadcastTaskAssigned(\App\Models\HomeworkTask $task, array $userIds): void
+    {
+        try {
+            HomeworkTaskAssigned::dispatch($task, $userIds);
+        } catch (Throwable $e) {
+            Log::warning('Homework task assignment broadcast failed.', [
+                'task_id' => $task->id,
+                'user_ids' => $userIds,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function broadcastTaskUpdated(\App\Models\HomeworkTask $task, array $userIds): void
+    {
+        try {
+            HomeworkTaskUpdated::dispatch($task, $userIds);
+        } catch (Throwable $e) {
+            Log::warning('Homework task update broadcast failed.', [
+                'task_id' => $task->id,
+                'user_ids' => $userIds,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }
