@@ -314,7 +314,7 @@ export default function TaskCard({
             <div className="flex flex-col sm:flex-row gap-4 xl:gap-4 2xl:gap-8 items-stretch sm:items-center relative flex-1 min-w-0 mr-4">
               {/* Title */}
               <div className="flex flex-col items-start relative flex-1 min-w-0 xl:max-w-[220px]">
-                <TaskCardTitleTask title={title} className="px-0 py-0 xl:p-[10px] w-full truncate" />
+                <TaskCardTitleTask title={title} className="w-full px-0 py-0 xl:p-[10px]" />
               </div>
 
               {/* Files */}
