@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Events\HomeworkTaskAssigned;
 use App\Events\HomeworkTaskUpdated;
+use App\Models\AppSetting;
+use App\Models\Core\User;
+use App\Services\HomeworkTaskTimingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class HomeworkTaskController extends Controller
@@ -13,14 +17,12 @@ class HomeworkTaskController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $this->ensureTaskRouteAccess($user);
         $query = \App\Models\HomeworkTask::with('users');
 
         if ($user && !$user->hasRole(['Root', 'Manajer', 'SPV'])) {
-            $query->where(function ($q) use ($user) {
-                $q->where('created_by', $user->id)
-                  ->orWhereHas('users', function ($q2) use ($user) {
-                      $q2->where('users.id', $user->id);
-                  });
+            $query->whereHas('users', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
             });
         }
 
@@ -34,6 +36,7 @@ class HomeworkTaskController extends Controller
 
     public function store(Request $request)
     {
+        $this->ensureTaskRouteAccess($request->user());
         $validated = $request->validate([
             'task_given_date' => 'required|date',
             'task_name' => 'required|string|max:255',
@@ -106,8 +109,9 @@ class HomeworkTaskController extends Controller
         return response()->json($task->load('users'), 201);
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id, HomeworkTaskTimingService $timing)
     {
+        $this->ensureTaskRouteAccess($request->user());
         $task = \App\Models\HomeworkTask::findOrFail($id);
         $user = auth()->user();
         
@@ -119,12 +123,29 @@ class HomeworkTaskController extends Controller
             'status' => 'required|string',
             'task_timestamps' => 'nullable|array',
             'file_link' => 'nullable|string|max:2048',
+            'delay_reason' => 'nullable|string|max:2000',
         ]);
+
+        $reasonStage = $timing->requiredReasonStage($task, $validated['status']);
+        if ($reasonStage && blank($validated['delay_reason'] ?? null)) {
+            throw ValidationException::withMessages([
+                'delay_reason' => "Alasan keterlambatan tahap {$reasonStage} wajib diisi sebelum melanjutkan task.",
+            ]);
+        }
+
+        $delayReasons = $task->delay_reasons ?? [];
+        if ($reasonStage) {
+            $delayReasons[$reasonStage] = [
+                'reason' => $validated['delay_reason'],
+                'recorded_at' => now()->toIso8601String(),
+            ];
+        }
 
         $task->update([
             'status' => $validated['status'],
             'task_timestamps' => $validated['task_timestamps'] ?? $task->task_timestamps,
             'file_link' => $validated['file_link'] ?? $task->file_link,
+            'delay_reasons' => $delayReasons,
         ]);
 
         // Broadcast ke semua user yang di-assign
@@ -138,6 +159,7 @@ class HomeworkTaskController extends Controller
 
     public function uploadFile(Request $request, $id)
     {
+        $this->ensureTaskRouteAccess($request->user());
         $task = \App\Models\HomeworkTask::findOrFail($id);
         $user = auth()->user();
         
@@ -184,6 +206,7 @@ class HomeworkTaskController extends Controller
 
     public function destroy($id)
     {
+        $this->ensureTaskRouteAccess(request()->user());
         $task = \App\Models\HomeworkTask::findOrFail($id);
         $user = auth()->user();
         
@@ -197,6 +220,7 @@ class HomeworkTaskController extends Controller
 
     public function uploadTempFile(Request $request)
     {
+        $this->ensureTaskRouteAccess($request->user());
         $request->validate([
             'file' => 'required|file|max:10240',
         ]);
@@ -224,6 +248,39 @@ class HomeworkTaskController extends Controller
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function accessUsers(Request $request)
+    {
+        $user = $request->user();
+        abort_unless($user?->hasRole(['Root', 'Manajer']), 403);
+
+        return response()->json(
+            User::query()
+                ->whereDoesntHave('roles', fn ($query) => $query->whereIn('name', ['Root', 'Manajer', 'SPV']))
+                ->orderBy('name')
+                ->pluck('name')
+                ->unique()
+                ->values(),
+        );
+    }
+
+    private function ensureTaskRouteAccess(?User $user): void
+    {
+        abort_unless($user, 401);
+        if ($user->hasRole(['Root', 'Manajer', 'SPV'])) {
+            return;
+        }
+
+        if (HomeworkTask::query()->whereHas('users', fn ($query) => $query->where('users.id', $user->id))->exists()) {
+            return;
+        }
+
+        $rawNames = AppSetting::query()->where('key', 'task_route_allowed_names')->value('value');
+        $allowedNames = is_string($rawNames) ? json_decode($rawNames, true) : [];
+        $allowedNames = is_array($allowedNames) ? $allowedNames : [];
+
+        abort_unless(in_array($user->name, $allowedNames, true), 403, 'Anda tidak memiliki akses ke halaman Task.');
     }
 
     private function broadcastTaskUpdated(\App\Models\HomeworkTask $task, array $userIds): void

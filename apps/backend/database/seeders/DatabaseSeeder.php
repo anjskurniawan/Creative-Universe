@@ -143,7 +143,10 @@ class DatabaseSeeder extends Seeder
         // 4. Seed data onboarding profile
         $this->call(OnboardingDataSeeder::class);
 
-        // 5. Seed permission dan default config ODDS
+        // 5. Seed data dummy task untuk pengujian halaman /task.
+        $this->call(HomeworkTaskDemoSeeder::class);
+
+        // 6. Seed permission dan default config ODDS
         $this->call(OddsPermissionSeeder::class);
         $this->call(OddsDefaultSeeder::class);
     }

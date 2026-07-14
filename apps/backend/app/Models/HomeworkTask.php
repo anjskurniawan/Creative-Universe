@@ -16,6 +16,7 @@ class HomeworkTask extends Model
         'file_link',
         'status',
         'task_timestamps',
+        'delay_reasons',
         'created_by',
     ];
 
@@ -23,6 +24,7 @@ class HomeworkTask extends Model
         'task_given_date' => 'date',
         'deadline_date' => 'date',
         'task_timestamps' => 'array',
+        'delay_reasons' => 'array',
         'support_file_path' => 'array',
         'draft_file_path' => 'array',
     ];
@@ -36,4 +38,11 @@ class HomeworkTask extends Model
     {
         return $this->belongsTo(\App\Models\Core\User::class, 'created_by');
     }
+
+    public function getTimingEvaluationAttribute(): array
+    {
+        return app(\App\Services\HomeworkTaskTimingService::class)->evaluate($this);
+    }
+
+    protected $appends = ['timing_evaluation'];
 }

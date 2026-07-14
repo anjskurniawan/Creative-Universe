@@ -5,6 +5,8 @@ import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/
 import { apiFetch } from "@/lib/api";
 import { type TaskCardConfig } from "@/components/taskcard";
 import { useAuth } from "@/providers/auth-provider";
+import { MaterialIcon } from "@/components/material-icon";
+import { TaskDesktopPageTransition } from "@/components/task-desktop-page-transition";
 
 const PRIMARY_MENU: SideMenuItem[] = [
   {
@@ -12,9 +14,9 @@ const PRIMARY_MENU: SideMenuItem[] = [
     icon: "today",
     href: "/task",
   },
-  { label: "Tugas Belum Selesai", icon: "assignment_late" },
-  { label: "Tugas Bulan Ini", icon: "calendar_month" },
-  { label: "Rekap Performa", icon: "analytics" },
+  { label: "Tugas Belum Selesai", icon: "assignment_late", href: "/task/unfinished" },
+  { label: "Tugas Bulan Ini", icon: "calendar_month", href: "/task/month" },
+  { label: "Rekap Performa", icon: "analytics", href: "/task/performance" },
   {
     label: "Option Page",
     icon: "settings",
@@ -33,7 +35,7 @@ export default function OptionPage() {
   const [mobileSidebarVariant, setMobileSidebarVariant] = useState<SideMenuVariant>("Collaps");
   const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Collaps");
 
-  const [activeTab, setActiveTab] = useState<"General" | "Overlays" | "Status" | "Colors" | "FormInput">("General");
+  const [activeTab, setActiveTab] = useState<"General" | "Overlays" | "Status" | "Colors" | "FormInput" | "Access">("General");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const { hasRole, user, isLoading: isAuthLoading } = useAuth();
@@ -43,6 +45,10 @@ export default function OptionPage() {
   const [task_page_subtitle, set_task_page_subtitle] = useState("");
   
   const [config, setConfig] = useState<TaskCardConfig>({});
+  const [taskAccessNames, setTaskAccessNames] = useState<string[]>([]);
+  const [taskAccessUserOptions, setTaskAccessUserOptions] = useState<string[]>([]);
+  const [isTaskAccessMenuOpen, setIsTaskAccessMenuOpen] = useState(false);
+  const [taskAccessSearch, setTaskAccessSearch] = useState("");
 
   const handleConfigChange = (key: keyof TaskCardConfig, value: string) => {
     setConfig(prev => ({ ...prev, [key]: value }));
@@ -59,6 +65,7 @@ export default function OptionPage() {
     "task_empty_state",
     "color_done_bg", "color_done_text", "color_progress_bg", "color_progress_text", "color_delete_bg", "color_delete_text",
     "icon_file_empty", "icon_file_filled"
+    , "task_route_allowed_names"
   ];
 
   useEffect(() => {
@@ -83,6 +90,16 @@ export default function OptionPage() {
           }
         }
         setConfig(loadedConfig);
+        try {
+          const parsedNames = typeof data?.task_route_allowed_names === "string"
+            ? JSON.parse(data.task_route_allowed_names)
+            : [];
+          setTaskAccessNames(Array.isArray(parsedNames) ? parsedNames.filter((name): name is string => typeof name === "string") : []);
+          const users = await apiFetch<string[]>("/homework-tasks/access-users");
+          setTaskAccessUserOptions(users);
+        } catch (error) {
+          console.error("Gagal memuat daftar akses Task:", error);
+        }
       } catch (err) {
         console.error("Gagal memuat pengaturan:", err);
       } finally {
@@ -111,6 +128,7 @@ export default function OptionPage() {
           settings: {
             task_page_title,
             task_page_subtitle,
+            task_route_allowed_names: JSON.stringify(taskAccessNames),
             ...config
           }
         })
@@ -130,6 +148,7 @@ export default function OptionPage() {
     { id: "Status", label: "Teks Status" },
     { id: "Colors", label: "Warna & Ikon" },
     { id: "FormInput", label: "Form Input" },
+    { id: "Access", label: "Akses Route" },
   ] as const;
 
   return (
@@ -149,7 +168,7 @@ export default function OptionPage() {
         className="hidden lg:flex"
       />
 
-      <main className="min-w-0 overflow-hidden px-4 py-8 sm:px-8 lg:pl-12 lg:pr-16">
+      <TaskDesktopPageTransition className="min-w-0 overflow-visible px-4 py-8 sm:px-8 lg:pl-12 lg:pr-16">
         <div className="w-full max-w-4xl">
           <header className="min-h-[140px] gap-6 2xl:flex 2xl:items-center 2xl:justify-between">
             <div className="w-full max-w-[590px] shrink-0">
@@ -162,7 +181,7 @@ export default function OptionPage() {
             </div>
           </header>
 
-          <section className="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden w-full mb-20">
+          <section className="mt-8 w-full rounded-2xl border border-gray-200 bg-white shadow-sm overflow-visible mb-20">
             <div className="flex overflow-x-auto border-b border-gray-200">
               {tabs.map(tab => (
                 <button
@@ -219,6 +238,40 @@ export default function OptionPage() {
                           placeholder="Belum ada tugas yang sesuai."
                         />
                       </div>
+                      {false && <div className="col-span-1 flex flex-col gap-3 rounded-xl border border-[#e6e2ff] bg-[#faf9ff] p-4 md:col-span-2">
+                        <div>
+                          <label className="text-sm font-semibold text-gray-700">Akses Route Task</label>
+                          <p className="mt-1 text-xs text-gray-500">Root, Manajer, dan SPV selalu memiliki akses. Tambahkan pengguna berdasarkan nama.</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {taskAccessNames.length === 0 ? <span className="text-xs text-gray-500">Belum ada pengguna tambahan.</span> : taskAccessNames.map((name) => <span key={name} className="inline-flex items-center gap-1 rounded-full bg-[#eeebff] px-3 py-1 text-xs font-medium text-[#6255c7]">{name}<button type="button" aria-label={`Hapus ${name}`} onClick={() => setTaskAccessNames((current) => current.filter((item) => item !== name))} className="text-base leading-none">×</button></span>)}
+                        </div>
+                        <select value="" onChange={(event) => { const name = event.target.value; if (name) setTaskAccessNames((current) => current.includes(name) ? current : [...current, name]); }} className="h-10 max-w-sm rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[#8474f9]/30">
+                          <option value="">Tambah berdasarkan nama...</option>
+                          {taskAccessUserOptions.filter((name) => !taskAccessNames.includes(name)).map((name) => <option key={name} value={name}>{name}</option>)}
+                        </select>
+                      </div>}
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "Access" && (
+                  <div className="flex max-w-2xl flex-col gap-5">
+                    <div>
+                      <h2 className="text-xl font-semibold">Akses Route Task</h2>
+                      <p className="mt-1 text-sm text-gray-500">Root, Manajer, dan SPV selalu memiliki akses. Tambahkan pengguna lain berdasarkan nama.</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {taskAccessNames.length === 0 ? <span className="text-sm text-gray-500">Belum ada pengguna tambahan.</span> : taskAccessNames.map((name) => <span key={name} className="inline-flex items-center gap-1 rounded-full bg-[#eeebff] px-3 py-1.5 text-sm font-medium text-[#6255c7]">{name}<button type="button" aria-label={`Hapus ${name}`} onClick={() => setTaskAccessNames((current) => current.filter((item) => item !== name))} className="text-lg leading-none">×</button></span>)}
+                    </div>
+                    <div className="relative max-w-md">
+                      <button type="button" onClick={() => setIsTaskAccessMenuOpen((open) => !open)} className="flex h-11 w-full items-center justify-between rounded-xl border border-[#d7dcdd] bg-white px-4 text-left text-sm text-[#3b4446] shadow-sm">
+                        <span>Tambah berdasarkan nama...</span><MaterialIcon name="keyboard_arrow_down" size="auto" className="text-xl" />
+                      </button>
+                      {isTaskAccessMenuOpen && <div className="absolute z-20 mt-2 w-full rounded-xl border border-[#d7dcdd] bg-white p-2 shadow-lg">
+                        <label className="relative block"><MaterialIcon name="search" size="auto" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-[#7b868a]" /><input autoFocus value={taskAccessSearch} onChange={(event) => setTaskAccessSearch(event.target.value)} placeholder="Cari nama..." className="h-10 w-full rounded-lg bg-[#f6f7f8] py-2 pl-9 pr-3 text-sm outline-none" /></label>
+                        <div className="mt-2 max-h-48 overflow-y-auto">{taskAccessUserOptions.filter((name) => !taskAccessNames.includes(name) && name.toLowerCase().includes(taskAccessSearch.toLowerCase())).map((name) => <button key={name} type="button" onClick={() => { setTaskAccessNames((current) => [...current, name]); setTaskAccessSearch(""); setIsTaskAccessMenuOpen(false); }} className="flex w-full rounded-lg px-3 py-2 text-left text-sm text-[#3b4446] hover:bg-[#eeebff]">{name}</button>)}{taskAccessUserOptions.filter((name) => !taskAccessNames.includes(name) && name.toLowerCase().includes(taskAccessSearch.toLowerCase())).length === 0 && <p className="px-3 py-2 text-sm text-[#7b868a]">Nama tidak ditemukan.</p>}</div>
+                      </div>}
                     </div>
                   </div>
                 )}
@@ -690,7 +743,7 @@ export default function OptionPage() {
             )}
           </section>
         </div>
-      </main>
+      </TaskDesktopPageTransition>
     </div>
   );
 }

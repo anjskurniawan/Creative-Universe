@@ -24,6 +24,8 @@ class AppSettingController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless($request->user()?->hasRole(['Root', 'Manajer']), 403);
+
         $data = $request->validate([
             'settings' => 'required|array',
             'settings.*' => 'nullable|string'

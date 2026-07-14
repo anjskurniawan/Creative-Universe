@@ -127,7 +127,7 @@ export function CustomDatePicker({
   }
 
   return (
-    <div className={`relative ${className}`} ref={containerRef}>
+    <div className={`relative w-full ${className}`} ref={containerRef}>
       <div
         className={`min-h-[52px] cursor-pointer flex flex-wrap items-center gap-2 rounded-xl border px-4 py-3 outline-none transition-all ${
           isOpen
@@ -153,7 +153,7 @@ export function CustomDatePicker({
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-20 mt-2 w-[280px] p-4 rounded-2xl border border-[#e5e7eb] bg-white shadow-xl">
+        <div className="absolute left-0 top-full z-20 mt-2 min-w-[280px] w-full rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-xl">
           <div className="flex items-center justify-between mb-4">
             <button
               type="button"

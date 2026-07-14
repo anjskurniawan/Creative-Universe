@@ -12,6 +12,7 @@ import TaskCardDeleteOverlay from "./delete-overlay";
 import TaskCardSubmitLinkOverlay from "./submit-link-overlay";
 import TaskCardViewLinkOverlay from "./view-link-overlay";
 import TaskCardUploadOverlay from "./upload-overlay";
+import TaskCardDelayReasonOverlay from "./delay-reason-overlay";
 import { apiFetch } from "@/lib/api";
 import { MaterialIcon } from "@/components/material-icon";
 import { 
@@ -60,8 +61,8 @@ function getStepState(cardState: TaskCardState, index: number): TaskCardButtonSt
 
 export type TaskCardProps = {
   state?: TaskCardState;
-  onNextClick?: (fileLink?: string) => void;
-  onStepClick?: (status: TaskCardButtonStatusState) => void;
+  onNextClick?: (fileLink?: string, delayReason?: string) => void;
+  onStepClick?: (status: TaskCardButtonStatusState, delayReason?: string) => void;
   onDetailStatusClick?: (status: TaskCardDetailStatusState) => void;
   onDeleteConfirm?: () => void;
   timestamps?: Record<string, string>;
@@ -78,6 +79,7 @@ export type TaskCardProps = {
   config?: TaskCardConfig;
   currentUser?: any;
   createdBy?: number;
+  delayReasonStage?: string;
 };
 
 export default function TaskCard({ 
@@ -100,6 +102,7 @@ export default function TaskCard({
   config = {},
   currentUser,
   createdBy,
+  delayReasonStage,
 }: TaskCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmittingFile, setIsSubmittingFile] = useState(false);
@@ -110,6 +113,12 @@ export default function TaskCard({
   const [isUploading, setIsUploading] = useState(false);
   const [inputFileLink, setInputFileLink] = useState("");
   const [internalTimestamps, setInternalTimestamps] = useState<Record<string, string>>(timestamps || {});
+  const [delayReason, setDelayReason] = useState("");
+  const [pendingStep, setPendingStep] = useState<TaskCardButtonStatusState | null>(null);
+
+  const canManageTask = !currentUser || !createdBy || currentUser.id === createdBy || ["Root", "Manajer", "SPV"].some((role) =>
+    currentUser.roles?.some((currentRole: string | { name?: string }) => typeof currentRole === "string" ? currentRole === role : currentRole.name === role),
+  );
 
   useEffect(() => {
     if (timestamps) {
@@ -118,7 +127,7 @@ export default function TaskCard({
   }, [timestamps]);
 
   const getNextAllowedStep = (): TaskCardButtonStatusState | null => {
-    if (currentUser && createdBy && currentUser.id !== createdBy && !['Root', 'Manajer', 'SPV'].some(role => currentUser.roles?.some((r: any) => r.name === role))) {
+    if (!canManageTask) {
       return null;
     }
     
@@ -129,21 +138,25 @@ export default function TaskCard({
     return null;
   };
 
+  const commitStep = (stepName: TaskCardButtonStatusState, reason?: string) => {
+    const now = new Date();
+    const pad = (num: number) => String(num).padStart(2, "0");
+    const formatted = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    setInternalTimestamps(prev => ({ ...prev, [stepName]: formatted }));
+    onStepClick?.(stepName, reason);
+  };
+
   const handleStepClick = (stepName: TaskCardButtonStatusState) => {
     if (stepName !== getNextAllowedStep()) {
       return; // Safeguard: sequential step flow or unauthorized
     }
 
-    const now = new Date();
-    const pad = (num: number) => String(num).padStart(2, "0");
-    const formatted = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    
-    setInternalTimestamps(prev => ({
-      ...prev,
-      [stepName]: formatted
-    }));
-    
-    onStepClick?.(stepName);
+    if (delayReasonStage) {
+      setPendingStep(stepName);
+      return;
+    }
+
+    commitStep(stepName);
   };
 
   const isDone = state === "Done";
@@ -251,7 +264,7 @@ export default function TaskCard({
 
   const handleFileClick = (path: string | null | undefined, type: "support_file" | "draft_file") => {
     if (!path) {
-      if (currentUser && createdBy && currentUser.id !== createdBy && !['Root', 'Manajer', 'SPV'].some(role => currentUser.roles?.some((r: any) => r.name === role))) {
+      if (!canManageTask) {
         return;
       }
       setUploadingDocType(type);
@@ -311,9 +324,9 @@ export default function TaskCard({
             ].join(" ")}
           >
             {/* Task Info Container */}
-            <div className="flex flex-col sm:flex-row gap-4 xl:gap-4 2xl:gap-8 items-stretch sm:items-center relative flex-1 min-w-0 mr-4">
+            <div className="flex flex-col sm:flex-row gap-4 xl:gap-4 2xl:gap-6 items-stretch sm:items-center relative min-w-0 xl:flex-none xl:mr-6">
               {/* Title */}
-              <div className="flex flex-col items-start relative flex-1 min-w-0 xl:max-w-[220px]">
+              <div className="flex flex-col items-start relative flex-1 min-w-0 xl:w-[420px] xl:flex-none">
                 <TaskCardTitleTask title={title} className="w-full px-0 py-0 xl:p-[10px]" />
               </div>
 
@@ -442,9 +455,9 @@ export default function TaskCard({
               <div className="flex justify-end lg:block shrink-0">
                 <TaskCardNextButton 
                   state={nextButtonState} 
-                  className={`size-[38px] ${currentUser && createdBy && currentUser.id !== createdBy && !['Root', 'Manajer', 'SPV'].some(role => currentUser.roles?.some((r: any) => r.name === role)) ? "opacity-50 pointer-events-none" : ""}`}
+                  className={`size-[38px] ${!canManageTask ? "opacity-50 pointer-events-none" : ""}`}
                   onClick={() => {
-                    if (currentUser && createdBy && currentUser.id !== createdBy && !['Root', 'Manajer', 'SPV'].some(role => currentUser.roles?.some((r: any) => r.name === role))) {
+                    if (!canManageTask) {
                        return;
                     }
                     if (nextButtonState === "Delete") {
@@ -473,6 +486,20 @@ export default function TaskCard({
           setIsDeleting(false);
         }}
         config={config}
+      />
+
+      <TaskCardDelayReasonOverlay
+        isOpen={Boolean(pendingStep)}
+        stage={delayReasonStage}
+        value={delayReason}
+        onChange={setDelayReason}
+        onCancel={() => { setPendingStep(null); setDelayReason(""); }}
+        onConfirm={() => {
+          if (!pendingStep || !delayReason.trim()) return;
+          commitStep(pendingStep, delayReason.trim());
+          setPendingStep(null);
+          setDelayReason("");
+        }}
       />
 
       {/* Submit File Overlay */}

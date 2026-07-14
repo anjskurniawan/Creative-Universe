@@ -195,6 +195,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Homework Tasks Routes
+    Route::get('/homework-tasks/access-users', [\App\Http\Controllers\HomeworkTaskController::class, 'accessUsers']);
     Route::post('/temp-upload', [\App\Http\Controllers\HomeworkTaskController::class, 'uploadTempFile']);
     Route::get('/homework-tasks', [\App\Http\Controllers\HomeworkTaskController::class, 'index']);
     Route::post('/homework-tasks', [\App\Http\Controllers\HomeworkTaskController::class, 'store']);

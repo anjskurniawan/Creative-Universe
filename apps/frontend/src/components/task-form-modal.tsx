@@ -41,7 +41,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await apiFetch<any>('/users?per_page=50');
+        const res = await apiFetch<UserOption[] | { data?: UserOption[] }>('/users?per_page=50');
         if (Array.isArray(res)) setUsersList(res);
         else if (res && Array.isArray(res.data)) setUsersList(res.data);
       } catch (err) {
@@ -49,7 +49,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
       }
 
       try {
-        const settings = await apiFetch<any>('/settings?keys=vendor_options');
+        const settings = await apiFetch<{ vendor_options?: string }>('/settings?keys=vendor_options');
         if (settings && settings.vendor_options) {
           const vendors = settings.vendor_options.split(",").map((v: string) => v.trim()).filter(Boolean);
           setVendorOptions(vendors.length > 0 ? vendors : ["Mireco", "Fushion"]);
@@ -165,12 +165,12 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
   const labelClass = "mb-2 block text-sm font-medium text-[#4b5563]";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-md">
-      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden p-2 sm:p-4">
+    <div className="fixed inset-0 z-[200] flex items-start justify-center bg-gray-900/40 p-0 backdrop-blur-md sm:items-center sm:p-4">
+      <div className="relative flex min-h-dvh max-h-dvh w-full max-w-2xl flex-col overflow-hidden rounded-none bg-white p-0 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] sm:min-h-0 sm:max-h-[90vh] sm:rounded-3xl sm:p-4">
         <div 
-          className="overflow-y-auto p-6 sm:p-6 custom-scrollbar w-full h-full rounded-2xl"
+          className="h-full w-full overflow-y-auto p-4 custom-scrollbar sm:rounded-2xl sm:p-6"
         >
-          <div className="flex items-start justify-between gap-4 mb-8">
+          <div className="mb-6 flex items-start justify-between gap-4 sm:mb-8">
             <h2 className="text-2xl font-bold tracking-tight text-[#111827]">Tambah Tugas Baru</h2>
             <button
               onClick={onClose}
@@ -184,7 +184,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
           
           {/* 1. Tanggal tugas diberikan */}
           <div>
-            <label className={labelClass}>Tanggal tugas diberikan</label>
+            <label className={labelClass}>Tanggal tugas diberikan <span className="text-[#ea4c89]">*</span></label>
             <CustomDatePicker
               value={taskGivenDate}
               onChange={setTaskGivenDate}
@@ -195,7 +195,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
 
           {/* 2. Nama Tugas */}
           <div>
-            <label className={labelClass}>Nama Tugas</label>
+            <label className={labelClass}>Nama Tugas <span className="text-[#ea4c89]">*</span></label>
             <input
               type="text"
               placeholder="Masukkan nama tugas..."
@@ -208,7 +208,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
 
           {/* 3. Pic Vendor */}
           <div>
-            <label className={labelClass}>PIC Vendor</label>
+            <label className={labelClass}>PIC Vendor <span className="text-[#ea4c89]">*</span></label>
             <div className="relative" ref={vendorDropdownRef}>
               <div 
                 className={`min-h-[52px] cursor-pointer flex flex-wrap items-center gap-2 rounded-xl border px-4 py-3 outline-none transition-all ${isVendorDropdownOpen ? "bg-white border-[#8474f9] ring-4 ring-[#8474f9]/10" : "bg-gray-50/50 border-transparent hover:bg-gray-50 hover:border-gray-200"}`}
@@ -246,7 +246,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
 
           {/* 4. Assigned to */}
           <div ref={dropdownRef} className="relative">
-            <label className={labelClass}>Assigned to</label>
+            <label className={labelClass}>Assigned to <span className="text-[#ea4c89]">*</span></label>
             <div 
               className={`min-h-[52px] cursor-text flex flex-wrap items-center gap-2 rounded-xl border px-4 py-2 outline-none transition-all ${isDropdownOpen ? "bg-white border-[#8474f9] ring-4 ring-[#8474f9]/10" : "bg-gray-50/50 border-transparent hover:bg-gray-50 hover:border-gray-200"}`}
               onClick={() => setIsDropdownOpen(true)}
@@ -315,7 +315,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
 
           {/* 6. Deadline Tugas diberikan */}
           <div>
-            <label className={labelClass}>Deadline Tugas diberikan</label>
+            <label className={labelClass}>Deadline Tugas diberikan <span className="text-[#ea4c89]">*</span></label>
             <CustomDatePicker
               value={deadlineDate}
               onChange={setDeadlineDate}
@@ -333,12 +333,12 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
           />
 
           {/* Keterangan & Submit */}
-          <div className="pt-4 flex items-center gap-4 border-t border-gray-100">
-            <span className="text-xs text-gray-400 font-medium">Tanda * Wajib diisi</span>
+          <div className="flex flex-col gap-2 border-t border-gray-100 pt-4">
+            <span className="text-xs font-medium text-gray-400">Tanda <span className="text-[#ea4c89]">*</span> wajib diisi</span>
             <button
               type="submit"
               disabled={isSubmitting || supportFiles.some(f => f.status === 'uploading') || draftFiles.some(f => f.status === 'uploading')}
-              className="ml-auto flex items-center justify-center gap-2 rounded-xl bg-[#8474f9] px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-[#6c5bfa] focus:ring-4 focus:ring-[#8474f9]/20 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_8px_20px_-6px_rgba(132,116,249,0.5)]"
+              className="flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#8474f9] px-4 text-base font-semibold text-white transition-all hover:bg-[#6c5bfa] focus:ring-4 focus:ring-[#8474f9]/20 disabled:cursor-not-allowed disabled:opacity-50 shadow-[0_8px_20px_-6px_rgba(132,116,249,0.5)]"
             >
               {isSubmitting ? (
                 <>
