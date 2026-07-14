@@ -30,12 +30,16 @@ export default function TaskCardDetail({
     const doneText = config.color_done_text || "#2b9915";
     const progressText = config.color_progress_text || "#8474f9";
     const progressBgLight = "#eeebff"; // fallback
+    const isOverdue = isCountDown && value?.startsWith("Terlambat");
 
     let badgeBg = "";
     let style = {};
 
     if (isVariant4) {
       style = { backgroundColor: doneBg, color: doneText, borderColor: doneText };
+      badgeBg = "hover:opacity-80";
+    } else if (isOverdue) {
+      style = { backgroundColor: "#fff0f1", color: "#ef4444", borderColor: "#ef4444" };
       badgeBg = "hover:opacity-80";
     } else {
       style = { backgroundColor: progressBgLight, color: progressText, borderColor: progressText };
