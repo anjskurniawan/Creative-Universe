@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Api;
 
 use App\Models\Core\User;
-use App\Models\Pricetag\PricetagCategory;
-use App\Models\Pricetag\PricetagProduct;
+use App\SubApps\Generator\Pricetag\Models\PricetagCategory;
+use App\SubApps\Generator\Pricetag\Models\PricetagProduct;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -27,32 +27,32 @@ class PricetagCatalogMutationApiTest extends TestCase
 
     public function test_manager_can_create_update_and_soft_delete_category_with_ownership(): void
     {
-        $created = $this->actingAs($this->manager)->postJson('/api/v1/pricetag/categories', [
+        $created = $this->actingAs($this->manager)->postJson('/api/v1/generator/pricetag/categories', [
             'name' => 'Smart Home',
         ]);
 
         $created->assertCreated()->assertJsonPath('data.name', 'Smart Home');
         $categoryId = $created->json('data.id');
-        $this->assertDatabaseHas('pricetag_categories', [
+        $this->assertDatabaseHas('generator_pricetag_categories', [
             'id' => $categoryId,
             'created_by' => $this->manager->id,
         ]);
 
         $this->actingAs($this->manager)
-            ->patchJson("/api/v1/pricetag/categories/{$categoryId}", ['name' => 'Rumah Pintar'])
+            ->patchJson("/api/v1/generator/pricetag/categories/{$categoryId}", ['name' => 'Rumah Pintar'])
             ->assertOk();
 
-        $this->assertDatabaseHas('pricetag_categories', [
+        $this->assertDatabaseHas('generator_pricetag_categories', [
             'id' => $categoryId,
             'updated_by' => $this->manager->id,
         ]);
 
         $this->actingAs($this->manager)
-            ->deleteJson("/api/v1/pricetag/categories/{$categoryId}")
+            ->deleteJson("/api/v1/generator/pricetag/categories/{$categoryId}")
             ->assertOk();
 
-        $this->assertSoftDeleted('pricetag_categories', ['id' => $categoryId]);
-        $this->assertDatabaseHas('pricetag_categories', [
+        $this->assertSoftDeleted('generator_pricetag_categories', ['id' => $categoryId]);
+        $this->assertDatabaseHas('generator_pricetag_categories', [
             'id' => $categoryId,
             'deleted_by' => $this->manager->id,
         ]);
@@ -68,11 +68,11 @@ class PricetagCatalogMutationApiTest extends TestCase
         [$category] = $this->catalogFixture();
 
         $this->actingAs($this->manager)
-            ->deleteJson("/api/v1/pricetag/categories/{$category->id}")
+            ->deleteJson("/api/v1/generator/pricetag/categories/{$category->id}")
             ->assertStatus(422)
             ->assertJsonPath('message', "Kategori {$category->name} masih memiliki produk aktif dan tidak dapat dihapus.");
 
-        $this->assertNotSoftDeleted('pricetag_categories', ['id' => $category->id]);
+        $this->assertNotSoftDeleted('generator_pricetag_categories', ['id' => $category->id]);
     }
 
     public function test_manager_can_create_update_and_soft_delete_product_with_price_audit(): void
@@ -82,7 +82,7 @@ class PricetagCatalogMutationApiTest extends TestCase
             'created_by' => $this->manager->id,
         ]);
 
-        $created = $this->actingAs($this->manager)->postJson('/api/v1/pricetag/products', [
+        $created = $this->actingAs($this->manager)->postJson('/api/v1/generator/pricetag/products', [
             'category_id' => $category->id,
             'name' => 'Smart Watch',
             'variant_name' => '',
@@ -94,7 +94,7 @@ class PricetagCatalogMutationApiTest extends TestCase
             ->assertJsonPath('data.variant_name', ' ');
         $productId = $created->json('data.id');
 
-        $this->actingAs($this->manager)->patchJson("/api/v1/pricetag/products/{$productId}", [
+        $this->actingAs($this->manager)->patchJson("/api/v1/generator/pricetag/products/{$productId}", [
             'category_id' => $category->id,
             'name' => 'Smart Watch',
             'variant_name' => ' ',
@@ -102,7 +102,7 @@ class PricetagCatalogMutationApiTest extends TestCase
             'discount_price' => 1100000,
         ])->assertOk();
 
-        $this->assertDatabaseHas('pricetag_products', [
+        $this->assertDatabaseHas('generator_pricetag_products', [
             'id' => $productId,
             'created_by' => $this->manager->id,
             'updated_by' => $this->manager->id,
@@ -116,11 +116,11 @@ class PricetagCatalogMutationApiTest extends TestCase
         ]);
 
         $this->actingAs($this->manager)
-            ->deleteJson("/api/v1/pricetag/products/{$productId}")
+            ->deleteJson("/api/v1/generator/pricetag/products/{$productId}")
             ->assertOk();
 
-        $this->assertSoftDeleted('pricetag_products', ['id' => $productId]);
-        $this->assertDatabaseHas('pricetag_products', [
+        $this->assertSoftDeleted('generator_pricetag_products', ['id' => $productId]);
+        $this->assertDatabaseHas('generator_pricetag_products', [
             'id' => $productId,
             'deleted_by' => $this->manager->id,
         ]);
@@ -130,7 +130,7 @@ class PricetagCatalogMutationApiTest extends TestCase
     {
         [$category, $product] = $this->catalogFixture();
 
-        $this->actingAs($this->manager)->postJson('/api/v1/pricetag/products', [
+        $this->actingAs($this->manager)->postJson('/api/v1/generator/pricetag/products', [
             'category_id' => $category->id,
             'name' => $product->name,
             'variant_name' => $product->variant_name,
@@ -146,11 +146,11 @@ class PricetagCatalogMutationApiTest extends TestCase
         $reader = User::factory()->create([]);
         $reader->givePermissionTo('access-pricetag');
 
-        $this->actingAs($reader)->postJson('/api/v1/pricetag/categories', ['name' => 'Ditolak'])
+        $this->actingAs($reader)->postJson('/api/v1/generator/pricetag/categories', ['name' => 'Ditolak'])
             ->assertForbidden();
-        $this->actingAs($reader)->patchJson("/api/v1/pricetag/categories/{$category->id}", ['name' => 'Ditolak'])
+        $this->actingAs($reader)->patchJson("/api/v1/generator/pricetag/categories/{$category->id}", ['name' => 'Ditolak'])
             ->assertForbidden();
-        $this->actingAs($reader)->deleteJson("/api/v1/pricetag/products/{$product->id}")
+        $this->actingAs($reader)->deleteJson("/api/v1/generator/pricetag/products/{$product->id}")
             ->assertForbidden();
     }
 

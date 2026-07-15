@@ -35,6 +35,8 @@ class UpdateUserRequest extends FormRequest
             'roles.*' => ['string', 'exists:roles,name'],
             'permissions' => ['present', 'array'],
             'permissions.*' => ['string', 'exists:permissions,name'],
+            'applications' => ['sometimes', 'array'],
+            'applications.*' => ['string', 'distinct', 'exists:applications,key'],
         ];
     }
 

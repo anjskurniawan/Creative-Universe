@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FileText, Puzzle, ChevronRight } from "lucide-react";
+import { Boxes, FileText, ChevronRight } from "lucide-react";
+import { COMPONENT_DOCS_MENU_GROUPS } from "@/design-system/documentation/component-registry";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,35 +34,45 @@ const MENU_DATA: DocCategory[] = [
     icon: FileText,
     children: [
       {
-        label: "Main App",
+        label: "Core & Applications",
         children: [
-          { label: "Changelogs", slug: "main-app/changelogs" },
-        ],
-      },
-      {
-        label: "Pricetag Generator",
-        children: [
-          { label: "Overview", slug: "pricetag-generator/overview" },
-        ],
-      },
-      {
-        label: "AI Agents",
-        children: [
-          { label: "Overview", slug: "ai-agents/overview" },
+          { label: "Application Catalog", slug: "core/application-catalog" },
+          { label: "Modular Architecture", slug: "core/modular-sub-app-architecture" },
+          { label: "Backend Migration Map", slug: "core/backend-modularization-migration-map" },
+          { label: "Frontend Refactor Baseline", slug: "core/frontend-refactor-baseline" },
+          { label: "Frontend Audit Report", slug: "core/frontend-audit-report" },
+          { label: "Frontend-Backend Contract Matrix", slug: "core/frontend-backend-contract-matrix" },
+          { label: "Frontend Module Boundaries", slug: "core/frontend-module-boundaries" },
+          { label: "Frontend Route & Layout Migration", slug: "core/frontend-route-layout-migration" },
+          { label: "Frontend Canonical URLs", slug: "core/frontend-canonical-urls" },
+          { label: "Frontend Legacy Route Cleanup", slug: "core/frontend-legacy-route-cleanup" },
+          { label: "Frontend API Client Foundation", slug: "core/frontend-api-client-foundation" },
+          { label: "Frontend Domain API Modules", slug: "core/frontend-domain-api-modules" },
+          { label: "Frontend Authentication", slug: "core/frontend-authentication-synchronization" },
+          { label: "Frontend Application Access", slug: "core/frontend-application-access" },
+          { label: "Frontend Permission Aliases", slug: "core/frontend-permission-aliases" },
+          { label: "Frontend Core Alignment", slug: "core/frontend-core-module-alignment" },
+          { label: "Frontend Pusher Configuration", slug: "core/frontend-pusher-configuration" },
+          { label: "KV Retail Integration", slug: "core/frontend-kv-retail-integration" },
+          { label: "KV Retail State Stability", slug: "core/frontend-kv-retail-state-stability" },
+          { label: "Creative Report Integration", slug: "core/frontend-creative-report-integration" },
+          { label: "ODDS Integration", slug: "core/frontend-odds-integration" },
+          { label: "Core Chat Integration", slug: "core/frontend-core-chat-integration" },
+          { label: "Frontend Finalization F19-F32", slug: "core/frontend-finalization-f19-f32" },
+          { label: "Core Public Contracts", slug: "core/public-contracts" },
+          { label: "API Route Map", slug: "core/api-route-map" },
+          { label: "Database ERD Map", slug: "core/database-erd-map" },
+          { label: "cPanel Deployment", slug: "core/cpanel-deployment-runbook" },
+          { label: "Emergency Maintenance", slug: "core/emergency-maintenance" },
         ],
       },
     ],
   },
   {
-    id: "components",
-    label: "Components",
-    icon: Puzzle,
-    children: [
-      {
-        label: "Navbar",
-        slug: "components/navbar",
-      },
-    ],
+    id: "design-system",
+    label: "Design System",
+    icon: Boxes,
+    children: COMPONENT_DOCS_MENU_GROUPS,
   },
 ];
 

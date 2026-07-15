@@ -26,7 +26,7 @@ export function TaskMobileNavigation({ items, activeLabel, onItemSelect }: TaskM
       {isOpen && (
         <div className="flex flex-col items-end gap-2">
           {[...items].reverse().map((item) => {
-          const active = activeLabel ? activeLabel === item.label : (item.href === "/task" ? pathname === "/task" : pathname === item.href);
+          const active = activeLabel ? activeLabel === item.label : (item.href === "/kv-retail" ? pathname === "/kv-retail" : pathname === item.href);
           const content = (
             <>
               <span className="rounded-lg bg-white px-3 py-2 text-xs font-medium leading-4 text-[#3b4446] shadow-[0_4px_12px_rgba(59,68,70,0.14)]">

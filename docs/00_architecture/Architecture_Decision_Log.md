@@ -55,3 +55,16 @@ Dokumen ini mencatat keputusan arsitektur yang mengikat refactor Creative Univer
 - PIC keputusan: project owner sebagai pemilik akses `Root`.
 - Trigger: error autentikasi massal, pelanggaran authorization, kehilangan/korupsi data, queue kritis berhenti, atau integrasi Pricetag gagal tanpa workaround.
 - Mekanisme: kembalikan routing frontend ke aplikasi legacy, hentikan write pada aplikasi baru jika diperlukan, dan pulihkan database hanya melalui backup yang telah diverifikasi.
+
+## ADR-008 - Modular Sub-App dan Core bersama
+
+- Status: `ACCEPTED`
+- Tanggal keputusan: 2026-07-14.
+- Keputusan: Creative Universe menggunakan modular monolith. Core hanya memiliki capability lintas aplikasi: account, authentication, RBAC, profile, settings, chat, notification, asset/file, dan activity log.
+- Katalog aplikasi: KV Retail Task, Creative Report, One Dashboard Design System (ODDS), Generator, Creative Artificial Intelligence (backend key `cai`), dan Design Assets. Creative AI dan Design Assets berstatus eksperimen.
+- Pricetag bukan Sub-App tingkat atas; Pricetag adalah generator pertama di dalam Sub-App Generator.
+- Setiap Sub-App memiliki business rule, route, service, model, migration, dan prefix tabelnya sendiri.
+- Integrasi: Sub-App tidak mengakses model atau tabel Sub-App lain secara langsung. Hubungan lintas aplikasi menggunakan contract/service publik atau domain event yang terdokumentasi.
+- Permission: key teknis memakai pola `{app}.{resource}.{action}`. Antarmuka pengguna memakai alias, grup, dan deskripsi yang ramah pengguna.
+- Role: role bersifat global dengan urutan otoritas minimum `Root > Manajer > SPV`; akses fitur aktual tetap ditentukan oleh permission per Sub-App.
+- Data: tabel lama dipertahankan melalui migration rename, bukan dibuat ulang dengan kehilangan data.

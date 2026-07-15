@@ -2,7 +2,8 @@
 
 import React, { useRef, useState } from 'react';
 import { MaterialIcon } from './material-icon';
-import { getCookie, refreshCsrfCookie } from '@/lib/api';
+import { uploadFileWithProgress } from '@/core/files';
+import { KV_RETAIL_API_PATHS } from '@/features/kv-retail/api';
 
 export interface UploadedFile {
   originalFile: File;
@@ -29,88 +30,39 @@ export default function FileUploadDropzone({
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const triggerUpload = (fileToUpload: File, fileIndex: number, isRetry = false) => {
-    const xhr = new XMLHttpRequest();
-    const formData = new FormData();
-    formData.append('file', fileToUpload);
-
-    xhr.upload.addEventListener('progress', (event) => {
-      if (event.lengthComputable) {
-        const percentCompleted = Math.round((event.loaded * 100) / event.total);
+  const triggerUpload = (fileToUpload: File, fileIndex: number) => {
+    void uploadFileWithProgress<{ path?: string }>({
+      path: KV_RETAIL_API_PATHS.temporaryUploads,
+      file: fileToUpload,
+      onProgress: (percentCompleted) => {
         setFiles(prev => {
           const newFiles = [...prev];
           newFiles[fileIndex].progress = percentCompleted;
           return newFiles;
         });
-      }
-    });
-
-    xhr.addEventListener('load', async () => {
-      if (xhr.status === 419 && !isRetry) {
-        // CSRF Token mismatch, refresh cookie and retry
-        try {
-          await refreshCsrfCookie();
-          triggerUpload(fileToUpload, fileIndex, true);
-        } catch (e) {
-          setFiles(prev => {
-            const newFiles = [...prev];
-            newFiles[fileIndex].status = 'error';
-            newFiles[fileIndex].errorMessage = 'Sesi kedaluwarsa';
-            onFilesChange(newFiles);
-            return newFiles;
-          });
-        }
-        return;
-      }
-
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const response = JSON.parse(xhr.responseText);
+      },
+      mapResponse: (payload) => {
+        const response = payload as { success?: boolean; data?: { path?: string }; path?: string } | null;
+        return response?.success === true ? (response.data ?? {}) : (response ?? {});
+      },
+    }).then((uploaded) => {
         setFiles(prev => {
           const newFiles = [...prev];
           newFiles[fileIndex].status = 'success';
           newFiles[fileIndex].progress = 100;
-          newFiles[fileIndex].tempPath = response.path;
+          newFiles[fileIndex].tempPath = uploaded?.path;
           onFilesChange(newFiles);
           return newFiles;
         });
-      } else {
-        setFiles(prev => {
-          const newFiles = [...prev];
-          newFiles[fileIndex].status = 'error';
-          newFiles[fileIndex].errorMessage = 'Upload gagal';
-          onFilesChange(newFiles);
-          return newFiles;
-        });
-      }
-    });
-
-    xhr.addEventListener('error', () => {
+    }).catch((error: unknown) => {
       setFiles(prev => {
         const newFiles = [...prev];
         newFiles[fileIndex].status = 'error';
-        newFiles[fileIndex].errorMessage = 'Terjadi kesalahan jaringan';
+        newFiles[fileIndex].errorMessage = error instanceof Error ? error.message : 'Upload gagal';
         onFilesChange(newFiles);
         return newFiles;
       });
     });
-
-    const API_HOST = process.env.NEXT_PUBLIC_API_URL || "";
-    xhr.open('POST', `${API_HOST}/api/v1/temp-upload`);
-    xhr.withCredentials = true;
-    xhr.setRequestHeader('Accept', 'application/json');
-
-    // Get CSRF Token
-    const csrfToken = getCookie("XSRF-TOKEN");
-    if (csrfToken) {
-      xhr.setRequestHeader('X-XSRF-TOKEN', csrfToken);
-    }
-
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (token) {
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-    }
-
-    xhr.send(formData);
   };
 
   const handleFileSelect = (selectedFiles: FileList | null) => {

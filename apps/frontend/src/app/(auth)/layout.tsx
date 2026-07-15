@@ -11,7 +11,12 @@ export default function AuthLayout({
 }) {
   const pathname = usePathname();
 
-  if (pathname === "/onboarding" || pathname.startsWith("/onboarding/")) {
+  if (
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/onboarding" ||
+    pathname.startsWith("/onboarding/")
+  ) {
     return <>{children}</>;
   }
 

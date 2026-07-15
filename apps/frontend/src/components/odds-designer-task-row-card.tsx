@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MaterialIcon } from "@/components/material-icon";
-import { OddsTask, formatOddsDate, statusLabel } from "@/lib/odds";
+import { OddsTask, formatOddsDate, statusLabel } from "@/features/odds/api";
 
 interface OddsDesignerTaskRowCardProps {
   task: OddsTask;

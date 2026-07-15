@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\ArtisanTokenMiddleware;
 use App\Http\Middleware\EnsureUserCanAccessApp;
+use App\Http\Middleware\EnsureEmergencyMaintenanceAccess;
 use Illuminate\Auth\AccessDeniedException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -29,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withBroadcasting(
         __DIR__.'/../routes/channels.php',
-        ['middleware' => ['web', 'auth:sanctum']]
+        ['middleware' => ['web', 'auth:sanctum', EnsureEmergencyMaintenanceAccess::class]]
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
@@ -44,10 +45,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             StartSession::class,
         ]);
+        $middleware->api(append: [
+            EnsureEmergencyMaintenanceAccess::class,
+        ]);
 
         // SRD v6.2 Seksi 8.3 — Middleware aliases
         $middleware->alias([
             'app' => EnsureUserCanAccessApp::class,
+            'emergency-maintenance' => EnsureEmergencyMaintenanceAccess::class,
             'artisan-token' => ArtisanTokenMiddleware::class,
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,

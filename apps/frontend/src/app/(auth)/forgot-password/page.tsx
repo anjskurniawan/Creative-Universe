@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { apiFetch, ValidationError, refreshCsrfCookie } from "@/lib/api";
+import { ValidationError } from "@/core/api/client";
+import { authApi } from "@/core/auth";
+import { APP_ROUTES } from "@/core/navigation/routes";
 import { MaterialIcon } from "@/components/material-icon";
 
 type Step = "REQUEST" | "VERIFY" | "RESET";
@@ -29,11 +31,7 @@ export default function ForgotPasswordPage() {
     setFieldErrors({});
 
     try {
-      await refreshCsrfCookie();
-      const res = await apiFetch<{ masked_phone: string }>("/auth/password/otp", {
-        method: "POST",
-        body: JSON.stringify({ login }),
-      });
+      const res = await authApi.passwordReset.requestOtp(login);
       setMaskedPhone(res.masked_phone || "nomor WhatsApp Anda");
       setStep("VERIFY");
     } catch (err: unknown) {
@@ -55,10 +53,7 @@ export default function ForgotPasswordPage() {
     setFieldErrors({});
 
     try {
-      await apiFetch("/auth/password/otp/verify", {
-        method: "POST",
-        body: JSON.stringify({ otp }),
-      });
+      await authApi.passwordReset.verifyOtp(otp);
       setStep("RESET");
     } catch (err: unknown) {
       if (err instanceof ValidationError) {
@@ -78,11 +73,7 @@ export default function ForgotPasswordPage() {
     setFieldErrors({});
 
     try {
-      await refreshCsrfCookie();
-      const res = await apiFetch<{ masked_phone: string }>("/auth/password/otp", {
-        method: "POST",
-        body: JSON.stringify({ login }),
-      });
+      const res = await authApi.passwordReset.requestOtp(login);
       setMaskedPhone(res.masked_phone || "nomor WhatsApp Anda");
       setError(null);
       alert("Kode OTP berhasil dikirim ulang.");
@@ -101,14 +92,8 @@ export default function ForgotPasswordPage() {
     setFieldErrors({});
 
     try {
-      await apiFetch("/auth/password/reset", {
-        method: "POST",
-        body: JSON.stringify({
-          password,
-          password_confirmation: passwordConfirmation,
-        }),
-      });
-      router.push("/login?registered=false&reset=success");
+      await authApi.passwordReset.reset(password, passwordConfirmation);
+      router.push(`${APP_ROUTES.login}?registered=false&reset=success`);
     } catch (err: unknown) {
       if (err instanceof ValidationError) {
         setFieldErrors(err.errors);

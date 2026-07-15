@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Core\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,14 +17,14 @@ return new class extends Migration
         });
 
         // Backfill existing tasks with a Manajer user
-        $managerId = \DB::table('users')
+        $managerId = DB::table('users')
             ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
             ->where('roles.name', 'Manajer')
-            ->where('model_has_roles.model_type', \App\Models\Core\User::class)
+            ->where('model_has_roles.model_type', User::class)
             ->value('users.id') ?? 1;
 
-        \DB::table('homework_tasks')->update(['created_by' => $managerId]);
+        DB::table('homework_tasks')->update(['created_by' => $managerId]);
     }
 
     /**

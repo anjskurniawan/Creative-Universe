@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import TaskCardDate from "./date";
 import TaskCardNextButton from "./next-button";
 import TaskCardTitleTask from "./title-task";
@@ -13,7 +13,8 @@ import TaskCardSubmitLinkOverlay from "./submit-link-overlay";
 import TaskCardViewLinkOverlay from "./view-link-overlay";
 import TaskCardUploadOverlay from "./upload-overlay";
 import TaskCardDelayReasonOverlay from "./delay-reason-overlay";
-import { apiFetch } from "@/lib/api";
+import { resolveStorageUrl } from "@/core/api/client";
+import { kvRetailApi } from "@/features/kv-retail/api";
 import { MaterialIcon } from "@/components/material-icon";
 import { 
   type TaskCardButtonStatusType, 
@@ -70,14 +71,14 @@ export type TaskCardProps = {
   picVendor?: string;
   givenDate?: string;
   deadlineDate?: string;
-  assignedUsers?: any[];
+  assignedUsers?: unknown[];
   supportFileUrl?: (string | null)[];
   draftFileUrl?: (string | null)[];
   fileLink?: string | null;
   id?: number;
   onRefresh?: () => void;
   config?: TaskCardConfig;
-  currentUser?: any;
+  currentUser?: { id?: number; roles?: Array<string | { name?: string }> } | null;
   createdBy?: number;
   delayReasonStage?: string;
 };
@@ -119,12 +120,6 @@ export default function TaskCard({
   const canManageTask = !currentUser || !createdBy || currentUser.id === createdBy || ["Root", "Manajer", "SPV"].some((role) =>
     currentUser.roles?.some((currentRole: string | { name?: string }) => typeof currentRole === "string" ? currentRole === role : currentRole.name === role),
   );
-
-  useEffect(() => {
-    if (timestamps) {
-      setInternalTimestamps(timestamps);
-    }
-  }, [timestamps]);
 
   const getNextAllowedStep = (): TaskCardButtonStatusState | null => {
     if (!canManageTask) {
@@ -270,9 +265,7 @@ export default function TaskCard({
       setUploadingDocType(type);
       return;
     }
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    const fullUrl = `${baseUrl}/storage/${path}`;
-    window.open(fullUrl, '_blank');
+    window.open(resolveStorageUrl(path) ?? undefined, '_blank');
   };
 
   const handleUploadSubmit = async () => {
@@ -283,10 +276,7 @@ export default function TaskCard({
       formData.append(uploadingDocType, uploadFileObj);
       formData.append("file_index", uploadFileIndex.toString());
 
-      await apiFetch(`/homework-tasks/${id}/upload`, {
-        method: "POST",
-        body: formData,
-      });
+      await kvRetailApi.tasks.uploadFile(id, formData);
       
       onRefresh?.();
       
@@ -343,9 +333,7 @@ export default function TaskCard({
                     }
                   }}
                   onViewClick={(url) => {
-                    const isAbsolute = url.startsWith('http://') || url.startsWith('https://');
-                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-                    window.open(isAbsolute ? url : `${baseUrl}/storage/${url}`, '_blank');
+                    window.open(resolveStorageUrl(url) ?? undefined, '_blank');
                   }}
                   config={config}
                 />
@@ -360,9 +348,7 @@ export default function TaskCard({
                     }
                   }}
                   onViewClick={(url) => {
-                    const isAbsolute = url.startsWith('http://') || url.startsWith('https://');
-                    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-                    window.open(isAbsolute ? url : `${baseUrl}/storage/${url}`, '_blank');
+                    window.open(resolveStorageUrl(url) ?? undefined, '_blank');
                   }}
                   config={config}
                 />

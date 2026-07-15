@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use App\Models\Core\PermissionMetadata;
 
 class RoleController extends BaseApiController
 {
@@ -91,5 +92,33 @@ class RoleController extends BaseApiController
             $permissions->pluck('name')->values()->all(),
             'Daftar izin berhasil diambil.'
         );
+    }
+
+    public function permissionCatalog(Request $request): JsonResponse
+    {
+        $metadata = PermissionMetadata::query()
+            ->with(['permission:id,name', 'application:id,key,display_name,sort_order'])
+            ->get()
+            ->keyBy('permission_id');
+
+        $catalog = Permission::query()->orderBy('name')->get()->map(function (Permission $permission) use ($metadata) {
+            $item = $metadata->get($permission->id);
+
+            return [
+                'key' => $permission->name,
+                'display_name' => $item?->display_name ?? str($permission->name)->replace(['.', '-'], ' ')->title()->toString(),
+                'group_key' => $item?->group_key ?? 'other',
+                'description' => $item?->description,
+                'application_key' => $item?->application?->key ?? 'core',
+                'application_name' => $item?->application?->display_name ?? 'Core',
+                'sort_order' => $item?->sort_order ?? 0,
+            ];
+        })->sortBy([
+            ['application_key', 'asc'],
+            ['sort_order', 'asc'],
+            ['display_name', 'asc'],
+        ])->values();
+
+        return $this->sendResponse($catalog, 'Katalog izin berhasil diambil.');
     }
 }

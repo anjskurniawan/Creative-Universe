@@ -5,6 +5,7 @@ namespace App\Models\Core;
 use Database\Factories\Core\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,6 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
+use App\SubApps\KvRetail\Models\KvRetailTask;
 
 /**
  * Model User — SRD v6.2 Seksi 6.1 / ERD v1.0 Seksi 5.1
@@ -109,6 +111,18 @@ class User extends Authenticatable
     public function assetLinks(): HasMany
     {
         return $this->hasMany(AssetLink::class, 'created_by');
+    }
+
+    public function applications(): BelongsToMany
+    {
+        return $this->belongsToMany(Application::class)
+            ->withPivot('granted_by')
+            ->withTimestamps();
+    }
+
+    public function kvRetailTasks(): BelongsToMany
+    {
+        return $this->belongsToMany(KvRetailTask::class, 'kv_retail_task_user', 'user_id', 'kv_retail_task_id');
     }
 
     public function conversations()

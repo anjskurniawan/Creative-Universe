@@ -6,8 +6,8 @@ namespace Tests\Feature\Api;
 
 use App\Models\Core\AssetLink;
 use App\Models\Core\User;
-use App\Models\Pricetag\PricetagCategory;
-use App\Models\Pricetag\PricetagProduct;
+use App\SubApps\Generator\Pricetag\Models\PricetagCategory;
+use App\SubApps\Generator\Pricetag\Models\PricetagProduct;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -38,7 +38,7 @@ class PricetagProductApiTest extends TestCase
         $this->product('Speaker Mini', 'Putih');
 
         $response = $this->actingAs($this->user)->getJson(
-            "/api/v1/pricetag/products?category_id={$this->category->id}&search=Hitam"
+            "/api/v1/generator/pricetag/products?category_id={$this->category->id}&search=Hitam"
         );
 
         $response->assertOk()
@@ -46,7 +46,7 @@ class PricetagProductApiTest extends TestCase
             ->assertJsonPath('data.0.id', $matching->id)
             ->assertJsonPath('data.0.category.name', 'Audio')
             ->assertJsonPath('data.0.is_ready', false)
-            ->assertJsonPath('data.0.generator_path', "/pricetag/generator?product_id={$matching->id}");
+            ->assertJsonPath('data.0.generator_path', "/generator/pricetag?product_id={$matching->id}");
     }
 
     public function test_ready_filter_returns_preview_and_download_from_polymorphic_asset_links(): void
@@ -71,7 +71,7 @@ class PricetagProductApiTest extends TestCase
             'created_by' => $this->user->id,
         ]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/v1/pricetag/products?status=ready');
+        $response = $this->actingAs($this->user)->getJson('/api/v1/generator/pricetag/products?status=ready');
 
         $response->assertOk()
             ->assertJsonCount(1, 'data')
@@ -86,7 +86,7 @@ class PricetagProductApiTest extends TestCase
         $unauthorized = User::factory()->create([]);
 
         $this->actingAs($unauthorized)
-            ->getJson('/api/v1/pricetag/products')
+            ->getJson('/api/v1/generator/pricetag/products')
             ->assertForbidden();
     }
 

@@ -20,6 +20,13 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
+    'root_user' => [
+        'name' => env('ROOT_NAME', 'Root'),
+        'email' => env('ROOT_EMAIL', 'root@creativeuniverse.test'),
+        'username' => env('ROOT_USERNAME', 'root'),
+        'password' => env('ROOT_PASSWORD'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Core\ApplicationResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
@@ -39,6 +40,9 @@ class UserResource extends JsonResource
                 ? $this->permissions->pluck('name')->values()->all()
                 : $this->permissions()->pluck('name')->values()->all(),
             'all_permissions' => $this->getAllPermissions()->pluck('name')->values()->all(),
+            'applications' => ApplicationResource::collection(
+                $this->relationLoaded('applications') ? $this->applications : $this->applications()->orderBy('sort_order')->get()
+            )->resolve($request),
             'settings' => $safeSettings,
         ];
     }

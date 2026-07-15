@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Odds\Task;
-use App\Services\Odds\OddsEscalationService;
-use App\Services\Odds\OddsReportingService;
+use App\SubApps\Odds\Models\Task;
+use App\SubApps\Odds\Services\OddsEscalationService;
+use App\SubApps\Odds\Services\OddsReportingService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;

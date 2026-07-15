@@ -10,6 +10,7 @@ import {
   sideMenuIconVariantToType,
   type SideMenuIconVariant,
 } from "@/components/sidemenu";
+import { SidebarUtilityActions } from "@/components/sidebar-utility-actions";
 import { useAuth } from "@/providers/auth-provider";
 
 export type SideMenuVariant = "Collaps" | "Expand";
@@ -38,7 +39,6 @@ type SideMenuAvatarProps = {
 type SideMenuProps = {
   variant?: SideMenuVariant;
   primaryItems: SideMenuItem[];
-  secondaryItems?: SideMenuItem[];
   onVariantChange?: (variant: SideMenuVariant) => void;
   className?: string;
 };
@@ -79,7 +79,6 @@ export function SideMenuAvatar({
 export function SideMenu({
   variant = "Collaps",
   primaryItems,
-  secondaryItems = [],
   onVariantChange,
   className = "",
 }: SideMenuProps) {
@@ -95,7 +94,7 @@ export function SideMenu({
     return (
       <SideMenuExpand
         primaryItems={primaryItems}
-        secondaryItems={secondaryItems}
+        secondaryContent={<SidebarUtilityActions model="Icon + Text" />}
         onCollapse={onVariantChange ? () => onVariantChange("Collaps") : undefined}
         avatarName={avatarName}
         avatarRole={roleLabel}
@@ -107,7 +106,7 @@ export function SideMenu({
   return (
     <SideMenuCollaps
       primaryItems={primaryItems}
-      secondaryItems={secondaryItems}
+      secondaryContent={<SidebarUtilityActions model="Icon" />}
       onExpand={onVariantChange ? () => onVariantChange("Expand") : undefined}
       avatarName={avatarName}
       avatarRole={roleLabel}

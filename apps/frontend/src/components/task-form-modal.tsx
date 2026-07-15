@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { MaterialIcon } from "./material-icon";
 import { CustomDatePicker } from "./custom-date-picker";
 import FileUploadDropzone, { UploadedFile } from './file-upload-dropzone';
-import { apiFetch } from "@/lib/api";
+import { coreApi } from "@/core/api";
+import { kvRetailApi } from "@/features/kv-retail/api";
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -41,15 +42,14 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await apiFetch<UserOption[] | { data?: UserOption[] }>('/users?per_page=50');
-        if (Array.isArray(res)) setUsersList(res);
-        else if (res && Array.isArray(res.data)) setUsersList(res.data);
+        const res = await kvRetailApi.assignees<UserOption[]>();
+        setUsersList(res);
       } catch (err) {
         console.error("Gagal memuat daftar user", err);
       }
 
       try {
-        const settings = await apiFetch<{ vendor_options?: string }>('/settings?keys=vendor_options');
+        const settings = await coreApi.settings.get<{ vendor_options?: string }>(['vendor_options']);
         if (settings && settings.vendor_options) {
           const vendors = settings.vendor_options.split(",").map((v: string) => v.trim()).filter(Boolean);
           setVendorOptions(vendors.length > 0 ? vendors : ["Mireco", "Fushion"]);
@@ -137,10 +137,7 @@ export function TaskFormModal({ isOpen, onClose }: TaskFormModalProps) {
         }
       });
 
-      await apiFetch('/homework-tasks', {
-        method: 'POST',
-        body: formData,
-      });
+      await kvRetailApi.tasks.create(formData);
 
       alert("Tugas berhasil disubmit!");
       // Reset form

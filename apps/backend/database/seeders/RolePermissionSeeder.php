@@ -28,8 +28,16 @@ class RolePermissionSeeder extends Seeder
             'approve-users',
             'view-logs',
             'run-artisan',
+            'access-cai',
             'access-pricetag',
             'pricetag.manage',
+            'kv-retail.tasks.view',
+            'kv-retail.tasks.create',
+            'kv-retail.tasks.update-status',
+            'kv-retail.tasks.delete',
+            'kv-retail.settings.manage',
+            'creative-report.assessments.view',
+            'creative-report.assessments.update',
         ];
 
         foreach ($permissions as $permission) {
@@ -69,6 +77,13 @@ class RolePermissionSeeder extends Seeder
             'pricetag.manage',
             'approve-users',
             'manage-users',
+            'kv-retail.tasks.view',
+            'kv-retail.tasks.create',
+            'kv-retail.tasks.update-status',
+            'kv-retail.tasks.delete',
+            'kv-retail.settings.manage',
+            'creative-report.assessments.view',
+            'creative-report.assessments.update',
         ]);
 
         // CEO: akses core & pricetag (read-only, no write/edit permissions)
@@ -87,12 +102,19 @@ class RolePermissionSeeder extends Seeder
         $spv->syncPermissions([
             'access-core',
             'access-pricetag',
+            'kv-retail.tasks.view',
+            'kv-retail.tasks.create',
+            'kv-retail.tasks.update-status',
+            'creative-report.assessments.view',
+            'creative-report.assessments.update',
         ]);
 
         // Designer: akses core & pricetag
         $designer->syncPermissions([
             'access-core',
             'access-pricetag',
+            'kv-retail.tasks.view',
+            'kv-retail.tasks.update-status',
         ]);
 
         // Videographer: akses core & pricetag (sama seperti designer)
@@ -110,12 +132,18 @@ class RolePermissionSeeder extends Seeder
         $leaderRetail->syncPermissions([
             'access-core',
             'access-pricetag',
+            'kv-retail.tasks.view',
+            'kv-retail.tasks.create',
+            'kv-retail.tasks.update-status',
+            'kv-retail.tasks.delete',
         ]);
 
         // PIC Retail: akses core & pricetag
         $picRetail->syncPermissions([
             'access-core',
             'access-pricetag',
+            'kv-retail.tasks.view',
+            'kv-retail.tasks.update-status',
         ]);
     }
 }

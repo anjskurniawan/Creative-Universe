@@ -4,7 +4,9 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { useAuth } from "@/providers/auth-provider";
-import { apiFetch, ValidationError } from "@/lib/api";
+import { ValidationError } from "@/core/api/client";
+import { authApi, type OnboardingDivision, type OnboardingInput } from "@/core/auth";
+import { APP_ROUTES } from "@/core/navigation/routes";
 import { AuthParticleBackground } from "@/components/auth-particle-background";
 
 // --- SVG Icons ---
@@ -39,18 +41,6 @@ const ChevronCircle = () => (
 
 // --- Interfaces ---
 
-interface Position {
-  id: number;
-  name: string;
-  division_id: number;
-}
-
-interface Division {
-  id: number;
-  name: string;
-  positions: Position[];
-}
-
 function OnboardingCard() {
   const { user, refreshUser } = useAuth();
   const router = useRouter();
@@ -68,7 +58,7 @@ function OnboardingCard() {
   const [positionName, setPositionName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
 
-  const [divisions, setDivisions] = useState<Division[]>([]);
+  const [divisions, setDivisions] = useState<OnboardingDivision[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   // Dropdown UI states
@@ -77,14 +67,14 @@ function OnboardingCard() {
 
   useEffect(() => {
     if (user && user.is_onboarded) {
-      router.replace("/dashboard");
+      router.replace(APP_ROUTES.dashboard);
     }
   }, [user, router]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await apiFetch<Division[]>("/onboarding/data");
+        const data = await authApi.onboarding.data();
         setDivisions(data);
       } catch (err) {
         console.error("Failed to load divisions", err);
@@ -134,13 +124,7 @@ function OnboardingCard() {
     setError(null);
 
     try {
-      const payload: {
-        name: string;
-        division_id: number;
-        whatsapp_number: string;
-        position_id?: number;
-        position_name?: string;
-      } = {
+      const payload: OnboardingInput = {
         name: fullName,
         division_id: parseInt(divisionId),
         whatsapp_number: whatsapp,
@@ -152,16 +136,13 @@ function OnboardingCard() {
         payload.position_name = positionName.trim();
       }
 
-      await apiFetch("/onboarding/submit", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      await authApi.onboarding.submit(payload);
 
       await refreshUser();
       changeStep(8);
       
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push(APP_ROUTES.dashboard);
       }, 2500);
     } catch (err: unknown) {
       if (err instanceof ValidationError) {

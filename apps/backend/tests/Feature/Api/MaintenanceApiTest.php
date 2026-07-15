@@ -212,6 +212,58 @@ class MaintenanceApiTest extends TestCase
             ->assertJsonPath('message', 'Tindakan ini dilarang pada environment production.');
     }
 
+    public function test_root_can_run_production_seeder_in_production(): void
+    {
+        $this->actingAs($this->root);
+        app()->detectEnvironment(fn () => 'production');
+
+        Artisan::shouldReceive('call')
+            ->with('db:seed', [
+                '--class' => 'ProductionDatabaseSeeder',
+                '--force' => true,
+            ])
+            ->once()
+            ->andReturn(0);
+        Artisan::shouldReceive('output')
+            ->once()
+            ->andReturn('Production foundation seeded.');
+
+        $response = $this->postJson('/api/v1/maintenance/commands', [
+            'command' => 'seed-production',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.command', 'seed-production')
+            ->assertJsonPath('data.output', 'Production foundation seeded.');
+    }
+
+    public function test_root_can_run_hosting_data_restore_in_production(): void
+    {
+        $this->actingAs($this->root);
+        app()->detectEnvironment(fn () => 'production');
+
+        Artisan::shouldReceive('call')
+            ->with('db:seed', [
+                '--class' => 'HostingRealDataSeeder',
+                '--force' => true,
+            ])
+            ->once()
+            ->andReturn(0);
+        Artisan::shouldReceive('output')
+            ->once()
+            ->andReturn('Hosting data restored.');
+
+        $response = $this->postJson('/api/v1/maintenance/commands', [
+            'command' => 'restore-hosting-data',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.command', 'restore-hosting-data')
+            ->assertJsonPath('data.output', 'Hosting data restored.');
+    }
+
     public function test_root_can_run_clean_and_optimize_commands(): void
     {
         $this->actingAs($this->root);

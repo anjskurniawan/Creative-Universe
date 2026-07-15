@@ -465,6 +465,23 @@
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.cu-landing-action-enter {
+  animation: landingActionEnter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  will-change: opacity, transform, filter;
+}
+
+.hero-heading-cursor-anchor {
+  display: inline-block;
+  width: 0.04em;
+  height: 0.8em;
+  margin-left: 0.08em;
+  vertical-align: -0.08em;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, var(--color-cu-gradient-start), var(--color-cu-gradient-middle), var(--color-cu-gradient-end));
+  box-shadow: 0 0 0.14em color-mix(in srgb, var(--color-cu-gradient-start) 55%, transparent);
+  animation: heroHeadingCursorPulse 1.1s ease-in-out infinite;
+}
+
 .cu-toast-enter {
   animation: toastEnter 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -540,6 +557,30 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes landingActionEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes heroHeadingCursorPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.18; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cu-landing-action-enter {
+    animation: none;
   }
 }
 

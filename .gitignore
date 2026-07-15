@@ -97,6 +97,8 @@ apps/backend/bootstrap/cache/*.php
 *.db
 *.sqlite
 apps/backend/database/*.sqlite
+/backup/
+.envhosting
 tmp/migration-backups/*
 /tmp/migration-backups/
 !**/tmp/migration-backups/.gitignore

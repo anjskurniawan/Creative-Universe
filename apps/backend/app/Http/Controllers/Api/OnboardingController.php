@@ -83,7 +83,7 @@ class OnboardingController extends BaseApiController
         return DB::transaction(function () use ($validated, $user) {
             $division = Division::find($validated['division_id']);
 
-            if (!$division) {
+            if (! $division) {
                 return $this->sendError('Divisi tidak valid.', [
                     'division_id' => ['Divisi tidak valid.'],
                 ], 422);
@@ -103,7 +103,7 @@ class OnboardingController extends BaseApiController
                     ->lockForUpdate()
                     ->first();
 
-                if (!$position) {
+                if (! $position) {
                     return $this->sendError('Jabatan Creative tidak valid.', [
                         'position_id' => ['Jabatan Creative tidak valid.'],
                     ], 422);

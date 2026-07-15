@@ -15,7 +15,7 @@ Dokumen ini mendefinisikan secara baku standar label status yang disematkan pada
 
 ### ACTIVE
 Fitur atau berkas yang saat ini terpasang aktif di dalam kode monorepo repositori baru (`apps/backend` dan `apps/frontend`) dan dapat diakses/dijalankan.
-* **Contoh:** Controller [AIAgentController.php](file:///c:/laragon/www/creativeuniverse/apps/backend/app/Http/Controllers/Api/AIAgentController.php) yang mengelola pengiriman pesan ke Gemini API.
+* **Contoh:** `CreativeAiController` pada namespace `App\Http\Controllers\Api\Cai` mengelola pengiriman pesan Creative AI ke service Gemini milik CAI.
 
 ### VERIFIED_ACTIVE
 Fitur yang tidak hanya aktif di dalam kode, tetapi sudah teruji kelulusannya oleh test suite (PHPUnit) atau divalidasi berhasil lewat build/linting statis.

@@ -56,8 +56,10 @@ ODDS permissions include:
 - **Role Management**: Protected by `can:manage-roles`.
 
 ## 8. Sub-App Access Permissions
-- **ODDS**: Access requires the `access-odds` permission.
-- **Pricetag**: Access requires the `access-pricetag` permission. Mutation endpoints require `pricetag.manage`.
+- **Semua Sub-App**: akses dasar memerlukan assignment pada `application_user`; Root memiliki akses global.
+- **ODDS**: setelah lolos assignment `odds`, setiap fitur tetap diperiksa dengan permission ODDS yang berlaku.
+- **Generator Pricetag**: setelah lolos assignment `generator`, endpoint baca/generate memerlukan `access-pricetag` dan mutation katalog memerlukan `pricetag.manage`.
+- **KV Retail Task**: setelah lolos assignment `kv-retail`, fitur memakai namespace permission `kv-retail.*`.
 
 ## 9. Spatie Cache Invalidation Rules
 - Seeders properly invalidate cache using `app()[PermissionRegistrar::class]->forgetCachedPermissions();`. This ensures updates are immediately effective.

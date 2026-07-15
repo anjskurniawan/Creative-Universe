@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\AppSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -12,6 +13,45 @@ use Illuminate\Support\Facades\Log;
 
 class MaintenanceController extends BaseApiController
 {
+    public function emergencyStatus(Request $request): JsonResponse
+    {
+        return $this->sendResponse([
+            'active' => AppSetting::query()
+                ->where('key', 'emergency_maintenance_mode')
+                ->value('value') === '1',
+        ], 'Status maintenance darurat berhasil diambil.');
+    }
+
+    public function updateEmergencyStatus(Request $request): JsonResponse
+    {
+        abort_unless($request->user()?->hasRole('Root'), 403);
+
+        $data = $request->validate([
+            'active' => ['required', 'boolean'],
+        ]);
+
+        AppSetting::updateOrCreate(
+            ['key' => 'emergency_maintenance_mode'],
+            ['value' => $data['active'] ? '1' : '0']
+        );
+
+        activity()
+            ->performedOn($request->user())
+            ->causedBy($request->user())
+            ->tap(fn ($activity) => $activity->log_name = 'maintenance-ui')
+            ->withProperties([
+                'ip' => $request->ip(),
+                'active' => $data['active'],
+            ])
+            ->log($data['active'] ? 'Mengaktifkan maintenance darurat' : 'Menonaktifkan maintenance darurat');
+
+        return $this->sendResponse([
+            'active' => $data['active'],
+        ], $data['active']
+            ? 'Maintenance darurat berhasil diaktifkan.'
+            : 'Maintenance darurat berhasil dinonaktifkan.');
+    }
+
     /**
      * Get system status metadata safely (no secrets returned).
      */
@@ -79,7 +119,9 @@ class MaintenanceController extends BaseApiController
             'clear-cache' => 'optimize:clear',
             'queue-restart' => 'queue:restart',
             'storage-link' => 'storage:link',
-            'seed-permissions' => 'db:seed', // custom parsed
+            'seed-permissions' => 'db:seed --class=RolePermissionSeeder --force', // custom parsed
+            'seed-production' => 'db:seed --class=ProductionDatabaseSeeder --force', // custom parsed
+            'restore-hosting-data' => 'db:seed --class=HostingRealDataSeeder --force', // custom parsed
             'migrate' => 'migrate',
             'migrate-fresh' => 'migrate:fresh',
             'seed' => 'db:seed', // custom parsed
@@ -109,6 +151,16 @@ class MaintenanceController extends BaseApiController
             if ($commandKey === 'seed-permissions') {
                 Artisan::call('db:seed', [
                     '--class' => 'RolePermissionSeeder',
+                    '--force' => true,
+                ]);
+            } elseif ($commandKey === 'seed-production') {
+                Artisan::call('db:seed', [
+                    '--class' => 'ProductionDatabaseSeeder',
+                    '--force' => true,
+                ]);
+            } elseif ($commandKey === 'restore-hosting-data') {
+                Artisan::call('db:seed', [
+                    '--class' => 'HostingRealDataSeeder',
                     '--force' => true,
                 ]);
             } elseif ($commandKey === 'seed') {

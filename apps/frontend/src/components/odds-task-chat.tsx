@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { MaterialIcon } from "@/components/material-icon";
-import { getEchoClient } from "@/lib/echo";
 import {
-  OddsChatMessage,
+  chatApi,
+  subscribeToConversationMessages,
+  type ChatMessage,
+} from "@/core/chat";
+import { appRoute } from "@/core/navigation/routes";
+import {
   OddsTaskConversation,
-  getConversationMessages,
   getOddsTaskConversation,
-  sendConversationMessage,
-} from "@/lib/odds";
+} from "@/features/odds/api";
 
 function formatChatTime(value: string | null | undefined): string {
   if (!value) return "";
@@ -37,7 +39,7 @@ export function OddsTaskChat({
   taskStatus?: string | null;
 }) {
   const [conversation, setConversation] = useState<OddsTaskConversation | null>(null);
-  const [messages, setMessages] = useState<OddsChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -51,7 +53,7 @@ export function OddsTaskChat({
       const nextConversation = await getOddsTaskConversation(taskId);
       setConversation(nextConversation);
       if (nextConversation) {
-        setMessages(await getConversationMessages(nextConversation.id));
+        setMessages(await chatApi.messages(nextConversation.id));
       } else {
         setMessages([]);
       }
@@ -75,20 +77,11 @@ export function OddsTaskChat({
   useEffect(() => {
     if (!conversation?.id) return;
 
-    const echo = getEchoClient();
-    if (!echo) return;
-
-    const channel = echo.private(`conversation.${conversation.id}`);
-    channel.listen(".message.sent", (event: { message: OddsChatMessage }) => {
-      if (event.message.sender_id !== userId) {
-        setMessages((prev) => [...prev, event.message]);
+    return subscribeToConversationMessages([conversation.id], (_conversationId, message) => {
+      if (Number(message.sender_id) !== Number(userId)) {
+        setMessages((prev) => prev.some((item) => String(item.id) === String(message.id)) ? prev : [...prev, message]);
       }
     });
-
-    return () => {
-      channel.stopListening(".message.sent");
-      echo.leave(`conversation.${conversation.id}`);
-    };
   }, [conversation?.id, userId]);
 
   useEffect(() => {
@@ -104,7 +97,7 @@ export function OddsTaskChat({
     setSending(true);
     setError(null);
     try {
-      const message = await sendConversationMessage(conversation.id, body);
+      const message = await chatApi.send({ conversation_id: conversation.id, body });
       setMessages((prev) => [...prev, message]);
     } catch (err) {
       setDraft(body);
@@ -129,7 +122,7 @@ export function OddsTaskChat({
         <div className="flex shrink-0 items-center gap-2">
           {conversation && (
             <Link
-              href={`/messages?conversation=${conversation.id}`}
+              href={appRoute.messagesConversation(conversation.id)}
               className="inline-flex size-8 items-center justify-center rounded-lg border border-cu-border text-cu-ink transition hover:bg-cu-panel-soft"
               aria-label="Buka chat penuh"
               title="Buka chat penuh"

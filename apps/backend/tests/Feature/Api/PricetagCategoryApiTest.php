@@ -3,8 +3,8 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Core\User;
-use App\Models\Pricetag\PricetagCategory;
-use App\Models\Pricetag\PricetagProduct;
+use App\SubApps\Generator\Pricetag\Models\PricetagCategory;
+use App\SubApps\Generator\Pricetag\Models\PricetagProduct;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -32,7 +32,7 @@ class PricetagCategoryApiTest extends TestCase
         PricetagCategory::create(['name' => 'Fashion', 'created_by' => $this->user->id]);
         PricetagCategory::create(['name' => 'Makanan', 'created_by' => $this->user->id]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/v1/pricetag/categories?per_page=2');
+        $response = $this->actingAs($this->user)->getJson('/api/v1/generator/pricetag/categories?per_page=2');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -56,7 +56,7 @@ class PricetagCategoryApiTest extends TestCase
         PricetagCategory::create(['name' => 'Gadget Murah', 'created_by' => $this->user->id]);
         PricetagCategory::create(['name' => 'Sepatu Olahraga', 'created_by' => $this->user->id]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/v1/pricetag/categories?name=Gadget');
+        $response = $this->actingAs($this->user)->getJson('/api/v1/generator/pricetag/categories?name=Gadget');
 
         $response->assertStatus(200);
         $this->assertCount(1, $response->json('data'));
@@ -73,7 +73,7 @@ class PricetagCategoryApiTest extends TestCase
         PricetagCategory::create(['name' => 'Belimbing', 'created_by' => $this->user->id]);
 
         // Descending sort by name
-        $response = $this->actingAs($this->user)->getJson('/api/v1/pricetag/categories?sort_by=name&sort_order=desc');
+        $response = $this->actingAs($this->user)->getJson('/api/v1/generator/pricetag/categories?sort_by=name&sort_order=desc');
 
         $response->assertStatus(200);
         $this->assertEquals('Ceri', $response->json('data.0.name'));
@@ -88,7 +88,7 @@ class PricetagCategoryApiTest extends TestCase
     {
         $category = PricetagCategory::create(['name' => 'Otomotif', 'created_by' => $this->user->id]);
 
-        $response = $this->actingAs($this->user)->getJson("/api/v1/pricetag/categories/{$category->id}");
+        $response = $this->actingAs($this->user)->getJson("/api/v1/generator/pricetag/categories/{$category->id}");
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -106,7 +106,7 @@ class PricetagCategoryApiTest extends TestCase
      */
     public function test_get_non_existent_category_returns_404(): void
     {
-        $response = $this->actingAs($this->user)->getJson('/api/v1/pricetag/categories/999');
+        $response = $this->actingAs($this->user)->getJson('/api/v1/generator/pricetag/categories/999');
 
         $response->assertStatus(404);
         $response->assertJson([
@@ -145,7 +145,7 @@ class PricetagCategoryApiTest extends TestCase
             'created_by' => $this->user->id,
         ]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/v1/pricetag/categories?sort_by=products_count&sort_order=desc');
+        $response = $this->actingAs($this->user)->getJson('/api/v1/generator/pricetag/categories?sort_by=products_count&sort_order=desc');
 
         $response->assertStatus(200);
         $this->assertEquals('Kategori B', $response->json('data.0.name'));
@@ -159,7 +159,7 @@ class PricetagCategoryApiTest extends TestCase
         $unauthorized = User::factory()->create([]);
 
         $this->actingAs($unauthorized)
-            ->getJson('/api/v1/pricetag/categories')
+            ->getJson('/api/v1/generator/pricetag/categories')
             ->assertForbidden();
     }
 }

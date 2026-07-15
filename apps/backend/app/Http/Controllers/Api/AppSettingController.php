@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\AppSetting;
 use Illuminate\Http\Request;
 
-class AppSettingController extends Controller
+class AppSettingController extends BaseApiController
 {
     public function index(Request $request)
     {
         $keys = $request->query('keys');
         $query = AppSetting::query();
-        
+
         if ($keys) {
             $keyArray = explode(',', $keys);
             $query->whereIn('key', $keyArray);
         }
 
         $settings = $query->get()->pluck('value', 'key');
-        return response()->json($settings);
+
+        return $this->sendResponse($settings, 'Pengaturan aplikasi berhasil diambil.');
     }
 
     public function store(Request $request)
@@ -28,7 +28,7 @@ class AppSettingController extends Controller
 
         $data = $request->validate([
             'settings' => 'required|array',
-            'settings.*' => 'nullable|string'
+            'settings.*' => 'nullable|string',
         ]);
 
         foreach ($data['settings'] as $key => $value) {
@@ -38,6 +38,6 @@ class AppSettingController extends Controller
             );
         }
 
-        return response()->json(['message' => 'Settings updated successfully']);
+        return $this->sendResponse(null, 'Pengaturan aplikasi berhasil diperbarui.');
     }
 }

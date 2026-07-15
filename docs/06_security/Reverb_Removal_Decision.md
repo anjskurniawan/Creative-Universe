@@ -1,9 +1,9 @@
 ---
 title: "Reverb Removal Decision"
-status: "NEEDS_REVIEW"
+status: "COMPLETED"
 version: "1.0"
 created: "2026-06-27"
-revised: "2026-06-27"
+revised: "2026-07-15"
 owner: "Divisi Creative - PT Doran Sukses Indonesia (JETE)"
 scope: "broadcasting dependency management"
 ---
@@ -44,9 +44,9 @@ Hapus dependensi secara permanen dari composer backend.
 - Pastikan semua tes unit (`php artisan test`) terutama notifikasi (`NotificationApiTest`) masih lulus tanpa kehadiran Reverb.
 - Pastikan frontend Echo client tidak memanggil `wsHost` atau setelan server Reverb secara *hardcode*.
 
-## 9. NEEDS_REVIEW
-Project Owner atau Lead Developer harus memvalidasi keputusan ini: "Apakah kita yakin 100% menggunakan arsitektur Pusher Cloud ke depannya, sehingga Server Websocket Mandiri (Reverb) tidak dibutuhkan lagi?".
+## 9. Final Decision
+Project Owner mengonfirmasi pada 2026-07-15 bahwa realtime sepenuhnya menggunakan Pusher Cloud. `laravel/reverb`, konfigurasi Reverb, dan dependency turunannya telah dihapus.
 
 ## 10. Next Actions
-- Jika disetujui, jalankan `composer remove laravel/reverb` pada batch berikutnya (misal Batch 13).
-- Perbarui dokumentasi *Environment Security* untuk mencerminkan penghapusan Reverb secara mutlak.
+- Pertahankan Pusher sebagai satu-satunya konfigurasi broadcasting production.
+- Instalasi Reverb kembali membutuhkan keputusan arsitektur baru dan hosting yang mendukung proses WebSocket persisten.

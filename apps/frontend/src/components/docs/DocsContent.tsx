@@ -5,11 +5,16 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import type { Components } from "react-markdown";
+import { NavbarDocumentation } from "@/design-system/templates/documentation/navbar-documentation";
+import { HeroHeadingDocumentation } from "@/design-system/templates/documentation/hero-heading-documentation";
+import { PrimaryActionLinkDocumentation } from "@/design-system/templates/documentation/primary-action-link-documentation";
+import { ErrorRunnerGameDocumentation } from "@/design-system/templates/documentation/error-runner-game-documentation";
+import { UniversalErrorViewDocumentation } from "@/design-system/templates/documentation/universal-error-view-documentation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface DocsContentProps {
-  /** Slug from URL param, e.g. "main-app/changelogs" */
+  /** Slug from URL param, e.g. "core/application-catalog" */
   slug: string;
 }
 
@@ -167,6 +172,12 @@ export default function DocsContent({ slug }: DocsContentProps) {
       window.clearTimeout(timeout);
     };
   }, [slug]);
+
+  if (slug === "components/navbar") return <NavbarDocumentation />;
+  if (slug === "components/hero-heading") return <HeroHeadingDocumentation />;
+  if (slug === "components/primary-action-link") return <PrimaryActionLinkDocumentation />;
+  if (slug === "components/error-runner-game") return <ErrorRunnerGameDocumentation />;
+  if (slug === "components/universal-error-view") return <UniversalErrorViewDocumentation />;
 
   // ── Render states ──
   if (state.status === "idle") return <EmptyState />;

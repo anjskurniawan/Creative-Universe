@@ -9,8 +9,8 @@
 
 use App\Models\Core\Conversation;
 use App\Models\Core\User;
-use App\Models\Odds\Task;
-use App\Models\Pricetag\PricetagBatch;
+use App\SubApps\Generator\Pricetag\Models\PricetagBatch;
+use App\SubApps\Odds\Models\Task;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.Core.User.{id}', function (User $user, int $id): bool {

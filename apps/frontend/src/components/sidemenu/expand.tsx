@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { SideMenuAvatar } from "@/components/sidemenu/avatar";
 import { SideMenuButton, type SideMenuButtonStatus } from "@/components/sidemenu/button";
 import { SideMenuIconApp } from "@/components/sidemenu/iconapp";
@@ -15,6 +16,7 @@ export type SideMenuExpandedItem = {
 type SideMenuExpandProps = {
   primaryItems: SideMenuExpandedItem[];
   secondaryItems?: SideMenuExpandedItem[];
+  secondaryContent?: ReactNode;
   onCollapse?: () => void;
   avatarName?: string;
   avatarRole?: string;
@@ -24,6 +26,7 @@ type SideMenuExpandProps = {
 export function SideMenuExpand({
   primaryItems,
   secondaryItems = [],
+  secondaryContent,
   onCollapse,
   avatarName,
   avatarRole,
@@ -68,7 +71,7 @@ export function SideMenuExpand({
               onClick={onCollapse}
             />
 
-            {secondaryItems.map((item) => (
+            {secondaryContent ?? secondaryItems.map((item) => (
               <SideMenuButton
                 key={item.label}
                 model="Icon + Text"

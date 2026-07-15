@@ -2,10 +2,13 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Core\ApplicationResource;
+use App\Models\Core\Application;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use App\Models\AppSetting;
 
 class UserProfileResource extends JsonResource
 {
@@ -23,6 +26,14 @@ class UserProfileResource extends JsonResource
             'auto_save_checklist',
         ]);
 
+        $applications = $this->hasRole('Root')
+            ? Application::query()->orderBy('sort_order')->get()
+            : Application::query()
+                ->where('key', 'core')
+                ->orWhereHas('users', fn ($query) => $query->whereKey($this->getKey()))
+                ->orderBy('sort_order')
+                ->get();
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -38,7 +49,11 @@ class UserProfileResource extends JsonResource
 
             'roles' => $this->getRoleNames()->values()->all(),
             'permissions' => $this->getAllPermissions()->pluck('name')->values()->all(),
+            'applications' => ApplicationResource::collection($applications)->resolve($request),
             'settings' => $safeSettings,
+            'emergency_maintenance' => AppSetting::query()
+                ->where('key', 'emergency_maintenance_mode')
+                ->value('value') === '1',
         ];
     }
 }

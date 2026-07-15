@@ -2,7 +2,7 @@
 
 namespace App\Notifications\Odds;
 
-use App\Models\Odds\Task;
+use App\SubApps\Odds\Models\Task;
 use App\Notifications\Channels\FonnteChannel;
 use Illuminate\Notifications\Notification;
 

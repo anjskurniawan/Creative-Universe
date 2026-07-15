@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Core\AssetLink;
 use App\Models\Core\User;
-use App\Models\Pricetag\PricetagCategory;
-use App\Models\Pricetag\PricetagProduct;
+use App\SubApps\Generator\Pricetag\Models\PricetagCategory;
+use App\SubApps\Generator\Pricetag\Models\PricetagProduct;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -17,10 +17,10 @@ class PricetagTestDataSeeder extends Seeder
         // 1. Drop/Truncate all pricetag database tables
         Schema::disableForeignKeyConstraints();
 
-        DB::table('pricetag_batch_items')->truncate();
-        DB::table('pricetag_batches')->truncate();
-        DB::table('pricetag_products')->truncate();
-        // DB::table('pricetag_categories')->truncate(); // Do not delete existing categories
+        DB::table('generator_pricetag_batch_items')->truncate();
+        DB::table('generator_pricetag_batches')->truncate();
+        DB::table('generator_pricetag_products')->truncate();
+        // DB::table('generator_pricetag_categories')->truncate(); // Do not delete existing categories
 
         // Also clean up polymorphic asset links for products
         AssetLink::where('linkable_type', PricetagProduct::class)->delete();

@@ -3,22 +3,18 @@
 namespace App\Http\Controllers\Api\Odds;
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Models\Odds\TaskCancelRequest;
-use App\Services\Odds\OddsEscalationService;
+use App\Http\Requests\Odds\ReviewDecisionRequest;
+use App\SubApps\Odds\Models\TaskCancelRequest;
+use App\SubApps\Odds\Services\OddsEscalationService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class EscalationController extends BaseApiController
 {
     public function __construct(private OddsEscalationService $escalations) {}
 
-    public function reviewCancel(Request $request, TaskCancelRequest $cancelRequest): JsonResponse
+    public function reviewCancel(ReviewDecisionRequest $request, TaskCancelRequest $cancelRequest): JsonResponse
     {
-        $data = $request->validate([
-            'decision' => ['required', Rule::in(['approved', 'rejected'])],
-            'note' => ['nullable', 'string'],
-        ]);
+        $data = $request->validated();
 
         return $this->sendResponse($this->escalations->reviewCancel($cancelRequest, $request->user()->id, $data['decision'], $data['note'] ?? null), 'Review cancel ODDS berhasil disimpan.');
     }

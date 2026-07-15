@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "sync:documentation": "node scripts/sync-documentation.mjs",
+    "predev": "npm run sync:documentation",
     "dev": "next dev",
+    "prebuild": "npm run sync:documentation",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:contracts": "node scripts/check-frontend-contracts.mjs"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.1",

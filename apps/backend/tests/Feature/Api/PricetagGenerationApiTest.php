@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
-use App\Jobs\Pricetag\GeneratePricetagChunkJob;
+use App\SubApps\Generator\Pricetag\Jobs\GeneratePricetagChunkJob;
 use App\Models\Core\AssetLink;
 use App\Models\Core\User;
-use App\Models\Pricetag\PricetagBatch;
-use App\Models\Pricetag\PricetagCategory;
-use App\Models\Pricetag\PricetagProduct;
+use App\SubApps\Generator\Pricetag\Models\PricetagBatch;
+use App\SubApps\Generator\Pricetag\Models\PricetagCategory;
+use App\SubApps\Generator\Pricetag\Models\PricetagProduct;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Broadcast;
@@ -91,10 +91,10 @@ class PricetagGenerationApiTest extends TestCase
 
     public function test_guest_cannot_access_generation_endpoints(): void
     {
-        $this->postJson('/api/v1/pricetag/generations/single', [])->assertStatus(401);
-        $this->postJson('/api/v1/pricetag/generations/checklist', [])->assertStatus(401);
-        $this->postJson('/api/v1/pricetag/generations/csv', [])->assertStatus(401);
-        $this->getJson('/api/v1/pricetag/batches')->assertStatus(401);
+        $this->postJson('/api/v1/generator/pricetag/generations/single', [])->assertStatus(401);
+        $this->postJson('/api/v1/generator/pricetag/generations/checklist', [])->assertStatus(401);
+        $this->postJson('/api/v1/generator/pricetag/generations/csv', [])->assertStatus(401);
+        $this->getJson('/api/v1/generator/pricetag/batches')->assertStatus(401);
     }
 
     public function test_unauthorized_user_cannot_access_generation_endpoints(): void
@@ -108,7 +108,7 @@ class PricetagGenerationApiTest extends TestCase
         // No roles, hence no access-pricetag
         $this->actingAs($unauthorized);
 
-        $this->postJson('/api/v1/pricetag/generations/single', [])->assertStatus(403);
+        $this->postJson('/api/v1/generator/pricetag/generations/single', [])->assertStatus(403);
     }
 
     public function test_single_generation_success(): void
@@ -123,7 +123,7 @@ class PricetagGenerationApiTest extends TestCase
             ], 200),
         ]);
 
-        $response = $this->postJson('/api/v1/pricetag/generations/single', [
+        $response = $this->postJson('/api/v1/generator/pricetag/generations/single', [
             'product_id' => $this->product->id,
             'discount_price' => 150000,
         ]);
@@ -134,7 +134,7 @@ class PricetagGenerationApiTest extends TestCase
             ->assertJsonPath('data.is_ready', true)
             ->assertJsonPath('data.preview_url', 'https://drive.google.com/file/d/test_view_id/view');
 
-        $this->assertDatabaseHas('pricetag_batches', [
+        $this->assertDatabaseHas('generator_pricetag_batches', [
             'batch_name' => 'JETE TWS T10',
             'status' => 'completed',
             'total_items' => 1,
@@ -142,7 +142,7 @@ class PricetagGenerationApiTest extends TestCase
             'created_by' => $this->designer1->id,
         ]);
 
-        $this->assertDatabaseHas('pricetag_batch_items', [
+        $this->assertDatabaseHas('generator_pricetag_batch_items', [
             'product_id' => $this->product->id,
             'status' => 'success',
         ]);
@@ -152,7 +152,7 @@ class PricetagGenerationApiTest extends TestCase
     {
         $this->actingAs($this->designer1);
 
-        $response = $this->postJson('/api/v1/pricetag/generations/single', [
+        $response = $this->postJson('/api/v1/generator/pricetag/generations/single', [
             'product_id' => 99999, // Unknown
             'discount_price' => -100, // Invalid
         ]);
@@ -166,7 +166,7 @@ class PricetagGenerationApiTest extends TestCase
         $this->actingAs($this->designer1);
         Queue::fake();
 
-        $response = $this->postJson('/api/v1/pricetag/generations/checklist', [
+        $response = $this->postJson('/api/v1/generator/pricetag/generations/checklist', [
             'batch_name' => 'Checklist Batch Test',
             'items' => [
                 ['product_id' => $this->product->id, 'discount_price' => 165000],
@@ -179,13 +179,13 @@ class PricetagGenerationApiTest extends TestCase
             ->assertJsonPath('data.total_items', 1)
             ->assertJsonPath('data.status', 'pending');
 
-        $this->assertDatabaseHas('pricetag_batches', [
+        $this->assertDatabaseHas('generator_pricetag_batches', [
             'batch_name' => 'Pritag #1',
             'status' => 'pending',
             'created_by' => $this->designer1->id,
         ]);
 
-        $this->assertDatabaseHas('pricetag_batch_items', [
+        $this->assertDatabaseHas('generator_pricetag_batch_items', [
             'product_id' => $this->product->id,
             'status' => 'pending',
         ]);
@@ -204,7 +204,7 @@ class PricetagGenerationApiTest extends TestCase
 
         $file = UploadedFile::fake()->createWithContent('pricetags.csv', $csvContent);
 
-        $response = $this->postJson('/api/v1/pricetag/generations/csv', [
+        $response = $this->postJson('/api/v1/generator/pricetag/generations/csv', [
             'batch_name' => 'CSV Batch Test',
             'file' => $file,
         ]);
@@ -226,7 +226,7 @@ class PricetagGenerationApiTest extends TestCase
 
         $file = UploadedFile::fake()->createWithContent('pricetags.csv', $csvContent);
 
-        $response = $this->postJson('/api/v1/pricetag/generations/csv', [
+        $response = $this->postJson('/api/v1/generator/pricetag/generations/csv', [
             'batch_name' => 'CSV Invalid Test',
             'file' => $file,
         ]);
@@ -256,14 +256,14 @@ class PricetagGenerationApiTest extends TestCase
 
         // 1. Designer 1 should only see Batch 1
         $this->actingAs($this->designer1);
-        $response1 = $this->getJson('/api/v1/pricetag/batches');
+        $response1 = $this->getJson('/api/v1/generator/pricetag/batches');
         $response1->assertStatus(200)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.batch_name', 'Batch Des 1');
 
         // 2. Root should see both batches
         $this->actingAs($this->root);
-        $response2 = $this->getJson('/api/v1/pricetag/batches');
+        $response2 = $this->getJson('/api/v1/generator/pricetag/batches');
         $response2->assertStatus(200)
             ->assertJsonCount(2, 'data');
     }
@@ -279,15 +279,15 @@ class PricetagGenerationApiTest extends TestCase
 
         // Designer 1 can access
         $this->actingAs($this->designer1);
-        $this->getJson("/api/v1/pricetag/batches/{$batch->id}")->assertStatus(200);
+        $this->getJson("/api/v1/generator/pricetag/batches/{$batch->id}")->assertStatus(200);
 
         // Designer 2 cannot access
         $this->actingAs($this->designer2);
-        $this->getJson("/api/v1/pricetag/batches/{$batch->id}")->assertStatus(403);
+        $this->getJson("/api/v1/generator/pricetag/batches/{$batch->id}")->assertStatus(403);
 
         // Root can access
         $this->actingAs($this->root);
-        $this->getJson("/api/v1/pricetag/batches/{$batch->id}")->assertStatus(200);
+        $this->getJson("/api/v1/generator/pricetag/batches/{$batch->id}")->assertStatus(200);
     }
 
     public function test_broadcast_channel_authorization(): void
@@ -374,7 +374,7 @@ class PricetagGenerationApiTest extends TestCase
             ]),
         ]);
 
-        $response = $this->get("/api/v1/pricetag/batches/{$batch->id}/download");
+        $response = $this->get("/api/v1/generator/pricetag/batches/{$batch->id}/download");
         $response->assertStatus(200);
         $this->assertTrue(str_contains($response->headers->get('Content-Type'), 'application/zip'));
     }
@@ -391,7 +391,7 @@ class PricetagGenerationApiTest extends TestCase
 
         // Designer 2 cannot download Designer 1's ZIP
         $this->actingAs($this->designer2);
-        $this->get("/api/v1/pricetag/batches/{$batch->id}/download")
+        $this->get("/api/v1/generator/pricetag/batches/{$batch->id}/download")
             ->assertStatus(403);
     }
 }

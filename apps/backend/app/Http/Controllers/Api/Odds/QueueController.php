@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Api\Odds;
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Models\Odds\Task;
-use App\Models\Odds\TaskQueue;
-use App\Models\Odds\TaskSkipRequest;
-use App\Services\Odds\OddsQueueService;
+use App\Http\Requests\Odds\ReasonRequest;
+use App\Http\Requests\Odds\ReviewDecisionRequest;
+use App\SubApps\Odds\Models\Task;
+use App\SubApps\Odds\Models\TaskQueue;
+use App\SubApps\Odds\Models\TaskSkipRequest;
+use App\SubApps\Odds\Services\OddsQueueService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class QueueController extends BaseApiController
 {
@@ -33,19 +34,16 @@ class QueueController extends BaseApiController
         return $this->sendResponse($this->queue->nextForDesigner($request->user()->id), 'Task prioritas berikutnya berhasil diambil.');
     }
 
-    public function requestSkip(Request $request, Task $task): JsonResponse
+    public function requestSkip(ReasonRequest $request, Task $task): JsonResponse
     {
-        $skip = $this->queue->requestSkip($task, $request->user()->id, $request->validate(['reason' => ['required', 'string']])['reason']);
+        $skip = $this->queue->requestSkip($task, $request->user()->id, $request->string('reason')->toString());
 
         return $this->sendResponse($skip, 'Permintaan skip ODDS berhasil dikirim.', 201);
     }
 
-    public function reviewSkip(Request $request, TaskSkipRequest $skipRequest): JsonResponse
+    public function reviewSkip(ReviewDecisionRequest $request, TaskSkipRequest $skipRequest): JsonResponse
     {
-        $data = $request->validate([
-            'decision' => ['required', Rule::in(['approved', 'rejected'])],
-            'note' => ['nullable', 'string'],
-        ]);
+        $data = $request->validated();
 
         return $this->sendResponse($this->queue->reviewSkip($skipRequest, $request->user()->id, $data['decision'], $data['note'] ?? null), 'Review skip ODDS berhasil disimpan.');
     }

@@ -4,12 +4,12 @@ namespace Tests\Feature\Api;
 
 use App\Models\Core\Conversation;
 use App\Models\Core\User;
-use App\Models\Odds\Category;
-use App\Models\Odds\DesignerDailyReport;
-use App\Models\Odds\DesignerProfile;
-use App\Models\Odds\SystemRule;
-use App\Models\Odds\Task;
-use App\Models\Odds\TaskRevision;
+use App\SubApps\Odds\Models\Category;
+use App\SubApps\Odds\Models\DesignerDailyReport;
+use App\SubApps\Odds\Models\DesignerProfile;
+use App\SubApps\Odds\Models\SystemRule;
+use App\SubApps\Odds\Models\Task;
+use App\SubApps\Odds\Models\TaskRevision;
 use App\Notifications\Odds\OddsWorkflowNotification;
 use Database\Seeders\OddsPermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -153,6 +153,65 @@ class OddsWorkflowApiTest extends TestCase
             ->getJson('/api/v1/odds/designer-profiles?active=1')
             ->assertOk()
             ->assertJsonPath('data.data.0.user.id', $this->designer->id);
+    }
+
+    public function test_queue_skip_request_and_review_permissions_are_separated(): void
+    {
+        $taskId = $this->createTask();
+        $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/brief/accept")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'queued');
+
+        $skipRequestId = $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/skip-requests", ['reason' => 'Perangkat render bermasalah.'])
+            ->assertCreated()
+            ->assertJsonPath('data.status', 'pending')
+            ->json('data.id');
+
+        $this->actingAs($this->manager)
+            ->getJson('/api/v1/odds/tasks')
+            ->assertOk()
+            ->assertJsonPath('data.data.0.skip_requests.0.id', $skipRequestId);
+
+        $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/skip-requests/{$skipRequestId}/review", ['decision' => 'approved'])
+            ->assertForbidden();
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/skip-requests", ['reason' => 'Tidak boleh mewakili desainer.'])
+            ->assertForbidden();
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/skip-requests/{$skipRequestId}/review", [
+                'decision' => 'approved',
+                'note' => 'Disetujui oleh manajer.',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'approved');
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/skip-requests/{$skipRequestId}/review", ['decision' => 'rejected'])
+            ->assertUnprocessable();
+    }
+
+    public function test_only_escalation_manager_can_extend_a_future_deadline(): void
+    {
+        $taskId = $this->createTask();
+        $deadline = now()->addDays(7)->seconds(0)->toDateTimeString();
+
+        $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/extend-deadline", ['deadline' => $deadline])
+            ->assertForbidden();
+
+        $this->actingAs($this->manager)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/extend-deadline", [
+                'deadline' => $deadline,
+                'note' => 'Penyesuaian timeline campaign.',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('odds_tasks', ['id' => $taskId, 'deadline' => $deadline]);
     }
 
     public function test_submit_validation_rechecks_type_category_designer_and_capacity(): void

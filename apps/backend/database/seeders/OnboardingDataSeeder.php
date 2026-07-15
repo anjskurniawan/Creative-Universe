@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Core\Division;
+use Illuminate\Database\Seeder;
 
 class OnboardingDataSeeder extends Seeder
 {

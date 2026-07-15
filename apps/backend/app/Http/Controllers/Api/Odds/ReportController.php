@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\Odds;
 
 use App\Http\Controllers\Api\BaseApiController;
-use App\Models\Odds\DesignerDailyReport;
-use App\Models\Odds\DesignerRanking;
-use App\Services\Odds\OddsReportingService;
+use App\SubApps\Odds\Models\DesignerDailyReport;
+use App\SubApps\Odds\Models\DesignerRanking;
+use App\SubApps\Odds\Services\OddsReportingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Api\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\Core\User;
+use App\Models\Core\Application;
+use App\Models\Core\PermissionMetadata;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -38,7 +40,7 @@ class UserController extends BaseApiController
         }
 
         $users = $query
-            ->with(['roles', 'permissions'])
+            ->with(['roles', 'permissions', 'applications'])
             ->latest()
             ->paginate($perPage);
 
@@ -83,6 +85,19 @@ class UserController extends BaseApiController
             'all_permissions' => $isRoot && $canManageUsers ? $allPermissions->values()->all() : [],
             'manager_whitelist' => $isRoot && $canManageUsers ? array_values($whitelisted) : [],
             'is_root' => $isRoot,
+            'permission_aliases' => PermissionMetadata::query()
+                ->whereHas('permission', fn ($query) => $query->whereIn('name', $isRoot ? $allPermissions : $manageablePermissions))
+                ->with('permission:id,name')
+                ->get()
+                ->mapWithKeys(fn (PermissionMetadata $metadata) => [$metadata->permission->name => $metadata->display_name])
+                ->all(),
+            'applications' => Application::query()
+                ->where('key', '!=', 'core')
+                ->when(! $isRoot, fn ($query) => $query->whereHas('users', fn ($users) => $users->whereKey($actor->id)))
+                ->orderBy('sort_order')
+                ->get(['key', 'display_name', 'status', 'frontend_path'])
+                ->values()
+                ->all(),
         ], 'Opsi pengelolaan pengguna berhasil diambil.');
     }
 
@@ -95,7 +110,7 @@ class UserController extends BaseApiController
             return $this->sendError('Manajer tidak dapat melihat detail pengguna Root.', [], 403);
         }
 
-        $user->load(['roles', 'permissions']);
+        $user->load(['roles', 'permissions', 'applications']);
         $canViewAudit = $actor->hasRole('Root');
 
         return $this->sendResponse([
@@ -119,6 +134,8 @@ class UserController extends BaseApiController
 
         $selectedRoles = $request->input('roles', []);
         $selectedPermissions = $request->input('permissions', []);
+        $selectedApplications = $request->input('applications', $user->applications()->pluck('key')->all());
+        $applicationsToSync = $selectedApplications;
         $permissionsToSync = $selectedPermissions;
 
         if (! $actor->hasRole('Root')) {
@@ -148,9 +165,22 @@ class UserController extends BaseApiController
                 ...$protectedExistingPermissions,
                 ...$selectedPermissions,
             ]));
+
+            $allowedApplications = $actor->applications()->pluck('key')->all();
+            foreach ($selectedApplications as $application) {
+                if (! in_array($application, $allowedApplications, true)) {
+                    return $this->sendError("Anda tidak dapat memberikan akses aplikasi '{$application}' karena Anda sendiri tidak memilikinya.", [], 403);
+                }
+            }
+
+            $protectedApplications = $user->applications()
+                ->pluck('key')
+                ->reject(fn (string $application) => in_array($application, $allowedApplications, true))
+                ->all();
+            $applicationsToSync = array_values(array_unique([...$protectedApplications, ...$selectedApplications]));
         }
 
-        $statusChanged = DB::transaction(function () use ($request, $user, $actor, $selectedRoles, $permissionsToSync) {
+        DB::transaction(function () use ($request, $user, $actor, $selectedRoles, $permissionsToSync, $applicationsToSync) {
             $user->fill([
                 'name' => $request->string('name')->toString(),
                 'email' => $request->string('email')->toString(),
@@ -165,6 +195,8 @@ class UserController extends BaseApiController
             $user->save();
             $user->syncRoles($selectedRoles);
             $user->syncPermissions($permissionsToSync);
+            $applicationIds = Application::query()->whereIn('key', $applicationsToSync)->pluck('id');
+            $user->applications()->syncWithPivotValues($applicationIds, ['granted_by' => $actor->id]);
             app(PermissionRegistrar::class)->forgetCachedPermissions();
 
             activity('user-management')
@@ -174,14 +206,14 @@ class UserController extends BaseApiController
                     'password_reset' => $request->filled('password'),
                     'roles' => $selectedRoles,
                     'permissions' => $permissionsToSync,
+                    'applications' => $applicationsToSync,
                     'ip' => $request->ip(),
                 ])
                 ->log("[CORE] User account settings managed: {$user->email}");
 
-            return true;
         });
 
-        $user->load(['roles', 'permissions']);
+        $user->load(['roles', 'permissions', 'applications']);
 
         return $this->sendResponse(
             (new UserResource($user))->resolve($request),

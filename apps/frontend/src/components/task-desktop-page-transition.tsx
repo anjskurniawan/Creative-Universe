@@ -31,7 +31,7 @@ export function TaskDesktopPageTransition({ children, className = "" }: TaskDesk
       if (window.innerWidth < 1024 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
-      const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href^="/task"]');
+      const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href^="/kv-retail"]');
       const href = anchor?.getAttribute("href");
       if (!anchor || anchor.target === "_blank" || !href || href === pathname || document.querySelector("[data-task-route-overlay]")) return;
 

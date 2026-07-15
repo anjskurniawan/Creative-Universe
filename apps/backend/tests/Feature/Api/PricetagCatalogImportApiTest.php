@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Api;
 
 use App\Models\Core\User;
-use App\Models\Pricetag\PricetagCategory;
-use App\Models\Pricetag\PricetagProduct;
+use App\SubApps\Generator\Pricetag\Models\PricetagCategory;
+use App\SubApps\Generator\Pricetag\Models\PricetagProduct;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -33,7 +33,7 @@ class PricetagCatalogImportApiTest extends TestCase
             "kategori,produk,variant,harga normal,harga diskon\nAudio,Headset Pro,Hitam,1.500.000,1.250.000\n"
         );
 
-        $response = $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
+        $response = $this->actingAs($this->manager)->post('/api/v1/generator/pricetag/imports/products', [
             'file' => $file,
         ], ['Accept' => 'application/json']);
 
@@ -41,7 +41,7 @@ class PricetagCatalogImportApiTest extends TestCase
             ->assertJsonPath('data.total', 1)
             ->assertJsonPath('data.created', 1)
             ->assertJsonPath('data.categories_created', 1);
-        $this->assertDatabaseHas('pricetag_products', [
+        $this->assertDatabaseHas('generator_pricetag_products', [
             'name' => 'Headset Pro',
             'variant_name' => 'Hitam',
             'normal_price' => 1500000,
@@ -63,14 +63,14 @@ class PricetagCatalogImportApiTest extends TestCase
             "category_name;product_name;variant_name;normal_price;discount_price\nAudio;Headset Pro;Hitam;100000;70000\n"
         );
 
-        $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
+        $this->actingAs($this->manager)->post('/api/v1/generator/pricetag/imports/products', [
             'file' => $file,
         ], ['Accept' => 'application/json'])
             ->assertOk()
             ->assertJsonPath('data.updated', 1)
             ->assertJsonPath('data.created', 0);
 
-        $this->assertDatabaseHas('pricetag_products', [
+        $this->assertDatabaseHas('generator_pricetag_products', [
             'id' => $product->id,
             'category_id' => $category->id,
             'discount_price' => 70000,
@@ -88,19 +88,19 @@ class PricetagCatalogImportApiTest extends TestCase
             "kategori,produk,varian,harga_normal,harga_diskon\nAudio,Headset Pro,Hitam,120000,90000\n"
         );
 
-        $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
+        $this->actingAs($this->manager)->post('/api/v1/generator/pricetag/imports/products', [
             'file' => $file,
         ], ['Accept' => 'application/json'])
             ->assertOk()
             ->assertJsonPath('data.restored', 1)
             ->assertJsonPath('data.categories_restored', 1);
 
-        $this->assertDatabaseHas('pricetag_categories', [
+        $this->assertDatabaseHas('generator_pricetag_categories', [
             'id' => $category->id,
             'deleted_at' => null,
             'deleted_by' => null,
         ]);
-        $this->assertDatabaseHas('pricetag_products', [
+        $this->assertDatabaseHas('generator_pricetag_products', [
             'id' => $product->id,
             'deleted_at' => null,
             'deleted_by' => null,
@@ -115,14 +115,14 @@ class PricetagCatalogImportApiTest extends TestCase
             "kategori,produk,varian,harga_normal,harga_diskon\nAudio,Valid Product,Default,100000,90000\nAudio,Broken Product,Default,bukan-angka,50000\n"
         );
 
-        $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
+        $this->actingAs($this->manager)->post('/api/v1/generator/pricetag/imports/products', [
             'file' => $file,
         ], ['Accept' => 'application/json'])
             ->assertUnprocessable()
             ->assertJsonPath('errors.rows.0.row', 3);
 
-        $this->assertDatabaseCount('pricetag_categories', 0);
-        $this->assertDatabaseCount('pricetag_products', 0);
+        $this->assertDatabaseCount('generator_pricetag_categories', 0);
+        $this->assertDatabaseCount('generator_pricetag_products', 0);
     }
 
     public function test_duplicate_product_variant_inside_file_is_rejected(): void
@@ -132,14 +132,14 @@ class PricetagCatalogImportApiTest extends TestCase
             "kategori,produk,varian,harga_normal\nAudio,Headset Pro,Hitam,100000\nAudio,headset pro,HITAM,120000\n"
         );
 
-        $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
+        $this->actingAs($this->manager)->post('/api/v1/generator/pricetag/imports/products', [
             'file' => $file,
         ], ['Accept' => 'application/json'])
             ->assertUnprocessable()
             ->assertJsonPath('errors.rows.0.row', 3)
             ->assertJsonPath('errors.rows.0.errors.0', 'Duplikat produk/varian dengan baris 2.');
 
-        $this->assertDatabaseCount('pricetag_products', 0);
+        $this->assertDatabaseCount('generator_pricetag_products', 0);
     }
 
     public function test_missing_required_headers_and_empty_file_are_rejected(): void
@@ -150,13 +150,13 @@ class PricetagCatalogImportApiTest extends TestCase
         );
         $empty = UploadedFile::fake()->createWithContent('empty.csv', '');
 
-        $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
+        $this->actingAs($this->manager)->post('/api/v1/generator/pricetag/imports/products', [
             'file' => $missingHeader,
         ], ['Accept' => 'application/json'])
             ->assertUnprocessable()
             ->assertJsonPath('message', 'Header CSV wajib memuat kategori, produk, dan harga normal.');
 
-        $this->actingAs($this->manager)->post('/api/v1/pricetag/imports/products', [
+        $this->actingAs($this->manager)->post('/api/v1/generator/pricetag/imports/products', [
             'file' => $empty,
         ], ['Accept' => 'application/json'])
             ->assertUnprocessable();
@@ -171,7 +171,7 @@ class PricetagCatalogImportApiTest extends TestCase
             "kategori,produk,harga_normal\nAudio,Headset,100000\n"
         );
 
-        $this->actingAs($reader)->post('/api/v1/pricetag/imports/products', [
+        $this->actingAs($reader)->post('/api/v1/generator/pricetag/imports/products', [
             'file' => $file,
         ], ['Accept' => 'application/json'])
             ->assertForbidden();

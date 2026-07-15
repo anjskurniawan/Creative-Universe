@@ -1,56 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { apiFetch } from "@/lib/api";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  chatApi,
+  subscribeToConversationMessages,
+  type ChatConversation,
+} from "@/core/chat";
+import { APP_ROUTES, appRoute } from "@/core/navigation/routes";
 import { MaterialIcon } from "./material-icon";
 
 interface MessageBellProps {
   userId: number;
   variant?: "light" | "dark";
+  renderTrigger?: (props: { isOpen: boolean; unreadCount: number; toggle: () => void }) => ReactNode;
+  panelClassName?: string;
 }
 
-type ChatUser = {
-  id?: number;
-  name?: string;
-  avatar?: string | null;
-  avatar_path?: string | null;
-};
-
-type LastMessage = {
-  body?: string | null;
-  is_read?: boolean;
-  sender_id?: number | null;
-};
-
-type ConversationPreview = {
-  id: number | string;
-  partner?: ChatUser | null;
-  task?: {
-    task_number?: string | null;
-    design_purpose?: string | null;
-  } | null;
-  context_type?: string | null;
-  last_message?: LastMessage | null;
-  status?: string | null;
-};
-
-type ConversationsResponse = {
-  data?: ConversationPreview[];
-};
-
-async function requestConversations(): Promise<ConversationPreview[]> {
-  const response = await apiFetch<ConversationsResponse>("/chat/conversations", {
-    _skipAuthRedirect: true,
+async function requestConversations(): Promise<ChatConversation[]> {
+  const response = await chatApi.conversations({
+    skipAuthRedirect: true,
   });
-  return Array.isArray(response?.data) ? response.data : [];
+  return Array.isArray(response) ? response : [];
 }
 
-export function MessageBell({ userId, variant = "light" }: MessageBellProps) {
+export function MessageBell({ userId, variant = "light", renderTrigger, panelClassName = "" }: MessageBellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [conversations, setConversations] = useState<ConversationPreview[]>([]);
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isDark = variant === "dark";
@@ -98,6 +76,27 @@ export function MessageBell({ userId, variant = "light" }: MessageBellProps) {
     };
   }, [isOpen]);
 
+  const conversationIdsKey = conversations.map((conversation) => conversation.id).join(",");
+  useEffect(() => subscribeToConversationMessages(
+    conversationIdsKey.split(",").filter(Boolean),
+    (conversationId, message) => {
+      setConversations((current) => current
+        .map((conversation) => Number(conversation.id) === conversationId
+          ? {
+              ...conversation,
+              last_message: {
+                body: message.body,
+                created_at: message.created_at,
+                is_read: false,
+                sender_id: Number(message.sender_id),
+              },
+              updated_at: message.created_at,
+            }
+          : conversation)
+        .sort((left, right) => new Date(right.updated_at ?? 0).getTime() - new Date(left.updated_at ?? 0).getTime()));
+    },
+  ), [conversationIdsKey]);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -129,26 +128,32 @@ export function MessageBell({ userId, variant = "light" }: MessageBellProps) {
 
   return (
     <div className="relative" ref={containerRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen((open) => !open)}
-        className={`relative inline-flex size-9 cursor-pointer items-center justify-center rounded-full p-1 transition-colors focus:outline-none focus:ring-2 ${buttonClass}`}
-        aria-label="Pesan Masuk"
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-      >
-        <MaterialIcon name="chat" size="md" />
-        {unreadCount > 0 && (
-          <span className={`absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 bg-cu-danger px-1 ${isDark ? "border-black" : "border-white"}`}>
-            <span className="text-xs font-bold leading-none text-white">
-              {unreadCount > 9 ? "9+" : unreadCount}
+      {renderTrigger ? renderTrigger({
+        isOpen,
+        unreadCount,
+        toggle: () => setIsOpen((open) => !open),
+      }) : (
+        <button
+          type="button"
+          onClick={() => setIsOpen((open) => !open)}
+          className={`relative inline-flex size-9 cursor-pointer items-center justify-center rounded-full p-1 transition-colors focus:outline-none focus:ring-2 ${buttonClass}`}
+          aria-label="Pesan Masuk"
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+        >
+          <MaterialIcon name="chat" size="md" />
+          {unreadCount > 0 && (
+            <span className={`absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 bg-cu-danger px-1 ${isDark ? "border-black" : "border-white"}`}>
+              <span className="text-xs font-bold leading-none text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
             </span>
-          </span>
-        )}
-      </button>
+          )}
+        </button>
+      )}
 
       {isOpen && (
-        <div className={dropdownPanelClass(isDark)}>
+        <div className={dropdownPanelClass(isDark, panelClassName)}>
           <DropdownHeader
             title="Messages"
             subtitle={`${unreadCount} unread ${unreadCount === 1 ? "message" : "messages"}`}
@@ -181,7 +186,7 @@ export function MessageBell({ userId, variant = "light" }: MessageBellProps) {
 
           {conversations.length > 0 && (
             <Link
-              href="/messages"
+              href={APP_ROUTES.messages}
               onClick={() => setIsOpen(false)}
               className={footerActionClass(isDark)}
               role="menuitem"
@@ -203,7 +208,7 @@ function MessagePreviewItem({
   highlighted,
   onClick,
 }: {
-  conversation: ConversationPreview;
+  conversation: ChatConversation;
   userId: number;
   isDark: boolean;
   highlighted: boolean;
@@ -220,7 +225,7 @@ function MessagePreviewItem({
 
   return (
     <Link
-      href="/messages"
+      href={appRoute.messagesConversation(conversation.id)}
       onClick={onClick}
       className={previewItemClass(isDark, highlighted)}
       role="menuitem"
@@ -278,10 +283,10 @@ function Avatar({ initials, isDark, muted = false }: { initials: string; isDark:
   );
 }
 
-function dropdownPanelClass(isDark: boolean) {
+function dropdownPanelClass(isDark: boolean, panelClassName = "") {
   return `fixed left-4 right-4 top-[4.75rem] z-[110] mt-2 flex max-h-[calc(100dvh-5.5rem)] w-auto flex-col items-start overflow-hidden rounded-2xl p-1.5 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:w-[280px] ${
     isDark ? "bg-black text-[#f9fafb]" : "border-[0.5px] border-[#f2f2f2] bg-white text-[#121212]"
-  }`;
+  } ${panelClassName}`;
 }
 
 function previewItemClass(isDark: boolean, highlighted: boolean) {

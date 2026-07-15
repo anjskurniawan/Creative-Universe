@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Core\User;
-use App\Models\Odds\Category;
-use App\Models\Odds\DesignerProfile;
-use App\Models\Odds\SystemRule;
+use App\SubApps\Odds\Models\Category;
+use App\SubApps\Odds\Models\DesignerProfile;
+use App\SubApps\Odds\Models\SystemRule;
 use Illuminate\Database\Seeder;
 
 class OddsDefaultSeeder extends Seeder

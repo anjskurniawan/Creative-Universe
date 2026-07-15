@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState, useRef } from "react";
-import { apiFetch } from "@/lib/api";
-import { getEchoClient } from "@/lib/echo";
+import { useCallback, useEffect, useState, useRef, type ReactNode } from "react";
+import { apiFetch } from "@/core/api/client";
+import { getEchoClient } from "@/core/realtime";
 import {
   LOCAL_NOTIFICATIONS_UPDATED_EVENT,
   markAllLocalNotificationsRead,
@@ -30,6 +30,8 @@ interface NotificationPayload {
 interface NotificationBellProps {
   userId: number;
   variant?: "light" | "dark";
+  renderTrigger?: (props: { isOpen: boolean; unreadCount: number; toggle: () => void }) => ReactNode;
+  panelClassName?: string;
 }
 
 const TOAST_VISIBLE_MS = 6000;
@@ -49,7 +51,7 @@ function mergeNotifications(serverItems: NotificationItem[], userId: number): No
   });
 }
 
-export function NotificationBell({ userId, variant = "light" }: NotificationBellProps) {
+export function NotificationBell({ userId, variant = "light", renderTrigger, panelClassName = "" }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -318,29 +320,35 @@ export function NotificationBell({ userId, variant = "light" }: NotificationBell
         </div>
       )}
 
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        type="button"
-        className={`relative inline-flex size-9 items-center justify-center rounded-full p-1 transition-colors focus:outline-none focus:ring-2 cursor-pointer ${buttonClass}`}
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-      >
-        <span className="sr-only">Lihat notifikasi</span>
-        <MaterialIcon name="notifications" size="md" />
+      {renderTrigger ? renderTrigger({
+        isOpen,
+        unreadCount,
+        toggle: () => setIsOpen((open) => !open),
+      }) : (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          type="button"
+          className={`relative inline-flex size-9 items-center justify-center rounded-full p-1 transition-colors focus:outline-none focus:ring-2 cursor-pointer ${buttonClass}`}
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+        >
+          <span className="sr-only">Lihat notifikasi</span>
+          <MaterialIcon name="notifications" size="md" />
 
-        {unreadCount > 0 && (
-          <div
-            className={`pointer-events-none absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 bg-cu-danger px-1 ${badgeBorderClass}`}
-          >
-            <span className="text-xs font-bold leading-none text-cu-surface">
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
-          </div>
-        )}
-      </button>
+          {unreadCount > 0 && (
+            <div
+              className={`pointer-events-none absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full border-2 bg-cu-danger px-1 ${badgeBorderClass}`}
+            >
+              <span className="text-xs font-bold leading-none text-cu-surface">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            </div>
+          )}
+        </button>
+      )}
 
       {isOpen && (
-        <div className={notificationDropdownPanelClass(isDark)}>
+        <div className={notificationDropdownPanelClass(isDark, panelClassName)}>
           <NotificationDropdownHeader
             title="Notifications"
             subtitle={`${unreadCount} unread ${unreadCount === 1 ? "notification" : "notifications"}`}
@@ -483,10 +491,10 @@ function NotificationAvatar({ initials, isDark, muted = false }: { initials: str
   );
 }
 
-function notificationDropdownPanelClass(isDark: boolean) {
+function notificationDropdownPanelClass(isDark: boolean, panelClassName = "") {
   return `fixed left-4 right-4 top-[4.75rem] z-[110] mt-2 flex max-h-[calc(100dvh-5.5rem)] w-auto flex-col items-start overflow-hidden rounded-2xl p-1.5 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:w-[280px] ${
     isDark ? "bg-black text-[#f9fafb]" : "border-[0.5px] border-[#f2f2f2] bg-white text-[#121212]"
-  }`;
+  } ${panelClassName}`;
 }
 
 function notificationItemClass(isDark: boolean, highlighted: boolean) {

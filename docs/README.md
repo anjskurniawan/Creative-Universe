@@ -1,80 +1,114 @@
----
-title: "Creative Universe Documentation Index"
-status: "ACTIVE"
-version: "1.0"
-revised: "2026-06-27"
-owner: "Divisi Creative - PT Doran Sukses Indonesia (JETE)"
----
+# Creative Universe Documentation
 
-# Creative Universe Documentation Index
+**Status:** ACTIVE
+**Revised:** 2026-07-15
 
-## 1. Purpose
-Dokumen ini merupakan indeks utama yang memetakan seluruh dokumentasi teknis di dalam monorepo Creative Universe, memudahkan developer menavigasi berkas secara hierarkis dan logis.
+Dokumentasi aktif di folder ini adalah sumber arah arsitektur dan operasional Creative Universe. Dokumen yang sudah tidak sesuai implementasi dipindahkan ke `backup`, sehingga tidak boleh digunakan sebagai referensi pembangunan baru.
 
-## 2. How to Read These Docs
-Setiap file dokumentasi memiliki YAML frontmatter yang menunjukkan metadata seperti `status` (ACTIVE, TARGET, LEGACY, dll), `version`, dan `revised` (tanggal pembaruan ISO). Selalu perhatikan status dokumen sebelum mengambil keputusan arsitektur.
+## Urutan membaca
 
-## 3. Source of Truth
-Berdasarkan aturan tata kelola, hirarki sumber kebenaran data teknis (dari prioritas tertinggi ke terendah) adalah:
-1. Keputusan arsitektur ter-approve (`docs/00_architecture/`)
-2. SRD target backend/frontend (`docs/03_backend_api/` dan `docs/04_frontend_nextjs/`)
-3. Spesifikasi kebutuhan bisnis asli (`docs/01_core_system/` dan `docs/02_pricetag_generator/`)
-4. Dokumentasi dan file legacy (`legacy/` dan file usang).
+1. `00_governance/Source_of_Truth_Rules.md`
+2. `00_architecture/Application_Catalog.md`
+3. `00_architecture/Modular_SubApp_Architecture.md`
+4. `00_architecture/Terminology_and_Conventions.md`
+5. `03_backend_api/Core_Public_Contracts.md`
+6. `03_backend_api/API_Route_Map.md`
+7. `05_database/Database_ERD_Verification.md`
+8. `08_operations/CPanel_Deployment_Runbook.md`
+9. `05_migration/Backend_Modularization_Migration_Map.md`
+10. `05_migration/Frontend_Refactor_Baseline.md`
+11. `05_migration/Frontend_Audit_Report.md`
+12. `05_migration/Frontend_Backend_Contract_Matrix.md`
+13. `05_migration/Frontend_Module_Boundaries.md`
+14. `05_migration/Frontend_Route_And_Layout_Migration.md`
+15. `05_migration/Frontend_Canonical_URLs.md`
+16. `05_migration/Frontend_Legacy_Route_Cleanup.md`
+17. `05_migration/Frontend_API_Client_Foundation.md`
+18. `05_migration/Frontend_Domain_API_Modules.md`
+19. `05_migration/Frontend_Authentication_Synchronization.md`
+20. `05_migration/Frontend_Application_Access.md`
+21. `05_migration/Frontend_Permission_Aliases.md`
+22. `05_migration/Frontend_Core_Module_Alignment.md`
+23. `05_migration/Frontend_Pusher_Configuration.md`
+24. `05_migration/Frontend_KV_Retail_Integration.md`
+25. `05_migration/Frontend_KV_Retail_State_Stability.md`
+26. `05_migration/Frontend_Creative_Report_Integration.md`
+27. `05_migration/Frontend_ODDS_Integration.md`
+28. `05_migration/Frontend_Core_Chat_Integration.md`
+29. `05_migration/Frontend_Finalization_F19_F32.md`
+30. `07_design_system/Components_Navbar.md`
+31. `07_design_system/Components_Guest_Landing.md`
+32. `07_design_system/Component_Hero_Heading.md`
+33. `07_design_system/Component_Primary_Action_Link.md`
+34. `07_design_system/Component_Error_Runner_Game.md`
+35. `07_design_system/Template_Universal_Error_View.md`
+36. `08_operations/Emergency_Maintenance.md`
 
-## 4. Governance Docs
-Dokumen tata kelola penulisan dan klasifikasi dokumentasi:
-- [Source of Truth Rules](file:///c:/laragon/www/creativeuniverse/docs/00_governance/Source_of_Truth_Rules.md) — Aturan prioritas penentuan keputusan teknis.
-- [Status Label Standard](file:///c:/laragon/www/creativeuniverse/docs/00_governance/Status_Label_Standard.md) — Standar label status (ACTIVE, TARGET, LEGACY, dll).
-- [Documentation Classification Index](file:///c:/laragon/www/creativeuniverse/docs/99_cleanup/Documentation_Classification_Index.md) — Daftar inventaris status seluruh berkas dokumentasi.
+## Dokumen aktif utama
 
-## 5. Architecture Docs
-Keputusan arsitektur tingkat tinggi:
-- [Headless Architecture](file:///c:/laragon/www/creativeuniverse/docs/00_architecture/Headless_Architecture.md) — Desain monorepo terpisah.
-- [Architecture Decision Log](file:///c:/laragon/www/creativeuniverse/docs/00_architecture/Architecture_Decision_Log.md) — Log keputusan arsitektur (ADR).
-- [Terminology and Conventions](file:///c:/laragon/www/creativeuniverse/docs/00_architecture/Terminology_and_Conventions.md) — Konvensi penamaan dan istilah kamus data.
+### Governance dan arsitektur
 
-## 6. Backend API Docs
-- [Laravel REST API SRD](file:///c:/laragon/www/creativeuniverse/docs/03_backend_api/Laravel_REST_API_SRD.md) — Spesifikasi kebutuhan sistem API backend.
-- [API Route Map](file:///c:/laragon/www/creativeuniverse/docs/03_backend_api/API_Route_Map.md) — Peta rute API backend riil hasil verifikasi `route:list`.
+- `00_governance/Source_of_Truth_Rules.md`
+- `00_governance/Status_Label_Standard.md`
+- `00_architecture/Architecture_Decision_Log.md`
+- `00_architecture/Application_Catalog.md`
+- `00_architecture/Modular_SubApp_Architecture.md`
+- `00_architecture/Terminology_and_Conventions.md`
+- `00_architecture/Headless_Architecture.md`
 
-## 7. Frontend Next.js Docs
-- [NextJS Frontend SRD](file:///c:/laragon/www/creativeuniverse/docs/04_frontend_nextjs/NextJS_Frontend_SRD.md) — Spesifikasi antarmuka Next.js target.
-- [Frontend Structure Verification](file:///c:/laragon/www/creativeuniverse/docs/04_frontend_nextjs/Frontend_Structure_Verification.md) — Hasil audit struktur folder frontend.
-- [Frontend API & Auth Verification](file:///c:/laragon/www/creativeuniverse/docs/04_frontend_nextjs/Frontend_API_Auth_Verification.md) — Analisis detail integrasi client API, CSRF, dan Echo.
+### Backend dan database
 
-## 8. Database and ERD Docs
-- [Creative Universe MainApp ERD](file:///c:/laragon/www/creativeuniverse/docs/01_core_system/CreativeUniverse-MainApp_ERD.md) — Skema database sistem utama.
-- [Database ERD Verification](file:///c:/laragon/www/creativeuniverse/docs/05_database/Database_ERD_Verification.md) — Hasil pemetaan migrasi riil backend vs ERD lama.
+- `03_backend_api/Core_Public_Contracts.md`
+- `03_backend_api/API_Route_Map.md`
+- `05_database/Database_ERD_Verification.md`
+- `06_security/RBAC_and_Permission_Matrix.md`
+- `06_security/Maintenance_Command_Security.md`
+- `06_security/Reverb_Removal_Decision.md`
 
-## 9. Security Docs
-- [RBAC and Permission Matrix](file:///c:/laragon/www/creativeuniverse/docs/06_security/RBAC_and_Permission_Matrix.md) — Matriks peran (roles) dan perizinan Spatie.
-- [Maintenance Command Security](file:///c:/laragon/www/creativeuniverse/docs/06_security/Maintenance_Command_Security.md) — Evaluasi keamanan command remote Web Artisan.
-- [Environment and Broadcasting Security](file:///c:/laragon/www/creativeuniverse/docs/06_security/Environment_and_Broadcasting_Security.md) — Keamanan variabel lingkungan dan keputusan Pusher/Reverb.
+### Operations dan migration
 
-## 10. Operations Docs
-- [Operations Verification](file:///c:/laragon/www/creativeuniverse/docs/08_operations/Operations_Verification.md) — Panduan deployment cPanel, static export, local dev, dan gaps operasional.
+- `08_operations/CPanel_Deployment_Runbook.md`
+- `08_operations/Emergency_Maintenance.md`
+- `05_migration/Backend_Modularization_Migration_Map.md`
+- `05_migration/Frontend_Refactor_Baseline.md`
+- `05_migration/Frontend_Audit_Report.md`
+- `05_migration/Frontend_Backend_Contract_Matrix.md`
+- `05_migration/Frontend_Module_Boundaries.md`
+- `05_migration/Frontend_Route_And_Layout_Migration.md`
+- `05_migration/Frontend_Canonical_URLs.md`
+- `05_migration/Frontend_Legacy_Route_Cleanup.md`
+- `05_migration/Frontend_API_Client_Foundation.md`
+- `05_migration/Frontend_Domain_API_Modules.md`
+- `05_migration/Frontend_Authentication_Synchronization.md`
+- `05_migration/Frontend_Application_Access.md`
+- `05_migration/Frontend_Permission_Aliases.md`
+- `05_migration/Frontend_Core_Module_Alignment.md`
+- `05_migration/Frontend_Pusher_Configuration.md`
+- `05_migration/Frontend_KV_Retail_Integration.md`
+- `05_migration/Frontend_KV_Retail_State_Stability.md`
+- `05_migration/Frontend_Creative_Report_Integration.md`
+- `05_migration/Frontend_ODDS_Integration.md`
+- `05_migration/Frontend_Core_Chat_Integration.md`
+- `05_migration/Frontend_Finalization_F19_F32.md`
+- Dokumen milestone dalam `05_migration` bersifat catatan historis, bukan kontrak sistem terbaru.
 
-## 11. Module Docs
-Dokumentasi spesifik untuk Sub-App modul individu:
-- [Creative Universe MainApp SRD](file:///c:/laragon/www/creativeuniverse/docs/01_core_system/CreativeUniverse-MainApp_SRD.md)
-- [Pricetag Generator SRD](file:///c:/laragon/www/creativeuniverse/docs/02_pricetag_generator/CreativeUniverse-SubApp_PricetagGenerator_SRD.md)
-- [ODDS Sub-App SRD](file:///c:/laragon/www/creativeuniverse/docs/06_odds/CreativeUniverse-SubApp_ODDS_SRD.md) (Status: OUTDATED)
-- [ODDS Sub-App ERD](file:///c:/laragon/www/creativeuniverse/docs/06_odds/CreativeUniverse-SubApp_ODDS_ERD.md) (Status: OUTDATED)
+### Design system
 
-## 12. Cleanup and Audit Docs
-- [Repository and Docs Audit](file:///c:/laragon/www/creativeuniverse/docs/99_cleanup/Repository_And_Docs_Audit.md) — Laporan awal audit repo.
-- [Enterprise Refactor Task List](file:///c:/laragon/www/creativeuniverse/docs/99_cleanup/Enterprise_Refactor_Task_List.md) — Daftar tugas terstruktur per batch.
-- [ODDS Implementation Verification](file:///c:/laragon/www/creativeuniverse/docs/99_cleanup/ODDS_Implementation_Verification.md) — Detail sinkronisasi implementasi ODDS.
+- `07_design_system/Components_Navbar.md`
+- `07_design_system/Components_Guest_Landing.md`
+- `07_design_system/Component_Hero_Heading.md`
+- `07_design_system/Component_Primary_Action_Link.md`
+- `07_design_system/Component_Error_Runner_Game.md`
+- `07_design_system/Template_Universal_Error_View.md`
+- Visualisasi dan control panel komponen tersedia melalui `/docs?section=components/navbar`.
 
-## 13. NEEDS_REVIEW Docs
-Terdapat file dokumentasi yang tidak selaras dengan implementasi riil dan membutuhkan ulasan berkala:
-- [brainstromming ODDS.md](file:///c:/laragon/www/creativeuniverse/docs/brainstromming%20ODDS.md) — Catatan coret-coretan ide ODDS.
-- [Documentation Gap Register](file:///c:/laragon/www/creativeuniverse/docs/99_cleanup/Documentation_Gap_Register.md) — Daftar lubang informasi dokumentasi.
+## Web Documentation
 
-## 14. Recommended Reading Order
-Bagi developer baru yang bergabung di proyek:
-1. `docs/00_governance/Source_of_Truth_Rules.md` (Pahami tata tertib penentuan kebenaran)
-2. `docs/README.md` (Pahami peta navigasi ini)
-3. `docs/00_architecture/Headless_Architecture.md` (Ketahui kerangka headless yang digunakan)
-4. `docs/03_backend_api/Laravel_REST_API_SRD.md` dan `docs/04_frontend_nextjs/NextJS_Frontend_SRD.md` (Pahami kontrak API & Frontend)
-5. `docs/08_operations/Operations_Verification.md` (Ikuti alur deployment).
+Dokumen yang dibutuhkan untuk arah pengembangan disinkronkan oleh `apps/frontend/scripts/sync-documentation.mjs` dan dapat dibaca melalui route `/docs`. File yang tidak ada di menu webpage tidak otomatis menjadi sumber kebenaran.
+
+## Aturan pemeliharaan
+
+- Perubahan arsitektur harus memperbarui dokumen aktif dan test terkait dalam perubahan yang sama.
+- Jangan menghidupkan kembali route, model, atau istilah lama dari dokumen milestone.
+- Dokumen obsolete dipindahkan ke `backup`, bukan disimpan berdampingan dengan sumber aktif.
+- Secret, token, credential, dan file `.env` tidak boleh dimasukkan ke dokumentasi atau repository.

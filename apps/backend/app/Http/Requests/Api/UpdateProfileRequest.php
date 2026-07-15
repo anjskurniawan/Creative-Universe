@@ -35,7 +35,7 @@ class UpdateProfileRequest extends FormRequest
             'settings' => ['sometimes', 'array'],
             'settings.theme' => ['nullable', 'string', 'in:light,dark,system'],
             'settings.navbar_variant' => ['nullable', 'string', 'in:solid,glass,dark-glass'],
-            'settings.redirect_to' => ['nullable', 'string', 'in:/,/dashboard,/profile,/pricetag/search,/pricetag/generator'],
+            'settings.redirect_to' => ['nullable', 'string', 'in:/,/dashboard,/profile,/generator/pricetag,/generator/pricetag/search'],
         ];
     }
 

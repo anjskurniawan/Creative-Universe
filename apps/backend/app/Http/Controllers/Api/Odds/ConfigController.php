@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Api\Odds;
 
-use App\Enums\Odds\DesignerAvailabilityEnum;
 use App\Http\Controllers\Api\BaseApiController;
-use App\Models\Odds\Category;
-use App\Models\Odds\DesignerProfile;
-use App\Models\Odds\SystemRule;
-use App\Services\Odds\OddsConfigService;
+use App\Http\Requests\Odds\SaveCategoryRequest;
+use App\Http\Requests\Odds\SaveDesignerProfileRequest;
+use App\Http\Requests\Odds\SaveSystemRuleRequest;
+use App\SubApps\Odds\Models\Category;
+use App\SubApps\Odds\Models\DesignerProfile;
+use App\SubApps\Odds\Models\SystemRule;
+use App\SubApps\Odds\Services\OddsConfigService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class ConfigController extends BaseApiController
 {
@@ -21,16 +22,16 @@ class ConfigController extends BaseApiController
         return $this->sendResponse($this->config->categories($request->query()), 'Kategori ODDS berhasil diambil.');
     }
 
-    public function storeCategory(Request $request): JsonResponse
+    public function storeCategory(SaveCategoryRequest $request): JsonResponse
     {
-        $category = $this->config->saveCategory($this->categoryPayload($request), $request->user()->id);
+        $category = $this->config->saveCategory($request->validated(), $request->user()->id);
 
         return $this->sendResponse($category, 'Kategori ODDS berhasil dibuat.', 201);
     }
 
-    public function updateCategory(Request $request, Category $category): JsonResponse
+    public function updateCategory(SaveCategoryRequest $request, Category $category): JsonResponse
     {
-        $category = $this->config->saveCategory($this->categoryPayload($request, true), $request->user()->id, $category);
+        $category = $this->config->saveCategory($request->validated(), $request->user()->id, $category);
 
         return $this->sendResponse($category, 'Kategori ODDS berhasil diperbarui.');
     }
@@ -47,16 +48,16 @@ class ConfigController extends BaseApiController
         return $this->sendResponse($this->config->designerProfiles($request->query()), 'Profil desainer ODDS berhasil diambil.');
     }
 
-    public function storeDesignerProfile(Request $request): JsonResponse
+    public function storeDesignerProfile(SaveDesignerProfileRequest $request): JsonResponse
     {
-        $profile = $this->config->saveDesignerProfile($this->designerProfilePayload($request), $request->user()->id);
+        $profile = $this->config->saveDesignerProfile($request->validated(), $request->user()->id);
 
         return $this->sendResponse($profile, 'Profil desainer ODDS berhasil dibuat.', 201);
     }
 
-    public function updateDesignerProfile(Request $request, DesignerProfile $designerProfile): JsonResponse
+    public function updateDesignerProfile(SaveDesignerProfileRequest $request, DesignerProfile $designerProfile): JsonResponse
     {
-        $profile = $this->config->saveDesignerProfile($this->designerProfilePayload($request, true, $designerProfile), $request->user()->id, $designerProfile);
+        $profile = $this->config->saveDesignerProfile($request->validated(), $request->user()->id, $designerProfile);
 
         return $this->sendResponse($profile, 'Profil desainer ODDS berhasil diperbarui.');
     }
@@ -73,16 +74,16 @@ class ConfigController extends BaseApiController
         return $this->sendResponse($this->config->rules($request->query()), 'Rules ODDS berhasil diambil.');
     }
 
-    public function storeSystemRule(Request $request): JsonResponse
+    public function storeSystemRule(SaveSystemRuleRequest $request): JsonResponse
     {
-        $rule = $this->config->saveRule($this->rulePayload($request), $request->user()->id);
+        $rule = $this->config->saveRule($request->validated(), $request->user()->id);
 
         return $this->sendResponse($rule, 'Rule ODDS berhasil dibuat.', 201);
     }
 
-    public function updateSystemRule(Request $request, SystemRule $systemRule): JsonResponse
+    public function updateSystemRule(SaveSystemRuleRequest $request, SystemRule $systemRule): JsonResponse
     {
-        $rule = $this->config->saveRule($this->rulePayload($request, true), $request->user()->id, $systemRule);
+        $rule = $this->config->saveRule($request->validated(), $request->user()->id, $systemRule);
 
         return $this->sendResponse($rule, 'Rule ODDS berhasil diperbarui.');
     }
@@ -92,47 +93,5 @@ class ConfigController extends BaseApiController
         $systemRule->delete();
 
         return $this->sendResponse(null, 'Rule ODDS berhasil dihapus.');
-    }
-
-    private function categoryPayload(Request $request, bool $partial = false): array
-    {
-        return $request->validate([
-            'name' => [$partial ? 'sometimes' : 'required', 'string', 'max:120'],
-            'score_weight' => [$partial ? 'sometimes' : 'required', 'numeric', 'min:0'],
-            'normal_revision_limit' => [$partial ? 'sometimes' : 'required', 'integer', 'min:0'],
-            'workload_point' => [$partial ? 'sometimes' : 'required', 'integer', 'min:1'],
-            'sla_days' => [$partial ? 'sometimes' : 'required', 'integer', 'min:1'],
-            'is_active' => ['sometimes', 'boolean'],
-        ]);
-    }
-
-    private function designerProfilePayload(Request $request, bool $partial = false, ?DesignerProfile $profile = null): array
-    {
-        return $request->validate([
-            'user_id' => [
-                $partial ? 'sometimes' : 'required',
-                'integer',
-                'exists:users,id',
-                Rule::unique('odds_designer_profiles', 'user_id')
-                    ->ignore($profile?->id)
-                    ->whereNull('deleted_at'),
-            ],
-            'status' => [$partial ? 'sometimes' : 'required', Rule::in(DesignerAvailabilityEnum::values())],
-            'specializations' => ['sometimes', 'array'],
-            'daily_capacity_points' => [$partial ? 'sometimes' : 'required', 'integer', 'min:1'],
-            'max_active_tasks' => [$partial ? 'sometimes' : 'required', 'integer', 'min:1'],
-            'assignment_priority' => ['sometimes', 'integer', 'min:1'],
-            'is_active' => ['sometimes', 'boolean'],
-        ]);
-    }
-
-    private function rulePayload(Request $request, bool $partial = false): array
-    {
-        return $request->validate([
-            'key' => [$partial ? 'sometimes' : 'required', 'string', 'max:120'],
-            'value' => [$partial ? 'sometimes' : 'required', 'array'],
-            'description' => ['nullable', 'string', 'max:255'],
-            'is_active' => ['sometimes', 'boolean'],
-        ]);
     }
 }
