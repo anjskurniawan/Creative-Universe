@@ -253,7 +253,6 @@ class TaskController extends BaseApiController
         return $this->sendResponse(
             User::query()
                 ->whereHas('applications', fn ($query) => $query->where('key', 'kv-retail'))
-                ->whereDoesntHave('roles', fn ($query) => $query->whereIn('name', ['Root', 'Manajer', 'SPV']))
                 ->orderBy('name')
                 ->get(['users.id', 'users.name'])
                 ->values(),

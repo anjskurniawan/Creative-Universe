@@ -16,6 +16,31 @@ class KvRetailTaskApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_assignee_options_include_every_user_with_kv_retail_access_regardless_of_role(): void
+    {
+        $creator = User::factory()->create(['name' => 'Task Manager']);
+        $creator->assignRole(Role::findOrCreate('Manajer'));
+        $this->grantKvRetail($creator);
+
+        $spv = User::factory()->create(['name' => 'Assigned SPV']);
+        $spv->assignRole(Role::findOrCreate('SPV'));
+        $this->grantExistingKvRetailApplication($spv, $creator);
+
+        $retailUser = User::factory()->create(['name' => 'Assigned Retail']);
+        $this->grantExistingKvRetailApplication($retailUser, $creator);
+
+        $withoutAccess = User::factory()->create(['name' => 'No Application Access']);
+
+        $this->actingAs($creator)
+            ->getJson('/api/v1/kv-retail/assignees')
+            ->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonFragment(['id' => $creator->id, 'name' => 'Task Manager'])
+            ->assertJsonFragment(['id' => $spv->id, 'name' => 'Assigned SPV'])
+            ->assertJsonFragment(['id' => $retailUser->id, 'name' => 'Assigned Retail'])
+            ->assertJsonMissing(['id' => $withoutAccess->id, 'name' => 'No Application Access']);
+    }
+
     public function test_creating_kv_retail_task_broadcasts_assignment_to_selected_users(): void
     {
         Event::fake([KvRetailTaskAssigned::class]);
@@ -95,5 +120,12 @@ class KvRetailTaskApiTest extends TestCase
             'table_prefix' => 'kv_retail_',
         ]);
         $user->applications()->attach($application, ['granted_by' => $user->id]);
+    }
+
+    private function grantExistingKvRetailApplication(User $user, User $grantedBy): void
+    {
+        $application = Application::query()->where('key', 'kv-retail')->firstOrFail();
+
+        $user->applications()->attach($application, ['granted_by' => $grantedBy->id]);
     }
 }
