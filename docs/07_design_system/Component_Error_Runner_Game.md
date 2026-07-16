@@ -6,6 +6,8 @@
 
 Permainan runner ringan yang ditampilkan pada pengalaman error universal. Visual dan mekaniknya dibuat khusus untuk Creative Universe; konsep interaksinya terinspirasi permainan runner offline tanpa menyalin aset Chrome Dino.
 
+Palet komponen mengikuti tema terang Universal Error View.
+
 ## Lokasi
 
 `apps/frontend/src/design-system/organisms/feedback/error-runner-game.tsx`

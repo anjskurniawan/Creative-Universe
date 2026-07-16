@@ -59,13 +59,13 @@ export function ErrorRunnerGame() {
     jumpRef.current = jump;
 
     const drawRunner = () => {
-      context.fillStyle = "#f7f7f8";
+      context.fillStyle = "#24252b";
       context.fillRect(runner.x + 5, runner.y + 4, 22, 26);
       context.fillRect(runner.x + 20, runner.y, 12, 15);
       context.fillRect(runner.x, runner.y + 20, 12, 8);
       context.fillRect(runner.x + 8, runner.y + 30, 6, 12);
       context.fillRect(runner.x + 23, runner.y + 30, 6, 12);
-      context.fillStyle = "#111217";
+      context.fillStyle = "#ffffff";
       context.fillRect(runner.x + 26, runner.y + 4, 3, 3);
     };
 
@@ -76,7 +76,7 @@ export function ErrorRunnerGame() {
       const height = 220;
       const ground = height - 20;
       context.clearRect(0, 0, width, height);
-      context.strokeStyle = "rgba(255,255,255,.35)";
+      context.strokeStyle = "rgba(17,18,23,.24)";
       context.lineWidth = 1;
       context.beginPath(); context.moveTo(0, ground); context.lineTo(width, ground); context.stroke();
 
@@ -118,5 +118,5 @@ export function ErrorRunnerGame() {
     return () => { window.cancelAnimationFrame(frameId); window.removeEventListener("keydown", handleKey); observer.disconnect(); jumpRef.current = null; };
   }, [startOrJump]);
 
-  return <section className="w-full max-w-3xl" aria-label="Permainan runner"><div className="mb-3 flex items-center justify-between text-xs font-medium uppercase tracking-[0.12em] text-white/55"><span>{status === "game-over" ? "Game over" : status === "playing" ? "Running" : "Ready"}</span><span>Score {String(score).padStart(4, "0")}</span></div><button type="button" onClick={startOrJump} className="block w-full cursor-pointer overflow-hidden rounded-2xl border border-white/15 bg-black/25 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white" aria-label={status === "game-over" ? "Mulai ulang permainan" : "Lompat"}><canvas ref={canvasRef} className="block h-[220px] w-full" /><span className="block border-t border-white/10 px-4 py-3 text-center text-xs text-white/60">{status === "game-over" ? "Tekan untuk main lagi" : "Tekan Space, Arrow Up, atau area game untuk melompat"}</span></button></section>;
+  return <section className="w-full max-w-3xl" aria-label="Permainan runner"><div className="mb-3 flex items-center justify-between text-xs font-medium uppercase tracking-[0.12em] text-[#6f7078]"><span>{status === "game-over" ? "Game over" : status === "playing" ? "Running" : "Ready"}</span><span>Score {String(score).padStart(4, "0")}</span></div><button type="button" onClick={startOrJump} className="block w-full cursor-pointer overflow-hidden rounded-2xl border border-black/10 bg-[#f5f5f7] text-left shadow-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ba0dcb]" aria-label={status === "game-over" ? "Mulai ulang permainan" : "Lompat"}><canvas ref={canvasRef} className="block h-[220px] w-full" /><span className="block border-t border-black/10 px-4 py-3 text-center text-xs text-[#6f7078]">{status === "game-over" ? "Tekan untuk main lagi" : "Tekan Space, Arrow Up, atau area game untuk melompat"}</span></button></section>;
 }

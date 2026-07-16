@@ -6,6 +6,8 @@
 
 Template tunggal untuk pengalaman error universal Creative Universe.
 
+Template menggunakan tema terang sebagai tampilan baku untuk seluruh jenis error.
+
 ## Lokasi
 
 `apps/frontend/src/design-system/templates/feedback/universal-error-view.tsx`
