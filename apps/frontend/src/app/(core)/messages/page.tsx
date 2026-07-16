@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
 import {
@@ -12,7 +12,9 @@ import {
   type ChatConversation,
   type ChatMessage,
   type ChatUser,
+  type ChatAttachment,
 } from "@/core/chat";
+import { resolveStorageUrl } from "@/core/api/client";
 import { useAuth } from "@/providers/auth-provider";
 
 function avatarFor(user?: ChatUser | ChatContact | null): string | null {
@@ -104,13 +106,22 @@ function MessagesContent() {
   const [activeConversation, setActiveConversation] = useState<ChatConversation | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [pendingAttachments, setPendingAttachments] = useState<ChatAttachment[]>([]);
+  const [replyTo, setReplyTo] = useState<ChatMessage | null>(null);
+  const [mentionOpen, setMentionOpen] = useState(false);
+  const [messagePage, setMessagePage] = useState(1);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [loadingEarlier, setLoadingEarlier] = useState(false);
   const [contacts, setContacts] = useState<ChatContact[]>([]);
   const [showContacts, setShowContacts] = useState(false);
   const [conversationFilter, setConversationFilter] = useState<"active" | "history">("active");
+  const [conversationTypeFilter, setConversationTypeFilter] = useState<"all" | "unread" | "direct" | "odds_task">("all");
+  const [conversationSearch, setConversationSearch] = useState("");
   const [chatError, setChatError] = useState<string | null>(null);
   const pendingConversationIdRef = useRef<number | null>(null);
   const activeConversationIdRef = useRef<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -138,11 +149,16 @@ function MessagesContent() {
     }
   }, []);
 
-  const fetchMessages = useCallback(async (id: number) => {
+  const fetchMessages = useCallback(async (id: number, page = 1, appendEarlier = false) => {
     setChatError(null);
     try {
-      const chatMessages = await chatApi.messages(id);
-      setMessages(chatMessages);
+      const response = await chatApi.messages(id, page);
+      setMessages((previous) => appendEarlier ? [...response.data, ...previous] : response.data);
+      setMessagePage(page);
+      setHasMoreMessages(Boolean(response.meta.has_more));
+      setConversations((items) => items.map((conversation) => conversation.id === id && conversation.last_message
+        ? { ...conversation, last_message: { ...conversation.last_message, is_read: true } }
+        : conversation));
     } catch (error) {
       console.error(error);
       setChatError("Gagal memuat pesan.");
@@ -252,9 +268,28 @@ function MessagesContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const uploadAttachments = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    if (!files.length) return;
+    try {
+      const uploaded = await Promise.all(files.slice(0, 8 - pendingAttachments.length).map((file) => chatApi.uploadAttachment(file)));
+      setPendingAttachments((items) => [...items, ...uploaded]);
+    } catch (error) {
+      console.error(error);
+      setChatError("Lampiran gagal diunggah. Maksimal 10 MB per file.");
+    }
+  };
+
+  const insertMention = (participant: ChatUser) => {
+    const token = `@${participant.username ?? participant.name.replaceAll(" ", ".").toLowerCase()} `;
+    setNewMessage((value) => `${value}${token}`);
+    setMentionOpen(false);
+  };
+
   const sendMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!newMessage.trim() || !activeConversation) return;
+    if ((!newMessage.trim() && pendingAttachments.length === 0) || !activeConversation) return;
     if (activeConversation.can_send === false || activeConversation.status === "closed") return;
 
     const bodyToSend = newMessage.trim();
@@ -262,14 +297,20 @@ function MessagesContent() {
     const tempMessage: ChatMessage = {
       id: tempId,
       body: bodyToSend,
+      attachments: pendingAttachments,
+      reply_to_id: typeof replyTo?.id === "number" ? replyTo.id : null,
+      reply_to: replyTo ? { id: Number(replyTo.id), body: replyTo.body, sender: replyTo.sender } : null,
+      read_state: "sending",
       sender_id: user?.id,
       created_at: new Date().toISOString(),
-      sender: user ?? undefined,
+      sender: user ? { ...user, email: user.email ?? undefined } : undefined,
     };
 
     setChatError(null);
     setMessages((prev) => [...prev, tempMessage]);
     setNewMessage("");
+    setPendingAttachments([]);
+    setReplyTo(null);
 
     if (isPersistedConversation(activeConversation)) {
       updateConversationLastMessage(activeConversation.id, tempMessage);
@@ -281,8 +322,8 @@ function MessagesContent() {
         throw new Error("Penerima pesan tidak ditemukan.");
       }
       const payload = isPersistedConversation(activeConversation)
-        ? { conversation_id: activeConversation.id, body: bodyToSend } as const
-        : { receiver_id: receiverId as number, body: bodyToSend } as const;
+        ? { conversation_id: activeConversation.id, body: bodyToSend, reply_to_id: typeof replyTo?.id === "number" ? replyTo.id : undefined, attachment_ids: pendingAttachments.map((item) => item.id) } as const
+        : { receiver_id: receiverId as number, body: bodyToSend, reply_to_id: typeof replyTo?.id === "number" ? replyTo.id : undefined, attachment_ids: pendingAttachments.map((item) => item.id) } as const;
 
       const persistedMessage = await chatApi.send(payload);
 
@@ -302,10 +343,19 @@ function MessagesContent() {
       }
     } catch (error) {
       console.error("Gagal mengirim pesan", error);
-      setMessages((prev) => prev.filter((message) => message.id !== tempId));
+      setMessages((prev) => prev.map((message) => message.id === tempId ? { ...message, read_state: "failed" } : message));
       setNewMessage(bodyToSend);
+      setPendingAttachments(pendingAttachments);
+      setReplyTo(replyTo);
       setChatError("Gagal mengirim pesan. Coba kirim ulang.");
     }
+  };
+
+  const retryMessage = (message: ChatMessage) => {
+    setNewMessage(message.body);
+    setPendingAttachments(message.attachments ?? []);
+    setReplyTo(message.reply_to ? { ...message.reply_to, sender_id: message.reply_to.sender?.id, created_at: "" } : null);
+    setMessages((items) => items.filter((item) => item.id !== message.id));
   };
 
   const startNewConversation = (contact: ChatContact) => {
@@ -333,12 +383,20 @@ function MessagesContent() {
     setMessages([]);
   };
 
+  const isUnreadConversation = (conversation: ChatConversation) => Boolean(
+    conversation.last_message && conversation.last_message.is_read === false && Number(conversation.last_message.sender_id) !== Number(user?.id)
+  );
   const visibleConversations = conversations.filter((conversation) => {
     const isHistory = conversation.status === "closed";
-    return conversationFilter === "history" ? isHistory : !isHistory;
+    if (conversationFilter === "history" ? !isHistory : isHistory) return false;
+    if (conversationTypeFilter === "unread" && !isUnreadConversation(conversation)) return false;
+    if (conversationTypeFilter !== "all" && conversationTypeFilter !== "unread" && conversation.context_type !== conversationTypeFilter) return false;
+    const query = conversationSearch.trim().toLowerCase();
+    return !query || `${conversationTitle(conversation)} ${conversationSubtitle(conversation, user?.id)}`.toLowerCase().includes(query);
   });
   const activeCount = conversations.filter((conversation) => conversation.status !== "closed").length;
   const historyCount = conversations.filter((conversation) => conversation.status === "closed").length;
+  const unreadCount = conversations.filter(isUnreadConversation).length;
   const activeIsTaskRoom = activeConversation?.context_type === "odds_task";
   const activeTask = activeConversation?.task;
   const activeCanSend = activeConversation
@@ -347,7 +405,7 @@ function MessagesContent() {
 
   return (
     <div className="flex h-full w-full overflow-hidden rounded-lg border border-cu-line bg-cu-surface text-cu-ink shadow-sm">
-      <aside className="flex w-1/3 min-w-[320px] flex-col border-r border-cu-line bg-cu-surface-soft">
+      <aside className="flex w-[360px] shrink-0 flex-col border-r border-cu-line bg-cu-surface-soft xl:w-[380px]">
         <div className="flex items-center justify-between border-b border-cu-line bg-white px-5 py-4">
           <div>
             <h1 className="text-lg font-semibold text-cu-ink">Pesan</h1>
@@ -364,7 +422,9 @@ function MessagesContent() {
         </div>
 
         {!showContacts && (
-          <div className="grid grid-cols-2 gap-2 border-b border-cu-line bg-white px-4 py-3">
+          <div className="space-y-3 border-b border-cu-line bg-white px-4 py-3">
+            <label className="relative block"><MaterialIcon name="search" size="sm" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-cu-muted" /><input value={conversationSearch} onChange={(event) => setConversationSearch(event.target.value)} placeholder="Cari pesan atau task..." className="h-10 w-full rounded-lg border border-cu-line bg-cu-surface-soft pl-10 pr-3 text-sm outline-none focus:border-cu-info" /></label>
+            <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => setConversationFilter("active")}
@@ -387,6 +447,10 @@ function MessagesContent() {
             >
               Riwayat ({historyCount})
             </button>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-0.5">
+              {([['all', 'Semua'], ['unread', `Belum dibaca (${unreadCount})`], ['direct', 'Direct'], ['odds_task', 'Task ODDS']] as const).map(([value, label]) => <button key={value} type="button" onClick={() => setConversationTypeFilter(value)} className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${conversationTypeFilter === value ? "border-cu-ink bg-cu-ink text-white" : "border-cu-line bg-white text-cu-muted hover:bg-cu-panel-soft"}`}>{label}</button>)}
+            </div>
           </div>
         )}
 
@@ -420,6 +484,7 @@ function MessagesContent() {
               {visibleConversations.map((conversation) => {
                 const isSelected = activeConversation?.id === conversation.id;
                 const lastMessage = conversation.last_message;
+                const isUnread = isUnreadConversation(conversation);
 
                 return (
                   <button
@@ -437,7 +502,7 @@ function MessagesContent() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-3">
-                        <p className="truncate text-sm font-semibold text-cu-ink">{conversationTitle(conversation)}</p>
+                        <p className={`truncate text-sm ${isUnread ? "font-bold text-cu-ink" : "font-semibold text-cu-ink"}`}>{conversationTitle(conversation)}</p>
                         {lastMessage && (
                           <span className="shrink-0 text-[11px] text-cu-muted">
                             {formatMessageTime(lastMessage.created_at)}
@@ -448,6 +513,7 @@ function MessagesContent() {
                         {conversationSubtitle(conversation, user?.id)}
                       </p>
                     </div>
+                    {isUnread && <span className="size-2 shrink-0 rounded-full bg-cu-info" aria-label="Belum dibaca" />}
                   </button>
                 );
               })}
@@ -474,10 +540,7 @@ function MessagesContent() {
                 <div className="min-w-0">
                   <h2 className="truncate text-base font-semibold text-cu-ink">{conversationTitle(activeConversation)}</h2>
                   {activeIsTaskRoom ? (
-                    <p className="truncate text-xs text-cu-muted">
-                      {activeTask?.design_purpose ?? "Diskusi task ODDS"}
-                      {activeConversation.status === "closed" ? " - Riwayat" : ""}
-                    </p>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-cu-muted"><span className="truncate">{activeTask?.design_purpose ?? "Diskusi task ODDS"}</span><span className="rounded-full bg-cu-panel-soft px-2 py-0.5 font-medium">{activeTask?.status ?? "Task ODDS"}</span>{activeTask?.deadline && <span>Tenggat {new Date(activeTask.deadline).toLocaleDateString("id-ID")}</span>}</div>
                   ) : (
                     <p className="truncate text-xs text-cu-muted">
                       {activeConversation.partner?.roles?.join(", ") || "Direct message"}
@@ -507,6 +570,16 @@ function MessagesContent() {
 
             <div className="flex-1 overflow-y-auto bg-[#f7f8fa] p-6 cu-popup-scrollbar-light">
               <div className="flex flex-col space-y-4">
+                {hasMoreMessages && (
+                  <button
+                    type="button"
+                    disabled={loadingEarlier}
+                    onClick={async () => { if (!isPersistedConversation(activeConversation)) return; setLoadingEarlier(true); await fetchMessages(activeConversation.id, messagePage + 1, true); setLoadingEarlier(false); }}
+                    className="mx-auto rounded-full border border-cu-line bg-white px-3 py-1.5 text-xs font-semibold text-cu-muted hover:bg-cu-panel-soft disabled:opacity-60"
+                  >
+                    {loadingEarlier ? "Memuat pesan sebelumnya..." : "Muat pesan sebelumnya"}
+                  </button>
+                )}
                 {messages.map((message) => {
                   const isMine = Number(message.sender_id) === Number(user?.id);
 
@@ -522,10 +595,15 @@ function MessagesContent() {
                         {!isMine && message.sender?.name && (
                           <p className="mb-1 text-[11px] font-semibold text-cu-muted">{message.sender.name}</p>
                         )}
-                        <p className="whitespace-pre-wrap leading-6">{message.body}</p>
-                        <span className={`mt-1 block text-right text-[10px] ${isMine ? "text-white/75" : "text-cu-muted"}`}>
-                          {formatMessageTime(message.created_at)}
-                        </span>
+                        {message.reply_to && <div className={`mb-2 rounded border-l-2 px-2 py-1 text-xs ${isMine ? "border-white/70 bg-white/15 text-white/85" : "border-cu-info bg-cu-panel-soft text-cu-muted"}`}><p className="font-semibold">{message.reply_to.sender?.name ?? "Pesan"}</p><p className="truncate">{message.reply_to.body}</p></div>}
+                        {message.body && <p className="whitespace-pre-wrap leading-6">{message.body}</p>}
+                        {(message.attachments ?? []).map((attachment) => <a key={attachment.id} href={resolveStorageUrl(attachment.path) ?? "#"} target="_blank" rel="noreferrer" className={`mt-2 flex items-center gap-2 rounded border px-2 py-1.5 text-xs font-semibold ${isMine ? "border-white/25 bg-white/15 text-white" : "border-cu-line bg-cu-surface-soft text-cu-ink"}`}><MaterialIcon name="attach_file" size="sm" /><span className="truncate">{attachment.name}</span></a>)}
+                        <div className={`mt-1 flex items-center justify-end gap-1 text-[10px] ${isMine ? "text-white/75" : "text-cu-muted"}`}>
+                          <span>{formatMessageTime(message.created_at)}</span>
+                          {isMine && <MaterialIcon name={message.read_state === "read" ? "done_all" : message.read_state === "failed" ? "error" : "done"} size="sm" />}
+                          {message.read_state === "failed" && <button type="button" onClick={() => retryMessage(message)} className="ml-1 underline">Coba lagi</button>}
+                        </div>
+                        {activeCanSend && message.read_state !== "failed" && <button type="button" onClick={() => setReplyTo(message)} className={`mt-1 text-[10px] font-semibold ${isMine ? "text-white/80" : "text-cu-info"}`}>Balas</button>}
                       </div>
                     </div>
                   );
@@ -537,29 +615,39 @@ function MessagesContent() {
               </div>
             </div>
 
-            <footer className="border-t border-cu-line bg-white p-4">
+            <footer className="border-t border-cu-line bg-white px-5 py-4">
               {chatError && (
                 <p className="mb-3 rounded-lg border border-cu-danger/20 bg-cu-danger/10 px-3 py-2 text-sm text-cu-danger">
                   {chatError}
                 </p>
               )}
               {activeCanSend ? (
-                <form onSubmit={sendMessage} className="flex items-center gap-3">
-                  <input
-                    type="text"
+                <form onSubmit={sendMessage} className="space-y-2">
+                  {replyTo && <div className="flex items-center justify-between rounded-lg border border-cu-line bg-cu-surface-soft px-3 py-2 text-xs"><div className="min-w-0"><p className="font-semibold text-cu-ink">Membalas {replyTo.sender?.name ?? "pesan"}</p><p className="truncate text-cu-muted">{replyTo.body}</p></div><button type="button" onClick={() => setReplyTo(null)} className="text-cu-muted hover:text-cu-ink"><MaterialIcon name="close" size="sm" /></button></div>}
+                  {pendingAttachments.length > 0 && <div className="flex flex-wrap gap-2">{pendingAttachments.map((attachment) => <span key={attachment.id} className="inline-flex max-w-full items-center gap-1 rounded-full border border-cu-line bg-cu-surface-soft px-2 py-1 text-xs text-cu-ink"><MaterialIcon name="attach_file" size="sm" /><span className="max-w-48 truncate">{attachment.name}</span><button type="button" onClick={() => setPendingAttachments((items) => items.filter((item) => item.id !== attachment.id))}><MaterialIcon name="close" size="sm" /></button></span>)}</div>}
+                <div className="flex items-end gap-3">
+                  <input ref={attachmentInputRef} type="file" multiple className="hidden" onChange={uploadAttachments} />
+                  <button type="button" onClick={() => attachmentInputRef.current?.click()} className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-cu-line text-cu-muted hover:bg-cu-panel-soft" title="Tambah lampiran"><MaterialIcon name="attach_file" size="sm" /></button>
+                  <div className="relative min-w-0 flex-1">
+                  <textarea
                     value={newMessage}
                     onChange={(event) => setNewMessage(event.target.value)}
-                    placeholder="Ketik pesan..."
-                    className="h-11 min-w-0 flex-1 rounded-lg border border-cu-line bg-cu-surface-soft px-4 text-sm text-cu-ink outline-none transition placeholder:text-cu-muted focus:border-cu-info focus:bg-white"
+                    onKeyDown={(event) => { if (event.key === "@") setMentionOpen(true); if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }}
+                    placeholder="Ketik pesan... (Enter untuk kirim, Shift+Enter untuk baris baru)"
+                    rows={1}
+                    className="block min-h-11 max-h-32 w-full resize-y rounded-lg border border-cu-line bg-cu-surface-soft px-4 py-3 text-sm text-cu-ink outline-none transition placeholder:text-cu-muted focus:border-cu-info focus:bg-white"
                   />
+                  {mentionOpen && (activeConversation.participants ?? []).filter((participant) => participant.id !== user?.id).length > 0 && <div className="absolute bottom-full left-0 z-10 mb-2 w-64 overflow-hidden rounded-lg border border-cu-line bg-white shadow-lg">{(activeConversation.participants ?? []).filter((participant) => participant.id !== user?.id).map((participant) => <button key={participant.id} type="button" onClick={() => insertMention(participant)} className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-cu-panel-soft"><span className="font-semibold text-cu-ink">{participant.name}</span><span className="text-xs text-cu-muted">@{participant.username ?? participant.name.replaceAll(" ", ".").toLowerCase()}</span></button>)}</div>}
+                  </div>
                   <button
                     type="submit"
-                    disabled={!newMessage.trim()}
+                    disabled={!newMessage.trim() && pendingAttachments.length === 0}
                     className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-cu-info text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
                     aria-label="Kirim pesan"
                   >
                     <MaterialIcon name="send" size="sm" />
                   </button>
+                </div>
                 </form>
               ) : (
                 <p className="rounded-lg border border-cu-line bg-cu-surface-soft px-4 py-3 text-sm text-cu-muted">

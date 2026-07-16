@@ -24,7 +24,7 @@ class UpdateProfileRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'email' => [
-                'required',
+                'nullable',
                 'string',
                 'lowercase',
                 'email',
@@ -36,6 +36,18 @@ class UpdateProfileRequest extends FormRequest
             'settings.theme' => ['nullable', 'string', 'in:light,dark,system'],
             'settings.navbar_variant' => ['nullable', 'string', 'in:solid,glass,dark-glass'],
             'settings.redirect_to' => ['nullable', 'string', 'in:/,/dashboard,/profile,/generator/pricetag,/generator/pricetag/search'],
+            'settings.language' => ['nullable', 'string', 'in:id,en'],
+            'settings.timezone' => ['nullable', 'string', 'max:100'],
+            'settings.reduce_motion' => ['nullable', 'boolean'],
+            'settings.high_contrast' => ['nullable', 'boolean'],
+            'settings.notification_in_app' => ['nullable', 'boolean'],
+            'settings.notification_whatsapp' => ['nullable', 'boolean'],
+            'settings.notification_task_updates' => ['nullable', 'boolean'],
+            'settings.notification_mentions' => ['nullable', 'boolean'],
+            'settings.notification_deadlines' => ['nullable', 'boolean'],
+            'settings.notification_quiet_start' => ['nullable', 'date_format:H:i'],
+            'settings.notification_quiet_end' => ['nullable', 'date_format:H:i'],
+            'settings.profile_show_applications' => ['nullable', 'boolean'],
         ];
     }
 

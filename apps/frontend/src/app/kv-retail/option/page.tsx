@@ -38,7 +38,7 @@ const KV_RETAIL_SETTING_KEYS = [
 
 export default function OptionPage() {
   const [mobileSidebarVariant, setMobileSidebarVariant] = useState<SideMenuVariant>("Collaps");
-  const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Collaps");
+  const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Expand");
 
   const [activeTab, setActiveTab] = useState<"General" | "Overlays" | "Status" | "Colors" | "FormInput">("General");
   const [isLoading, setIsLoading] = useState(true);

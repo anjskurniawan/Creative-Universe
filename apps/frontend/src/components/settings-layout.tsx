@@ -20,7 +20,7 @@ interface NavItemBase {
 }
 
 export interface SettingsNavItem extends NavItemBase {
-  /** Full href including query string, e.g. "/profile?tab=security" */
+  /** Full href including query string, e.g. "/settings/profile?tab=security" */
   href: string;
   /** Dedicated page used by the mobile settings flow. */
   mobileHref?: string;
@@ -62,20 +62,23 @@ const NAV_GROUPS: SettingsNavGroup[] = [
   {
     title: "Pengaturan Akun",
     items: [
-      { href: "/profile", mobileHref: "/settings/profile", label: "Profil & Tampilan", icon: "person" },
+      { href: "/settings/profile", mobileHref: "/settings/profile", label: "Profil & Tampilan", icon: "person" },
+      { href: "/settings/profile?tab=notifications", mobileHref: "/settings/profile?tab=notifications", label: "Notifikasi", icon: "notifications" },
+      { href: "/settings/profile?tab=privacy", mobileHref: "/settings/profile?tab=privacy", label: "Privasi Profil", icon: "visibility" },
+      { href: "/settings/profile?tab=applications", mobileHref: "/settings/profile?tab=applications", label: "Aplikasi Saya", icon: "apps" },
     ],
   },
   {
     title: "Keamanan & Akses",
     items: [
-      { href: "/profile?tab=security", mobileHref: "/settings/security", label: "Sandi & Perangkat", icon: "security" },
+      { href: "/settings/profile?tab=security", mobileHref: "/settings/security", label: "Perangkat & Sesi", icon: "devices" },
     ],
   },
   {
     title: "Hak Akses",
     items: [
       {
-        href: "/profile?tab=role_settings",
+        href: "/settings/profile?tab=role_settings",
         mobileHref: "/settings/role-settings",
         label: "Pengaturan Peran",
         icon: "admin_panel_settings",
@@ -86,7 +89,7 @@ const NAV_GROUPS: SettingsNavGroup[] = [
   {
     title: "Log Audit",
     items: [
-      { href: "/profile?tab=activity_log", mobileHref: "/settings/activity-log", label: "Jejak Aktivitas", icon: "history" },
+      { href: "/settings/profile?tab=activity_log", mobileHref: "/settings/activity-log", label: "Jejak Aktivitas", icon: "history" },
     ],
   },
   /*
@@ -148,8 +151,8 @@ function hrefMatches(
   }
 
   // Item has no query → only active when there is no `tab` query param either
-  // (so "/profile" is active only when there's no ?tab=...)
-  if (hrefPath === "/profile") {
+  // (so "/settings/profile" is active only when there's no ?tab=...)
+  if (hrefPath === "/settings/profile") {
     return !searchParams?.get("tab");
   }
 
@@ -170,9 +173,7 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
   const normalizedPath = (pathname ?? "").replace(/\/$/, "") || "/";
 
   const urlShowsMobileDetail =
-    (normalizedPath !== "/profile" && normalizedPath !== "/settings") ||
-    (normalizedPath === "/profile" &&
-      (searchParams.get("view") === "detail" || Boolean(activeTab)));
+    normalizedPath !== "/settings";
   const isMobileDetail = urlShowsMobileDetail;
 
   // Collapsible menu state

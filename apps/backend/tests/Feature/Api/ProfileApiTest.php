@@ -6,7 +6,6 @@ use App\Models\Core\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -72,26 +71,18 @@ class ProfileApiTest extends TestCase
             ->assertJsonValidationErrors(['username', 'email', 'whatsapp_number']);
     }
 
-    public function test_active_user_can_update_password_with_current_password(): void
+    public function test_active_user_can_keep_email_empty_until_it_is_provided(): void
     {
-        $user = User::factory()->create([
-            'password' => 'password-lama',
-        ]);
+        $user = User::factory()->create(['email' => null]);
 
-        $this->actingAs($user)->putJson('/api/v1/profile/password', [
-            'current_password' => 'password-lama',
-            'password' => 'password-baru',
-            'password_confirmation' => 'password-baru',
-        ])->assertOk();
-
-        $this->assertTrue(Hash::check('password-baru', $user->refresh()->password));
-
-        $this->actingAs($user)->putJson('/api/v1/profile/password', [
-            'current_password' => 'salah',
-            'password' => 'password-lain',
-            'password_confirmation' => 'password-lain',
-        ])->assertUnprocessable()
-            ->assertJsonValidationErrors(['current_password']);
+        $this->actingAs($user)
+            ->patchJson('/api/v1/profile', [
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => null,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.email', null);
     }
 
     public function test_active_user_can_replace_avatar_and_old_file_is_removed(): void

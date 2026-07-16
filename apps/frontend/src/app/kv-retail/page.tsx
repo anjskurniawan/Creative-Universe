@@ -298,7 +298,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
   const [mobileSidebarVariant, setMobileSidebarVariant] =
     useState<SideMenuVariant>("Collaps");
   const [desktopSidebarVariant, setDesktopSidebarVariant] =
-    useState<SideMenuVariant>("Collaps");
+    useState<SideMenuVariant>("Expand");
   
   const { tasks, refresh: fetchTasks, merge: mergeTask, mutate: mutateTask, remove: removeTask } = useKvRetailTasks();
   const [isModalOpen, setIsModalOpen] = useState(false);

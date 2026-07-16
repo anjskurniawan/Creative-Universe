@@ -7,11 +7,11 @@ import { SettingsLayout } from "@/components/settings-layout";
 export default function SettingsIndexPage() {
   const router = useRouter();
 
-  // Desktop (lg+): langsung ke /profile agar sidebar aktif dengan konten
+  // Desktop (lg+): langsung ke pengaturan profil agar sidebar aktif dengan konten
   useEffect(() => {
     const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
     if (isDesktop) {
-      router.replace("/profile");
+      router.replace("/settings/profile");
     }
   }, [router]);
 

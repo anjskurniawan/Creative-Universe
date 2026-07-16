@@ -18,7 +18,8 @@ class StoreTaskRequest extends OddsFormRequest
             'deadline' => ['nullable', 'date', 'after_or_equal:today'],
             'important_matrix' => ['nullable', 'string', 'max:20'],
             'attachment_notes' => ['nullable', 'string'],
-            'attachments' => ['sometimes', 'array'],
+            'attachment_ids' => ['nullable', 'array', 'max:8'],
+            'attachment_ids.*' => ['integer', 'exists:stored_files,id'],
         ];
     }
 }

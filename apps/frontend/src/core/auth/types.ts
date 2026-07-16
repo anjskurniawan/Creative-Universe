@@ -4,7 +4,7 @@ export interface AuthUser {
   id: number;
   name: string;
   username: string;
-  email: string;
+  email: string | null;
   whatsapp_number: string | null;
   avatar_url: string | null;
   is_onboarded: boolean;

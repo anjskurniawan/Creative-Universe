@@ -53,7 +53,8 @@ export function OddsTaskChat({
       const nextConversation = await getOddsTaskConversation(taskId);
       setConversation(nextConversation);
       if (nextConversation) {
-        setMessages(await chatApi.messages(nextConversation.id));
+        const response = await chatApi.messages(nextConversation.id);
+        setMessages(response.data);
       } else {
         setMessages([]);
       }

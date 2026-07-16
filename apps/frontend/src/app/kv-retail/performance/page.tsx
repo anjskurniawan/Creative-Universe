@@ -27,7 +27,7 @@ const DESKTOP_PRIMARY_MENU: SideMenuItem[] = TASK_NAVIGATION_ITEMS.map((item) =>
 
 export default function TaskPerformancePage() {
   const [tasks, setTasks] = useState<TaskPerformanceTask[]>([]);
-  const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Collaps");
+  const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Expand");
   const { user, hasPermission } = useAuth();
 
   useEffect(() => {

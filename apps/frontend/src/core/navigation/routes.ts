@@ -10,6 +10,7 @@ export const APP_ROUTES = {
   users: "/users",
   roles: "/roles",
   messages: "/messages",
+  notifications: "/notifications",
   maintenance: "/maintenance",
   documentation: "/docs",
   kvRetail: "/kv-retail",

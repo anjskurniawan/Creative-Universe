@@ -6,6 +6,8 @@ use App\Enums\Odds\TaskStatusEnum;
 use App\SubApps\Odds\Models\Category;
 use App\SubApps\Odds\Models\DesignerProfile;
 use App\SubApps\Odds\Models\Task;
+use App\Models\Core\StoredFile;
+use App\Services\Core\FileStorageService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -13,7 +15,8 @@ class OddsTaskIntakeService
 {
     public function __construct(
         private OddsQueueService $queue,
-        private OddsNotificationService $notifications
+        private OddsNotificationService $notifications,
+        private FileStorageService $files,
     ) {}
 
     public function create(array $data, int $userId): Task
@@ -28,6 +31,17 @@ class OddsTaskIntakeService
                 throw ValidationException::withMessages([
                     'category_id' => 'Kategori ODDS tidak aktif atau tidak ditemukan.',
                 ]);
+            }
+
+            $attachmentIds = array_values(array_unique($data['attachment_ids'] ?? []));
+            $attachments = StoredFile::query()
+                ->whereIn('id', $attachmentIds)
+                ->where('uploaded_by', $userId)
+                ->where('application_key', 'odds')
+                ->where('context_type', 'task_draft')
+                ->get();
+            if ($attachments->count() !== count($attachmentIds)) {
+                throw ValidationException::withMessages(['attachment_ids' => 'Satu atau lebih lampiran ODDS tidak valid.']);
             }
 
             $preferredDesignerId = $data['preferred_designer_id'] ?? null;
@@ -89,10 +103,22 @@ class OddsTaskIntakeService
                 'updated_by' => $userId,
             ]);
 
+            $attachmentPayload = $attachments->map(function (StoredFile $file) use ($task, $userId) {
+                $path = $this->files->relocate($file->path, 'odds', 'task', $task->id, 'attachments', $userId, $file->disk);
+                $file->refresh();
+                return [
+                    'id' => $file->id,
+                    'name' => $file->original_name,
+                    'path' => $path,
+                    'mime_type' => $file->mime_type,
+                    'size' => $file->size,
+                ];
+            })->values()->all();
+
             $task->brief()->create([
                 'content' => $data['brief_text'],
                 'reference_visual' => $data['reference_visual'] ?? null,
-                'attachments' => $data['attachments'] ?? null,
+                'attachments' => $attachmentPayload ?: null,
                 'updated_by' => $userId,
             ]);
 

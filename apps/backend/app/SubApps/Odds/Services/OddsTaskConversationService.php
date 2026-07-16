@@ -3,6 +3,7 @@
 namespace App\SubApps\Odds\Services;
 
 use App\Models\Core\Conversation;
+use App\Models\Core\MessageRead;
 use App\Models\Core\User;
 use App\SubApps\Odds\Contracts\OddsConversationPresenter;
 use App\SubApps\Odds\Models\Task;
@@ -108,6 +109,7 @@ class OddsTaskConversationService implements OddsConversationPresenter
             'partner' => $partner ? [
                 'id' => $partner->id,
                 'name' => $partner->name,
+                'username' => $partner->username,
                 'avatar' => $partner->avatar_path,
                 'roles' => $partner->roles->pluck('name')->values(),
             ] : null,
@@ -115,6 +117,7 @@ class OddsTaskConversationService implements OddsConversationPresenter
                 ->map(fn (User $participant) => [
                     'id' => $participant->id,
                     'name' => $participant->name,
+                    'username' => $participant->username,
                     'avatar' => $participant->avatar_path,
                     'roles' => $participant->roles->pluck('name')->values(),
                 ])
@@ -124,13 +127,15 @@ class OddsTaskConversationService implements OddsConversationPresenter
                 'task_number' => $task->task_number,
                 'design_purpose' => $task->design_purpose,
                 'status' => $task->status,
+                'deadline' => $task->deadline?->toIso8601String(),
                 'requester_id' => $task->requester_id,
                 'assigned_designer_id' => $task->assigned_designer_id,
             ] : null,
             'last_message' => $lastMessage ? [
                 'body' => $lastMessage->body,
                 'created_at' => $lastMessage->created_at,
-                'is_read' => $lastMessage->read_at !== null,
+                'is_read' => (int) $lastMessage->sender_id === (int) $user->id
+                    || MessageRead::query()->where('message_id', $lastMessage->id)->where('user_id', $user->id)->exists(),
                 'sender_id' => $lastMessage->sender_id,
             ] : null,
             'updated_at' => $conversation->updated_at,

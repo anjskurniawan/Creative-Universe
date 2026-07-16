@@ -184,17 +184,15 @@ export function MessageBell({ userId, variant = "light", renderTrigger, panelCla
             ))}
           </div>
 
-          {conversations.length > 0 && (
-            <Link
-              href={APP_ROUTES.messages}
-              onClick={() => setIsOpen(false)}
-              className={footerActionClass(isDark)}
-              role="menuitem"
-            >
-              <StatusDot unread isDark={isDark} />
-              <span>View all messages</span>
-            </Link>
-          )}
+          <Link
+            href={APP_ROUTES.messages}
+            onClick={() => setIsOpen(false)}
+            className={footerActionClass(isDark)}
+            role="menuitem"
+          >
+            <StatusDot unread={unreadCount > 0} isDark={isDark} />
+            <span>View all messages</span>
+          </Link>
         </div>
       )}
     </div>

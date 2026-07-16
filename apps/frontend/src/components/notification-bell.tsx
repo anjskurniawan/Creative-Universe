@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState, useRef, type ReactNode } from "react";
 import { apiFetch } from "@/core/api/client";
+import { APP_ROUTES } from "@/core/navigation/routes";
 import { getEchoClient } from "@/core/realtime";
 import {
   LOCAL_NOTIFICATIONS_UPDATED_EVENT,
@@ -432,20 +433,15 @@ export function NotificationBell({ userId, variant = "light", renderTrigger, pan
             )}
           </div>
 
-          {notifications.length > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                if (unreadCount > 0) void markAllAsRead();
-                setIsOpen(false);
-              }}
-              className={notificationFooterActionClass(isDark)}
-              role="menuitem"
-            >
-              <NotificationStatusDot unread isDark={isDark} />
-              <span>View all notifications</span>
-            </button>
-          )}
+          <Link
+            href={APP_ROUTES.notifications}
+            onClick={() => setIsOpen(false)}
+            className={notificationFooterActionClass(isDark)}
+            role="menuitem"
+          >
+            <NotificationStatusDot unread={unreadCount > 0} isDark={isDark} />
+            <span>View all notifications</span>
+          </Link>
         </div>
       )}
     </div>

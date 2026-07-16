@@ -34,13 +34,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('chat')->group(function () {
         Route::get('/conversations', [ChatController::class, 'getConversations']);
         Route::get('/conversations/{id}/messages', [ChatController::class, 'getMessages']);
+        Route::post('/attachments', [ChatController::class, 'uploadAttachment']);
         Route::post('/messages', [ChatController::class, 'sendMessage']);
         Route::get('/contacts', [ChatController::class, 'getContacts']);
     });
 
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::patch('/profile', [ProfileController::class, 'update']);
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
     Route::get('/profile/sessions', [ProfileSessionController::class, 'index']);
     Route::delete('/profile/sessions/{session}', [ProfileSessionController::class, 'destroy']);

@@ -10,7 +10,7 @@ const CORE_CONTENT_GUTTER = "px-4 md:px-16";
 export function CoreShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isMessagesPage = pathname.startsWith("/messages");
-  const isSettingsPage = pathname.startsWith("/settings") || pathname.startsWith("/profile");
+  const isSettingsPage = pathname.startsWith("/settings");
   const isUsersPage = pathname.startsWith("/users");
 
   const mainClass = isMessagesPage

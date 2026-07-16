@@ -18,3 +18,12 @@ export function applicationForPath(pathname: string): ApplicationKey {
 export function canAccessApplication(applications: AccessibleApplication[], key: ApplicationKey): boolean {
   return key === "core" || applications.some((application) => application.key === key);
 }
+
+/**
+ * Canonical app-launcher entries shared by navbar and application sidebars.
+ */
+export function visibleSubApplications(applications: AccessibleApplication[]): AccessibleApplication[] {
+  return applications
+    .filter((application) => application.type === "sub_app" && application.frontend_path)
+    .sort((left, right) => left.sort_order - right.sort_order);
+}

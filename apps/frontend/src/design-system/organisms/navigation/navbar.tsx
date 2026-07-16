@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { AuthUser } from "@/core/auth";
 import { useAuth } from "@/providers/auth-provider";
 import { APP_ROUTES } from "@/core/navigation/routes";
-import { APPLICATION_ICONS } from "@/core/applications";
+import { APPLICATION_ICONS, visibleSubApplications } from "@/core/applications";
 import { CreativeUniverseLogo } from "@/design-system/atoms/brand/creative-universe-logo";
 import { NavbarAction, navbarActionClass, type NavbarTone } from "@/design-system/atoms/navigation/navbar-action";
 import { NavbarAvatar } from "@/design-system/atoms/navigation/navbar-avatar";
@@ -57,7 +57,7 @@ export function Navbar({ variant = "light", sticky = true, session = "connected"
           {session === "connected" ? <><NotificationBell userId={user.id} variant={bellVariant} /><MessageBell userId={user.id} variant={bellVariant} /></> : <><NavbarAction icon="notifications" label="Notifikasi" tone={variant} /><NavbarAction icon="chat_bubble" label="Pesan" tone={variant} /></>}
           <div className="relative" ref={appsRef}>
             <button type="button" className={navbarActionClass(variant)} onClick={toggleApps} aria-expanded={appsOpen} aria-haspopup="menu"><span className="sr-only">Buka menu aplikasi</span><MaterialIcon name="apps" size="md" /></button>
-            {appsOpen && <div className={`fixed left-4 right-4 top-[4.75rem] z-[110] mt-2 max-h-[calc(100dvh-5.5rem)] overflow-hidden rounded-2xl p-1.5 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:w-[280px] ${panel} animate-slide-up`}><ul role="menu" aria-label="Menu aplikasi" className="m-0 flex list-none flex-col gap-1 p-0">{user.applications.filter((app) => app.type === "sub_app" && app.frontend_path).sort((a,b) => a.sort_order-b.sort_order).map((app) => <NavbarMenuItem key={app.key} href={app.frontend_path!} icon={APPLICATION_ICONS[app.key] ?? "apps"} label={app.display_name} badge={app.status === "experimental" ? "Eksperimen" : undefined} tone={variant} onClick={() => setAppsOpen(false)} />)}</ul></div>}
+            {appsOpen && <div className={`fixed left-4 right-4 top-[4.75rem] z-[110] mt-2 max-h-[calc(100dvh-5.5rem)] overflow-hidden rounded-2xl p-1.5 sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:w-[280px] ${panel} animate-slide-up`}><ul role="menu" aria-label="Menu aplikasi" className="m-0 flex list-none flex-col gap-1 p-0">{visibleSubApplications(user.applications).map((app) => <NavbarMenuItem key={app.key} href={app.frontend_path!} icon={APPLICATION_ICONS[app.key] ?? "apps"} label={app.display_name} badge={app.status === "experimental" ? "Eksperimen" : undefined} tone={variant} onClick={() => setAppsOpen(false)} />)}</ul></div>}
           </div>
           <div className="relative" ref={profileRef}>
             <NavbarAvatar name={user.name} avatarUrl={user.avatar_url} tone={variant} onClick={toggleProfile} expanded={profileOpen} />

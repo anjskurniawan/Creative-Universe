@@ -77,7 +77,7 @@ export function SideMenuAvatar({
 }
 
 export function SideMenu({
-  variant = "Collaps",
+  variant = "Expand",
   primaryItems,
   onVariantChange,
   className = "",

@@ -8,6 +8,7 @@ import { SideMenuButton, type SideMenuButtonModel } from "@/components/sidemenu/
 import { MaterialIcon } from "@/components/material-icon";
 import { useAuth } from "@/providers/auth-provider";
 import { APP_ROUTES } from "@/core/navigation/routes";
+import { APPLICATION_ICONS, visibleSubApplications } from "@/core/applications";
 
 const sidebarPanelPosition = "!absolute !bottom-0 !left-full !right-auto !top-auto !mt-0 !ml-3 !w-[280px]";
 
@@ -55,8 +56,10 @@ export function SidebarUtilityActions({ model }: { model: SideMenuButtonModel })
 }
 
 function SidebarAppLauncher({ model }: { model: SideMenuButtonModel }) {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const applications = visibleSubApplications(user?.applications ?? []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,8 +89,16 @@ function SidebarAppLauncher({ model }: { model: SideMenuButtonModel }) {
       {isOpen && (
         <div className="absolute bottom-0 left-full z-[120] ml-3 w-[280px] rounded-2xl border-[0.5px] border-[#f2f2f2] bg-white p-1.5 text-[#121212] shadow-xl">
           <ul role="menu" aria-label="Menu aplikasi" className="m-0 flex list-none flex-col gap-1 p-0">
-            <SidebarAppMenuItem href={APP_ROUTES.kvRetail} icon="task" label="KV Retail Task" onClick={() => setIsOpen(false)} />
-            <SidebarAppMenuItem href={APP_ROUTES.odds} icon="architecture" label="ODDS (One Dashboard Design System)" onClick={() => setIsOpen(false)} />
+            {applications.map((application) => (
+              <SidebarAppMenuItem
+                key={application.key}
+                href={application.frontend_path!}
+                icon={APPLICATION_ICONS[application.key] ?? "apps"}
+                label={application.display_name}
+                badge={application.status === "experimental" ? "Eksperimen" : undefined}
+                onClick={() => setIsOpen(false)}
+              />
+            ))}
           </ul>
         </div>
       )}
@@ -95,7 +106,7 @@ function SidebarAppLauncher({ model }: { model: SideMenuButtonModel }) {
   );
 }
 
-function SidebarAppMenuItem({ href, icon, label, onClick }: { href: string; icon: string; label: string; onClick: () => void }) {
+function SidebarAppMenuItem({ href, icon, label, badge, onClick }: { href: string; icon: string; label: string; badge?: string; onClick: () => void }) {
   return (
     <li>
       <Link
@@ -105,7 +116,8 @@ function SidebarAppMenuItem({ href, icon, label, onClick }: { href: string; icon
         role="menuitem"
       >
         <MaterialIcon name={icon} size="sm" className="text-cu-muted transition-colors group-hover:text-cu-ink" />
-        <span className="min-w-0 truncate">{label}</span>
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+        {badge && <span className="rounded-full bg-[#f2f2f2] px-1.5 py-0.5 text-[10px] font-semibold text-cu-muted">{badge}</span>}
       </Link>
     </li>
   );

@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Actions\Core\UpdateProfileAction;
 use App\Actions\Core\UpdateUserAvatarAction;
-use App\Actions\Core\UpdateUserPasswordAction;
 use App\Http\Requests\Api\UpdateAvatarRequest;
-use App\Http\Requests\Api\UpdatePasswordRequest;
 use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Http\Resources\UserProfileResource;
 use Illuminate\Http\JsonResponse;
@@ -31,15 +29,6 @@ class ProfileController extends BaseApiController
             (new UserProfileResource($user))->resolve($request),
             'Profil berhasil diperbarui.'
         );
-    }
-
-    public function updatePassword(
-        UpdatePasswordRequest $request,
-        UpdateUserPasswordAction $action
-    ): JsonResponse {
-        $action->handle($request->user(), $request->string('password')->toString());
-
-        return $this->sendResponse(null, 'Password berhasil diperbarui.');
     }
 
     public function updateAvatar(

@@ -19,7 +19,5 @@ export function resolveAuthenticatedRoute(
     return configured;
   }
 
-  return user.roles.some((role) => role.toLowerCase() === "root")
-    ? APP_ROUTES.dashboard
-    : APP_ROUTES.home;
+  return APP_ROUTES.home;
 }

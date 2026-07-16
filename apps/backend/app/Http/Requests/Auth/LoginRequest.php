@@ -87,7 +87,7 @@ class LoginRequest extends FormRequest
                     $user = User::create([
                         'username' => $username,
                         'name' => $username,
-                        'email' => $username.'@creative.doran.id', // Placeholder email
+                        'email' => null,
                         'password' => Hash::make(Str::random(16)), // Password acak
                         'is_onboarded' => false,
                     ]);

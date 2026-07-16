@@ -22,6 +22,7 @@ use App\SubApps\Odds\Services\OddsQueueService;
 use App\SubApps\Odds\Services\OddsTaskConversationService;
 use App\SubApps\Odds\Services\OddsTaskIntakeService;
 use App\SubApps\Odds\Services\OddsWorkReviewService;
+use App\Services\Core\FileStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -62,6 +63,25 @@ class TaskController extends BaseApiController
         $task = $this->intake->create($request->validated(), $request->user()->id);
 
         return $this->sendResponse($task, 'Task ODDS berhasil dibuat.', 201);
+    }
+
+    public function uploadAttachment(Request $request, FileStorageService $files): JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240|mimes:jpg,jpeg,png,webp,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,zip',
+        ]);
+
+        $file = $files->store(
+            $request->file('file'), 'odds', 'task_draft', $request->user()->id, 'attachments', $request->user()->id, 'public',
+        );
+
+        return $this->sendResponse([
+            'id' => $file->id,
+            'name' => $file->original_name,
+            'path' => $file->path,
+            'mime_type' => $file->mime_type,
+            'size' => $file->size,
+        ], 'Lampiran ODDS siap dikirim.', 201);
     }
 
     public function show(Request $request, Task $task): JsonResponse

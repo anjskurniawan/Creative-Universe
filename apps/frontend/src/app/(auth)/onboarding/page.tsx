@@ -67,7 +67,7 @@ function OnboardingCard() {
 
   useEffect(() => {
     if (user && user.is_onboarded) {
-      router.replace(APP_ROUTES.dashboard);
+      router.replace(APP_ROUTES.home);
     }
   }, [user, router]);
 
@@ -142,7 +142,7 @@ function OnboardingCard() {
       changeStep(8);
       
       setTimeout(() => {
-        router.push(APP_ROUTES.dashboard);
+        router.push(APP_ROUTES.home);
       }, 2500);
     } catch (err: unknown) {
       if (err instanceof ValidationError) {

@@ -12,9 +12,9 @@ import {
   getOddsCategories,
   getOddsDesignerProfiles,
   oddsError,
+  type OddsTaskAttachment,
+  uploadOddsTaskAttachment,
 } from "@/features/odds/api";
-
-type RequestStep = "category" | "designer" | "brief" | "validation";
 
 type TaskForm = {
   request_type: "design";
@@ -40,39 +40,6 @@ const emptyForm: TaskForm = {
   attachment_notes: "",
 };
 
-const steps: Array<{
-  id: RequestStep;
-  label: string;
-  icon: string;
-  description: string;
-}> = [
-  {
-    id: "category",
-    label: "Kategori",
-    icon: "category",
-    description: "Snapshot kategori dan SLA.",
-  },
-  {
-    id: "designer",
-    label: "Designer",
-    icon: "person_search",
-    description: "Rekomendasi dan preferensi.",
-  },
-  {
-    id: "brief",
-    label: "Brief",
-    icon: "edit_note",
-    description: "Detail request dan submit.",
-  },
-  {
-    id: "validation",
-    label: "Validasi Submit",
-    icon: "verified",
-    description: "Recheck sebelum create task.",
-  },
-];
-
-const primaryButtonClass = "inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-cu-info px-4 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50";
 const secondaryButtonClass = "inline-flex h-10 items-center justify-center rounded-lg border border-cu-border px-4 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft";
 
 export default function NewOddsTaskPage() {
@@ -80,11 +47,11 @@ export default function NewOddsTaskPage() {
   const [categories, setCategories] = useState<OddsCategory[]>([]);
   const [designerProfiles, setDesignerProfiles] = useState<OddsDesignerProfile[]>([]);
   const [form, setForm] = useState<TaskForm>(emptyForm);
-  const [activeStep, setActiveStep] = useState<RequestStep>("category");
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploadedAttachments, setUploadedAttachments] = useState<OddsTaskAttachment[]>([]);
+  const [uploadingAttachments, setUploadingAttachments] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -155,16 +122,19 @@ export default function NewOddsTaskPage() {
     update("preferred_designer_id", String(recommendedDesigner.user_id));
   };
 
-  const addAttachmentFiles = (files: FileList | null) => {
+  const addAttachmentFiles = async (files: FileList | null) => {
     const nextFiles = Array.from(files ?? []);
     if (nextFiles.length === 0) return;
-
-    setSelectedFiles((prev) => [...prev, ...nextFiles]);
-    const fileNames = nextFiles.map((file) => `- ${file.name}`).join("\n");
-    setForm((prev) => ({
-      ...prev,
-      attachment_notes: `${prev.attachment_notes}${prev.attachment_notes ? "\n" : ""}File terpilih:\n${fileNames}`,
-    }));
+    setUploadingAttachments(true);
+    setError(null);
+    try {
+      const uploaded = await Promise.all(nextFiles.slice(0, 8 - uploadedAttachments.length).map(uploadOddsTaskAttachment));
+      setUploadedAttachments((current) => [...current, ...uploaded]);
+    } catch (err) {
+      setError(oddsError(err));
+    } finally {
+      setUploadingAttachments(false);
+    }
   };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -185,6 +155,7 @@ export default function NewOddsTaskPage() {
         deadline: form.deadline || undefined,
         important_matrix: form.important_matrix,
         attachment_notes: form.attachment_notes || undefined,
+        attachment_ids: uploadedAttachments.map((attachment) => attachment.id),
       });
       router.push(`/odds/detail?id=${task.id}`);
     } catch (err) {
@@ -196,7 +167,7 @@ export default function NewOddsTaskPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 py-6">
-      <header className="flex items-center gap-3 border-b border-cu-border pb-5">
+      <header className="flex items-start gap-3 border-b border-cu-border pb-5">
         <Link
           href="/odds"
           className="inline-flex size-10 items-center justify-center rounded-lg border border-cu-border text-cu-ink transition hover:bg-cu-panel-soft"
@@ -205,9 +176,9 @@ export default function NewOddsTaskPage() {
           <MaterialIcon name="arrow_back" size="sm" />
         </Link>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">ODDS</p>
-          <h1 className="text-2xl font-semibold text-cu-ink">Tambah Permintaan</h1>
-          <p className="mt-1 text-sm text-cu-muted">Alur request client untuk desain.</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">One Dashboard Design System</p>
+          <h1 className="mt-1 text-2xl font-semibold text-cu-ink">Buat Request Desain</h1>
+          <p className="mt-1 text-sm text-cu-muted">Lengkapi kebutuhan Anda, lalu kirimkan untuk diproses.</p>
         </div>
       </header>
 
@@ -217,45 +188,10 @@ export default function NewOddsTaskPage() {
         </div>
       )}
 
-      <main className="grid gap-6 lg:grid-cols-[18rem_1fr]">
-        <aside className="self-start rounded-lg border border-cu-border bg-white p-3 lg:sticky lg:top-24">
-          <div className="mb-3 px-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">Request Flow</p>
-            <p className="mt-1 text-sm text-cu-muted">Pilih langkah request.</p>
-          </div>
-          <nav className="space-y-1">
-            {steps.map((step) => {
-              const complete = isStepComplete(step.id, form);
-
-              return (
-                <button
-                  key={step.id}
-                  type="button"
-                  onClick={() => setActiveStep(step.id)}
-                  className={`flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition ${
-                    activeStep === step.id
-                      ? "bg-cu-info text-white"
-                      : "text-cu-ink hover:bg-cu-panel-soft"
-                  }`}
-                >
-                  <MaterialIcon name={complete ? "check_circle" : step.icon} size="sm" className="mt-0.5 shrink-0" />
-                  <span className="min-w-0 flex-1">
-                    <span className="text-sm font-semibold">{step.label}</span>
-                    <span className={`mt-1 block text-xs leading-5 ${
-                      activeStep === step.id ? "text-white/80" : "text-cu-muted"
-                    }`}>
-                      {step.description}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
-        </aside>
-
-        <form onSubmit={submit} className="min-w-0">
-          {activeStep === "category" && (
-            <Panel title="Kategori Desain" icon="category">
+      <main>
+        <form onSubmit={submit} className="min-w-0 space-y-6">
+          {true && (
+            <Panel title="Pilih Kategori" icon="category">
               <div className="grid gap-3 md:grid-cols-2">
                 {categories.map((category) => (
                   <button
@@ -286,31 +222,16 @@ export default function NewOddsTaskPage() {
               {categories.length === 0 && (
                 <EmptyState text="Belum ada kategori aktif. Root/SPV perlu mengaktifkan kategori lebih dulu." />
               )}
-              {selectedCategory && (
-                <div className="mt-4 rounded-lg border border-cu-border bg-cu-panel-soft p-4 text-sm text-cu-muted">
-                  Snapshot kategori akan dikunci saat submit: bobot, batas revisi, workload point, dan SLA default.
-                </div>
-              )}
-              <StepActions>
-                <button
-                  type="button"
-                  disabled={!form.category_id}
-                  onClick={() => setActiveStep("designer")}
-                  className={primaryButtonClass}
-                >
-                  Lanjut
-                </button>
-              </StepActions>
             </Panel>
           )}
 
-          {activeStep === "designer" && (
+          {true && (
             <Panel title="Pilih Designer" icon="person_search">
               {recommendedDesigner && (
                 <div className="mb-4 rounded-lg border border-cu-info/30 bg-blue-50 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-cu-info">Rekomendasi sistem</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-cu-info">Rekomendasi</p>
                       <h3 className="mt-1 font-semibold text-cu-ink">
                         {recommendedDesigner.user?.name ?? `User #${recommendedDesigner.user_id}`}
                       </h3>
@@ -363,25 +284,14 @@ export default function NewOddsTaskPage() {
                 <EmptyState text="Tidak ada designer aktif yang cocok dengan kategori ini." />
               )}
 
-              <StepActions>
-                <button type="button" onClick={() => setActiveStep("category")} className={secondaryButtonClass}>Kembali</button>
-                <button
-                  type="button"
-                  disabled={!form.preferred_designer_id}
-                  onClick={() => setActiveStep("brief")}
-                  className={primaryButtonClass}
-                >
-                  Lanjut
-                </button>
-              </StepActions>
             </Panel>
           )}
 
-          {activeStep === "brief" && (
-            <Panel title="Brief Request" icon="edit_note">
+          {true && (
+            <Panel title="Detail Request" icon="edit_note">
               <div className="grid gap-4 md:grid-cols-2">
                 <SelectField
-                  label="Important Matrix"
+                  label="Prioritas"
                   value={form.important_matrix}
                   onChange={(value) => update("important_matrix", value)}
                   options={[
@@ -391,61 +301,54 @@ export default function NewOddsTaskPage() {
                     ["Quadrant 1", "Quadrant 1"],
                     ["Quadrant 2", "Quadrant 2"],
                   ]}
-                  help="Dipakai untuk priority score antrean."
                 />
                 <InputField
                   label="Deadline"
                   type="date"
                   value={form.deadline}
                   onChange={(value) => update("deadline", value)}
-                  help="Kosongkan untuk memakai SLA default kategori."
                 />
                 <InputField
-                  label="Judul task"
+                  label="Judul request"
                   value={form.design_purpose}
                   required
                   placeholder="Banner marketplace promo JETE"
                   onChange={(value) => update("design_purpose", value)}
                   className="md:col-span-2"
-                  help="Nama request yang mudah dikenali oleh SPV dan designer."
                 />
                 <label className="block md:col-span-2">
                   <span className="mb-1.5 block text-sm font-medium text-cu-ink">Brief Design</span>
                   <OddsRichTextEditor value={form.brief_text} onChange={(value) => update("brief_text", value)} />
-                  <FieldHelp>Brief ini akan direview designer. Jika belum lengkap, designer bisa mengembalikannya ke client.</FieldHelp>
                 </label>
                 <InputField
-                  label="Referensi visual"
+                  label="Link referensi (opsional)"
                   value={form.reference_visual}
                   placeholder="Link atau arahan visual"
                   onChange={(value) => update("reference_visual", value)}
                   className="md:col-span-2"
-                  help="Bisa berupa link drive, Figma, marketplace, atau arahan gaya visual."
                 />
                 <label className="block md:col-span-2">
                   <span className="mb-1.5 block text-sm font-medium text-cu-ink">Upload file pendukung</span>
                   <div className="rounded-lg border border-dashed border-cu-border bg-cu-panel-soft p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-cu-ink">Pilih file referensi</p>
-                        <p className="mt-1 text-xs text-cu-muted">File dicatat sebagai attachment note untuk simulasi ODDS saat ini.</p>
-                      </div>
+                      <p className="text-sm font-semibold text-cu-ink">Lampiran file</p>
                       <span className="relative inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-cu-border bg-white px-4 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft">
                         <MaterialIcon name="upload_file" size="sm" />
                         Upload
                         <input
                           type="file"
                           multiple
-                          onChange={(event) => addAttachmentFiles(event.target.files)}
+                          onChange={(event) => void addAttachmentFiles(event.target.files)}
                           className="absolute inset-0 cursor-pointer opacity-0"
                         />
                       </span>
                     </div>
-                    {selectedFiles.length > 0 && (
+                    {uploadedAttachments.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {selectedFiles.map((file, index) => (
-                          <span key={`${file.name}-${index}`} className="rounded-full border border-cu-border bg-white px-2.5 py-1 text-xs text-cu-muted">
-                            {file.name}
+                        {uploadedAttachments.map((attachment) => (
+                          <span key={attachment.id} className="inline-flex items-center gap-1 rounded-full border border-cu-border bg-white px-2.5 py-1 text-xs text-cu-muted">
+                            {attachment.name}
+                            <button type="button" onClick={() => setUploadedAttachments((items) => items.filter((item) => item.id !== attachment.id))} aria-label={`Hapus ${attachment.name}`}><MaterialIcon name="close" size="sm" /></button>
                           </span>
                         ))}
                       </div>
@@ -453,80 +356,59 @@ export default function NewOddsTaskPage() {
                   </div>
                 </label>
                 <InputField
-                  label="Catatan attachment"
+                  label="Catatan lampiran (opsional)"
                   value={form.attachment_notes}
                   placeholder="Google Drive, Figma, atau file internal"
                   onChange={(value) => update("attachment_notes", value)}
                   className="md:col-span-2"
-                  help="Catatan lokasi file pendukung bila ada."
                 />
               </div>
 
-              <div className="mt-5 rounded-lg border border-cu-border bg-cu-panel-soft p-4 text-sm text-cu-muted">
-                Setelah brief lengkap, lanjut ke validasi submit. Backend tetap melakukan recheck anti race condition saat tombol kirim ditekan.
-              </div>
-
-              <StepActions>
-                <button type="button" onClick={() => setActiveStep("designer")} className={secondaryButtonClass}>Kembali</button>
-                <button
-                  type="button"
-                  disabled={!form.design_purpose.trim() || !stripRichText(form.brief_text)}
-                  onClick={() => setActiveStep("validation")}
-                  className={primaryButtonClass}
-                >
-                  Lanjut
-                </button>
-              </StepActions>
             </Panel>
           )}
 
-          {activeStep === "validation" && (
-            <Panel title="Validasi Submit" icon="verified">
+          {true && (
+            <Panel title="Ringkasan Request" icon="verified">
               <div className="grid gap-3 md:grid-cols-2">
                 <ValidationCard
                   ok={Boolean(selectedCategory)}
-                  title="Kategori aktif"
-                  description={selectedCategory ? `${selectedCategory.name} akan disnapshot saat submit.` : "Kategori belum dipilih."}
+                  title="Kategori"
+                  description={selectedCategory ? selectedCategory.name : "Pilih kategori"}
                 />
                 <ValidationCard
                   ok={Boolean(form.preferred_designer_id)}
-                  title="Designer valid"
+                  title="Designer"
                   description={
                     selectedDesignerName(form.preferred_designer_id, designerProfiles)
                       ?? "Designer belum dipilih."
                   }
                 />
                 <ValidationCard
-                  ok={Boolean(recommendedDesigner || form.preferred_designer_id)}
-                  title="Kapasitas awal"
-                  description="Backend akan recheck status, spesialisasi, workload, dan capacity sebelum create task."
+                  ok={Boolean(form.deadline || selectedCategory)}
+                  title="Deadline"
+                  description={form.deadline || (selectedCategory ? `SLA kategori: ${selectedCategory.sla_days} hari` : "Pilih kategori")}
                 />
                 <ValidationCard
                   ok={Boolean(form.design_purpose.trim())}
-                  title="Judul task"
-                  description={form.design_purpose.trim() ? form.design_purpose : "Judul task wajib diisi."}
+                  title="Judul"
+                  description={form.design_purpose.trim() || "Masukkan judul request"}
                 />
                 <ValidationCard
                   ok={Boolean(stripRichText(form.brief_text))}
                   title="Brief"
-                  description={stripRichText(form.brief_text) ? "Brief siap direview designer." : "Brief wajib diisi."}
+                  description={stripRichText(form.brief_text) ? "Siap dikirim" : "Lengkapi brief"}
                 />
               </div>
 
-              <div className="mt-5 rounded-lg border border-cu-border bg-cu-panel-soft p-4 text-sm text-cu-muted">
-                Jika ada perubahan data setelah halaman ini dibuka, backend akan menolak request dengan pesan validasi yang sesuai.
-              </div>
-
               <StepActions>
-                <button type="button" onClick={() => setActiveStep("brief")} className={secondaryButtonClass}>Kembali</button>
                 <Link href="/odds" className={secondaryButtonClass}>Batal</Link>
                 <button
                   type="submit"
-                  disabled={loading || initializing || !canSubmit}
+                  disabled={loading || initializing || uploadingAttachments || !canSubmit}
                   className="inline-flex h-10 items-center gap-2 rounded-lg bg-cu-info px-5 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50"
                 >
                   <MaterialIcon name="send" size="sm" />
-                  {loading ? "Menyimpan..." : "Kirim"}
+                  {loading ? "Mengirim..." : "Kirim Request"}
                 </button>
               </StepActions>
             </Panel>
@@ -584,16 +466,6 @@ function selectedDesignerName(userId: string, profiles: OddsDesignerProfile[]): 
   return profile?.user?.name ?? (profile ? `User #${profile.user_id}` : null);
 }
 
-function isStepComplete(step: RequestStep, form: TaskForm): boolean {
-  if (step === "category") return Boolean(form.category_id);
-  if (step === "designer") return Boolean(form.preferred_designer_id);
-  if (step === "brief") return Boolean(form.design_purpose.trim()) && Boolean(stripRichText(form.brief_text));
-  return Boolean(form.category_id)
-    && Boolean(form.preferred_designer_id)
-    && Boolean(form.design_purpose.trim())
-    && Boolean(stripRichText(form.brief_text));
-}
-
 function Panel({ title, icon, children }: { title: string; icon: string; children: ReactNode }) {
   return (
     <section className="rounded-lg border border-cu-border bg-white p-5 md:p-6">
@@ -643,10 +515,6 @@ function StepActions({ children }: { children: ReactNode }) {
   return <div className="mt-6 flex flex-wrap justify-end gap-2">{children}</div>;
 }
 
-function FieldHelp({ children }: { children: ReactNode }) {
-  return <p className="mt-1 text-xs leading-5 text-cu-muted">{children}</p>;
-}
-
 function InputField({
   label,
   value,
@@ -654,7 +522,6 @@ function InputField({
   type = "text",
   required,
   placeholder,
-  help,
   className = "",
 }: {
   label: string;
@@ -663,7 +530,6 @@ function InputField({
   type?: string;
   required?: boolean;
   placeholder?: string;
-  help?: string;
   className?: string;
 }) {
   return (
@@ -677,7 +543,6 @@ function InputField({
         placeholder={placeholder}
         className="h-11 w-full rounded-lg border border-cu-border px-3 text-sm outline-none focus:border-cu-info"
       />
-      {help && <FieldHelp>{help}</FieldHelp>}
     </label>
   );
 }
@@ -686,13 +551,11 @@ function SelectField({
   label,
   value,
   options,
-  help,
   onChange,
 }: {
   label: string;
   value: string;
   options: Array<[string, string]>;
-  help?: string;
   onChange: (value: string) => void;
 }) {
   return (
@@ -707,7 +570,6 @@ function SelectField({
           <option key={optionValue} value={optionValue}>{labelText}</option>
         ))}
       </select>
-      {help && <FieldHelp>{help}</FieldHelp>}
     </label>
   );
 }

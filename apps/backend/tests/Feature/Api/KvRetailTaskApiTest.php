@@ -16,11 +16,15 @@ class KvRetailTaskApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_assignee_options_include_every_user_with_kv_retail_access_regardless_of_role(): void
+    public function test_assignee_options_include_kv_retail_users_except_root(): void
     {
         $creator = User::factory()->create(['name' => 'Task Manager']);
         $creator->assignRole(Role::findOrCreate('Manajer'));
         $this->grantKvRetail($creator);
+
+        $root = User::factory()->create(['name' => 'Platform Root']);
+        $root->assignRole(Role::findOrCreate('Root'));
+        $this->grantExistingKvRetailApplication($root, $creator);
 
         $spv = User::factory()->create(['name' => 'Assigned SPV']);
         $spv->assignRole(Role::findOrCreate('SPV'));
@@ -38,6 +42,7 @@ class KvRetailTaskApiTest extends TestCase
             ->assertJsonFragment(['id' => $creator->id, 'name' => 'Task Manager'])
             ->assertJsonFragment(['id' => $spv->id, 'name' => 'Assigned SPV'])
             ->assertJsonFragment(['id' => $retailUser->id, 'name' => 'Assigned Retail'])
+            ->assertJsonMissing(['id' => $root->id, 'name' => 'Platform Root'])
             ->assertJsonMissing(['id' => $withoutAccess->id, 'name' => 'No Application Access']);
     }
 

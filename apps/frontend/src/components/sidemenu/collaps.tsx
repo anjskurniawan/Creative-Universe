@@ -42,7 +42,7 @@ export function SideMenuCollaps({
     >
       <div className="flex h-full w-[62px] flex-col items-center justify-between rounded-2xl border border-[#ebebeb] bg-white p-3">
         <div className="flex w-full flex-col items-center justify-center">
-          <div className="flex flex-col items-start gap-8">
+          <div className="flex w-full flex-col items-start gap-8">
             <SideMenuIconApp type="Icon" state="Light" />
 
             <nav aria-label="Navigasi utama" className="flex flex-col items-start gap-1">

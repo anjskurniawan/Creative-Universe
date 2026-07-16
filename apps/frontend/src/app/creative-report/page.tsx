@@ -356,7 +356,7 @@ export default function CreativeReportPage() {
   const { hasPermission } = useAuth();
   const canEdit = hasPermission("creative-report.assessments.update");
   const [sidebarVariant, setSidebarVariant] =
-    useState<SideMenuVariant>("Collaps");
+    useState<SideMenuVariant>("Expand");
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [jobdesk, setJobdesk] = useState(JOBDESKS[0]);
   const [search, setSearch] = useState("");

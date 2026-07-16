@@ -71,6 +71,7 @@ export interface OddsTaskBrief {
   reference_visual: string | null;
   last_return_note: string | null;
   ai_summary: string | null;
+  attachments?: OddsTaskAttachment[] | null;
 }
 
 export interface OddsTaskResult {
@@ -221,6 +222,15 @@ export interface CreateOddsTaskInput {
   deadline?: string;
   important_matrix?: string;
   attachment_notes?: string;
+  attachment_ids?: number[];
+}
+
+export interface OddsTaskAttachment {
+  id: number;
+  name: string;
+  path: string;
+  mime_type?: string | null;
+  size?: number | null;
 }
 
 export interface SubmitResultInput {
@@ -442,6 +452,12 @@ export async function createOddsTask(input: CreateOddsTaskInput): Promise<OddsTa
     method: "POST",
     body: JSON.stringify(input),
   });
+}
+
+export async function uploadOddsTaskAttachment(file: File): Promise<OddsTaskAttachment> {
+  const body = new FormData();
+  body.append("file", file);
+  return apiFetch<OddsTaskAttachment>("/odds/uploads", { method: "POST", body });
 }
 
 export async function updateOddsBrief(id: string | number, brief_text: string): Promise<OddsTask> {

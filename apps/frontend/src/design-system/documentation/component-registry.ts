@@ -11,7 +11,7 @@ export const COMPONENT_DOCUMENTATION = [
   { name: "Navbar", label: "Navbar", slug: "components/navbar", level: "organism", status: "stable", application: "core" },
   { name: "HeroHeading", label: "Hero Heading", slug: "components/hero-heading", level: "atom", status: "stable", application: "core" },
   { name: "PrimaryActionLink", label: "Primary Action Link", slug: "components/primary-action-link", level: "atom", status: "review", application: "core" },
-  { name: "ErrorRunnerGame", label: "Error Runner Game", slug: "components/error-runner-game", level: "organism", status: "review", application: "core" },
+  { name: "ErrorTetrisGame", label: "Error Tetris Game", slug: "components/error-tetris-game", level: "organism", status: "review", application: "core" },
   { name: "UniversalErrorView", label: "Universal Error View", slug: "components/universal-error-view", level: "template", status: "review", application: "core" },
 ] as const satisfies readonly ComponentDocumentationEntry[];
 

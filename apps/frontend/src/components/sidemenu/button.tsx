@@ -64,9 +64,7 @@ export function SideMenuButton({
     "group flex h-[38px] shrink-0 items-center overflow-hidden rounded-xl p-[10px] text-xs font-medium leading-4 transition-[width,padding,background-color,color] duration-[360ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8474f9] focus-visible:ring-offset-2",
     isIconOnly
       ? "w-[38px] justify-center p-0"
-      : hasBadge
-        ? "w-[216px] justify-between gap-1"
-        : "w-[194px] justify-start gap-2",
+      : "w-full justify-between gap-1",
     buttonStatusClasses(status),
     className,
   ].join(" ");

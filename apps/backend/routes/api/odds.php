@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::delete('/system-rules/{systemRule}', [ConfigController::class, 'deleteSystemRule'])->middleware('can:manage-odds-config');
 
     Route::get('/tasks', [TaskController::class, 'index']);
+    Route::post('/uploads', [TaskController::class, 'uploadAttachment'])->middleware('can:create-odds-tasks');
     Route::post('/tasks', [TaskController::class, 'store'])->middleware('can:create-odds-tasks');
     Route::get('/tasks/{task}', [TaskController::class, 'show']);
     Route::get('/tasks/{task}/conversation', [TaskController::class, 'conversation']);
