@@ -472,10 +472,20 @@
 
 .hero-heading-cursor-anchor {
   display: inline-block;
+  position: relative;
+  width: 0;
+  height: 1em;
+  margin: 0;
+  vertical-align: -0.08em;
+}
+
+.hero-heading-cursor-anchor::after {
+  position: absolute;
+  bottom: 0.04em;
+  left: 0.08em;
   width: 0.04em;
   height: 0.8em;
-  margin-left: 0.08em;
-  vertical-align: -0.08em;
+  content: "";
   border-radius: 999px;
   background: linear-gradient(to bottom, var(--color-cu-gradient-start), var(--color-cu-gradient-middle), var(--color-cu-gradient-end));
   box-shadow: 0 0 0.14em color-mix(in srgb, var(--color-cu-gradient-start) 55%, transparent);
@@ -582,6 +592,7 @@
   .cu-landing-action-enter {
     animation: none;
   }
+
 }
 
 @keyframes toastEnter {

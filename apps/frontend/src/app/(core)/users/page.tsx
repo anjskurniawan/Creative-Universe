@@ -71,7 +71,7 @@ export default function UsersPage() {
 
     try {
       const result = await coreApi.users.list<PaginatedResponse<ManagedUser>>(
-        `/users?${params.toString()}`
+        `?${params.toString()}`
       );
       setUsers(result.data);
       setLastPage(result.meta.last_page);
@@ -316,15 +316,23 @@ export default function UsersPage() {
           })}
         </div>
         <div className="hidden overflow-x-auto md:block">
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-[960px] table-fixed text-left text-sm xl:min-w-[1120px]">
+            <colgroup>
+              <col className="w-[22%]" />
+              <col className="w-[17%]" />
+              <col className="w-[22%]" />
+              <col className="w-[24%]" />
+              <col className="w-[9%]" />
+              <col className="w-[6%]" />
+            </colgroup>
             <thead className="border-b border-cu-line bg-cu-panel-soft/60 text-[10px] font-bold uppercase tracking-wider text-cu-muted">
               <tr>
-                <th className="px-6 py-4">Nama</th>
-                <th className="px-6 py-4">Username</th>
-                <th className="px-6 py-4">Email</th>
-                <th className="px-6 py-4">Peran & izin langsung</th>
-                <th className="px-6 py-4">Bergabung</th>
-                <th className="px-6 py-4 text-right">Aksi</th>
+                <th className="px-5 py-4">Nama</th>
+                <th className="px-4 py-4">Username</th>
+                <th className="px-4 py-4">Email</th>
+                <th className="px-4 py-4">Peran & izin langsung</th>
+                <th className="px-4 py-4">Bergabung</th>
+                <th className="px-5 py-4 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-cu-line/50">
@@ -335,35 +343,34 @@ export default function UsersPage() {
               ) : users.map((managedUser) => {
                 const protectedFromManager = !hasRole("Root") && managedUser.roles.includes("Root");
                 return (
-                  <tr key={managedUser.id} className="transition hover:bg-cu-panel-soft/30">
-                    <td className="px-6 py-4">
+                  <tr key={managedUser.id} className="group transition hover:bg-cu-panel-soft/30">
+                    <td className="px-5 py-4 align-middle">
                       <div className="flex items-center gap-3">
                         <Avatar user={managedUser} />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-cu-ink">{managedUser.name}</span>
-                          </div>
+                        <div className="min-w-0">
+                          <span className="block truncate font-semibold text-cu-ink" title={managedUser.name}>{managedUser.name}</span>
                           <span className="text-xs text-cu-muted">ID #{managedUser.id}</span>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-cu-ink">{managedUser.username}</td>
-                    <td className="px-6 py-4 text-cu-muted">{managedUser.email}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex max-w-sm flex-wrap gap-1.5">
+                    <td className="px-4 py-4 align-middle"><span className="block truncate text-cu-ink" title={managedUser.username}>@{managedUser.username}</span></td>
+                    <td className="px-4 py-4 align-middle"><span className="block truncate text-cu-muted" title={managedUser.email}>{managedUser.email}</span></td>
+                    <td className="px-4 py-4 align-middle">
+                      <div className="flex flex-wrap gap-1.5">
                         {managedUser.roles.map((role) => <Badge key={role} tone={role === "Root" ? "danger" : role === "Manajer" ? "info" : "neutral"}>{role}</Badge>)}
-                        {managedUser.permissions.map((permission) => <Badge key={permission} tone="soft">+{options?.permission_aliases[permission] ?? permission}</Badge>)}
+                        {managedUser.permissions.slice(0, 2).map((permission) => <Badge key={permission} tone="soft">+{options?.permission_aliases[permission] ?? permission}</Badge>)}
+                        {managedUser.permissions.length > 2 && <Badge tone="soft">+{managedUser.permissions.length - 2} lagi</Badge>}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-xs text-cu-muted">{formatDate(managedUser.created_at)}</td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-4 py-4 align-middle text-xs text-cu-muted"><span className="whitespace-nowrap">{formatDate(managedUser.created_at)}</span></td>
+                    <td className="px-5 py-4 text-right align-middle">
                       {protectedFromManager ? (
                         <span className="text-xs italic text-cu-muted">Protected</span>
                       ) : (
                         <button
                           type="button"
                           onClick={() => void openUser(managedUser)}
-                          className="rounded-lg border border-cu-line bg-cu-surface px-3 py-1.5 text-xs font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+                          className="rounded-full border border-cu-line bg-cu-surface px-3 py-1.5 text-xs font-semibold text-cu-ink transition hover:border-cu-ink hover:bg-cu-panel-soft"
                         >
                           Kelola
                         </button>
@@ -566,7 +573,7 @@ function AuditPanel({ detail, onRevoke }: { detail: ManagedUserDetail; onRevoke:
 
 function Modal({ title, children, onClose, wide = false }: { title: string; children: ReactNode; onClose: () => void; wide?: boolean }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-cu-overlay/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-cu-overlay/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
       <div className={`max-h-[92vh] w-full overflow-y-auto rounded-2xl border border-cu-line bg-cu-surface shadow-xl ${wide ? "max-w-5xl" : "max-w-2xl"}`}>
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-cu-line bg-cu-surface px-6 py-4">
           <h2 className="text-base font-bold text-cu-ink">{title}</h2>

@@ -211,10 +211,7 @@ function LoginParticleBackground() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-0">
-      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 size-full" />
-      <div aria-hidden="true" className="cu-landing-readability absolute inset-0" />
-      <div aria-hidden="true" className="cu-landing-fade absolute inset-x-0 bottom-0 h-40" />
+    <div className="pointer-events-none absolute inset-0 z-0 bg-[url('/images/landing/creative-universe-background.jpg')] bg-cover bg-center bg-no-repeat">
     </div>
   );
 }
@@ -566,16 +563,6 @@ export default function LoginPage() {
   useEffect(() => {
     const tweens: gsap.core.Tween[] = [];
 
-    if (whiteOverlayRef.current) {
-      tweens.push(
-        gsap.to(whiteOverlayRef.current, {
-          opacity: 0,
-          duration: 0.85,
-          ease: "power2.out",
-        })
-      );
-    }
-
     if (cardRef.current) {
       tweens.push(
         gsap.fromTo(
@@ -609,7 +596,7 @@ export default function LoginPage() {
       <LoginParticleBackground />
 
       <div className="absolute inset-x-0 top-0 z-20 hidden md:block">
-        <Navbar variant="light" />
+        <Navbar variant="transparent-dark" session="guest" />
       </div>
 
       <div
@@ -628,7 +615,7 @@ export default function LoginPage() {
       {/* Full-screen white transition overlay */}
       <div
         ref={whiteOverlayRef}
-        className="fixed inset-0 bg-white opacity-100 pointer-events-none z-[9999]"
+        className="fixed inset-0 pointer-events-none z-[9999] bg-white opacity-0"
       />
     </main>
   );

@@ -36,7 +36,7 @@ export function SideMenuCollaps({
     <aside
       data-variant="Collaps"
       className={[
-        "sticky top-4 m-4 flex h-[calc(100vh-2rem)] min-h-[640px] w-[78px] shrink-0 items-center p-2",
+        "sticky top-4 z-30 m-4 flex h-[calc(100vh-2rem)] min-h-[640px] w-[78px] shrink-0 items-center p-2",
         className,
       ].join(" ")}
     >

@@ -17,6 +17,7 @@ The guest landing page is intentionally limited to three visible components:
 3. Reusable `PrimaryActionLink` action atom.
 
 Authenticated users do not consume this page and are redirected to `/dashboard` after the Core authentication state resolves.
+The universe background is an independent layer and fades from transparent to visible through GSAP over 0.72 seconds. Typing starts after this entrance has completed. Reduced-motion users receive the background immediately.
 During authentication resolution, the page renders the same universe background without an entrance animation, preventing a white loading flash.
 The PrimaryActionLink is rendered 400ms after HeroHeading emits `onTypingComplete`. Its 1.2-second entrance preserves the legacy motion character: opacity 0, 14px downward offset, and 8px blur transition smoothly to the final state without scaling. Reduced-motion users receive the action without entrance motion.
 

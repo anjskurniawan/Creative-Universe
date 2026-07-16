@@ -74,8 +74,8 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6 w-full">
       {/* Header */}
-      <div className="border-b border-cu-line bg-cu-surface -mx-4 -mt-6 mb-6 px-4 py-5 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="border-b border-cu-line bg-cu-surface -mx-4 -mt-6 mb-6 px-4 py-5 md:-mx-16 md:px-16">
+        <div>
           <h1 className="text-2xl font-semibold text-cu-ink">Dashboard</h1>
           <p className="mt-1 text-sm text-cu-muted">Selamat datang kembali, {user?.name}.</p>
         </div>
