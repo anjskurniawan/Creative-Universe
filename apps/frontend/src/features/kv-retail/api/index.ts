@@ -8,10 +8,17 @@ export const kvRetailApi = {
   tasks: {
     list: (query = "", options?: ApiRequestOptions) =>
       apiFetch<KvRetailTask[]>(`${PREFIX}/tasks${query}`, options),
+    latestPerformanceAiReport: () =>
+      apiFetch<{ content: string; generated_at: string } | null>(`${PREFIX}/performance/creative-agent`),
     create: (body: FormData | Record<string, unknown>) => apiFetch<KvRetailTask>(`${PREFIX}/tasks`, {
       method: "POST",
       body: body instanceof FormData ? body : JSON.stringify(body),
     }),
+    updateTitle: (taskId: number | string, taskName: string) =>
+      apiFetch<KvRetailTask>(`${PREFIX}/tasks/${taskId}/title`, {
+        method: "PATCH",
+        body: JSON.stringify({ task_name: taskName }),
+      }),
     updateStatus: (taskId: number | string, body: unknown) =>
       apiFetch<KvRetailTask>(`${PREFIX}/tasks/${taskId}/status`, {
         method: "PATCH",

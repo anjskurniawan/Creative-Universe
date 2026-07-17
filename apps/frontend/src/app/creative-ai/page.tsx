@@ -1,29 +1,17 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import { MaterialIcon } from "@/components/material-icon";
 import { useAuth } from "@/providers/auth-provider";
 import { creativeAiApi } from "@/features/creative-ai/api";
 
-const AGENT_OPTIONS = [
-  { value: "storyboard",  label: "Storyboard Writer",  icon: "movie_edit" },
-  { value: "thumbnail",   label: "Youtube Thumbnail",  icon: "image" },
-  { value: "copywriting", label: "Copywriting",         icon: "edit_note" },
-] as const;
-
-type AgentType = (typeof AGENT_OPTIONS)[number]["value"];
-
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  agentType?: AgentType;
   timestamp: string;
 }
-
-// Suggested prompts removed in favor of dropdown selection
 
 export default function CreativeAiPage() {
   const { user } = useAuth();
@@ -38,12 +26,6 @@ export default function CreativeAiPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [inputValue, setInputValue] = useState("");
-  const [agentType, setAgentType] = useState<AgentType>("storyboard");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
-  const [mounted, setMounted] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [showNewText, setShowNewText] = useState(false);
 
@@ -51,10 +33,6 @@ export default function CreativeAiPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const messageCounterRef = useRef(0);
-
-  /* Mark client-side mounted (needed for portal) */
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setMounted(true); }, []);
 
   /* Scroll to bottom when messages change */
   useEffect(() => {
@@ -72,33 +50,6 @@ export default function CreativeAiPage() {
       document.body.classList.remove("creative-ai-dark-active");
     };
   }, [isFocused, messages.length]);
-
-  /* Compute trigger position whenever dropdown opens */
-  useEffect(() => {
-    if (!dropdownOpen || !triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    setDropdownPos({
-      top: rect.top + window.scrollY,   // above trigger: will subtract panel height via CSS
-      right: window.innerWidth - rect.right,
-    });
-  }, [dropdownOpen]);
-
-  const selectedAgent = AGENT_OPTIONS.find((o) => o.value === agentType)!;
-
-  /* Close dropdown on outside click */
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    const handler = (e: MouseEvent) => {
-      const target = e.target as Node;
-      const inTrigger = triggerRef.current?.contains(target);
-      const inDropdownWrapper = dropdownRef.current?.contains(target);
-      if (!inTrigger && !inDropdownWrapper) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [dropdownOpen]);
 
   const typewriterText = "Creative AI siap membantu Anda";
 
@@ -580,10 +531,9 @@ export default function CreativeAiPage() {
     setIsFocused(false);
     setIsTyping(true);
 
-    // Call backend Google Gemini API integration
+    // Call the general-purpose Creative AI chat endpoint.
     creativeAiApi.chat({
         message: messageText.trim(),
-        agent_type: agentType,
         history: currentHistory.slice(0, -1).map((msg) => ({
           role: msg.role,
           content: msg.content,
@@ -595,7 +545,6 @@ export default function CreativeAiPage() {
           id: `msg-${messageCounterRef.current}-assistant`,
           role: "assistant",
           content: data.content,
-          agentType: agentType,
           timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
         };
         setMessages((prev) => [...prev, assistantMsg]);
@@ -608,7 +557,6 @@ export default function CreativeAiPage() {
           id: `msg-${messageCounterRef.current}-assistant`,
           role: "assistant",
           content: `### ❌ Gagal Menghubungi Asisten AI\n\nTerjadi kesalahan saat memproses permintaan Anda: **${error?.message || "Kesalahan jaringan"}**.\n\nSilakan coba lagi beberapa saat lagi.`,
-          agentType: agentType,
           timestamp: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })
         };
         setMessages((prev) => [...prev, errorMsg]);
@@ -629,11 +577,6 @@ export default function CreativeAiPage() {
     >
       {/* CSS overrides for global elements and scrollbar styling */}
       <style>{`
-        @keyframes cu-dropdown-in {
-          from { opacity: 0; transform: translateY(6px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0)   scale(1); }
-        }
-
         /* Custom scrollbar for Chat history window */
         .chat-scrollbar::-webkit-scrollbar {
           width: 5px;
@@ -742,7 +685,7 @@ export default function CreativeAiPage() {
               <div className="flex-1 overflow-y-auto chat-scrollbar pr-2 space-y-4">
                 {messages.map((msg) => {
                   const isUser = msg.role === "user";
-                  const agent = msg.agentType ? AGENT_OPTIONS.find((o) => o.value === msg.agentType) : null;
+                  const agent = { label: "Creative AI" };
 
                   return (
                     <div
@@ -762,7 +705,7 @@ export default function CreativeAiPage() {
                         {isUser ? (
                           userName.slice(0, 2).toUpperCase()
                         ) : (
-                          <MaterialIcon name={agent?.icon || "smart_toy"} size="xs" className="text-white" />
+                          <MaterialIcon name="smart_toy" size="xs" className="text-white" />
                         )}
                       </div>
 
@@ -798,7 +741,7 @@ export default function CreativeAiPage() {
                 {isTyping && (
                   <div className="flex items-start gap-3 max-w-[80%] mr-auto">
                     <div className="flex items-center justify-center size-8 rounded-full bg-white/10 border border-white/10 text-white flex-shrink-0">
-                      <MaterialIcon name={selectedAgent.icon} size="xs" className="animate-spin" />
+                      <MaterialIcon name="smart_toy" size="xs" className="animate-spin" />
                     </div>
                     <div className="flex flex-col gap-1">
                       <div className="bg-white/5 border border-white/10 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-white/50 flex items-center gap-1">
@@ -854,7 +797,7 @@ export default function CreativeAiPage() {
                       handleSendMessage();
                     }
                   }}
-                  placeholder={`Tanya ${selectedAgent.label}…`}
+                  placeholder="Tulis pesan Anda…"
                   className="flex-1 bg-transparent text-sm text-cu-ink placeholder:text-cu-ink/40 outline-none"
                   aria-label="Input pesan Creative AI"
                   autoComplete="off"
@@ -865,101 +808,6 @@ export default function CreativeAiPage() {
 
                 {/* Right controls */}
                 <div className="flex-shrink-0 flex items-center gap-2">
-                  {/* Agent type — custom dropdown (hidden per request) */}
-                  <div ref={dropdownRef} className="hidden relative">
-                    {/* Trigger button */}
-                    <button
-                      ref={triggerRef}
-                      type="button"
-                      onClick={() => setDropdownOpen((v) => !v)}
-                      aria-haspopup="listbox"
-                      aria-expanded={dropdownOpen}
-                      aria-label="Pilih tipe Creative AI"
-                      className={`
-                        flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium
-                        transition-all duration-200
-                        ${
-                          dropdownOpen
-                            ? "bg-cu-ink/15 text-cu-ink font-semibold"
-                            : "bg-cu-ink/5 text-cu-ink/70 hover:bg-cu-ink/10 hover:text-cu-ink/90"
-                        }
-                      `}
-                    >
-                      <MaterialIcon name={selectedAgent.icon} size="xs" className="opacity-70" />
-                      <span className="hidden sm:inline">{selectedAgent.label}</span>
-                      <MaterialIcon
-                        name="keyboard_arrow_down"
-                        size="xs"
-                        className={`opacity-60 transition-transform duration-200 ${
-                          dropdownOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-
-                    {/* Dropdown panel panel — rendered via Portal */}
-                    {mounted && dropdownOpen && createPortal(
-                      <div
-                        role="listbox"
-                        aria-label="Tipe Creative AI"
-                        onMouseDown={(e) => e.stopPropagation()}
-                        style={{
-                          position: "fixed",
-                          top: dropdownPos.top - 8,
-                          right: dropdownPos.right,
-                          transform: "translateY(-100%)",
-                          zIndex: 9999,
-                          animation: "cu-dropdown-in 0.15s ease-out both",
-                        }}
-                        className="
-                          w-48 rounded-xl overflow-hidden
-                          border border-cu-line
-                          bg-white
-                          shadow-2xl
-                        "
-                      >
-                        {AGENT_OPTIONS.map((opt) => {
-                          const isActive = opt.value === agentType;
-                          return (
-                            <button
-                              key={opt.value}
-                              role="option"
-                              aria-selected={isActive}
-                              type="button"
-                              onClick={() => {
-                                setAgentType(opt.value);
-                                setDropdownOpen(false);
-                              }}
-                              className={`
-                                w-full flex items-center gap-2.5 px-3 py-2.5 text-xs text-left
-                                transition-colors duration-150
-                                ${
-                                  isActive
-                                    ? "bg-cu-panel-soft text-cu-ink font-semibold"
-                                    : "text-cu-ink/70 hover:bg-cu-panel-soft hover:text-cu-ink"
-                                }
-                              `}
-                            >
-                              <MaterialIcon
-                                name={opt.icon}
-                                size="xs"
-                                className={isActive ? "opacity-90" : "opacity-50"}
-                              />
-                              {opt.label}
-                              {isActive && (
-                                <MaterialIcon
-                                  name="check"
-                                  size="xs"
-                                  className="ml-auto opacity-80"
-                                />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>,
-                      document.body
-                    )}
-                  </div>
-
                   {/* Send button */}
                   <button
                     type="button"

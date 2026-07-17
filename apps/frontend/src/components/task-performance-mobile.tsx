@@ -5,6 +5,7 @@ import { MaterialIcon } from "@/components/material-icon";
 
 export type TaskPerformanceTask = {
   id: number;
+  task_name?: string | null;
   status: string;
   task_given_date?: string | null;
   deadline_date?: string | null;

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\KvRetail;
 use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Core\User;
 use App\Services\Core\FileStorageService;
+use App\SubApps\Cai\Services\GroqService;
 use App\SubApps\KvRetail\Events\KvRetailTaskAssigned;
 use App\SubApps\KvRetail\Events\KvRetailTaskUpdated;
+use App\SubApps\KvRetail\Services\KvRetailCreativeAgentService;
 use App\SubApps\KvRetail\Services\KvRetailTaskTimingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -100,6 +102,86 @@ class TaskController extends BaseApiController
         return $this->sendResponse($task->load('users'), 'Task KV Retail berhasil dibuat.', 201);
     }
 
+    public function performanceAiReport(Request $request, GroqService $groqService)
+    {
+        $this->ensureTaskRouteAccess($request->user());
+        $user = $request->user();
+        $query = \App\SubApps\KvRetail\Models\KvRetailTask::query();
+
+        if ($user && ! $user->hasRole(['Root', 'Manajer', 'SPV'])) {
+            $query->whereHas('users', fn ($taskQuery) => $taskQuery->where('users.id', $user->id));
+        }
+
+        $tasks = $query
+            ->whereBetween('task_given_date', [now()->startOfMonth(), now()->endOfMonth()])
+            ->orderBy('task_given_date')
+            ->get();
+
+        $bottleneckStages = ['ACC Draft', 'Progress Design', 'Approval Design'];
+        $summaries = $tasks->map(function ($task) use ($bottleneckStages) {
+            $evaluation = $task->timing_evaluation;
+            $bottleneckStagesForTask = collect($bottleneckStages)
+                ->filter(fn (string $stage) => data_get($evaluation, "violations.{$stage}.late"))
+                ->values()
+                ->all();
+            $isLate = (bool) data_get($evaluation, 'late');
+
+            return [
+                'task' => $task,
+                'is_late' => $isLate,
+                'bottleneck_stages' => $bottleneckStagesForTask,
+            ];
+        });
+
+        $priorityTasks = $summaries
+            ->filter(fn (array $summary) => $summary['is_late'] || $summary['bottleneck_stages'] !== [] || $summary['task']->status !== 'Done')
+            ->sortByDesc(fn (array $summary) => $summary['is_late'] || $summary['bottleneck_stages'] !== [])
+            ->take(3)
+            ->map(fn (array $summary) => [
+                'name' => mb_strimwidth((string) $summary['task']->task_name, 0, 48, '…'),
+                'issue' => $summary['is_late']
+                    ? 'terlambat'
+                    : ($summary['bottleneck_stages'] !== []
+                        ? 'bottleneck '.implode(', ', $summary['bottleneck_stages'])
+                        : 'dalam proses'),
+            ])
+            ->values();
+
+        $reportData = [
+            'periode' => now()->translatedFormat('F Y'),
+            'total_task' => $tasks->count(),
+            'selesai' => $tasks->where('status', 'Done')->count(),
+            'tepat_waktu' => $summaries->filter(fn (array $summary) => $summary['task']->status === 'Done' && ! $summary['is_late'])->count(),
+            'terlambat' => $summaries->where('is_late', true)->count(),
+            'dalam_proses' => $tasks->filter(fn ($task) => ! in_array($task->status, ['0', 'Done'], true))->count(),
+            'bottleneck_per_tahap' => collect($bottleneckStages)->mapWithKeys(fn (string $stage) => [
+                $stage => $summaries->filter(fn (array $summary) => in_array($stage, $summary['bottleneck_stages'], true))->count(),
+            ])->all(),
+            'task_prioritas' => $priorityTasks,
+        ];
+        $reportJson = json_encode($reportData, JSON_UNESCAPED_UNICODE) ?: '{}';
+
+        $prompt = <<<PROMPT
+KV Retail, Bahasa Indonesia. Data ringkas: {$reportJson}
+Berikan HANYA rekomendasi tindakan dalam Markdown: mulai dengan ## Rekomendasi Bulan Ini, lalu tepat 3 bullet. Setiap bullet hanya boleh membahas kumpulan task berdasarkan status, deadline, atau tahap proses bulan ini; sertakan angka yang relevan bila tersedia. Gunakan gaya seperti: "Tuntaskan 2 task terlambat ...", "Dorong 4 task di ACC Draft ...", atau "Pantau 5 task dalam proses ...". DILARANG menyarankan tindakan terhadap orang atau tim, termasuk anggota, staf, sumber daya, reviewer, pembagian beban kerja, rapat, reminder, atau evaluasi performa orang. Jangan menulis ringkasan, temuan, prioritas, angka yang berdiri sendiri, JSON, atau proses berpikir. Terlambat = Kirim Email melewati deadline. Bottleneck hanya ACC Draft, Progress Design, Approval Design.
+PROMPT;
+
+        try {
+            $report = $groqService->generateResponse($prompt);
+        } catch (\RuntimeException $exception) {
+            return $this->sendError($exception->getMessage(), [], 502);
+        }
+
+        return $this->sendResponse(['content' => $report], 'AI Report KV Retail berhasil dibuat.');
+    }
+
+    public function latestPerformanceAiReport(Request $request, KvRetailCreativeAgentService $creativeAgent)
+    {
+        $this->ensureTaskRouteAccess($request->user());
+
+        return $this->sendResponse($creativeAgent->latest(), 'Creative Agent terbaru berhasil diambil.');
+    }
+
     public function updateStatus(Request $request, $id, KvRetailTaskTimingService $timing)
     {
         $this->ensureTaskRouteAccess($request->user());
@@ -146,6 +228,32 @@ class TaskController extends BaseApiController
         }
 
         return $this->sendResponse($task->load('users'), 'Status task KV Retail berhasil diperbarui.');
+    }
+
+    public function updateTitle(Request $request, $id)
+    {
+        $this->ensureTaskRouteAccess($request->user());
+        $task = \App\SubApps\KvRetail\Models\KvRetailTask::findOrFail($id);
+        $user = $request->user();
+
+        abort_unless(
+            $user?->hasRole(['Root', 'Manajer', 'SPV']) || $task->created_by === $user?->id,
+            403,
+            'Unauthorized action.',
+        );
+
+        $validated = $request->validate([
+            'task_name' => 'required|string|max:255',
+        ]);
+
+        $task->update(['task_name' => $validated['task_name']]);
+
+        $assignedUserIds = $task->users->pluck('id')->map(fn ($id) => (int) $id)->toArray();
+        if (! empty($assignedUserIds)) {
+            $this->broadcastTaskUpdated($task, $assignedUserIds);
+        }
+
+        return $this->sendResponse($task->load('users'), 'Judul task KV Retail berhasil diperbarui.');
     }
 
     public function uploadFile(Request $request, $id)

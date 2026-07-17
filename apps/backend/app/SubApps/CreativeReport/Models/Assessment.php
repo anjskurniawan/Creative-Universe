@@ -16,7 +16,7 @@ class Assessment extends Model
 
     protected $fillable = [
         'creative_report_group_id', 'user_id', 'period', 'creative_scores',
-        'leave_count', 'absence_count', 'late_count', 'status', 'completed_at', 'completed_by',
+        'creative_report_member_id', 'leave_count', 'absence_count', 'late_count', 'status', 'completed_at', 'completed_by',
     ];
 
     protected function casts(): array
@@ -32,6 +32,11 @@ class Assessment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function member(): BelongsTo
+    {
+        return $this->belongsTo(CreativeMember::class, 'creative_report_member_id');
     }
 
     public function score30(): int

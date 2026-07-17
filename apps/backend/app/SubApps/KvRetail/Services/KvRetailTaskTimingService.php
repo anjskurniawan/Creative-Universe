@@ -39,10 +39,16 @@ class KvRetailTaskTimingService
             ],
         ];
 
-        $isLate = collect($violations)->contains(fn (array $violation) => $violation['late']);
+        $hasBottleneck = collect($violations)
+            ->except('Kirim Email')
+            ->contains(fn (array $violation) => $violation['late']);
+        // The sent-email timestamp is the source of truth for task timeliness.
+        // Sending it on the deadline remains on time.
+        $isLate = $task->status === 'Done'
+            && $this->isAfterDeadline($timestamps['Email'] ?? null, $task->deadline_date);
 
         return [
-            'bottleneck' => $isLate,
+            'bottleneck' => $hasBottleneck,
             'late' => $isLate,
             'violations' => $violations,
         ];
@@ -79,7 +85,15 @@ class KvRetailTaskTimingService
         $emailAt = $this->parseDate($emailTimestamp);
         $deadlineAt = $this->parseDate($deadline);
 
-        return $emailAt && $deadlineAt && ! $emailAt->startOfDay()->lessThan($deadlineAt->startOfDay());
+        return $emailAt && $deadlineAt && $emailAt->startOfDay()->greaterThan($deadlineAt->startOfDay());
+    }
+
+    private function isAfterDeadline(mixed $completedTimestamp, mixed $deadline): bool
+    {
+        $completedAt = $this->parseDate($completedTimestamp);
+        $deadlineAt = $this->parseDate($deadline);
+
+        return $completedAt && $deadlineAt && $completedAt->startOfDay()->greaterThan($deadlineAt->startOfDay());
     }
 
     private function parseDate(mixed $value): ?Carbon

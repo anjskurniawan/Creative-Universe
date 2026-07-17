@@ -16,7 +16,6 @@ class CreativeAiChatRequest extends FormRequest
     {
         return [
             'message' => ['required', 'string', 'max:10000'],
-            'agent_type' => ['required', 'string', 'in:storyboard,thumbnail,copywriting'],
             'history' => ['nullable', 'array'],
             'history.*.role' => ['required', 'string', 'in:user,assistant'],
             'history.*.content' => ['required', 'string'],

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MaterialIcon } from "@/components/material-icon";
 import { Navbar } from "@/components/navbar";
 import { creativeReportApi } from "@/features/creative-report/api";
+import { CreativeMemberManagement } from "@/features/creative-report/creative-member-management";
 import type {
   CreativeReportGroup,
   CreativeReportIndex,
@@ -353,8 +354,9 @@ function AssessmentTable({
 }
 
 export default function CreativeReportPage() {
-  const { hasPermission } = useAuth();
+  const { hasPermission, hasRole } = useAuth();
   const canEdit = hasPermission("creative-report.assessments.update");
+  const canManageMembers = hasRole("Root") || hasRole("Manajer");
   const [sidebarVariant, setSidebarVariant] =
     useState<SideMenuVariant>("Expand");
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -473,6 +475,7 @@ export default function CreativeReportPage() {
             </button>
           </div>
         </header>
+        {canManageMembers && <CreativeMemberManagement />}
         <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.2fr)_180px_repeat(3,minmax(170px,1fr))]">
           <label className="flex h-12 min-w-0 items-center gap-3 rounded-xl border border-[#e2e6e9] bg-white px-4">
             <MaterialIcon name="search" size="sm" className="text-[#7b868a]" />

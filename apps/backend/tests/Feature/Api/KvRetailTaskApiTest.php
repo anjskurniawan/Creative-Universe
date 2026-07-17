@@ -108,6 +108,63 @@ class KvRetailTaskApiTest extends TestCase
             ->assertJsonPath('data.timing_evaluation.bottleneck', true);
     }
 
+    public function test_done_task_is_late_only_after_its_deadline(): void
+    {
+        $creator = User::factory()->create();
+        $creator->assignRole(Role::findOrCreate('Manajer'));
+        $this->grantKvRetail($creator);
+
+        $onTimeTask = KvRetailTask::create([
+            'task_given_date' => '2026-07-01',
+            'task_name' => 'On time task',
+            'pic_vendor' => 'Mireco',
+            'deadline_date' => '2026-07-10',
+            'status' => 'Done',
+            'task_timestamps' => ['Email' => '10/07/2026 23:59'],
+            'created_by' => $creator->id,
+        ]);
+        $lateTask = KvRetailTask::create([
+            'task_given_date' => '2026-07-01',
+            'task_name' => 'Late task',
+            'pic_vendor' => 'Mireco',
+            'deadline_date' => '2026-07-10',
+            'status' => 'Done',
+            'task_timestamps' => ['Email' => '11/07/2026 00:01'],
+            'created_by' => $creator->id,
+        ]);
+
+        $response = $this->actingAs($creator)
+            ->getJson('/api/v1/kv-retail/tasks')
+            ->assertOk();
+
+        $tasks = collect($response->json('data'))->keyBy('id');
+        $this->assertFalse($tasks[$onTimeTask->id]['timing_evaluation']['late']);
+        $this->assertTrue($tasks[$lateTask->id]['timing_evaluation']['late']);
+        $this->assertFalse($tasks[$lateTask->id]['timing_evaluation']['bottleneck']);
+    }
+
+    public function test_task_creator_can_update_the_task_title(): void
+    {
+        $creator = User::factory()->create();
+        $creator->assignRole(Role::findOrCreate('Manajer'));
+        $this->grantKvRetail($creator);
+        $task = KvRetailTask::create([
+            'task_given_date' => '2026-07-01',
+            'task_name' => 'Judul lama',
+            'pic_vendor' => 'Mireco',
+            'deadline_date' => '2026-07-10',
+            'status' => '0',
+            'created_by' => $creator->id,
+        ]);
+
+        $this->actingAs($creator)
+            ->patchJson("/api/v1/kv-retail/tasks/{$task->id}/title", ['task_name' => 'Judul baru'])
+            ->assertOk()
+            ->assertJsonPath('data.task_name', 'Judul baru');
+
+        $this->assertDatabaseHas('kv_retail_tasks', ['id' => $task->id, 'task_name' => 'Judul baru']);
+    }
+
     private function grantKvRetail(User $user): void
     {
         foreach (['kv-retail.tasks.view', 'kv-retail.tasks.create', 'kv-retail.tasks.update-status'] as $permission) {

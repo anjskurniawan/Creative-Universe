@@ -251,8 +251,11 @@ function OddsPageContent() {
     if (activeSectionParam && visibleConfigSections.some((s) => s.id === activeSectionParam)) {
       return activeSectionParam;
     }
-    return canShowConfigSections ? "categories" : "spv_review";
-  }, [activeSectionParam, canShowConfigSections, visibleConfigSections]);
+    if (visibleConfigSections.some((section) => section.id === "all_tasks")) {
+      return "all_tasks";
+    }
+    return visibleConfigSections[0]?.id ?? "all_tasks";
+  }, [activeSectionParam, visibleConfigSections]);
 
   const effectiveActiveSection = useMemo(() => {
     return visibleConfigSections.some((section) => section.id === activeSection)

@@ -89,7 +89,10 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
   // request page consistently receives its contained-scroll shell.
   const normalizedPathname = pathname.replace(/\/$/, "") || "/";
   const usesContainedScroll = normalizedPathname === "/odds/new"
-    || (normalizedPathname === "/odds" && activeSection === "all_tasks");
+    || (normalizedPathname === "/odds" && (
+      activeSection === "all_tasks"
+      || (!activeSection && (canViewAllTasks || canReviewSpv))
+    ));
   const sidebarClassName = usesContainedScroll
     ? "!static !m-0 !h-full !min-h-0 !p-4"
     : "!m-0 !h-screen !p-4";
@@ -170,7 +173,8 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
       return item.id === activeSection;
     }
 
-    return item.id === menuItems[0]?.id;
+    const defaultItem = menuItems.find((menuItem) => menuItem.id === "all_tasks") ?? menuItems[0];
+    return item.id === defaultItem?.id;
   }, [activeSection, menuItems, normalizedPathname]);
 
   const sidebarItems = useMemo<SideMenuItem[]>(() => [

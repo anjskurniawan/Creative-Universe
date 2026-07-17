@@ -47,3 +47,17 @@ export interface CreativeReportUpdateInput {
   absence_count: number;
   late_count: number;
 }
+
+export interface CreativeMember {
+  id: number;
+  name: string;
+  position_name: "Manajer" | "SPV" | "Designer" | "Videographer";
+  status: "pending" | "active" | "resigned";
+}
+
+export interface HistoricalCreativeMemberInput {
+  name: string;
+  position_name: "SPV" | "Designer" | "Videographer";
+  start_month: string;
+  end_month: string;
+}

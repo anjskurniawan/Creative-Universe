@@ -3,6 +3,7 @@
 namespace App\SubApps\KvRetail\Models;
 
 use App\Models\Core\User;
+use App\SubApps\KvRetail\Jobs\GenerateKvRetailCreativeAgentReport;
 use App\SubApps\KvRetail\Services\KvRetailTaskTimingService;
 use Illuminate\Database\Eloquent\Model;
 
@@ -38,7 +39,8 @@ class KvRetailTask extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'kv_retail_task_user', 'kv_retail_task_id', 'user_id');
+        return $this->belongsToMany(User::class, 'kv_retail_task_user', 'kv_retail_task_id', 'user_id')
+            ->using(KvRetailTaskUser::class);
     }
 
     public function createdBy()
@@ -52,4 +54,17 @@ class KvRetailTask extends Model
     }
 
     protected $appends = ['timing_evaluation'];
+
+    protected static function booted(): void
+    {
+        $queueCreativeAgent = static function (): void {
+            if (! app()->environment('testing')) {
+                GenerateKvRetailCreativeAgentReport::dispatch();
+            }
+        };
+
+        static::created($queueCreativeAgent);
+        static::updated($queueCreativeAgent);
+        static::deleted($queueCreativeAgent);
+    }
 }

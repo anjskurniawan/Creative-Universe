@@ -16,7 +16,7 @@ import { EMERGENCY_MAINTENANCE_EVENT } from "@/core/api/client";
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const [emergencyForced, setEmergencyForced] = useState(false);
-  const { user, isLoading, isAuthenticated, hasApplication } = useAuth();
+  const { user, isLoading, sessionCheckFailed, isAuthenticated, hasApplication } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const currentPath = normalizePathname(pathname);
@@ -28,7 +28,7 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || sessionCheckFailed) return;
 
     const currentIsGuestPath = isGuestPath(currentPath);
     const currentIsPublicPath = isPublicPath(currentPath);
@@ -61,10 +61,14 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
         router.replace(`${APP_ROUTES.login}?redirect=${encodeURIComponent(currentPath)}`);
       }
     }
-  }, [user, isLoading, isAuthenticated, currentPath, router, hasApplication]);
+  }, [user, isLoading, sessionCheckFailed, isAuthenticated, currentPath, router, hasApplication]);
 
   if (isLoading) {
     return null;
+  }
+
+  if (sessionCheckFailed) {
+    return <UniversalErrorView showHomeAction={false} onRetry={() => window.location.reload()} />;
   }
 
   const isRoot = user?.roles.some((role) => role.toLowerCase() === "root") ?? false;

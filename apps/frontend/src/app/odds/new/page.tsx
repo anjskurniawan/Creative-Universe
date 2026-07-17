@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { MaterialIcon } from "@/components/material-icon";
@@ -86,6 +86,7 @@ export default function NewOddsTaskPage() {
     media.add({
       motionAllowed: "(prefers-reduced-motion: no-preference)",
       reduceMotion: "(prefers-reduced-motion: reduce)",
+      mobile: "(max-width: 639px)",
     }, (context) => {
       if (context.conditions?.reduceMotion) {
         gsap.set(".game-stage-content", { autoAlpha: 1 });
@@ -456,13 +457,16 @@ function WelcomeScreen({
           "+=0.06",
         );
 
+      const spriteTravel = context.conditions?.mobile ? 24 : 42;
+      const spriteJump = context.conditions?.mobile ? -9 : -14;
+
       gsap.timeline({ repeat: -1, repeatDelay: 0.25 })
-        .set(".sprite-unit", { x: -42, scaleX: 1 })
-        .to(".sprite-unit", { x: 42, duration: 1.45, ease: "steps(8)" })
+        .set(".sprite-unit", { x: -spriteTravel, scaleX: 1 })
+        .to(".sprite-unit", { x: spriteTravel, duration: 1.45, ease: "steps(8)" })
         .set(".sprite-unit", { scaleX: -1 })
-        .to(".sprite-unit", { x: -42, duration: 1.45, ease: "steps(8)" })
+        .to(".sprite-unit", { x: -spriteTravel, duration: 1.45, ease: "steps(8)" })
         .set(".sprite-unit", { scaleX: 1 });
-      gsap.to(".player-sprite", { y: -14, duration: 0.32, repeat: -1, repeatDelay: 0.55, yoyo: true, ease: "steps(3)" });
+      gsap.to(".player-sprite", { y: spriteJump, duration: 0.32, repeat: -1, repeatDelay: 0.55, yoyo: true, ease: "steps(3)" });
       gsap.to(".sprite-shadow", { scaleX: 0.68, autoAlpha: 0.38, duration: 0.32, repeat: -1, yoyo: true, ease: "steps(1)" });
       gsap.fromTo(".sprite-fx", { y: 8, autoAlpha: 0 }, { y: -26, autoAlpha: 1, duration: 1.1, repeat: -1, stagger: { each: 0.24, from: "random" }, ease: "steps(4)" });
       gsap.to(".scanline", { yPercent: 900, duration: 3.2, repeat: -1, ease: "none" });
@@ -561,39 +565,43 @@ function WelcomeScreen({
       <span className="spark-pixel absolute right-[9%] top-[25%] size-1.5 bg-[#24252b]" />
       <span className="spark-pixel absolute bottom-[18%] left-[14%] size-1.5 bg-[#24252b]" />
       <span className="spark-pixel absolute bottom-[23%] right-[16%] size-2 bg-[#ba0dcb]" />
-      <div className="welcome-content relative z-10 w-full max-w-3xl text-center">
+      <div className="welcome-content relative z-10 flex h-full w-full max-w-3xl flex-col items-center justify-between text-center sm:block sm:h-auto">
+        <div className="shrink-0">
         <p className="welcome-kicker text-[10px] font-black uppercase tracking-[0.24em]">Creative Universe Presents</p>
         <h1 className="welcome-title mt-3 text-3xl font-black uppercase leading-none tracking-[-0.06em] sm:text-5xl">Odds Quest</h1>
         <p className="welcome-subtitle mt-2 text-xs font-black uppercase tracking-[0.18em]">Build Your Creative Request</p>
+        </div>
 
-        <div className="my-6 flex justify-center">
-          <div className="player-stage flex min-h-52 w-full max-w-[240px] flex-col items-center justify-center overflow-hidden border-[3px] border-[#24252b] bg-[#eceee6] p-4 shadow-[5px_5px_0_#24252b]">
-            <div className="relative flex h-44 w-full items-end justify-center border-b-2 border-[#24252b] bg-[#dfe2d3] px-3 pb-4 pt-8">
+        <div className="flex min-h-0 w-full flex-1 items-center justify-center py-3 sm:my-6 sm:block sm:py-0">
+          <div className="player-stage mx-auto flex aspect-square w-full max-w-[210px] flex-col items-center justify-start overflow-hidden border-[3px] border-[#24252b] bg-[#eceee6] p-3 shadow-[4px_4px_0_#24252b] sm:aspect-auto sm:min-h-52 sm:max-w-[240px] sm:justify-center sm:p-4 sm:shadow-[5px_5px_0_#24252b]">
+            <div className="relative flex min-h-0 w-full flex-1 items-center justify-center border-b-2 border-[#24252b] bg-[#dfe2d3] px-3 sm:h-44 sm:flex-none sm:items-end sm:pb-4 sm:pt-8">
               <span className="sprite-fx absolute left-[18%] top-[62%] size-2 bg-[#ba0dcb]" />
               <span className="sprite-fx absolute right-[20%] top-[55%] size-1.5 bg-[#24252b]" />
               <span className="sprite-fx absolute left-[28%] top-[42%] size-1 bg-[#24252b]" />
               <span className="sprite-fx absolute right-[28%] top-[38%] size-2 bg-[#ba0dcb]" />
-              <div className="sprite-unit relative flex items-end justify-center pb-3">
-                <span className="sprite-shadow absolute bottom-1 h-2 w-20 bg-[#24252b]/45" />
+              <div className="sprite-unit relative flex items-end justify-center pb-2 sm:pb-3">
+                <span className="sprite-shadow absolute bottom-0 h-1.5 w-12 bg-[#24252b]/45 sm:bottom-1 sm:h-2 sm:w-20" />
                 <div className="player-sprite relative z-10 grid grid-cols-7 gap-0 [image-rendering:pixelated]" aria-label="ODDS pixel character" role="img">
                   {PIXEL_MASCOT.flatMap((row, rowIndex) => row.split("").map((pixel, columnIndex) => (
                     <span
                       key={`${rowIndex}-${columnIndex}`}
-                      className={`size-3.5 ${pixel === "1" ? `pixel-cell-active ${rowIndex < 2 ? "bg-[#ba0dcb]" : "bg-[#24252b]"}` : "bg-transparent"}`}
+                      className={`size-[9px] sm:size-3.5 ${pixel === "1" ? `pixel-cell-active ${rowIndex < 2 ? "bg-[#ba0dcb]" : "bg-[#24252b]"}` : "bg-transparent"}`}
                     />
                   )))}
                 </div>
               </div>
             </div>
-            <span className="mt-4 max-w-full truncate border-2 border-[#24252b] bg-[#c9ccc0] px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em]">{playerName}</span>
+            <span className="mt-3 max-w-full truncate border-2 border-[#24252b] bg-[#c9ccc0] px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] sm:mt-4">{playerName}</span>
           </div>
         </div>
 
+        <div className="shrink-0">
         <button type="button" onClick={handleStart} disabled={starting} aria-busy={starting} className="start-button group inline-flex min-w-48 cursor-pointer items-center justify-center gap-2 rounded-lg border-[3px] border-[#24252b] bg-[#ba0dcb] px-6 py-3 text-sm font-black uppercase tracking-[0.12em] text-white shadow-[0_5px_0_#24252b] transition-[transform,box-shadow,background-color] duration-150 ease-out hover:-translate-y-1 hover:bg-[#a80cba] hover:shadow-[0_7px_0_#24252b] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#ba0dcb]/40 active:translate-y-1 active:shadow-none disabled:pointer-events-none disabled:cursor-wait">
           <span className="text-base transition-transform duration-150 group-hover:translate-x-1 group-hover:scale-125">▶</span>
           {starting ? "Loading Stage" : "Start Game"}
         </button>
         <p className="press-start mt-4 text-[9px] font-black uppercase tracking-[0.18em] text-[#555850]">Press start to continue</p>
+        </div>
       </div>
     </div>
   );
@@ -601,22 +609,23 @@ function WelcomeScreen({
 
 function RequestTypeSelectStage({ onContinue }: { onContinue: () => void }) {
   return (
-    <section className="class-select-stage relative flex min-h-[440px] flex-1 flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 shadow-[inset_0_0_0_2px_#eceee6] sm:p-3">
+    <section className="class-select-stage relative flex h-full min-h-0 flex-1 flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 shadow-[inset_0_0_0_2px_#eceee6] sm:min-h-[440px] sm:p-3">
       <span className="pointer-events-none absolute -left-8 -top-8 size-20 rotate-45 border-[12px] border-[#ba0dcb] opacity-40" />
       <span className="pointer-events-none absolute -bottom-10 -right-10 size-28 rotate-45 border-[14px] border-[#24252b] opacity-10" />
 
-      <header className="relative flex flex-wrap items-end justify-between gap-3 border-b-2 border-[#24252b] bg-[#24252b] px-4 py-3 text-[#dfe2d3]">
-        <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#f2b8f6]">Request Type Select</p>
-          <h2 className="mt-1 text-lg font-black uppercase tracking-[0.06em] text-[#dfe2d3] sm:text-2xl">Choose Request Type</h2>
+      <header className="relative flex shrink-0 items-center justify-between gap-2 border-b-2 border-[#24252b] bg-[#24252b] px-3 py-2 text-[#dfe2d3] sm:items-end sm:gap-3 sm:px-4 sm:py-3">
+        <div className="min-w-0">
+          <p className="hidden text-[9px] font-black uppercase tracking-[0.22em] text-[#f2b8f6] sm:block">Request Type Select</p>
+          <h2 className="whitespace-nowrap text-xs font-black uppercase tracking-[0.02em] text-[#dfe2d3] min-[360px]:text-sm min-[360px]:tracking-[0.04em] sm:mt-1 sm:text-2xl sm:tracking-[0.06em]">Choose Request Type</h2>
         </div>
-        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.12em]">
+        <div className="flex shrink-0 items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.08em] sm:gap-2 sm:text-[9px] sm:tracking-[0.12em]">
           <span className="size-2 animate-pulse bg-[#ba0dcb]" />
-          01 / 02 Available
+          <span className="sm:hidden">1/2</span>
+          <span className="hidden sm:inline">01 / 02 Available</span>
         </div>
       </header>
 
-      <div className="relative mt-3 grid flex-1 gap-3 md:grid-cols-2">
+      <div className="retro-scrollbar relative mt-2 grid min-h-0 flex-1 grid-rows-2 gap-2 overflow-y-auto p-0.5 pr-1 sm:mt-3 sm:gap-3 md:grid-cols-2 md:grid-rows-1 md:overflow-visible md:p-0">
         <div className="group relative flex h-full flex-col overflow-hidden border-[3px] border-[#24252b] bg-[#dfe2d3] text-left shadow-[5px_5px_0_#24252b] transition-transform duration-150 hover:-translate-y-1" role="option" aria-selected="true">
           <div className="flex items-center justify-between border-b-2 border-[#24252b] bg-[#ba0dcb] px-3 py-2 text-white">
             <span className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em]"><span className="animate-pulse">▶</span> Option 01</span>
@@ -624,7 +633,7 @@ function RequestTypeSelectStage({ onContinue }: { onContinue: () => void }) {
           </div>
 
           <div
-            className="relative flex min-h-48 flex-1 items-center justify-center overflow-hidden border-b-2 border-[#24252b]"
+            className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border-b-2 border-[#24252b] sm:min-h-48"
             style={{
               backgroundImage: "linear-gradient(rgba(36,37,43,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(36,37,43,0.08) 1px, transparent 1px)",
               backgroundSize: "16px 16px",
@@ -635,11 +644,11 @@ function RequestTypeSelectStage({ onContinue }: { onContinue: () => void }) {
             <RetroRequestTypeIcon icon="brush" label="Design brush icon" />
           </div>
 
-          <div className="flex items-end justify-between gap-3 bg-[#eceee6] p-4">
+          <div className="flex shrink-0 items-end justify-between gap-2 bg-[#eceee6] p-2 sm:gap-3 sm:p-4">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-[#6b6e67]">Request Type</p>
-              <h3 className="mt-1 text-2xl font-black uppercase tracking-[-0.04em]">Design</h3>
-              <p className="mt-1 text-[9px] font-black uppercase tracking-[0.1em] text-[#555850]">Static Visual Asset</p>
+              <h3 className="mt-0.5 text-lg font-black uppercase tracking-[-0.04em] sm:mt-1 sm:text-2xl">Design</h3>
+              <p className="hidden text-[9px] font-black uppercase tracking-[0.1em] text-[#555850] sm:mt-1 sm:block">Static Visual Asset</p>
             </div>
             <button type="button" onClick={onContinue} className="group/select flex min-h-10 min-w-28 cursor-pointer items-center justify-between gap-3 border-2 border-[#24252b] bg-[#ba0dcb] px-3 py-2 text-[9px] font-black uppercase tracking-[0.14em] text-white shadow-[0_3px_0_#24252b] transition-[transform,background-color,box-shadow] duration-150 hover:-translate-y-0.5 hover:bg-[#a80cba] hover:shadow-[0_4px_0_#24252b] active:translate-y-0.5 active:shadow-none">
               Select <span className="transition-transform group-hover/select:translate-x-1">▶</span>
@@ -653,16 +662,16 @@ function RequestTypeSelectStage({ onContinue }: { onContinue: () => void }) {
             <span className="text-[9px] font-black uppercase tracking-[0.16em]">Option 02</span>
             <span className="border border-[#24252b] bg-[#d4d7cc] px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.14em]">Locked</span>
           </div>
-          <div className="relative flex min-h-48 flex-1 items-center justify-center overflow-hidden border-b-2 border-[#24252b]">
+          <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border-b-2 border-[#24252b] sm:min-h-48">
             <span className="absolute left-3 top-3 border-2 border-[#24252b] bg-[#d4d7cc] px-2 py-1 text-[8px] font-black uppercase tracking-[0.14em]">Type 02</span>
             <RetroRequestTypeIcon icon="videocam" label="Video camera icon" muted />
             <span className="absolute bottom-4 right-4 z-20 border-2 border-[#24252b] bg-[#24252b] px-3 py-1 text-[8px] font-black uppercase tracking-[0.14em] text-[#dfe2d3]">Future Update</span>
           </div>
-          <div className="relative z-20 flex items-end justify-between gap-3 bg-[#b9bdb1] p-4">
+          <div className="relative z-20 flex shrink-0 items-end justify-between gap-2 bg-[#b9bdb1] p-2 sm:gap-3 sm:p-4">
             <span>
               <span className="block text-[9px] font-black uppercase tracking-[0.18em] text-[#6b6e67]">Request Type</span>
-              <span className="mt-1 block text-2xl font-black uppercase tracking-[-0.04em]">Video</span>
-              <span className="mt-1 block text-[9px] font-black uppercase tracking-[0.1em]">Motion Visual Asset</span>
+              <span className="mt-0.5 block text-lg font-black uppercase tracking-[-0.04em] sm:mt-1 sm:text-2xl">Video</span>
+              <span className="mt-1 hidden text-[9px] font-black uppercase tracking-[0.1em] sm:block">Motion Visual Asset</span>
             </span>
             <button type="button" disabled className="min-h-10 min-w-28 cursor-not-allowed border-2 border-[#24252b] bg-[#d4d7cc] px-3 py-2 text-[8px] font-black uppercase tracking-[0.14em] text-[#777a72]">Locked</button>
           </div>
@@ -674,9 +683,9 @@ function RequestTypeSelectStage({ onContinue }: { onContinue: () => void }) {
 
 function RetroRequestTypeIcon({ icon, label, muted = false }: { icon: "brush" | "videocam"; label: string; muted?: boolean }) {
   return (
-    <span className={`relative z-20 flex size-32 items-center justify-center border-[4px] border-[#24252b] bg-[#eceee6] shadow-[7px_7px_0_#24252b] transition-transform duration-150 group-hover:-translate-y-2 group-hover:rotate-[-2deg] ${muted ? "opacity-60 grayscale" : ""}`} aria-label={label} role="img">
+    <span className={`relative z-20 flex size-20 items-center justify-center border-[3px] border-[#24252b] bg-[#eceee6] shadow-[4px_4px_0_#24252b] transition-transform duration-150 group-hover:-translate-y-2 group-hover:rotate-[-2deg] sm:size-32 sm:border-[4px] sm:shadow-[7px_7px_0_#24252b] ${muted ? "opacity-60 grayscale" : ""}`} aria-label={label} role="img">
       <span className="absolute inset-1 border-2 border-[#24252b]/20" />
-      <MaterialIcon name={icon} size="lg" className={`scale-[2.6] ${muted ? "text-[#666961]" : "text-[#ba0dcb]"}`} />
+      <MaterialIcon name={icon} size="lg" className={`scale-[1.8] sm:scale-[2.6] ${muted ? "text-[#666961]" : "text-[#ba0dcb]"}`} />
       <span className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-[#24252b]/20" />
     </span>
   );
@@ -696,21 +705,85 @@ function CategoryInventoryStage({
   onContinue: () => void;
 }) {
   const selectedCategory = categories.find((category) => String(category.id) === selectedCategoryId) ?? null;
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const categoryDragRef = useRef({ pointerId: -1, startY: 0, scrollTop: 0, moved: false });
+  const [categoryScrollbar, setCategoryScrollbar] = useState({ visible: false, top: 0, height: 48 });
+
+  const syncCategoryScrollbar = () => {
+    const element = categoryScrollRef.current;
+    if (!element) return;
+
+    const scrollRange = element.scrollHeight - element.clientHeight;
+    const height = Math.max(48, element.clientHeight * (element.clientHeight / element.scrollHeight));
+    const top = scrollRange > 0 ? (element.scrollTop / scrollRange) * (element.clientHeight - height) : 0;
+    setCategoryScrollbar({ visible: scrollRange > 1, top, height });
+  };
+
+  useEffect(() => {
+    const element = categoryScrollRef.current;
+    if (!element) return;
+
+    syncCategoryScrollbar();
+    const observer = new ResizeObserver(syncCategoryScrollbar);
+    observer.observe(element);
+    window.addEventListener("resize", syncCategoryScrollbar);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncCategoryScrollbar);
+    };
+  }, [categories.length]);
+
+  const startCategoryDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse") return;
+    categoryDragRef.current = {
+      pointerId: event.pointerId,
+      startY: event.clientY,
+      scrollTop: event.currentTarget.scrollTop,
+      moved: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const moveCategoryDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = categoryDragRef.current;
+    if (drag.pointerId !== event.pointerId) return;
+    const distance = event.clientY - drag.startY;
+    if (Math.abs(distance) > 4) drag.moved = true;
+    event.currentTarget.scrollTop = drag.scrollTop - distance;
+  };
+
+  const finishCategoryDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (categoryDragRef.current.pointerId !== event.pointerId) return;
+    categoryDragRef.current.pointerId = -1;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
 
   return (
-    <section className="category-inventory-stage relative flex min-h-[440px] flex-1 flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 shadow-[inset_0_0_0_2px_#eceee6] sm:p-3">
+    <section className="category-inventory-stage relative flex h-full min-h-0 flex-1 flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 shadow-[inset_0_0_0_2px_#eceee6] sm:min-h-[440px] sm:p-3">
       <span className="pointer-events-none absolute -right-7 -top-7 size-20 rotate-45 border-[11px] border-[#ba0dcb] opacity-30" />
 
-      <header className="relative flex flex-wrap items-end justify-between gap-3 border-b-2 border-[#24252b] bg-[#24252b] px-4 py-3 text-[#dfe2d3]">
-        <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#f2b8f6]">Skill Inventory</p>
-          <h2 className="mt-1 text-lg font-black uppercase tracking-[0.06em] text-[#dfe2d3] sm:text-2xl">Equip Category</h2>
+      <header className="relative flex shrink-0 items-center justify-between gap-2 border-b-2 border-[#24252b] bg-[#24252b] px-3 py-2 text-[#dfe2d3] sm:items-end sm:gap-3 sm:px-4 sm:py-3">
+        <div className="min-w-0">
+          <p className="hidden text-[9px] font-black uppercase tracking-[0.22em] text-[#f2b8f6] sm:block">Skill Inventory</p>
+          <h2 className="whitespace-nowrap text-xs font-black uppercase tracking-[0.02em] text-[#dfe2d3] min-[360px]:text-sm min-[360px]:tracking-[0.04em] sm:mt-1 sm:text-2xl sm:tracking-[0.06em]">Equip Category</h2>
         </div>
-        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.12em]"><span className="size-2 bg-[#ba0dcb]" />{categories.length} Slots</div>
+        <div className="flex shrink-0 items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.08em] sm:gap-2 sm:text-[9px] sm:tracking-[0.12em]"><span className="size-2 bg-[#ba0dcb]" /><span className="sm:hidden">{categories.length}</span><span className="hidden sm:inline">{categories.length} Slots</span></div>
       </header>
 
       {categories.length > 0 ? (
-        <div className="mt-3 grid min-h-0 flex-1 auto-rows-max grid-cols-2 gap-3 overflow-y-auto p-1 pr-2 [scrollbar-color:#24252b_#c9ccc0] sm:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6">
+        <div className="relative mt-2 min-h-0 flex-1 sm:mt-3">
+        <div
+          ref={categoryScrollRef}
+          onScroll={syncCategoryScrollbar}
+          onPointerDown={startCategoryDrag}
+          onPointerMove={moveCategoryDrag}
+          onPointerUp={finishCategoryDrag}
+          onPointerCancel={finishCategoryDrag}
+          className={`retro-scrollbar grid h-full touch-none auto-rows-max grid-cols-1 gap-2 overflow-y-auto overscroll-contain p-1 sm:touch-pan-y sm:grid-cols-3 sm:gap-3 lg:grid-cols-5 2xl:grid-cols-6 ${categoryScrollbar.visible ? "pr-7" : "pr-2"}`}
+        >
           {categories.map((category) => {
             const selected = selectedCategoryId === String(category.id);
 
@@ -719,14 +792,34 @@ function CategoryInventoryStage({
                 key={category.id}
                 type="button"
                 aria-pressed={selected}
-                onClick={() => onSelect(category)}
-                className={`group relative flex aspect-square min-w-0 items-center justify-center overflow-hidden border-[3px] border-[#24252b] p-4 text-center shadow-[3px_3px_0_#24252b] transition-[transform,background-color,box-shadow] duration-150 hover:-translate-y-1 hover:shadow-[5px_5px_0_#24252b] active:translate-y-0.5 active:shadow-[1px_1px_0_#24252b] ${selected ? "bg-[#ba0dcb] text-white" : "bg-[#eceee6] text-[#24252b]"}`}
+                onClick={() => {
+                  if (categoryDragRef.current.moved) {
+                    categoryDragRef.current.moved = false;
+                    return;
+                  }
+                  onSelect(category);
+                }}
+                className={`group relative flex min-h-16 min-w-0 touch-manipulation items-center justify-start overflow-hidden border-[3px] border-[#24252b] px-4 py-3 text-left shadow-[3px_3px_0_#24252b] transition-[transform,background-color,box-shadow] duration-150 hover:-translate-y-1 hover:shadow-[5px_5px_0_#24252b] active:translate-y-0.5 active:shadow-[1px_1px_0_#24252b] sm:aspect-square sm:justify-center sm:p-4 sm:text-center ${selected ? "bg-[#ba0dcb] text-white" : "bg-[#eceee6] text-[#24252b]"}`}
               >
                 {selected && <span className="absolute right-2 top-2 border border-white/70 px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.12em] text-white">Selected</span>}
-                <span className="line-clamp-4 text-base font-black uppercase leading-tight tracking-[-0.02em] sm:text-lg">{category.name}</span>
+                <span className="line-clamp-2 pr-20 text-base font-black uppercase leading-tight tracking-[-0.02em] sm:line-clamp-4 sm:pr-0 sm:text-lg">{category.name}</span>
               </button>
             );
           })}
+        </div>
+
+        {categoryScrollbar.visible && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-4 border-2 border-[#24252b] bg-[#8f938a] shadow-[inset_0_0_0_2px_#c9ccc0]" aria-hidden="true">
+            <span className="absolute inset-x-0 top-0 h-3 border-b-2 border-[#24252b] bg-[#c9ccc0] text-center text-[7px] font-black leading-[10px] text-[#24252b]">▲</span>
+            <span className="absolute inset-x-0 bottom-0 h-3 border-t-2 border-[#24252b] bg-[#c9ccc0] text-center text-[7px] font-black leading-[10px] text-[#24252b]">▼</span>
+            <span
+              className="absolute left-0.5 right-0.5 border-2 border-[#24252b] bg-[#ba0dcb] shadow-[inset_0_0_0_2px_#dfe2d3] transition-transform duration-75"
+              style={{ height: `${Math.max(24, categoryScrollbar.height - 24)}px`, transform: `translateY(${categoryScrollbar.top + 12}px)` }}
+            >
+              <span className="absolute left-1/2 top-1/2 grid -translate-x-1/2 -translate-y-1/2 gap-0.5"><span className="size-0.5 bg-[#24252b]" /><span className="size-0.5 bg-[#24252b]" /><span className="size-0.5 bg-[#24252b]" /></span>
+            </span>
+          </div>
+        )}
         </div>
       ) : (
         <div className="flex flex-1 items-center justify-center border-x-2 border-b-2 border-[#24252b] bg-[#dfe2d3] p-6 text-center text-[10px] font-black uppercase tracking-[0.12em]">No active categories available.</div>
@@ -788,12 +881,12 @@ function DesignerCharacterSelectStage({
     <section className="designer-character-stage relative flex min-h-[440px] flex-1 flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 shadow-[inset_0_0_0_2px_#eceee6] sm:p-3">
       <span className="pointer-events-none absolute -left-8 -top-8 size-20 rotate-45 border-[12px] border-[#ba0dcb] opacity-30" />
 
-      <header className="relative flex flex-wrap items-end justify-between gap-3 border-b-2 border-[#24252b] bg-[#24252b] px-4 py-3 text-[#dfe2d3]">
-        <div>
-          <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#f2b8f6]">Creative Roster</p>
-          <h2 className="mt-1 text-lg font-black uppercase tracking-[0.06em] text-[#dfe2d3] sm:text-2xl">Choose Your Creative</h2>
+      <header className="relative flex shrink-0 items-center justify-between gap-2 border-b-2 border-[#24252b] bg-[#24252b] px-3 py-2 text-[#dfe2d3] sm:items-end sm:gap-3 sm:px-4 sm:py-3">
+        <div className="min-w-0">
+          <p className="hidden text-[9px] font-black uppercase tracking-[0.22em] text-[#f2b8f6] sm:block">Creative Roster</p>
+          <h2 className="whitespace-nowrap text-xs font-black uppercase tracking-[0.02em] text-[#dfe2d3] min-[360px]:text-sm min-[360px]:tracking-[0.04em] sm:mt-1 sm:text-2xl sm:tracking-[0.06em]">Choose Your Creative</h2>
         </div>
-        <div className="text-right text-[8px] font-black uppercase tracking-[0.12em]"><span className="block text-[#ba0dcb]">{availableCount} Ready</span><span className="mt-1 block text-[#969a90]">{profiles.length} Roster</span></div>
+        <div className="flex shrink-0 items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.08em] sm:block sm:text-right sm:tracking-[0.12em]"><span className="size-2 bg-[#ba0dcb] sm:hidden" /><span className="text-[#f2b8f6] sm:block sm:text-[#ba0dcb]">{availableCount}<span className="hidden sm:inline"> Ready</span></span><span className="hidden text-[#969a90] sm:mt-1 sm:block">{profiles.length} Roster</span></div>
       </header>
 
       {profiles.length > 0 ? (
@@ -1056,31 +1149,38 @@ function MissionBriefStage({
   ][missionStep - 1];
 
   return (
-    <section className="mission-brief-stage relative flex h-full min-h-[560px] flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 text-[#24252b] shadow-[inset_0_0_0_2px_#eceee6] sm:p-3">
+    <section className="mission-brief-stage relative flex h-full min-h-0 flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 text-[#24252b] shadow-[inset_0_0_0_2px_#eceee6] sm:min-h-[560px] sm:p-3">
       <span className="pointer-events-none absolute -right-7 -top-7 size-20 rotate-45 border-[11px] border-[#ba0dcb] opacity-30" />
-      <header className="relative mb-3 flex shrink-0 items-center justify-between border-b-2 border-[#24252b] bg-[#24252b] px-4 py-3 text-[#dfe2d3]">
-        <div>
-          <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-[#f2b8f6]">Mission 0{missionStep}/04</span>
-          <h2 className="mt-1 text-xl font-black uppercase tracking-[0.06em] text-[#dfe2d3] sm:text-3xl">{["Name The Mission", "Choose Threat Level", "Set Mission Timer", "Transmit The Brief"][missionStep - 1]}</h2>
+      <header className="relative mb-2 flex shrink-0 items-center justify-between gap-2 border-b-2 border-[#24252b] bg-[#24252b] px-3 py-2 text-[#dfe2d3] sm:mb-3 sm:items-end sm:gap-3 sm:px-4 sm:py-3">
+        <div className="min-w-0">
+          <span className="hidden text-[10px] font-black uppercase tracking-[0.2em] text-[#f2b8f6] sm:block">Mission 0{missionStep}/04</span>
+          <h2 className="whitespace-nowrap text-xs font-black uppercase tracking-[0.02em] text-[#dfe2d3] min-[360px]:text-sm min-[360px]:tracking-[0.04em] sm:mt-1 sm:text-3xl sm:tracking-[0.06em]">{["Name The Mission", "Choose Threat Level", "Set Mission Timer", "Transmit The Brief"][missionStep - 1]}</h2>
         </div>
-        <div className="flex items-center gap-2">
-          {[1, 2, 3, 4].map((step) => <span key={step} className={`h-3 w-7 border border-[#eceee6] transition-colors sm:w-10 ${step <= missionStep ? "bg-[#ba0dcb]" : "bg-[#555850]"}`} />)}
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {[1, 2, 3, 4].map((step) => <span key={step} className={`size-2 border border-[#eceee6] transition-colors sm:h-3 sm:w-10 ${step <= missionStep ? "bg-[#ba0dcb]" : "bg-[#555850]"}`} />)}
         </div>
       </header>
 
       <div className="grid h-full min-h-0 flex-1 grid-cols-1 items-stretch gap-3">
         <div className={`${missionStep === 1 || missionStep === 2 || missionStep === 4 ? "flex" : "hidden"} h-full min-h-0 flex-col justify-center bg-transparent`}>
-          <div className={`${missionStep === 1 || missionStep === 2 ? "grid" : "hidden"} mx-auto w-full shrink-0 gap-5 border-[3px] border-[#24252b] bg-[#eceee6] p-8 shadow-[3px_3px_0_#24252b] ${missionStep === 2 ? "max-w-5xl md:grid-cols-3" : "max-w-3xl grid-cols-1"}`}>
+          <div className={`${missionStep === 1 || missionStep === 2 ? "grid" : "hidden"} mx-auto w-full shrink-0 gap-2 border-2 border-[#24252b] bg-[#eceee6] p-3 shadow-[2px_2px_0_#24252b] sm:gap-5 sm:border-[3px] sm:p-8 sm:shadow-[3px_3px_0_#24252b] ${missionStep === 2 ? "max-w-5xl md:grid-cols-3" : "max-w-3xl grid-cols-1"}`}>
             <label className={`${missionStep === 1 ? "block" : "hidden"} group`}>
-              <span className="mb-3 flex items-center justify-between text-xs font-black uppercase tracking-[0.12em]">
-                <span>01 / Mission Name</span>
-                <span className={`border-2 border-[#24252b] px-3 py-1 text-[10px] tracking-[0.1em] ${missionNamed ? "bg-[#ba0dcb] text-white" : "bg-[#dfe2d3] text-[#555850]"}`}>{missionNamed ? "Data OK" : "Required"}</span>
+              <span className="mb-2 flex items-center justify-between gap-2 text-[9px] font-black uppercase tracking-[0.08em] sm:mb-3 sm:text-xs sm:tracking-[0.12em]">
+                <span className="whitespace-nowrap"><span className="sm:hidden">Mission Name</span><span className="hidden sm:inline">01 / Mission Name</span></span>
+                <span className={`shrink-0 border-2 border-[#24252b] px-2 py-0.5 text-[8px] tracking-[0.08em] sm:px-3 sm:py-1 sm:text-[10px] sm:tracking-[0.1em] ${missionNamed ? "bg-[#ba0dcb] text-white" : "bg-[#dfe2d3] text-[#555850]"}`}>{missionNamed ? "Data OK" : "Required"}</span>
               </span>
+              <textarea
+                value={form.design_purpose}
+                onChange={(event) => onUpdate("design_purpose", event.target.value)}
+                placeholder="ENTER MISSION NAME_"
+                rows={3}
+                className="min-h-24 w-full resize-none overflow-y-auto border-2 border-[#24252b] bg-[#eceee6] px-4 py-3 text-lg font-black uppercase leading-7 tracking-[0.04em] outline-none shadow-[inset_2px_2px_0_#c9ccc0] placeholder:text-[#969a90] focus:border-[#ba0dcb] focus:bg-white sm:hidden"
+              />
               <input
                 value={form.design_purpose}
                 onChange={(event) => onUpdate("design_purpose", event.target.value)}
                 placeholder="ENTER MISSION NAME_"
-                className="h-20 w-full border-2 border-[#24252b] bg-[#eceee6] px-5 text-xl font-black uppercase tracking-[0.05em] outline-none shadow-[inset_3px_3px_0_#c9ccc0] placeholder:text-[#969a90] focus:border-[#ba0dcb] focus:bg-white sm:text-3xl"
+                className="hidden h-20 w-full border-2 border-[#24252b] bg-[#eceee6] px-5 text-3xl font-black uppercase tracking-[0.05em] outline-none shadow-[inset_3px_3px_0_#c9ccc0] placeholder:text-[#969a90] focus:border-[#ba0dcb] focus:bg-white sm:block"
               />
             </label>
 
@@ -1092,35 +1192,38 @@ function MissionBriefStage({
                   const { value, label, icon, description } = option;
                   const selected = form.important_matrix === value;
                   return (
-                    <button key={value} type="button" onClick={() => onUpdate("important_matrix", value)} className={`${missionStep === 2 ? "flex" : "hidden"} min-h-60 flex-col border-[3px] border-[#24252b] p-6 text-left transition hover:-translate-y-1 hover:shadow-[5px_5px_0_#24252b] ${selected ? "bg-[#ba0dcb] text-white shadow-[3px_3px_0_#24252b]" : "bg-[#eceee6] text-[#24252b] shadow-[3px_3px_0_#777a72]"}`}>
-                      <span className={`flex size-14 items-center justify-center border-2 border-[#24252b] ${selected ? "bg-white text-[#ba0dcb]" : "bg-[#dfe2d3]"}`}><MaterialIcon name={icon} size="lg" /></span>
-                      <span className="mt-6 text-2xl font-black uppercase tracking-[0.04em]">{label}</span>
-                      <span className={`mt-3 text-xs font-bold leading-5 ${selected ? "text-white/85" : "text-[#666961]"}`}>{description}</span>
-                      <span className="mt-auto pt-5 text-[9px] font-black uppercase tracking-[0.14em]">{selected ? "Selected" : "Choose Level"}</span>
+                    <button key={value} type="button" onClick={() => onUpdate("important_matrix", value)} className={`${missionStep === 2 ? "flex" : "hidden"} relative min-h-20 items-center gap-2 border-[3px] border-[#24252b] p-2 text-left transition hover:-translate-y-1 hover:shadow-[5px_5px_0_#24252b] sm:min-h-60 sm:flex-col sm:items-start sm:gap-0 sm:p-6 ${selected ? "bg-[#ba0dcb] text-white shadow-[3px_3px_0_#24252b]" : "bg-[#eceee6] text-[#24252b] shadow-[3px_3px_0_#777a72]"}`}>
+                      <span className={`flex size-8 shrink-0 items-center justify-center border-2 border-[#24252b] sm:size-14 ${selected ? "bg-white text-[#ba0dcb]" : "bg-[#dfe2d3]"}`}><MaterialIcon name={icon} size="lg" className="scale-50 sm:scale-100" /></span>
+                      <span className={`min-w-0 flex-1 sm:contents ${selected ? "pr-14" : "pr-1"}`}>
+                        <span className="block text-sm font-black uppercase tracking-[0.04em] sm:mt-6 sm:text-2xl">{label}</span>
+                        <span className={`mt-0.5 block line-clamp-2 text-[8px] font-bold leading-3 sm:mt-3 sm:line-clamp-none sm:text-xs sm:leading-5 ${selected ? "text-white/85" : "text-[#666961]"}`}>{description}</span>
+                      </span>
+                      {selected && <span className="absolute right-1.5 top-1.5 border border-white/70 px-1.5 py-0.5 text-[6px] font-black uppercase tracking-[0.06em] sm:hidden">Selected</span>}
+                      <span className="mt-auto hidden pt-5 text-[9px] font-black uppercase tracking-[0.14em] sm:block">{selected ? "Selected" : "Choose Level"}</span>
                     </button>
                   );
                 })}
           </div>
 
-          <div className={`${missionStep === 4 ? "flex" : "hidden"} min-h-[360px] flex-1 flex-col border border-[#24252b] bg-[#24252b]`}>
-            <div className="flex shrink-0 items-center justify-between px-3 py-2 text-[#eceee6]">
-              <span className="text-[9px] font-black uppercase tracking-[0.16em]">03 / Mission Transmission</span>
-              <span className={`flex items-center gap-1.5 text-[8px] font-black uppercase ${briefReady ? "text-[#f2b8f6]" : "text-[#969a90]"}`}><span className={`size-2 ${briefReady ? "animate-pulse bg-[#ba0dcb]" : "bg-[#666961]"}`} />{briefReady ? "Signal Clear" : "No Signal"}</span>
+          <div className={`${missionStep === 4 ? "flex" : "hidden"} min-h-0 flex-1 flex-col border border-[#24252b] bg-[#24252b] sm:min-h-[360px]`}>
+            <div className="flex shrink-0 items-center justify-between gap-2 px-2 py-1.5 text-[#eceee6] sm:px-3 sm:py-2">
+              <span className="whitespace-nowrap text-[8px] font-black uppercase tracking-[0.08em] sm:text-[9px] sm:tracking-[0.16em]">Mission Transmission</span>
+              <span className={`flex shrink-0 items-center gap-1 text-[7px] font-black uppercase sm:gap-1.5 sm:text-[8px] ${briefReady ? "text-[#f2b8f6]" : "text-[#969a90]"}`}><span className={`size-1.5 sm:size-2 ${briefReady ? "animate-pulse bg-[#ba0dcb]" : "bg-[#666961]"}`} /><span className="sm:hidden">{briefReady ? "Ready" : "Empty"}</span><span className="hidden sm:inline">{briefReady ? "Signal Clear" : "No Signal"}</span></span>
             </div>
             <RetroBriefEditor value={form.brief_text} onChange={(value) => onUpdate("brief_text", value)} onUploadImage={onUpload} />
           </div>
         </div>
 
         <aside className={`${missionStep === 3 ? "flex" : "hidden"} h-full min-h-0 flex-col justify-center gap-3`}>
-          <div className={`${missionStep === 3 ? "block" : "hidden"} mx-auto w-full max-w-3xl border-[3px] border-[#24252b] bg-[#eceee6] p-8 shadow-[3px_3px_0_#24252b]`}>
+          <div className={`${missionStep === 3 ? "flex" : "hidden"} relative mx-auto h-full w-full max-w-3xl flex-col justify-center border-2 border-[#24252b] bg-[#eceee6] p-3 shadow-[2px_2px_0_#24252b] sm:block sm:h-auto sm:border-[3px] sm:p-8 sm:shadow-[3px_3px_0_#24252b]`}>
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-black uppercase tracking-[0.16em]">Mission Timer</span>
               <MaterialIcon name="timer" size="sm" />
             </div>
-            <p className="mb-4 text-sm font-bold leading-6 text-[#666961]">Leave this empty to let us choose the best timing automatically for your request.</p>
-            <div className="grid grid-cols-2 gap-3">
+            <p className="mb-3 text-[9px] font-bold leading-4 text-[#666961] sm:mb-4 sm:text-sm sm:leading-6">Leave this empty to let us choose the best timing automatically for your request.</p>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {deadlineOptions.map((option) => (
-                <button key={option.label} type="button" onClick={() => onUpdate("deadline", option.value)} className={`border-2 border-[#24252b] px-2 py-3 text-[9px] font-black uppercase transition ${form.deadline === option.value ? "bg-[#ba0dcb] text-white hover:bg-[#a80cba]" : "bg-[#dfe2d3] hover:bg-white"}`}>{option.label}</button>
+                <button key={option.label} type="button" onClick={() => onUpdate("deadline", option.value)} className={`border-2 border-[#24252b] px-2 py-2 text-[8px] font-black uppercase transition sm:py-3 sm:text-[9px] ${form.deadline === option.value ? "bg-[#ba0dcb] text-white hover:bg-[#a80cba]" : "bg-[#dfe2d3] hover:bg-white"}`}>{option.label}</button>
               ))}
             </div>
             <RetroDatePicker value={form.deadline} onChange={(value) => onUpdate("deadline", value)} />
@@ -1214,17 +1317,38 @@ function MissionBriefStage({
 
 function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; onChange: (value: string) => void; onUploadImage: (files: FileList | null) => Promise<OddsTaskAttachment[]> }) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const savedRangeRef = useRef<Range | null>(null);
   const [activeTools, setActiveTools] = useState<string[]>([]);
   const [linkPanelOpen, setLinkPanelOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+  const [toolbarHint, setToolbarHint] = useState({ overflow: false, atEnd: false });
   const isEmpty = !stripRichText(value);
 
   useEffect(() => {
     const editor = editorRef.current;
     if (editor && editor.innerHTML !== value) editor.innerHTML = value;
   }, [value]);
+
+  useEffect(() => {
+    const toolbar = toolbarRef.current;
+    if (!toolbar) return;
+
+    const syncToolbarHint = () => {
+      const maxScroll = toolbar.scrollWidth - toolbar.clientWidth;
+      setToolbarHint({ overflow: maxScroll > 2, atEnd: toolbar.scrollLeft >= maxScroll - 2 });
+    };
+
+    syncToolbarHint();
+    const observer = new ResizeObserver(syncToolbarHint);
+    observer.observe(toolbar);
+    window.addEventListener("resize", syncToolbarHint);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncToolbarHint);
+    };
+  }, []);
 
   const tools = [
     { command: "bold", icon: "format_bold", label: "Bold" },
@@ -1310,8 +1434,13 @@ function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; o
 
   return (
     <div className="mission-terminal-editor flex min-h-0 flex-1 flex-col bg-[#eceee6]">
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b-2 border-[#24252b] bg-[#c9ccc0] p-2">
-        <div className="flex flex-wrap gap-1.5" role="toolbar" aria-label="Brief formatting tools">
+      <div className="relative flex shrink-0 items-center border-b-2 border-[#24252b] bg-[#c9ccc0] p-1 sm:justify-between sm:gap-2 sm:p-2">
+        <div ref={toolbarRef} onScroll={() => {
+          const toolbar = toolbarRef.current;
+          if (!toolbar) return;
+          const maxScroll = toolbar.scrollWidth - toolbar.clientWidth;
+          setToolbarHint({ overflow: maxScroll > 2, atEnd: toolbar.scrollLeft >= maxScroll - 2 });
+        }} className="retro-scrollbar flex w-full flex-nowrap gap-1 overflow-x-auto p-0.5 sm:w-auto sm:flex-wrap sm:gap-1.5 sm:overflow-visible sm:p-0" role="toolbar" aria-label="Brief formatting tools">
           {tools.map((tool) => (
             <button
               key={tool.command}
@@ -1321,33 +1450,34 @@ function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; o
               aria-pressed={activeTools.includes(tool.command)}
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => runCommand(tool.command)}
-              className={`flex size-9 items-center justify-center border-2 border-[#24252b] shadow-[2px_2px_0_#777a72] transition hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#24252b] active:translate-y-0 active:shadow-none ${activeTools.includes(tool.command) ? "bg-[#ba0dcb] text-white" : "bg-[#eceee6] text-[#24252b] hover:bg-white"}`}
+              className={`flex size-8 shrink-0 items-center justify-center border-2 border-[#24252b] shadow-[2px_2px_0_#777a72] transition hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#24252b] active:translate-y-0 active:shadow-none sm:size-9 ${activeTools.includes(tool.command) ? "bg-[#ba0dcb] text-white" : "bg-[#eceee6] text-[#24252b] hover:bg-white"}`}
             >
               <MaterialIcon name={tool.icon} size="sm" />
             </button>
           ))}
           <span className="mx-1 hidden w-px bg-[#24252b]/40 sm:block" />
-          <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => runCommand("removeFormat")} className="flex h-9 items-center gap-1.5 border-2 border-[#24252b] bg-[#eceee6] px-3 text-[8px] font-black uppercase shadow-[2px_2px_0_#777a72] hover:bg-white active:shadow-none"><MaterialIcon name="format_clear" size="sm" /> Clear</button>
-          <button type="button" aria-pressed={linkPanelOpen} onMouseDown={(event) => { event.preventDefault(); rememberSelection(); }} onClick={() => setLinkPanelOpen((open) => !open)} className={`flex h-9 items-center gap-1.5 border-2 border-[#24252b] px-3 text-[8px] font-black uppercase shadow-[2px_2px_0_#777a72] ${linkPanelOpen ? "bg-[#ba0dcb] text-white" : "bg-[#eceee6] hover:bg-white"}`}><MaterialIcon name="link" size="sm" /> Link</button>
-          <label className="flex h-9 cursor-pointer items-center gap-1.5 border-2 border-[#24252b] bg-[#eceee6] px-3 text-[8px] font-black uppercase shadow-[2px_2px_0_#777a72] hover:bg-white">
-            <MaterialIcon name={imageUploading ? "hourglass_top" : "image"} size="sm" className={imageUploading ? "animate-spin" : ""} /> {imageUploading ? "Uploading" : "Image"}
+          <button type="button" title="Clear formatting" aria-label="Clear formatting" onMouseDown={(event) => event.preventDefault()} onClick={() => runCommand("removeFormat")} className="flex size-8 shrink-0 items-center justify-center gap-1.5 border-2 border-[#24252b] bg-[#eceee6] text-[8px] font-black uppercase shadow-[2px_2px_0_#777a72] hover:bg-white active:shadow-none sm:h-9 sm:w-auto sm:px-3"><MaterialIcon name="format_clear" size="sm" /><span className="hidden sm:inline">Clear</span></button>
+          <button type="button" title="Insert link" aria-label="Insert link" aria-pressed={linkPanelOpen} onMouseDown={(event) => { event.preventDefault(); rememberSelection(); }} onClick={() => setLinkPanelOpen((open) => !open)} className={`flex size-8 shrink-0 items-center justify-center gap-1.5 border-2 border-[#24252b] text-[8px] font-black uppercase shadow-[2px_2px_0_#777a72] sm:h-9 sm:w-auto sm:px-3 ${linkPanelOpen ? "bg-[#ba0dcb] text-white" : "bg-[#eceee6] hover:bg-white"}`}><MaterialIcon name="link" size="sm" /><span className="hidden sm:inline">Link</span></button>
+          <label title="Insert image" aria-label="Insert image" className="flex size-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 border-2 border-[#24252b] bg-[#eceee6] text-[8px] font-black uppercase shadow-[2px_2px_0_#777a72] hover:bg-white sm:h-9 sm:w-auto sm:px-3">
+            <MaterialIcon name={imageUploading ? "hourglass_top" : "image"} size="sm" className={imageUploading ? "animate-spin" : ""} /><span className="hidden sm:inline">{imageUploading ? "Uploading" : "Image"}</span>
             <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple disabled={imageUploading} onChange={(event) => void insertImages(event.target.files)} className="sr-only" />
           </label>
         </div>
+        {toolbarHint.overflow && !toolbarHint.atEnd && <span className="pointer-events-none absolute bottom-1 right-1 top-1 flex items-center bg-gradient-to-l from-[#c9ccc0] via-[#c9ccc0] to-transparent pl-5 sm:hidden"><span className="animate-pulse border-2 border-[#24252b] bg-[#ba0dcb] px-1.5 py-1 text-[6px] font-black uppercase tracking-[0.08em] text-white shadow-[2px_2px_0_#24252b]">Swipe ›</span></span>}
         <span className="hidden text-[8px] font-black uppercase tracking-[0.12em] text-[#666961] lg:block">Ctrl+B · Ctrl+I · Ctrl+U</span>
       </div>
 
       {linkPanelOpen && (
-        <div className="flex shrink-0 items-center gap-2 border-b-2 border-[#24252b] bg-[#dfe2d3] p-2">
+        <div className="flex shrink-0 items-center gap-1 border-b-2 border-[#24252b] bg-[#dfe2d3] p-1 sm:gap-2 sm:p-2">
           <MaterialIcon name="link" size="sm" className="shrink-0" />
-          <input value={linkUrl} onChange={(event) => setLinkUrl(event.target.value)} onKeyDown={(event) => event.key === "Enter" && (event.preventDefault(), insertLink())} placeholder="https://figma.com/..." className="h-9 min-w-0 flex-1 border-2 border-[#24252b] bg-[#eceee6] px-3 text-xs font-bold outline-none focus:border-[#ba0dcb]" autoFocus />
-          <button type="button" onClick={insertLink} disabled={!linkUrl.trim()} className="h-9 border-2 border-[#24252b] bg-[#ba0dcb] px-4 text-[8px] font-black uppercase text-white disabled:bg-[#a9aca2]">Insert Link</button>
-          <button type="button" onClick={() => setLinkPanelOpen(false)} aria-label="Close link panel" className="flex size-9 items-center justify-center border-2 border-[#24252b] bg-[#eceee6]"><MaterialIcon name="close" size="sm" /></button>
+          <input value={linkUrl} onChange={(event) => setLinkUrl(event.target.value)} onKeyDown={(event) => event.key === "Enter" && (event.preventDefault(), insertLink())} placeholder="https://figma.com/..." className="h-8 min-w-0 flex-1 border-2 border-[#24252b] bg-[#eceee6] px-2 text-[10px] font-bold outline-none focus:border-[#ba0dcb] sm:h-9 sm:px-3 sm:text-xs" autoFocus />
+          <button type="button" onClick={insertLink} disabled={!linkUrl.trim()} aria-label="Insert link" className="flex size-8 items-center justify-center border-2 border-[#24252b] bg-[#ba0dcb] text-[8px] font-black uppercase text-white disabled:bg-[#a9aca2] sm:h-9 sm:w-auto sm:px-4"><MaterialIcon name="check" size="sm" /><span className="hidden sm:inline">Insert Link</span></button>
+          <button type="button" onClick={() => setLinkPanelOpen(false)} aria-label="Close link panel" className="flex size-8 items-center justify-center border-2 border-[#24252b] bg-[#eceee6] sm:size-9"><MaterialIcon name="close" size="sm" /></button>
         </div>
       )}
 
       <div className="relative min-h-0 flex-1">
-        {isEmpty && <span className="pointer-events-none absolute left-5 top-5 z-10 max-w-xl text-sm font-bold leading-6 text-[#969a90]">Describe the design need, dimensions, copy, channel, and final output...</span>}
+        {isEmpty && <span className="pointer-events-none absolute left-3 top-3 z-10 max-w-[calc(100%-24px)] text-xs font-bold leading-5 text-[#969a90] sm:left-5 sm:top-5 sm:max-w-xl sm:text-sm sm:leading-6">Describe the design need, dimensions, copy, channel, and final output...</span>}
         <div
           ref={editorRef}
           contentEditable
@@ -1367,7 +1497,7 @@ function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; o
             event.preventDefault();
             document.execCommand("insertText", false, event.clipboardData.getData("text/plain"));
           }}
-          className="retro-scrollbar h-full min-h-[300px] overflow-y-auto bg-[#eceee6] p-5 text-sm font-normal leading-7 text-[#24252b] outline-none [caret-color:#ba0dcb] focus:bg-white [&_a]:font-black [&_a]:text-[#ba0dcb] [&_a]:underline [&_figcaption]:border-x-2 [&_figcaption]:border-b-2 [&_figcaption]:border-[#24252b] [&_figcaption]:bg-[#c9ccc0] [&_figcaption]:px-3 [&_figcaption]:py-1 [&_figcaption]:text-[9px] [&_figcaption]:font-black [&_figcaption]:uppercase [&_figure]:my-4 [&_figure]:inline-block [&_figure]:max-w-md [&_figure]:align-top [&_img]:max-h-64 [&_img]:w-auto [&_img]:border-2 [&_img]:border-[#24252b] [&_img]:object-contain [&_li]:ml-6 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc"
+          className="retro-scrollbar h-full min-h-0 overflow-y-auto bg-[#eceee6] p-3 text-sm font-normal leading-6 text-[#24252b] outline-none [caret-color:#ba0dcb] focus:bg-white sm:min-h-[300px] sm:p-5 sm:leading-7 [&_a]:font-black [&_a]:text-[#ba0dcb] [&_a]:underline [&_figcaption]:border-x-2 [&_figcaption]:border-b-2 [&_figcaption]:border-[#24252b] [&_figcaption]:bg-[#c9ccc0] [&_figcaption]:px-3 [&_figcaption]:py-1 [&_figcaption]:text-[9px] [&_figcaption]:font-black [&_figcaption]:uppercase [&_figure]:my-4 [&_figure]:inline-block [&_figure]:max-w-md [&_figure]:align-top [&_img]:max-h-64 [&_img]:w-auto [&_img]:border-2 [&_img]:border-[#24252b] [&_img]:object-contain [&_li]:ml-6 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc"
         />
       </div>
 
@@ -1429,25 +1559,33 @@ function RetroDatePicker({ value, onChange }: { value: string; onChange: (value:
   const formatDate = (day: number) => `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
   return (
-    <div className="relative mt-3">
-      <button type="button" onClick={() => setOpen((current) => !current)} aria-expanded={open} className={`flex h-14 w-full items-center justify-between border-2 border-[#24252b] px-4 text-left text-xs font-black uppercase shadow-[2px_2px_0_#777a72] transition hover:bg-white ${open ? "bg-white ring-2 ring-[#ba0dcb]" : "bg-[#dfe2d3]"}`}>
-        <span>{value ? new Date(`${value}T00:00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "Choose a specific date"}</span>
+    <div className="mt-3 sm:relative">
+      <button type="button" onClick={() => setOpen((current) => !current)} aria-expanded={open} className={`flex h-11 w-full min-w-0 items-center justify-between gap-2 border-2 border-[#24252b] px-3 text-left text-[9px] font-black uppercase shadow-[2px_2px_0_#777a72] transition hover:bg-white sm:h-14 sm:px-4 sm:text-xs ${open ? "bg-white ring-2 ring-[#ba0dcb]" : "bg-[#dfe2d3]"}`}>
+        <span className="min-w-0 truncate">{value ? new Date(`${value}T00:00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "Choose a specific date"}</span>
         <MaterialIcon name={open ? "expand_less" : "calendar_month"} size="sm" />
       </button>
       {open && (
-        <div className="absolute right-0 top-[calc(100%+8px)] z-30 w-full min-w-[320px] border-2 border-[#24252b] bg-[#eceee6] p-3 shadow-[5px_5px_0_#24252b]">
-          <div className="mb-3 flex items-center justify-between border-b-2 border-[#24252b] pb-3">
+        <div className="absolute inset-0 z-30 flex min-w-0 flex-col border-2 border-[#24252b] bg-[#eceee6] p-2 shadow-[3px_3px_0_#24252b] sm:inset-auto sm:left-auto sm:right-0 sm:top-[calc(100%+8px)] sm:block sm:w-full sm:min-w-[320px] sm:p-3 sm:shadow-[5px_5px_0_#24252b]">
+          <div className="mb-2 flex items-center justify-between gap-2 border-b-2 border-[#24252b] pb-2 sm:hidden">
+            <span className="min-w-0 truncate text-[9px] font-black uppercase tracking-[0.08em]">{viewDate.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</span>
+            <span className="flex shrink-0 items-center gap-1">
+              <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))} aria-label="Previous month" className="flex size-7 items-center justify-center border-2 border-[#24252b] bg-[#dfe2d3] hover:bg-white"><MaterialIcon name="chevron_left" size="sm" /></button>
+              <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))} aria-label="Next month" className="flex size-7 items-center justify-center border-2 border-[#24252b] bg-[#dfe2d3] hover:bg-white"><MaterialIcon name="chevron_right" size="sm" /></button>
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close calendar" className="flex size-7 items-center justify-center border-2 border-[#24252b] bg-[#24252b] text-[#eceee6] hover:bg-[#555850]"><MaterialIcon name="close" size="sm" /></button>
+            </span>
+          </div>
+          <div className="mb-3 hidden items-center justify-between border-b-2 border-[#24252b] pb-3 sm:flex">
             <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))} className="flex size-9 items-center justify-center border-2 border-[#24252b] bg-[#dfe2d3] font-black hover:bg-white">‹</button>
-            <span className="text-xs font-black uppercase tracking-[0.12em]">{viewDate.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.08em] sm:text-xs sm:tracking-[0.12em]">{viewDate.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</span>
             <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))} className="flex size-9 items-center justify-center border-2 border-[#24252b] bg-[#dfe2d3] font-black hover:bg-white">›</button>
           </div>
-          <div className="grid grid-cols-7 gap-1 text-center">
+          <div className="grid min-h-0 flex-1 grid-cols-7 gap-1 text-center">
             {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => <span key={`${day}-${index}`} className="py-1 text-[8px] font-black text-[#666961]">{day}</span>)}
             {cells.map((day, index) => day ? (
-              <button key={day} type="button" onClick={() => { onChange(formatDate(day)); setOpen(false); }} className={`aspect-square border text-[9px] font-black transition hover:border-[#24252b] hover:bg-[#f2b8f6] ${value === formatDate(day) ? "border-[#24252b] bg-[#ba0dcb] text-white shadow-[2px_2px_0_#24252b]" : "border-transparent bg-[#dfe2d3]"}`}>{day}</button>
+              <button key={day} type="button" onClick={() => { onChange(formatDate(day)); setOpen(false); }} className={`min-h-5 border text-[8px] font-black transition hover:border-[#24252b] hover:bg-[#f2b8f6] sm:aspect-square sm:text-[9px] ${value === formatDate(day) ? "border-[#24252b] !bg-[#ba0dcb] text-white shadow-[2px_2px_0_#24252b]" : `border-transparent ${index % 7 === 0 ? "!bg-[#b9bdb1] sm:!bg-[#dfe2d3]" : "bg-[#dfe2d3]"}`}`}>{day}</button>
             ) : <span key={`empty-${index}`} />)}
           </div>
-          {value && <button type="button" onClick={() => { onChange(""); setOpen(false); }} className="mt-3 w-full border-2 border-[#24252b] bg-[#dfe2d3] py-2 text-[8px] font-black uppercase hover:bg-white">Clear Date</button>}
+          {value && <button type="button" onClick={() => { onChange(""); setOpen(false); }} className="mt-2 w-full border-2 border-[#24252b] bg-[#dfe2d3] py-1.5 text-[7px] font-black uppercase hover:bg-white sm:mt-3 sm:py-2 sm:text-[8px]">Clear Date</button>}
         </div>
       )}
     </div>

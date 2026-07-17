@@ -3,8 +3,11 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Core\Application;
+use App\Models\Core\Division;
+use App\Models\Core\Position;
 use App\Models\Core\User;
 use App\SubApps\CreativeReport\Models\Assessment;
+use App\SubApps\CreativeReport\Models\CreativeMember;
 use App\SubApps\CreativeReport\Models\ReportGroup;
 use Database\Seeders\ApplicationRegistrySeeder;
 use Database\Seeders\CreativeReportDemoSeeder;
@@ -94,6 +97,61 @@ class CreativeReportApiTest extends TestCase
         $this->assertDatabaseHas('users', ['name' => 'Bagas Pratama', 'username' => 'creative-creative-video-production-1']);
         $this->assertDatabaseHas('users', ['name' => 'Tio Prasetyo', 'username' => 'creative-creative-design-production-13']);
         $this->assertGreaterThan(1, Assessment::all()->map(fn (Assessment $item) => implode(',', $item->creative_scores))->unique()->count());
+    }
+
+    public function test_manager_can_approve_creative_staff_and_they_are_added_to_the_current_report(): void
+    {
+        $manager = User::factory()->create();
+        $manager->assignRole('Manajer');
+        $manager->applications()->attach(Application::where('key', 'creative-report')->firstOrFail(), ['granted_by' => $manager->id]);
+        $division = Division::create(['name' => 'Creative']);
+        $position = Position::create(['division_id' => $division->id, 'name' => 'Designer']);
+        $staff = User::factory()->create(['division_id' => $division->id, 'position_id' => $position->id]);
+        $member = CreativeMember::create(['user_id' => $staff->id, 'name' => $staff->name, 'position_id' => $position->id, 'position_name' => 'Designer']);
+
+        $this->actingAs($manager)->getJson('/api/v1/creative-reports/members/pending')
+            ->assertOk()->assertJsonPath('data.0.id', $member->id);
+        $this->actingAs($manager)->postJson("/api/v1/creative-reports/members/{$member->id}/approve")
+            ->assertOk()->assertJsonPath('data.status', 'active');
+
+        $this->assertTrue(Assessment::query()
+            ->where('creative_report_member_id', $member->id)
+            ->where('user_id', $staff->id)
+            ->whereDate('period', now()->startOfMonth())
+            ->exists());
+    }
+
+    public function test_manager_can_add_historical_personnel_without_an_account(): void
+    {
+        $manager = User::factory()->create();
+        $manager->assignRole('Manajer');
+        $manager->applications()->attach(Application::where('key', 'creative-report')->firstOrFail(), ['granted_by' => $manager->id]);
+
+        $this->actingAs($manager)->postJson('/api/v1/creative-reports/members/historical', [
+            'name' => 'Eks Designer',
+            'position_name' => 'Designer',
+            'start_month' => now()->subMonth()->format('Y-m'),
+            'end_month' => now()->format('Y-m'),
+        ])->assertOk()->assertJsonPath('data.status', 'resigned');
+
+        $member = CreativeMember::where('name', 'Eks Designer')->firstOrFail();
+        $this->assertNull($member->user_id);
+        $this->assertDatabaseCount('creative_report_assessments', 2);
+    }
+
+    public function test_manager_rejection_removes_the_pending_account(): void
+    {
+        $manager = User::factory()->create();
+        $manager->assignRole('Manajer');
+        $manager->applications()->attach(Application::where('key', 'creative-report')->firstOrFail(), ['granted_by' => $manager->id]);
+        $pendingUser = User::factory()->create();
+        $member = CreativeMember::create(['user_id' => $pendingUser->id, 'name' => $pendingUser->name, 'position_name' => 'Designer']);
+
+        $this->actingAs($manager)->postJson("/api/v1/creative-reports/members/{$member->id}/reject")
+            ->assertOk();
+
+        $this->assertDatabaseMissing('creative_report_members', ['id' => $member->id]);
+        $this->assertNull(User::withTrashed()->find($pendingUser->id));
     }
 
     private function validUpdatePayload(): array

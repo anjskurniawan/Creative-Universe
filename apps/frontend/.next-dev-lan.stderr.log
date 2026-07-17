@@ -1,0 +1,1328 @@
+⚠ Specified "rewrites" will not automatically work with "output: export". See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
+⚠ Blocked cross-origin request to Next.js dev resource /_next/webpack-hmr from "127.0.0.1".
+Cross-origin access to Next.js dev resources is blocked by default for safety.
+
+To allow this host in development, add it to "allowedDevOrigins" in next.config.js and restart the dev server:
+
+// next.config.js
+module.exports = {
+  allowedDevOrigins: ['127.0.0.1'],
+}
+
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+[browser] Error loading counts for sidebar: ApiError: Pusher\Pusher::__construct(): Argument #1 ($auth_key) must be of type string, null given, called in C:\laragon\www\creativeuniverse\apps\backend\vendor\laravel\framework\src\Illuminate\Broadcasting\BroadcastManager.php on line 341
+    at handleResponse (webpack-internal:///(app-pages-browser)/./src/core/api/client.ts:186:11)
+    at async apiFetch (webpack-internal:///(app-pages-browser)/./src/core/api/client.ts:135:20)
+    at async getOddsTasks (webpack-internal:///(app-pages-browser)/./src/features/odds/api/index.ts:165:26)
+    at async OddsLayout.useCallback[loadCounts] (webpack-internal:///(app-pages-browser)/./src/app/odds/layout.tsx:58:34) (webpack-internal:///(app-pages-browser)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/odds/new/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] GSAP target .boot-bar not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .boot-screen not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-kicker not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-title not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-subtitle not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .player-stage not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .pixel-cell-active not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .start-button not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .press-start not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .player-sprite not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-shadow not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-fx not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .scanline not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .press-start not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .boot-bar not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .boot-screen not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-kicker not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-title not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-subtitle not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .player-stage not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .pixel-cell-active not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .start-button not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .press-start not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .player-sprite not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-shadow not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-fx not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .scanline not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .press-start not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .boot-bar not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .boot-screen not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-kicker not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-title not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-subtitle not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .player-stage not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .pixel-cell-active not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .start-button not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .press-start not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .player-sprite not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-shadow not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-fx not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .scanline not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .press-start not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .boot-bar not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .boot-screen not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-kicker not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-title not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .welcome-subtitle not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .player-stage not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .pixel-cell-active not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .start-button not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .press-start not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .player-sprite not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-shadow not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .sprite-fx not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target  not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .scanline not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] GSAP target .press-start not found. https://gsap.com (webpack-internal:///(app-pages-browser)
+[browser] ⨯ unhandledRejection: ChunkLoadError: Failed to load chunk /_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1xch-cm._.js from module [turbopack]/browser/dev/hmr-client/hmr-client.ts [app-client] (ecmascript, async loader)
+    at <unknown> (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/turbopack-_01_ro95._.js:698:25)
+[browser] Uncaught Error: Internal Next.js error: Router action dispatched before initialization.
+    at dispatchAppRouterAction (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:916:37)
+    at <unknown> (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:11931:61)
+    at startTransition (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/node_modules_next_dist_compiled_1amofcm._.js:1279:31)
+    at Object.hmrRefresh (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:11930:40)
+    at <unknown> (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:14098:64)
+    at startTransition (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/node_modules_next_dist_compiled_1amofcm._.js:1279:31)
+    at processMessage (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:14097:44)
+    at WebSocket.handleMessage (file://C:/laragon/www/creativeuniverse/apps/frontend/.next/dev/static/chunks/node_modules_next_dist_client_0r5nbpw._.js:13466:52)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:210:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  208 |   if (response.status === 401) {
+  209 |     redirectToLogin(options.skipAuthRedirect);
+> 210 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  211 |   }
+  212 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  213 |   if (response.status === 422) { (src\app\odds\layout.tsx:75:15)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:210:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  208 |   if (response.status === 401) {
+  209 |     redirectToLogin(options.skipAuthRedirect);
+> 210 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  211 |   }
+  212 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  213 |   if (response.status === 422) { (src\app\odds\layout.tsx:75:15)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:210:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  208 |   if (response.status === 401) {
+  209 |     redirectToLogin(options.skipAuthRedirect);
+> 210 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  211 |   }
+  212 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  213 |   if (response.status === 422) { (src\app\odds\layout.tsx:75:15)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\app\odds\layout.tsx:75:15)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\app\odds\layout.tsx:75:15)
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: read ECONNRESET
+    at ignore-listed frames {
+  errno: -4077,
+  code: 'ECONNRESET',
+  syscall: 'read'
+}
+Error: read ECONNRESET
+    at ignore-listed frames {
+  errno: -4077,
+  code: 'ECONNRESET',
+  syscall: 'read'
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/designer-profiles?per_page=100 Error: read ECONNRESET
+    at ignore-listed frames {
+  errno: -4077,
+  code: 'ECONNRESET',
+  syscall: 'read'
+}
+Error: read ECONNRESET
+    at ignore-listed frames {
+  errno: -4077,
+  code: 'ECONNRESET',
+  syscall: 'read'
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/system-rules?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/users?role=Designer&per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/users?role=Videographer&per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/rankings?period_type=daily&per_page=10 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/categories?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/reports/summary Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/tasks?per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/reports/daily?per_page=20 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/designer-profiles?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/system-rules?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/users?role=Designer&per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/users?role=Videographer&per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/tasks?per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/tasks?per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan sistem.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:75:15)
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/tasks?per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/reports/daily?per_page=20 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/reports/summary Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/rankings?period_type=daily&per_page=10 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/categories?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/designer-profiles?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/system-rules?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/users?role=Designer&per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/users?role=Videographer&per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/tasks?per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/reports/daily?per_page=20 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/notifications Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/reports/summary Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/rankings?period_type=daily&per_page=10 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/categories?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/designer-profiles?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/odds/system-rules?per_page=100 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/users?role=Designer&per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Failed to proxy http://creativeuniverse.test/api/v1/users?role=Videographer&per_page=50 Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+Error: connect ECONNREFUSED 127.0.0.1:80
+    at <unknown> (Error: connect ECONNREFUSED 127.0.0.1:80) {
+  errno: -4078,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '127.0.0.1',
+  port: 80
+}
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\app\odds\layout.tsx:75:15)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/odds/new/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] GSAP target .boot-bar not found. https://gsap.com (src\app\odds\new\page.tsx:433:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:433:10)
+[browser] GSAP target .boot-screen not found. https://gsap.com (src\app\odds\new\page.tsx:434:10)
+[browser] GSAP target .welcome-kicker not found. https://gsap.com (src\app\odds\new\page.tsx:435:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:435:10)
+[browser] GSAP target .welcome-title not found. https://gsap.com (src\app\odds\new\page.tsx:436:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:436:10)
+[browser] GSAP target .welcome-subtitle not found. https://gsap.com (src\app\odds\new\page.tsx:437:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:437:10)
+[browser] GSAP target .player-stage not found. https://gsap.com (src\app\odds\new\page.tsx:438:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:438:10)
+[browser] GSAP target .pixel-cell-active not found. https://gsap.com (src\app\odds\new\page.tsx:439:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:439:10)
+[browser] GSAP target .start-button not found. https://gsap.com (src\app\odds\new\page.tsx:440:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:440:10)
+[browser] GSAP target .press-start not found. https://gsap.com (src\app\odds\new\page.tsx:453:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:453:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:464:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:465:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:466:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:467:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:468:10)
+[browser] GSAP target .player-sprite not found. https://gsap.com (src\app\odds\new\page.tsx:469:12)
+[browser] GSAP target .sprite-shadow not found. https://gsap.com (src\app\odds\new\page.tsx:470:12)
+[browser] GSAP target .sprite-fx not found. https://gsap.com (src\app\odds\new\page.tsx:471:12)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:471:12)
+[browser] GSAP target .scanline not found. https://gsap.com (src\app\odds\new\page.tsx:472:12)
+[browser] GSAP target .press-start not found. https://gsap.com (src\app\odds\new\page.tsx:474:12)
+[browser] GSAP target .boot-bar not found. https://gsap.com (src\app\odds\new\page.tsx:433:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:433:10)
+[browser] GSAP target .boot-screen not found. https://gsap.com (src\app\odds\new\page.tsx:434:10)
+[browser] GSAP target .welcome-kicker not found. https://gsap.com (src\app\odds\new\page.tsx:435:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:435:10)
+[browser] GSAP target .welcome-title not found. https://gsap.com (src\app\odds\new\page.tsx:436:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:436:10)
+[browser] GSAP target .welcome-subtitle not found. https://gsap.com (src\app\odds\new\page.tsx:437:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:437:10)
+[browser] GSAP target .player-stage not found. https://gsap.com (src\app\odds\new\page.tsx:438:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:438:10)
+[browser] GSAP target .pixel-cell-active not found. https://gsap.com (src\app\odds\new\page.tsx:439:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:439:10)
+[browser] GSAP target .start-button not found. https://gsap.com (src\app\odds\new\page.tsx:440:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:440:10)
+[browser] GSAP target .press-start not found. https://gsap.com (src\app\odds\new\page.tsx:453:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:453:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:464:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:465:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:466:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:467:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:468:10)
+[browser] GSAP target .player-sprite not found. https://gsap.com (src\app\odds\new\page.tsx:469:12)
+[browser] GSAP target .sprite-shadow not found. https://gsap.com (src\app\odds\new\page.tsx:470:12)
+[browser] GSAP target .sprite-fx not found. https://gsap.com (src\app\odds\new\page.tsx:471:12)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:471:12)
+[browser] GSAP target .scanline not found. https://gsap.com (src\app\odds\new\page.tsx:472:12)
+[browser] GSAP target .press-start not found. https://gsap.com (src\app\odds\new\page.tsx:474:12)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:479:13)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:479:13)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:479:13)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:479:13)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:479:13)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:479:13)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:479:13)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:479:13)
+[browser] GSAP target .boot-bar not found. https://gsap.com (src\app\odds\new\page.tsx:433:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:433:10)
+[browser] GSAP target .boot-screen not found. https://gsap.com (src\app\odds\new\page.tsx:434:10)
+[browser] GSAP target .welcome-kicker not found. https://gsap.com (src\app\odds\new\page.tsx:435:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:435:10)
+[browser] GSAP target .welcome-title not found. https://gsap.com (src\app\odds\new\page.tsx:436:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:436:10)
+[browser] GSAP target .welcome-subtitle not found. https://gsap.com (src\app\odds\new\page.tsx:437:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:437:10)
+[browser] GSAP target .player-stage not found. https://gsap.com (src\app\odds\new\page.tsx:438:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:438:10)
+[browser] GSAP target .pixel-cell-active not found. https://gsap.com (src\app\odds\new\page.tsx:439:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:439:10)
+[browser] GSAP target .start-button not found. https://gsap.com (src\app\odds\new\page.tsx:440:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:440:10)
+[browser] GSAP target .press-start not found. https://gsap.com (src\app\odds\new\page.tsx:453:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:453:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:464:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:465:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:466:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:467:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:468:10)
+[browser] GSAP target .player-sprite not found. https://gsap.com (src\app\odds\new\page.tsx:469:12)
+[browser] GSAP target .sprite-shadow not found. https://gsap.com (src\app\odds\new\page.tsx:470:12)
+[browser] GSAP target .sprite-fx not found. https://gsap.com (src\app\odds\new\page.tsx:471:12)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:471:12)
+[browser] GSAP target .scanline not found. https://gsap.com (src\app\odds\new\page.tsx:472:12)
+[browser] GSAP target .press-start not found. https://gsap.com (src\app\odds\new\page.tsx:474:12)
+[browser] GSAP target .boot-bar not found. https://gsap.com (src\app\odds\new\page.tsx:433:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:433:10)
+[browser] GSAP target .boot-screen not found. https://gsap.com (src\app\odds\new\page.tsx:434:10)
+[browser] GSAP target .welcome-kicker not found. https://gsap.com (src\app\odds\new\page.tsx:435:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:435:10)
+[browser] GSAP target .welcome-title not found. https://gsap.com (src\app\odds\new\page.tsx:436:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:436:10)
+[browser] GSAP target .welcome-subtitle not found. https://gsap.com (src\app\odds\new\page.tsx:437:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:437:10)
+[browser] GSAP target .player-stage not found. https://gsap.com (src\app\odds\new\page.tsx:438:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:438:10)
+[browser] GSAP target .pixel-cell-active not found. https://gsap.com (src\app\odds\new\page.tsx:439:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:439:10)
+[browser] GSAP target .start-button not found. https://gsap.com (src\app\odds\new\page.tsx:440:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:440:10)
+[browser] GSAP target .press-start not found. https://gsap.com (src\app\odds\new\page.tsx:453:10)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:453:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:464:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:465:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:466:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:467:10)
+[browser] GSAP target .sprite-unit not found. https://gsap.com (src\app\odds\new\page.tsx:468:10)
+[browser] GSAP target .player-sprite not found. https://gsap.com (src\app\odds\new\page.tsx:469:12)
+[browser] GSAP target .sprite-shadow not found. https://gsap.com (src\app\odds\new\page.tsx:470:12)
+[browser] GSAP target .sprite-fx not found. https://gsap.com (src\app\odds\new\page.tsx:471:12)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:471:12)
+[browser] GSAP target .scanline not found. https://gsap.com (src\app\odds\new\page.tsx:472:12)
+[browser] GSAP target .press-start not found. https://gsap.com (src\app\odds\new\page.tsx:474:12)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Uncaught TypeError: Failed to execute 'createRadialGradient' on 'CanvasRenderingContext2D': The provided double value is non-finite.
+    at CreativeAiPage.useEffect.renderAurora.drawBlob (src\app\creative-ai\page.tsx:476:28)
+    at CreativeAiPage.useEffect.renderAurora (src\app\creative-ai\page.tsx:493:9)
+  474 |         if (pr <= 0) return;
+  475 |
+> 476 |         const grad = ctx2d.createRadialGradient(px, py, 0, px, py, pr);
+      |                            ^
+  477 |         
+  478 |         let cStart = b.colorStart;
+  479 |         if (b.active !== undefined) {
+[browser] Gagal memuat tugas KV Retail: ApiError: SQLSTATE[HY000] [1049] Unknown database 'laravel' (Connection: mysql, SQL: select * from `sessions` where `id` = HzS3fgw4Dz34dAwsbtounfenSfC05QnWC52zQga6 limit 1)
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[mutate] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:55:21)
+    at async handleTitleSave (src\app\kv-retail\page.tsx:481:5)
+    at async save (src\components\taskcard\title-task.tsx:30:7)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\taskcard\title-task.tsx:33:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] The final argument passed to useEffect changed size between renders. The order and size of this array must remain constant.
+
+Previous: [0:1:2:3:11.494444444444444:16.456770833333334:9:4:5:4:44.4:0:22.2:22.2:13, 22.2, 0]
+Incoming: [13:0:2:4:11.494444444444444:1:3:16.456770833333334] 
+    at TaskPerformanceDesktop (src\components\task-performance-desktop.tsx:75:12)
+  73 |   const animationKey = [tasks.length, timely, late, bottleneck, average, previousTimely, p...
+  74 |
+> 75 |   useEffect(() => {
+     |            ^
+  76 |     const dashboard = dashboardRef.current;
+  77 |     if (!dashboard || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  78 |     const context = gsap.context(() => { (src\components\task-performance-desktop.tsx:75:12)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] ./src/app/kv-retail/page.tsx
+Error: 
+
+Caused by:
+    0: Failed to read source code from C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\page.tsx
+    1: The system cannot find the file specified. (os error 2)
+
+Import trace for requested module:
+./src/app/kv-retail/page.tsx 
+⨯ ./src/app/kv-retail/page.tsx
+Error: 
+
+Caused by:
+    0: Failed to read source code from C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\page.tsx
+    1: The system cannot find the file specified. (os error 2)
+
+Import trace for requested module:
+./src/app/kv-retail/page.tsx
+[browser] ./src/app/kv-retail/page.tsx
+Error: 
+
+Caused by:
+    0: Failed to read source code from C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\page.tsx
+    1: The system cannot find the file specified. (os error 2)
+
+Import trace for requested module:
+./src/app/kv-retail/page.tsx 
+[browser] ./src/app/kv-retail/page.tsx
+Error: 
+
+Caused by:
+    0: Failed to read source code from C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\page.tsx
+    1: The system cannot find the file specified. (os error 2)
+
+Import trace for requested module:
+./src/app/kv-retail/page.tsx 
+[browser] ./src/app/kv-retail/page.tsx
+Error: 
+
+Caused by:
+    0: Failed to read source code from C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\page.tsx
+    1: The system cannot find the file specified. (os error 2)
+
+Import trace for requested module:
+./src/app/kv-retail/page.tsx 
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz'
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading

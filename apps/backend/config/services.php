@@ -46,9 +46,11 @@ return [
         'apps_script_pricetag_url' => env('GOOGLE_APPS_SCRIPT_PRICETAG_URL', ''),
     ],
 
-    // Google AI Studio Gemini API Configuration
-    'gemini' => [
-        'key' => env('GEMINI_API_KEY'),
+    // Groq OpenAI-compatible API configuration for Creative AI.
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+        'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
+        'model' => env('GROQ_CHAT_MODEL', 'openai/gpt-oss-120b'),
     ],
 
 ];

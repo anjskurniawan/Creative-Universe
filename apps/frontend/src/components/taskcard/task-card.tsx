@@ -81,6 +81,8 @@ export type TaskCardProps = {
   currentUser?: { id?: number; roles?: Array<string | { name?: string }> } | null;
   createdBy?: number;
   delayReasonStage?: string;
+  isLate?: boolean;
+  onTitleSave?: (title: string) => Promise<void>;
 };
 
 export default function TaskCard({ 
@@ -104,6 +106,8 @@ export default function TaskCard({
   currentUser,
   createdBy,
   delayReasonStage,
+  isLate = false,
+  onTitleSave,
 }: TaskCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmittingFile, setIsSubmittingFile] = useState(false);
@@ -317,7 +321,10 @@ export default function TaskCard({
             <div className="flex flex-col sm:flex-row gap-4 xl:gap-4 2xl:gap-6 items-stretch sm:items-center relative min-w-0 xl:flex-none xl:mr-6">
               {/* Title */}
               <div className="flex flex-col items-start relative flex-1 min-w-0 xl:w-[420px] xl:flex-none">
-                <TaskCardTitleTask title={title} className="w-full px-0 py-0 xl:p-[10px]" />
+                <TaskCardTitleTask title={title} editable={canManageTask} onSave={onTitleSave} className="w-full px-0 py-0 xl:p-[10px]" />
+                {isDone && isLate && (
+                  <span className="mt-1 rounded-full bg-[#fee2e2] px-2 py-1 text-xs font-semibold text-[#b91c1c]">Terlambat</span>
+                )}
               </div>
 
               {/* Files */}
@@ -327,10 +334,8 @@ export default function TaskCard({
                   isDone={isDone}
                   files={supportFileUrl}
                   onUploadClick={(idx) => {
-                    if (!isDone) {
-                      setUploadingDocType("support_file");
-                      setUploadFileIndex(idx);
-                    }
+                    setUploadingDocType("support_file");
+                    setUploadFileIndex(idx);
                   }}
                   onViewClick={(url) => {
                     window.open(resolveStorageUrl(url) ?? undefined, '_blank');
@@ -342,10 +347,8 @@ export default function TaskCard({
                   isDone={isDone}
                   files={draftFileUrl}
                   onUploadClick={(idx) => {
-                    if (!isDone) {
-                      setUploadingDocType("draft_file");
-                      setUploadFileIndex(idx);
-                    }
+                    setUploadingDocType("draft_file");
+                    setUploadFileIndex(idx);
                   }}
                   onViewClick={(url) => {
                     window.open(resolveStorageUrl(url) ?? undefined, '_blank');

@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\Core\Division;
 use App\Models\Core\Position;
 use App\Models\Core\User;
+use App\SubApps\CreativeReport\Models\CreativeMember;
 use Database\Seeders\OnboardingDataSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -112,5 +113,28 @@ class OnboardingApiTest extends TestCase
             ->assertJsonValidationErrors(['position_id']);
 
         $this->assertFalse((bool) $user->fresh()->is_onboarded);
+    }
+
+    public function test_creative_onboarding_creates_a_pending_member_for_manager_review(): void
+    {
+        $creative = Division::where('name', 'Creative')->firstOrFail();
+        $designerPosition = Position::where('division_id', $creative->id)
+            ->where('name', 'Designer')
+            ->firstOrFail();
+        $user = User::factory()->create(['is_onboarded' => false]);
+
+        $this->actingAs($user)->postJson('/api/v1/onboarding/submit', [
+            'name' => 'Designer Baru',
+            'division_id' => $creative->id,
+            'position_id' => $designerPosition->id,
+            'whatsapp_number' => '081234567899',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('creative_report_members', [
+            'user_id' => $user->id,
+            'name' => 'Designer Baru',
+            'position_name' => 'Designer',
+            'status' => CreativeMember::STATUS_PENDING,
+        ]);
     }
 }

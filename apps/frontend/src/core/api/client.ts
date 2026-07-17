@@ -206,7 +206,12 @@ async function handleResponse<T>(
     : "Terjadi kesalahan sistem.";
 
   if (response.status === 401) {
-    redirectToLogin(options.skipAuthRedirect);
+    // A single feature request can return 401 while the browser session is
+    // still valid (for example during a reload or a transient proxy failure).
+    // Only force a full-page logout after the canonical session endpoint also
+    // confirms that the cookie session is no longer authenticated.
+    const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+    if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
   }
   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
@@ -280,6 +285,22 @@ function redirectToLogin(skip: boolean): void {
   if (skip || window.location.pathname.startsWith(APP_ROUTES.login)) return;
   const currentPath = window.location.pathname + window.location.search;
   window.location.href = `${APP_ROUTES.login}?redirect=${encodeURIComponent(currentPath)}`;
+}
+
+async function isSessionExpired(): Promise<boolean> {
+  try {
+    const response = await fetch(resolveApiUrl("/auth/me"), {
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    });
+    return response.status === 401;
+  } catch {
+    // A network or proxy failure must not log a user out locally.
+    return false;
+  }
 }
 
 function createRequestSignal(parentSignal: AbortSignal | null | undefined, timeoutMs: number) {

@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { AUTH_SESSION_EXPIRED_EVENT } from "@/core/api/client";
+import { ApiError, AUTH_SESSION_EXPIRED_EVENT } from "@/core/api/client";
 import { authApi, type AuthUser, type LoginCredentials } from "@/core/auth";
 import { APP_ROUTES } from "@/core/navigation/routes";
 import { canAccessApplication, type ApplicationKey } from "@/core/applications";
@@ -17,6 +17,7 @@ export type User = AuthUser;
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  sessionCheckFailed: boolean;
   isAuthenticated: boolean;
   login: (credentials: LoginCredentials) => Promise<User>;
   logout: () => Promise<void>;
@@ -31,14 +32,17 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sessionCheckFailed, setSessionCheckFailed] = useState(false);
 
   const refreshUser = useCallback(async (): Promise<User | null> => {
     try {
       const profile = await authApi.session.current();
       setUser(profile);
+      setSessionCheckFailed(false);
       return profile;
-    } catch {
-      setUser(null);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) setUser(null);
+      else setSessionCheckFailed(true);
       return null;
     } finally {
       setIsLoading(false);
@@ -49,10 +53,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let active = true;
     authApi.session.current()
       .then((profile) => {
-        if (active) setUser(profile);
+        if (active) {
+          setUser(profile);
+          setSessionCheckFailed(false);
+        }
       })
-      .catch(() => {
-        if (active) setUser(null);
+      .catch((error) => {
+        if (!active) return;
+        if (error instanceof ApiError && error.status === 401) setUser(null);
+        else setSessionCheckFailed(true);
       })
       .finally(() => {
         if (active) setIsLoading(false);
@@ -66,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const expireSession = () => {
       setUser(null);
       setIsLoading(false);
+      setSessionCheckFailed(false);
     };
     window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, expireSession);
     return () => window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, expireSession);
@@ -75,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const profile = await authApi.session.login(credentials);
     setUser(profile);
     setIsLoading(false);
+    setSessionCheckFailed(false);
     return profile;
   };
 
@@ -102,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         isLoading,
+        sessionCheckFailed,
         isAuthenticated: user !== null,
         login,
         logout,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Core\Division;
 use App\Models\Core\Position;
 use App\Models\Core\User;
+use App\SubApps\CreativeReport\Services\CreativeMembershipService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -67,7 +68,7 @@ class OnboardingController extends BaseApiController
     /**
      * Submit onboarding data and update user.
      */
-    public function submit(Request $request): JsonResponse
+    public function submit(Request $request, CreativeMembershipService $memberships): JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -80,7 +81,7 @@ class OnboardingController extends BaseApiController
         /** @var User $user */
         $user = Auth::user();
 
-        return DB::transaction(function () use ($validated, $user) {
+        return DB::transaction(function () use ($validated, $user, $memberships) {
             $division = Division::find($validated['division_id']);
 
             if (! $division) {
@@ -145,6 +146,11 @@ class OnboardingController extends BaseApiController
             $roleName = $isCreativePosition ? $position->name : 'Client';
 
             $user->syncRoles([$roleName]);
+
+            if ($isCreativePosition) {
+                $user->load('position');
+                $memberships->registerPending($user);
+            }
 
             return $this->sendResponse(null, 'Onboarding completed successfully.');
         });
