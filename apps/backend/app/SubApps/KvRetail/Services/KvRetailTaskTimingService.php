@@ -42,10 +42,11 @@ class KvRetailTaskTimingService
         $hasBottleneck = collect($violations)
             ->except('Kirim Email')
             ->contains(fn (array $violation) => $violation['late']);
-        // The sent-email timestamp is the source of truth for task timeliness.
-        // Sending it on the deadline remains on time.
-        $isLate = $task->status === 'Done'
-            && $this->isAfterDeadline($timestamps['Email'] ?? null, $task->deadline_date);
+        // If the email exists, its timestamp is the source of truth. Otherwise,
+        // an unfinished task becomes late as soon as its deadline has passed.
+        $isLate = isset($timestamps['Email']) && $timestamps['Email']
+            ? $this->isAfterDeadline($timestamps['Email'], $task->deadline_date)
+            : $this->isDeadlinePassed($task->deadline_date);
 
         return [
             'bottleneck' => $hasBottleneck,
@@ -94,6 +95,13 @@ class KvRetailTaskTimingService
         $deadlineAt = $this->parseDate($deadline);
 
         return $completedAt && $deadlineAt && $completedAt->startOfDay()->greaterThan($deadlineAt->startOfDay());
+    }
+
+    private function isDeadlinePassed(mixed $deadline): bool
+    {
+        $deadlineAt = $this->parseDate($deadline);
+
+        return $deadlineAt && now()->startOfDay()->greaterThan($deadlineAt->startOfDay());
     }
 
     private function parseDate(mixed $value): ?Carbon
