@@ -99,7 +99,7 @@ class KvRetailCreativeAgentService
             'selesai' => $tasks->where('status', 'Done')->count(),
             'tepat_waktu' => $summaries->filter(fn (array $summary) => $summary['task']->status === 'Done' && ! $summary['is_late'])->count(),
             'terlambat' => $summaries->where('is_late', true)->count(),
-            'dalam_proses' => $tasks->filter(fn (KvRetailTask $task) => ! in_array($task->status, ['0', 'Done'], true))->count(),
+            'dalam_proses' => $tasks->filter(fn (KvRetailTask $task) => $task->status !== 'Done')->count(),
             'bottleneck_per_tahap' => collect(self::BOTTLENECK_STAGES)->mapWithKeys(fn (string $stage) => [
                 $stage => $summaries->filter(fn (array $summary) => in_array($stage, $summary['bottleneck_stages'], true))->count(),
             ])->all(),

@@ -23,7 +23,15 @@ function isInMonth(task: TaskPerformanceTask, month: Date) {
   return Boolean(date && date.getMonth() === month.getMonth() && date.getFullYear() === month.getFullYear());
 }
 
-function isLate(task: TaskPerformanceTask) { return Boolean(task.timing_evaluation?.late); }
+function isLate(task: TaskPerformanceTask) {
+  if (task.timing_evaluation?.late) return true;
+  if (task.task_timestamps?.Email) return false;
+
+  const deadline = toDate(task.deadline_date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Boolean(deadline && deadline.setHours(0, 0, 0, 0) < today.getTime());
+}
 function isBottleneck(task: TaskPerformanceTask) { return BOTTLENECK_STAGES.some((stage) => task.timing_evaluation?.violations?.[stage]?.late); }
 function isTimely(task: TaskPerformanceTask) { return task.status === "Done" && !isLate(task); }
 function percent(value: number, total: number) { return total ? Math.round((value / total) * 1000) / 10 : 0; }
@@ -79,7 +87,7 @@ export function TaskPerformanceDesktop({ tasks, showToolbar = true }: { tasks: T
   const previousLate = previous.filter(isLate).length;
   const bottleneck = current.filter(isBottleneck).length;
   const bottleneckTasks = current.filter(isBottleneck);
-  const inProgress = current.filter((task) => task.status !== "0" && task.status !== "Done").length;
+  const inProgress = current.filter((task) => task.status !== "Done").length;
   const averageDuration = (items: TaskPerformanceTask[]) => {
     const durations = items.flatMap((task) => {
       const start = toDate(task.task_given_date); const end = toDate(task.task_timestamps?.Email);

@@ -50,7 +50,15 @@ function inMonth(task: TaskPerformanceTask, month: Date) {
   return date?.getMonth() === month.getMonth() && date.getFullYear() === month.getFullYear();
 }
 
-function isFinalLate(task: TaskPerformanceTask) { return Boolean(task.timing_evaluation?.late); }
+function isFinalLate(task: TaskPerformanceTask) {
+  if (task.timing_evaluation?.late) return true;
+  if (task.task_timestamps?.Email) return false;
+
+  const deadline = parseTaskDate(task.deadline_date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Boolean(deadline && deadline.setHours(0, 0, 0, 0) < today.getTime());
+}
 function isBottleneck(task: TaskPerformanceTask) { return ["ACC Draft", "Progress Design", "Approval Design"].some((stage) => task.timing_evaluation?.violations?.[stage]?.late); }
 function isTimelyDone(task: TaskPerformanceTask) { return task.status === "Done" && !isFinalLate(task); }
 

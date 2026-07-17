@@ -500,8 +500,8 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
       taskDate.getFullYear() === now.getFullYear();
   });
 
-  const totalTasks = scopedTasks.filter(t => t.status !== "Done").length;
-  const inProgress = scopedTasks.filter(t => ["ACC Draft", "Progress Design", "Approval Design", "Kirim Email"].includes(t.status)).length;
+  const totalTasks = scopedTasks.length;
+  const inProgress = scopedTasks.filter(t => t.status !== "Done").length;
   const mendesak = scopedTasks.filter(t => {
     if (t.status === "Done") return false;
     if (!t.deadline_date) return false;
