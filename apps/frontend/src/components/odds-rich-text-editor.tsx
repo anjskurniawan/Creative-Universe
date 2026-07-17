@@ -35,16 +35,18 @@ export function OddsRichTextEditor({
   value,
   onChange,
   minHeight = 220,
+  placeholder = "Tulis kebutuhan desain, ukuran, copy, channel, dan output final.",
 }: {
   value: string;
   onChange: (value: string) => void;
   minHeight?: number;
+  placeholder?: string;
 }) {
   return (
     <textarea
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      placeholder="Tulis kebutuhan desain, ukuran, copy, channel, dan output final."
+      placeholder={placeholder}
       className="w-full resize-y rounded-lg border border-cu-border bg-white px-4 py-3 text-sm leading-6 text-cu-ink outline-none transition focus:border-cu-info"
       style={{ minHeight }}
     />

@@ -18,11 +18,12 @@ type SideMenuButtonProps = {
   badge?: number | string;
   onClick?: () => void;
   className?: string;
+  isActive?: boolean;
 };
 
 function buttonStatusClasses(status: SideMenuButtonStatus) {
   if (status === "Highlight") {
-    return "bg-[#ea4c89] text-white";
+    return "shadow-[inset_0_0_0_1px_#8a38f5] text-[#8a38f5] hover:bg-[#f4edff]";
   }
 
   if (status === "Active") {
@@ -38,7 +39,7 @@ function buttonStatusClasses(status: SideMenuButtonStatus) {
 
 function badgeStatusClasses(status: SideMenuButtonStatus) {
   if (status === "Highlight") {
-    return "bg-[#eff2f3] text-[#ea4c89]";
+    return "bg-[#f4edff] text-[#8a38f5]";
   }
 
   if (status === "Active") {
@@ -57,6 +58,7 @@ export function SideMenuButton({
   badge,
   onClick,
   className = "",
+  isActive = false,
 }: SideMenuButtonProps) {
   const isIconOnly = model === "Icon";
   const hasBadge = model === "Icon + Text + Badge";
@@ -66,6 +68,7 @@ export function SideMenuButton({
       ? "w-[38px] justify-center p-0"
       : "w-full justify-between gap-1",
     buttonStatusClasses(status),
+    isActive && status === "Highlight" ? "bg-[#f4edff]" : "",
     className,
   ].join(" ");
 
@@ -74,7 +77,7 @@ export function SideMenuButton({
       <span
         className={[
           "flex shrink-0 items-center",
-          isIconOnly ? "w-full justify-center gap-0" : "min-w-0 gap-1",
+          isIconOnly ? "w-full justify-center gap-0" : "min-w-0 gap-2",
         ].join(" ")}
       >
         <span className="flex size-6 shrink-0 items-center justify-center">
@@ -103,7 +106,7 @@ export function SideMenuButton({
       {hasBadge && (
         <span
           className={[
-            "flex size-[18px] shrink-0 items-center justify-center rounded-full text-center text-[8px] font-medium leading-[10px]",
+            "mr-1 flex size-[18px] shrink-0 items-center justify-center rounded-full text-center text-[8px] font-medium leading-[10px]",
             badgeStatusClasses(status),
           ].join(" ")}
         >
@@ -118,7 +121,7 @@ export function SideMenuButton({
       <Link
         href={href}
         className={classes}
-        aria-current={status === "Active" ? "page" : undefined}
+        aria-current={isActive || status === "Active" ? "page" : undefined}
         title={isIconOnly ? label : undefined}
       >
         {content}

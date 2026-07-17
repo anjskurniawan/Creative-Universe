@@ -41,8 +41,9 @@ Dokumentasi aktif di folder ini adalah sumber arah arsitektur dan operasional Cr
 32. `07_design_system/Component_Hero_Heading.md`
 33. `07_design_system/Component_Primary_Action_Link.md`
 34. `07_design_system/Component_Error_Runner_Game.md`
-35. `07_design_system/Template_Universal_Error_View.md`
-36. `08_operations/Emergency_Maintenance.md`
+35. `07_design_system/Pattern_ODDS_Gameboy_Frame.md`
+36. `07_design_system/Template_Universal_Error_View.md`
+37. `08_operations/Emergency_Maintenance.md`
 
 ## Dokumen aktif utama
 
@@ -99,6 +100,7 @@ Dokumentasi aktif di folder ini adalah sumber arah arsitektur dan operasional Cr
 - `07_design_system/Component_Hero_Heading.md`
 - `07_design_system/Component_Primary_Action_Link.md`
 - `07_design_system/Component_Error_Runner_Game.md`
+- `07_design_system/Pattern_ODDS_Gameboy_Frame.md`
 - `07_design_system/Template_Universal_Error_View.md`
 - Visualisasi dan control panel komponen tersedia melalui `/docs?section=components/navbar`.
 

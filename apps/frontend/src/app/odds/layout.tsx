@@ -5,9 +5,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/side-menu";
 import {
-  getOddsConfigCategories,
-  getOddsConfigDesignerProfiles,
-  getOddsSystemRules,
   getOddsTasks,
   OddsTask,
 } from "@/features/odds/api";
@@ -19,6 +16,14 @@ type OddsMenuItem = {
   href: string;
   group: "tasks" | "manage" | "reports";
 };
+
+const ODDS_GROUP_LABELS: Record<OddsMenuItem["group"], string> = {
+  tasks: "Tugas",
+  manage: "Kelola ODDS",
+  reports: "Laporan",
+};
+
+const ODDS_GROUP_ORDER: OddsMenuItem["group"][] = ["tasks", "manage", "reports"];
 
 export default function OddsLayout({ children }: { children: ReactNode }) {
   const { hasPermission } = useAuth();
@@ -64,21 +69,11 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
           .filter((r: { status: string }) => r.status === "pending").length,
       };
 
-      if (canShowConfigSections) {
-        const [categories, designers, rules] = await Promise.all([
-          getOddsConfigCategories(),
-          getOddsConfigDesignerProfiles(),
-          getOddsSystemRules(),
-        ]);
-        newCounts.categories = categories.length;
-        newCounts.designers = designers.length;
-        newCounts.rules = rules.length;
-      }
       setCounts(newCounts);
     } catch (err) {
       console.error("Error loading counts for sidebar:", err);
     }
-  }, [canShowConfigSections]);
+  }, []);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -89,6 +84,14 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
   }, [loadCounts]);
 
   const activeSection = searchParams.get("section");
+  // Next can preserve a trailing slash in the local URL. Normalize it so the
+  // request page consistently receives its contained-scroll shell.
+  const normalizedPathname = pathname.replace(/\/$/, "") || "/";
+  const usesContainedScroll = normalizedPathname === "/odds/new"
+    || (normalizedPathname === "/odds" && activeSection === "all_tasks");
+  const sidebarClassName = usesContainedScroll
+    ? "!static !m-0 !h-full !min-h-0 !p-4"
+    : "!m-0 !h-screen !p-4";
 
   const menuItems = useMemo<OddsMenuItem[]>(() => {
     const items: OddsMenuItem[] = [];
@@ -158,8 +161,8 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     canViewAssignedTasks,
   ]);
 
-  const isSectionActive = (item: typeof menuItems[0]) => {
-    if (pathname === "/odds/new" || pathname === "/odds/detail") {
+  const isSectionActive = useCallback((item: typeof menuItems[0]) => {
+    if (normalizedPathname === "/odds/new" || normalizedPathname === "/odds/detail") {
       return false;
     }
     if (activeSection) {
@@ -167,26 +170,37 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     }
 
     return item.id === menuItems[0]?.id;
-  };
+  }, [activeSection, menuItems, normalizedPathname]);
 
   const sidebarItems = useMemo<SideMenuItem[]>(() => [
-    ...(canCreateTask ? [{ label: "Request Baru", icon: "add", href: "/odds/new", status: pathname === "/odds/new" ? "Active" as const : "Default" as const }] : []),
-    ...menuItems.map((item) => ({
-      label: item.label,
-      icon: item.icon,
-      href: item.href,
-      badge: counts[item.id] > 0 ? counts[item.id] : undefined,
-      status: isSectionActive(item) ? "Active" as const : "Default" as const,
-    })),
-  ], [canCreateTask, counts, menuItems, pathname, searchParams]);
+    ...(canCreateTask ? [{
+      label: "Request Baru",
+      icon: "add",
+      href: "/odds/new",
+      group: ODDS_GROUP_LABELS.tasks,
+      status: "Highlight" as const,
+      isActive: normalizedPathname === "/odds/new",
+    }] : []),
+    ...ODDS_GROUP_ORDER.flatMap((group) => menuItems
+      .filter((item) => item.group === group)
+      .map((item) => ({
+        label: item.label,
+        icon: item.icon,
+        href: item.href,
+        group: ODDS_GROUP_LABELS[group],
+        badge: item.group === "manage" ? undefined : counts[item.id] > 0 ? counts[item.id] : undefined,
+        status: isSectionActive(item) ? "Active" as const : "Default" as const,
+        isActive: isSectionActive(item),
+      }))),
+  ], [canCreateTask, counts, isSectionActive, menuItems, normalizedPathname]);
 
   return (
-    <div className="min-h-screen bg-[#f6faff] font-sans text-cu-ink antialiased">
-      <div className="grid min-h-screen grid-cols-[auto_minmax(0,1fr)]">
-        <SideMenu variant={mobileSidebarVariant} primaryItems={sidebarItems} onVariantChange={setMobileSidebarVariant} className="!m-0 !h-screen !w-[94px] !p-4 lg:hidden" />
-        <SideMenu variant={desktopSidebarVariant} primaryItems={sidebarItems} onVariantChange={setDesktopSidebarVariant} className="!m-0 !h-screen !w-[264px] !p-4 hidden lg:flex" />
-        <main className="min-w-0 px-4 py-6 sm:px-8 lg:px-12 lg:py-8">
-        <div className="min-h-full p-4 text-slate-800 sm:p-6">
+    <div className={`${usesContainedScroll ? "h-screen overflow-hidden" : "min-h-screen"} bg-[#f6faff] font-sans text-cu-ink antialiased`}>
+      <div className={`grid ${usesContainedScroll ? "h-full" : "min-h-screen"} grid-cols-[auto_minmax(0,1fr)]`}>
+        <SideMenu variant={mobileSidebarVariant} primaryItems={sidebarItems} onVariantChange={setMobileSidebarVariant} className={`${sidebarClassName} lg:hidden`} />
+        <SideMenu variant={desktopSidebarVariant} primaryItems={sidebarItems} onVariantChange={setDesktopSidebarVariant} className={`${sidebarClassName} hidden lg:flex`} />
+        <main className={`min-w-0 px-4 py-6 sm:px-8 lg:px-12 lg:py-8 ${usesContainedScroll ? "h-full overflow-hidden" : ""}`}>
+        <div className={`${usesContainedScroll ? "h-full min-h-0" : "min-h-full"} text-slate-800`}>
           {children}
         </div>
       </main>

@@ -8,6 +8,7 @@ use App\SubApps\Odds\Models\DesignerProfile;
 use App\SubApps\Odds\Models\Task;
 use App\Models\Core\StoredFile;
 use App\Services\Core\FileStorageService;
+use App\SubApps\Odds\Support\BriefHtmlSanitizer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -17,10 +18,12 @@ class OddsTaskIntakeService
         private OddsQueueService $queue,
         private OddsNotificationService $notifications,
         private FileStorageService $files,
+        private BriefHtmlSanitizer $briefHtml,
     ) {}
 
     public function create(array $data, int $userId): Task
     {
+        $data['brief_text'] = $this->briefHtml->sanitize($data['brief_text']);
         return DB::transaction(function () use ($data, $userId) {
             $category = Category::query()
                 ->where('is_active', true)
@@ -132,6 +135,7 @@ class OddsTaskIntakeService
 
     public function updateBrief(Task $task, array $data, int $userId): Task
     {
+        $data['brief_text'] = $this->briefHtml->sanitize($data['brief_text']);
         $task->update([
             'brief_text' => $data['brief_text'],
             'reference_visual' => $data['reference_visual'] ?? $task->reference_visual,

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
+import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
+import { stripRichText } from "@/components/odds-rich-text-editor";
 import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-card";
 import { useAuth } from "@/providers/auth-provider";
 import {
@@ -727,6 +729,18 @@ function OddsPageContent() {
     );
   }
 
+  if (effectiveActiveSection === "all_tasks") {
+    return (
+      <ConfigPanel title="All Tasks" icon="assignment" retroHeader>
+        <AllTasksCards
+          loading={loading}
+          empty="Belum ada task ODDS."
+          tasks={tasks}
+        />
+      </ConfigPanel>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between border-b border-cu-border pb-4">
@@ -1252,18 +1266,6 @@ function OddsPageContent() {
         </ConfigPanel>
       )}
 
-      {effectiveActiveSection === "all_tasks" && (
-        <ConfigPanel title="Monitoring Semua Task" icon="assignment">
-          <p className="mb-4 text-sm text-cu-muted">
-            Ringkasan task ODDS aktif dan selesai untuk pengecekan alur.
-          </p>
-          <TaskOperationsTable
-            loading={loading}
-            empty="Belum ada task ODDS."
-            tasks={tasks}
-          />
-        </ConfigPanel>
-      )}
       </div>
     </div>
   );
@@ -1277,7 +1279,34 @@ export default function OddsPage() {
   );
 }
 
-function ConfigPanel({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
+function ConfigPanel({ title, icon, children, retroHeader = false }: { title: string; icon: string; children: React.ReactNode; retroHeader?: boolean }) {
+  if (retroHeader) {
+    return (
+      <OddsGameboyFrame
+        label="ODDS Debug Console"
+        action={<span className="flex items-center gap-2 text-[8px] tracking-[0.14em]"><span className="size-2 animate-pulse bg-[#ba0dcb]" /> System Ready</span>}
+        className="h-full"
+      >
+        <div className="flex min-h-0 flex-1 flex-col rounded-xl border-[3px] border-[#24252b] bg-[#dfe2d3] p-3 shadow-[inset_0_0_0_3px_#b5b9ad] sm:p-4">
+          <div className="mb-4 flex shrink-0 items-center justify-between gap-4 border-b-2 border-[#24252b] pb-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex size-10 shrink-0 items-center justify-center border-2 border-[#24252b] bg-[#ba0dcb] text-white shadow-[2px_2px_0_#24252b]"><MaterialIcon name={icon} size="sm" /></span>
+              <div className="min-w-0">
+                <p className="text-[8px] font-black uppercase tracking-[0.2em] text-[#666961]">Audit Mode // Live Data</p>
+                <h2 className="mt-1 truncate text-lg font-black uppercase tracking-[0.08em] text-[#24252b]">{title}</h2>
+              </div>
+            </div>
+            <span className="hidden border-2 border-[#24252b] bg-[#eceee6] px-3 py-1 text-[8px] font-black uppercase tracking-[0.14em] shadow-[2px_2px_0_#777a72] sm:block">Task Log</span>
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-hidden">
+            {children}
+          </div>
+        </div>
+      </OddsGameboyFrame>
+    );
+  }
+
   return (
     <section className="rounded-lg border border-cu-border bg-white p-4">
       <div className="mb-4 flex items-center gap-2">
@@ -1330,6 +1359,26 @@ function StatusBadge({ status }: { status: string }) {
               : "border-cu-border bg-cu-panel-soft text-cu-muted"
       }`}
     >
+      {statusLabel(status)}
+    </span>
+  );
+}
+
+function RetroStatusBadge({ status }: { status: string }) {
+  const danger = ["cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(status);
+  const success = ["done", "client_review"].includes(status);
+  const active = ["in_progress", "spv_review", "queued", "submitted"].includes(status);
+
+  return (
+    <span className={`inline-flex border-2 border-[#24252b] px-2.5 py-1 font-mono text-[8px] font-black uppercase tracking-[0.12em] text-[#24252b] shadow-[2px_2px_0_#777a72] ${
+      danger
+        ? "bg-[#e7a0a0]"
+        : success
+          ? "bg-[#a9d49b]"
+          : active
+            ? "bg-[#ba0dcb] text-white"
+            : "bg-[#c9ccc0]"
+    }`}>
       {statusLabel(status)}
     </span>
   );
@@ -1564,6 +1613,198 @@ function TaskOperationsTable({ loading, empty, tasks }: { loading: boolean; empt
         ];
       })}
     />
+  );
+}
+
+function AllTasksCards({ loading, empty, tasks }: { loading: boolean; empty: string; tasks: OddsTask[] }) {
+  if (loading) {
+    return <div className="border-2 border-dashed border-[#777a72] bg-[#eceee6] px-5 py-10 text-center font-mono text-xs font-black uppercase tracking-[0.14em] text-[#666961]">Loading task log...</div>;
+  }
+
+  if (tasks.length === 0) {
+    return <div className="border-2 border-dashed border-[#777a72] bg-[#eceee6] px-5 py-10 text-center font-mono text-xs font-black uppercase tracking-[0.14em] text-[#666961]">{empty}</div>;
+  }
+
+  return (
+    <div className="retro-scrollbar h-full min-h-0 space-y-8 overflow-y-auto overscroll-contain pr-2">
+      <RoleViewPreview label="Manager / SPV View">
+        {tasks.map((task) => <ManagerSpvTaskCard key={`manager-${task.id}`} task={task} />)}
+      </RoleViewPreview>
+
+      <RoleViewPreview label="Client View">
+        {tasks.map((task) => <ClientTaskCard key={`client-${task.id}`} task={task} />)}
+      </RoleViewPreview>
+
+      <RoleViewPreview label="Designer View">
+        {tasks.map((task) => <DesignerTaskCard key={`designer-${task.id}`} task={task} />)}
+      </RoleViewPreview>
+    </div>
+  );
+}
+
+function RoleViewPreview({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <div className="mb-3 flex items-center gap-3 border-b-2 border-[#24252b] pb-2">
+        <span className="size-2 bg-[#ba0dcb] shadow-[0_0_0_2px_#24252b]" />
+        <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.14em] text-[#24252b]">{label}</h3>
+      </div>
+      <div className="space-y-3">{children}</div>
+    </section>
+  );
+}
+
+function ManagerSpvTaskCard({ task }: { task: OddsTask }) {
+  return <RoleTaskExpandableCard task={task} viewRole="manager" />;
+}
+
+function ClientTaskCard({ task }: { task: OddsTask }) {
+  return <RoleTaskExpandableCard task={task} viewRole="client" />;
+}
+
+function DesignerTaskCard({ task }: { task: OddsTask }) {
+  return <RoleTaskExpandableCard task={task} viewRole="designer" />;
+}
+
+function RoleTaskExpandableCard({ task, viewRole }: { task: OddsTask; viewRole: "manager" | "client" | "designer" }) {
+  const [expanded, setExpanded] = useState(false);
+  const [designerBriefOpen, setDesignerBriefOpen] = useState(false);
+  const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
+  const contentId = `all-task-${viewRole}-${task.id}-content`;
+  const createdDate = task.created_at ? new Date(task.created_at) : null;
+  const hasValidCreatedDate = createdDate && !Number.isNaN(createdDate.getTime());
+  const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const createdWeekday = hasValidCreatedDate ? dayNames[createdDate.getDay()] : "---";
+  const createdDay = hasValidCreatedDate ? createdDate.toLocaleDateString("en-US", { day: "2-digit" }) : "--";
+  const createdMonthYear = hasValidCreatedDate ? `${monthNames[createdDate.getMonth()]}-${createdDate.getFullYear()}` : "--- ----";
+
+  return (
+    <article className="border-2 border-[#24252b] bg-[#eceee6] font-mono text-[#24252b] shadow-[3px_3px_0_#777a72]">
+      {viewRole === "designer" ? (
+        <div className="grid w-full grid-cols-[64px_minmax(0,1fr)] items-stretch justify-start text-left sm:grid-cols-[76px_minmax(130px,170px)_220px_140px] lg:grid-cols-[76px_minmax(160px,200px)_260px_150px_210px]">
+          <span className="flex flex-col items-center justify-center border-r-2 border-[#24252b] bg-[#c9ccc0] px-2 py-3 text-center uppercase">
+            <span className="text-[9px] font-black tracking-[0.12em] text-[#666961]">{createdWeekday}</span>
+            <span className="my-0.5 text-2xl font-black leading-none sm:text-3xl">{createdDay}</span>
+            <span className="text-[8px] font-black tracking-[0.08em] text-[#666961]">{createdMonthYear}</span>
+          </span>
+          <span className="flex min-w-0 flex-col justify-center px-4 py-3">
+            <span className="line-clamp-2 text-sm font-black uppercase leading-6 tracking-[0.03em] sm:text-base" title={task.design_purpose}>{task.design_purpose}</span>
+            <span className="mt-1 flex flex-wrap items-center gap-2">
+              <TaskTypePill taskType={task.task_type} />
+            </span>
+            <button type="button" aria-expanded={designerBriefOpen} aria-controls={`${contentId}-brief`} onClick={() => setDesignerBriefOpen((open) => !open)} className="mt-2 inline-flex w-fit items-center gap-1 text-[9px] font-black uppercase tracking-[0.1em] text-[#666961] underline decoration-dotted underline-offset-4 transition hover:text-[#ba0dcb]">
+              {designerBriefOpen ? "Hide Brief" : "View Brief"} <MaterialIcon name={designerBriefOpen ? "keyboard_arrow_up" : "keyboard_arrow_down"} size="xs" />
+            </button>
+          </span>
+          <span className="col-start-2 row-start-2 flex flex-col justify-center gap-1 border-t border-dashed border-[#a9aca2] px-4 py-3 text-[9px] sm:col-start-auto sm:row-start-auto sm:border-l sm:border-t-0">
+            <span><strong className="inline-block w-[70px] uppercase text-[#666961]">Client</strong>: {task.requester?.name ?? "-"}</span>
+            <span><strong className="inline-block w-[70px] uppercase text-[#666961]">Kategori</strong>: {task.category?.name ?? "-"}</span>
+            <span><strong className="inline-block w-[70px] uppercase text-[#666961]">Deadline</strong>: {formatOddsDate(task.deadline, true)}</span>
+          </span>
+          <span className="col-start-2 row-start-3 flex flex-col items-start justify-center gap-2 border-t border-dashed border-[#a9aca2] px-4 py-3 sm:col-start-auto sm:row-start-auto sm:border-l sm:border-t-0">
+            <DeadlineCountdown deadline={task.deadline} />
+            <RetroStatusBadge status={task.status} />
+          </span>
+          <span className="col-start-2 row-start-4 flex items-center border-t border-dashed border-[#a9aca2] px-4 py-3 sm:col-span-3 sm:col-start-2 sm:row-start-2 lg:col-span-1 lg:col-start-auto lg:row-start-auto lg:border-l lg:border-t-0">
+            <DesignerActionButtons />
+          </span>
+        </div>
+      ) : (
+        <button type="button" aria-expanded={expanded} aria-controls={contentId} onClick={() => setExpanded((current) => !current)} className="grid w-full cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-4 p-4 text-left md:grid-cols-[minmax(15rem,1fr)_auto_auto]">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="border border-[#24252b] bg-[#c9ccc0] px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.12em]">{task.task_number}</span>
+              <TaskTypePill taskType={task.task_type} />
+            </div>
+            <h3 className="mt-2 truncate text-sm font-black uppercase leading-6 tracking-[0.03em] sm:text-base" title={task.design_purpose}>{task.design_purpose}</h3>
+          </div>
+
+          <div className="hidden md:block"><StatusBadge status={task.status} /></div>
+          <span className={`flex size-9 items-center justify-center border-2 border-[#24252b] bg-[#dfe2d3] shadow-[2px_2px_0_#777a72] transition-transform ${expanded ? "rotate-180" : ""}`}>
+            <MaterialIcon name="keyboard_arrow_down" size="sm" />
+          </span>
+        </button>
+      )}
+
+      {viewRole === "designer" && designerBriefOpen && (
+        <div id={`${contentId}-brief`} className="border-t-2 border-[#24252b] bg-[#dfe2d3] px-5 py-4">
+          <p className="mb-2 text-[8px] font-black uppercase tracking-[0.14em] text-[#666961]">Brief.txt</p>
+          <p className="whitespace-pre-wrap text-xs font-bold leading-6 text-[#24252b]">{stripRichText(task.brief_text) || "No brief provided."}</p>
+        </div>
+      )}
+
+      {viewRole !== "designer" && expanded && (
+        <div id={contentId} className="grid gap-4 border-t-2 border-[#24252b] bg-[#dfe2d3] p-4 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-end">
+          <AuditCardField label="Client" value={task.requester?.name ?? "-"} />
+          <AuditCardField label="Designer" value={assignedDesigner?.name ?? "-"} />
+          <div>
+            <p className="mb-1 text-[8px] font-black uppercase tracking-[0.14em] text-[#666961]">Status</p>
+            <StatusBadge status={task.status} />
+          </div>
+          <AuditCardField label="Deadline" value={formatOddsDate(task.deadline, true)} />
+          <Link href={`/odds/detail?id=${task.id}`} className="inline-flex h-10 items-center justify-center gap-2 border-2 border-[#24252b] bg-[#ba0dcb] px-4 text-[9px] font-black uppercase tracking-[0.1em] text-white shadow-[2px_2px_0_#24252b] transition hover:-translate-y-0.5 hover:brightness-90 hover:shadow-[3px_3px_0_#24252b] active:translate-y-0.5 active:shadow-none">
+            Detail <MaterialIcon name="arrow_forward" size="sm" />
+          </Link>
+        </div>
+      )}
+    </article>
+  );
+}
+
+function DesignerActionButtons() {
+  const actions = [
+    { icon: "play_arrow", label: "Play", primary: true },
+    { icon: "chat", label: "Action 2" },
+    { icon: "flag", label: "Action 3" },
+    { icon: "visibility", label: "Action 4" },
+    { icon: "more_horiz", label: "Action 5" },
+  ];
+
+  return (
+    <span className="flex flex-nowrap gap-2">
+      {actions.map((action) => (
+        <button key={action.label} type="button" aria-label={action.label} className={`flex size-8 items-center justify-center border-2 border-[#24252b] shadow-[2px_2px_0_#777a72] transition hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#24252b] active:translate-y-0.5 active:shadow-none ${action.primary ? "bg-[#ba0dcb] text-white" : "bg-[#c9ccc0] text-[#24252b] hover:bg-white"}`}>
+          <MaterialIcon name={action.icon} size="sm" />
+        </button>
+      ))}
+    </span>
+  );
+}
+
+function DeadlineCountdown({ deadline }: { deadline?: string | null }) {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const target = deadline ? new Date(deadline).getTime() : Number.NaN;
+  const remaining = target - now;
+  const valid = Number.isFinite(target);
+  const overdue = valid && remaining <= 0;
+  const days = valid && !overdue ? Math.floor(remaining / 86_400_000) : 0;
+  const hours = valid && !overdue ? Math.floor((remaining % 86_400_000) / 3_600_000) : 0;
+  const minutes = valid && !overdue ? Math.floor((remaining % 3_600_000) / 60_000) : 0;
+  const urgent = valid && !overdue && remaining <= 86_400_000;
+
+  return (
+    <span className="block min-w-0">
+      <span className="block text-[8px] font-black uppercase tracking-[0.14em] text-[#666961]">Countdown</span>
+      <span className={`mt-1 block whitespace-nowrap text-xs font-black uppercase ${overdue || urgent ? "text-[#ba0dcb]" : "text-[#24252b]"}`}>
+        {!valid ? "--" : overdue ? "Overdue" : `${days}D ${String(hours).padStart(2, "0")}H ${String(minutes).padStart(2, "0")}M`}
+      </span>
+    </span>
+  );
+}
+
+function AuditCardField({ label, value, className = "" }: { label: string; value: string; className?: string }) {
+  return (
+    <div className={className}>
+      <p className="text-[8px] font-black uppercase tracking-[0.14em] text-[#666961]">{label}</p>
+      <p className="mt-1 truncate text-xs font-bold" title={value}>{value}</p>
+    </div>
   );
 }
 

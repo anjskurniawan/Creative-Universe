@@ -15,6 +15,7 @@ use App\Http\Requests\Odds\StoreTaskRequest;
 use App\Http\Requests\Odds\SubmitResultRequest;
 use App\Http\Requests\Odds\UpdateBriefRequest;
 use App\Http\Resources\Odds\TaskResource;
+use App\Models\Core\StoredFile;
 use App\SubApps\Odds\Models\Task;
 use App\SubApps\Odds\Services\OddsBriefReviewService;
 use App\SubApps\Odds\Services\OddsEscalationService;
@@ -26,6 +27,8 @@ use App\Services\Core\FileStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TaskController extends BaseApiController
 {
@@ -82,6 +85,24 @@ class TaskController extends BaseApiController
             'mime_type' => $file->mime_type,
             'size' => $file->size,
         ], 'Lampiran ODDS siap dikirim.', 201);
+    }
+
+    public function attachmentContent(Request $request, StoredFile $storedFile): StreamedResponse
+    {
+        abort_unless($storedFile->application_key === 'odds', 404);
+
+        if ($storedFile->uploaded_by !== $request->user()->id) {
+            abort_unless($storedFile->context_type === 'task' && $storedFile->context_id, 403);
+            $this->authorizeTaskView($request, Task::findOrFail($storedFile->context_id));
+        }
+
+        abort_unless(Storage::disk($storedFile->disk)->exists($storedFile->path), 404);
+
+        return Storage::disk($storedFile->disk)->response(
+            $storedFile->path,
+            $storedFile->original_name,
+            ['Content-Disposition' => 'inline'],
+        );
     }
 
     public function show(Request $request, Task $task): JsonResponse

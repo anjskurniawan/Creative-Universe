@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { SideMenuAvatar } from "@/components/sidemenu/avatar";
 import { SideMenuButton, type SideMenuButtonStatus } from "@/components/sidemenu/button";
 import { SideMenuIconApp } from "@/components/sidemenu/iconapp";
@@ -11,6 +11,8 @@ export type SideMenuCollapsedItem = {
   href?: string;
   badge?: number | string;
   status?: SideMenuButtonStatus;
+  group?: string;
+  isActive?: boolean;
 };
 
 type SideMenuCollapsProps = {
@@ -40,29 +42,34 @@ export function SideMenuCollaps({
         className,
       ].join(" ")}
     >
-      <div className="flex h-full w-[62px] flex-col items-center justify-between rounded-2xl border border-[#ebebeb] bg-white p-3">
-        <div className="flex w-full flex-col items-center justify-center">
-          <div className="flex w-full flex-col items-start gap-8">
+      <div className="flex h-full w-[62px] flex-col items-center justify-between rounded-2xl border border-[#ebebeb] bg-white px-2.5 py-3">
+        <div className="flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden">
+          <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-6">
             <SideMenuIconApp type="Icon" state="Light" />
 
-            <nav aria-label="Navigasi utama" className="flex flex-col items-start gap-1">
-              {primaryItems.map((item) => (
-                <SideMenuButton
-                  key={item.label}
-                  model="Icon"
-                  status={item.status}
-                  label={item.label}
-                  icon={item.icon}
-                  href={item.href}
-                  badge={item.badge}
-                />
+            <nav aria-label="Navigasi utama" className="flex min-h-0 w-full flex-col items-center gap-1 overflow-y-auto overflow-x-hidden [scrollbar-width:none]">
+              {primaryItems.map((item, index) => (
+                <Fragment key={item.label}>
+                  {index > 0 && item.group && item.group !== primaryItems[index - 1]?.group && (
+                    <span className="my-1 h-px w-[30px] shrink-0 bg-[#ebebeb]" aria-hidden="true" />
+                  )}
+                  <SideMenuButton
+                    model="Icon"
+                    status={item.status}
+                    label={item.label}
+                    icon={item.icon}
+                    href={item.href}
+                    badge={item.badge}
+                    isActive={item.isActive}
+                  />
+                </Fragment>
               ))}
             </nav>
           </div>
         </div>
 
-        <div className="flex flex-col items-start gap-2 border-t border-[#ebebeb] py-2">
-          <nav aria-label="Navigasi akun" className="flex flex-col items-start gap-1">
+        <div className="flex shrink-0 flex-col items-center gap-2 border-t border-[#ebebeb] py-2">
+          <nav aria-label="Navigasi akun" className="flex flex-col items-center gap-1">
             <SideMenuButton
               model="Icon"
               status="Default"

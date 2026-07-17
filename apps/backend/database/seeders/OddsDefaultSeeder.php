@@ -34,6 +34,26 @@ class OddsDefaultSeeder extends Seeder
             ]
         );
 
+        $additionalCategories = [
+            ['name' => 'Instagram Story', 'score_weight' => 1, 'normal_revision_limit' => 2, 'workload_point' => 1, 'sla_days' => 1],
+            ['name' => 'Social Media Carousel', 'score_weight' => 2, 'normal_revision_limit' => 2, 'workload_point' => 2, 'sla_days' => 3],
+            ['name' => 'Product Launch Key Visual', 'score_weight' => 3, 'normal_revision_limit' => 3, 'workload_point' => 3, 'sla_days' => 5],
+            ['name' => 'E-Commerce Product Thumbnail', 'score_weight' => 1, 'normal_revision_limit' => 2, 'workload_point' => 1, 'sla_days' => 2],
+            ['name' => 'Website Hero Banner', 'score_weight' => 2.5, 'normal_revision_limit' => 2, 'workload_point' => 3, 'sla_days' => 4],
+            ['name' => 'Promotional Poster', 'score_weight' => 2, 'normal_revision_limit' => 2, 'workload_point' => 2, 'sla_days' => 3],
+            ['name' => 'Email Campaign Banner', 'score_weight' => 1.5, 'normal_revision_limit' => 2, 'workload_point' => 1, 'sla_days' => 2],
+            ['name' => 'Event Branding', 'score_weight' => 4, 'normal_revision_limit' => 3, 'workload_point' => 4, 'sla_days' => 7],
+            ['name' => 'Packaging Label', 'score_weight' => 3, 'normal_revision_limit' => 3, 'workload_point' => 3, 'sla_days' => 5],
+            ['name' => 'Presentation Deck', 'score_weight' => 3.5, 'normal_revision_limit' => 3, 'workload_point' => 4, 'sla_days' => 6],
+        ];
+
+        foreach ($additionalCategories as $category) {
+            Category::firstOrCreate(
+                ['name' => $category['name']],
+                [...$category, 'is_active' => true]
+            );
+        }
+
         SystemRule::firstOrCreate(
             ['key' => 'brief_return_limit'],
             [

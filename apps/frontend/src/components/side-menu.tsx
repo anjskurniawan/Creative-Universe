@@ -24,6 +24,8 @@ export type SideMenuItem = {
   href?: string;
   badge?: number | string;
   status?: SideMenuMenuStatus;
+  group?: string;
+  isActive?: boolean;
 };
 
 type SideMenuIconProps = {
