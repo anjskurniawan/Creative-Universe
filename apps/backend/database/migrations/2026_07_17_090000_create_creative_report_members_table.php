@@ -27,8 +27,8 @@ return new class extends Migration
         }
 
         Schema::table('creative_report_assessments', function (Blueprint $table) {
-            $table->dropUnique(['user_id', 'period']);
             $table->dropForeign(['user_id']);
+            $table->dropUnique(['user_id', 'period']);
             $table->foreignId('creative_report_member_id')->nullable()->after('creative_report_group_id')
                 ->constrained('creative_report_members')->nullOnDelete();
             $table->unsignedBigInteger('user_id')->nullable()->change();
