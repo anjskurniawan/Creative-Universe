@@ -23,7 +23,7 @@ function isInMonth(task: TaskPerformanceTask, month: Date) {
   return Boolean(date && date.getMonth() === month.getMonth() && date.getFullYear() === month.getFullYear());
 }
 
-function isLate(task: TaskPerformanceTask) { return Boolean(task.timing_evaluation?.violations?.["Kirim Email"]?.late); }
+function isLate(task: TaskPerformanceTask) { return Boolean(task.timing_evaluation?.late); }
 function isBottleneck(task: TaskPerformanceTask) { return BOTTLENECK_STAGES.some((stage) => task.timing_evaluation?.violations?.[stage]?.late); }
 function isTimely(task: TaskPerformanceTask) { return task.status === "Done" && !isLate(task); }
 function percent(value: number, total: number) { return total ? Math.round((value / total) * 1000) / 10 : 0; }

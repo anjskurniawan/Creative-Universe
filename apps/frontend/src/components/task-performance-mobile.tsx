@@ -11,6 +11,8 @@ export type TaskPerformanceTask = {
   deadline_date?: string | null;
   task_timestamps?: Record<string, string> | null;
   timing_evaluation?: {
+    bottleneck?: boolean;
+    late?: boolean;
     violations?: Record<string, { late?: boolean }>;
   } | null;
 };
@@ -48,7 +50,7 @@ function inMonth(task: TaskPerformanceTask, month: Date) {
   return date?.getMonth() === month.getMonth() && date.getFullYear() === month.getFullYear();
 }
 
-function isFinalLate(task: TaskPerformanceTask) { return Boolean(task.timing_evaluation?.violations?.["Kirim Email"]?.late); }
+function isFinalLate(task: TaskPerformanceTask) { return Boolean(task.timing_evaluation?.late); }
 function isBottleneck(task: TaskPerformanceTask) { return ["ACC Draft", "Progress Design", "Approval Design"].some((stage) => task.timing_evaluation?.violations?.[stage]?.late); }
 function isTimelyDone(task: TaskPerformanceTask) { return task.status === "Done" && !isFinalLate(task); }
 

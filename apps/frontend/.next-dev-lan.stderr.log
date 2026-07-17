@@ -1326,3 +1326,149 @@ Import trace for requested module:
 <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz'
 [browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
 Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
