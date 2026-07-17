@@ -40,6 +40,18 @@ function isPersistedConversation(conversation: ChatConversation | null): convers
   return typeof conversation?.id === "number";
 }
 
+function uniqueMessages(messages: ChatMessage[]): ChatMessage[] {
+  const seen = new Set<string>();
+
+  return messages.filter((message) => {
+    const key = String(message.id);
+    if (seen.has(key)) return false;
+
+    seen.add(key);
+    return true;
+  });
+}
+
 function conversationTitle(conversation: ChatConversation): string {
   if (conversation.context_type === "odds_task") {
     return conversation.task?.task_number ?? "Task ODDS";
@@ -153,7 +165,7 @@ function MessagesContent() {
     setChatError(null);
     try {
       const response = await chatApi.messages(id, page);
-      setMessages((previous) => appendEarlier ? [...response.data, ...previous] : response.data);
+      setMessages((previous) => uniqueMessages(appendEarlier ? [...response.data, ...previous] : response.data));
       setMessagePage(page);
       setHasMoreMessages(Boolean(response.meta.has_more));
       setConversations((items) => items.map((conversation) => conversation.id === id && conversation.last_message
@@ -258,7 +270,7 @@ function MessagesContent() {
           setMessages((prev) => {
             const alreadyExists = prev.some((item) => String(item.id) === String(message.id));
 
-            return alreadyExists ? prev : [...prev, message];
+            return alreadyExists ? prev : uniqueMessages([...prev, message]);
           });
         }
     });
@@ -307,7 +319,7 @@ function MessagesContent() {
     };
 
     setChatError(null);
-    setMessages((prev) => [...prev, tempMessage]);
+    setMessages((prev) => uniqueMessages([...prev, tempMessage]));
     setNewMessage("");
     setPendingAttachments([]);
     setReplyTo(null);
@@ -327,7 +339,7 @@ function MessagesContent() {
 
       const persistedMessage = await chatApi.send(payload);
 
-      setMessages((prev) => prev.map((message) => (message.id === tempId ? persistedMessage : message)));
+      setMessages((prev) => uniqueMessages(prev.map((message) => (message.id === tempId ? persistedMessage : message))));
 
       if (persistedMessage.conversation_id) {
         updateConversationLastMessage(persistedMessage.conversation_id, persistedMessage);

@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useMemo, type ReactNode } from "react
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/side-menu";
+import { Navbar } from "@/components/navbar";
+import { TaskMobileNavigation } from "@/components/task-mobile-navigation";
 import {
   getOddsTasks,
   OddsTask,
@@ -46,7 +48,6 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
 
   // State to hold counts
   const [counts, setCounts] = useState<Record<string, number>>({});
-  const [mobileSidebarVariant, setMobileSidebarVariant] = useState<SideMenuVariant>("Collaps");
   const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Expand");
 
   // Load counts for menu badges
@@ -194,10 +195,30 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
       }))),
   ], [canCreateTask, counts, isSectionActive, menuItems, normalizedPathname]);
 
+  const activeMobileLabel = sidebarItems.find((item) => item.isActive)?.label;
+
   return (
     <div className={`${usesContainedScroll ? "h-screen overflow-hidden" : "min-h-screen"} bg-[#f6faff] font-sans text-cu-ink antialiased`}>
-      <div className={`grid ${usesContainedScroll ? "h-full" : "min-h-screen"} grid-cols-[auto_minmax(0,1fr)]`}>
-        <SideMenu variant={mobileSidebarVariant} primaryItems={sidebarItems} onVariantChange={setMobileSidebarVariant} className={`${sidebarClassName} lg:hidden`} />
+      <div className="lg:hidden">
+        <Navbar />
+      </div>
+
+      <div className={`${usesContainedScroll ? "h-[calc(100dvh-72px)] overflow-hidden" : "min-h-[calc(100dvh-72px)]"} lg:hidden`}>
+        <main className={`min-w-0 px-4 py-4 ${usesContainedScroll ? "h-full overflow-hidden" : ""}`}>
+          <div className={`${usesContainedScroll ? "h-full min-h-0" : "min-h-full"} text-slate-800`}>
+            {children}
+          </div>
+        </main>
+      </div>
+
+      <div className="lg:hidden">
+        <TaskMobileNavigation
+          items={sidebarItems.map(({ label, icon, href }) => ({ label, icon, href }))}
+          activeLabel={activeMobileLabel}
+        />
+      </div>
+
+      <div className={`hidden ${usesContainedScroll ? "h-full" : "min-h-screen"} grid-cols-[auto_minmax(0,1fr)] lg:grid`}>
         <SideMenu variant={desktopSidebarVariant} primaryItems={sidebarItems} onVariantChange={setDesktopSidebarVariant} className={`${sidebarClassName} hidden lg:flex`} />
         <main className={`min-w-0 px-4 py-6 sm:px-8 lg:px-12 lg:py-8 ${usesContainedScroll ? "h-full overflow-hidden" : ""}`}>
         <div className={`${usesContainedScroll ? "h-full min-h-0" : "min-h-full"} text-slate-800`}>
