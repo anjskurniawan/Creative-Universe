@@ -8,21 +8,23 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('creative_report_members', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->nullable()->unique()->constrained('users')->nullOnDelete();
-            $table->string('name');
-            $table->foreignId('position_id')->nullable()->constrained('positions')->nullOnDelete();
-            $table->string('position_name');
-            $table->string('status')->default('pending');
-            $table->timestamp('joined_at')->nullable();
-            $table->timestamp('resigned_at')->nullable();
-            $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('reviewed_at')->nullable();
-            $table->timestamps();
+        if (! Schema::hasTable('creative_report_members')) {
+            Schema::create('creative_report_members', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->nullable()->unique()->constrained('users')->nullOnDelete();
+                $table->string('name');
+                $table->foreignId('position_id')->nullable()->constrained('positions')->nullOnDelete();
+                $table->string('position_name');
+                $table->string('status')->default('pending');
+                $table->timestamp('joined_at')->nullable();
+                $table->timestamp('resigned_at')->nullable();
+                $table->foreignId('reviewed_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->timestamp('reviewed_at')->nullable();
+                $table->timestamps();
 
-            $table->index(['status', 'position_name']);
-        });
+                $table->index(['status', 'position_name']);
+            });
+        }
 
         Schema::table('creative_report_assessments', function (Blueprint $table) {
             $table->dropUnique(['user_id', 'period']);
