@@ -7,6 +7,8 @@ Route::middleware(['auth:sanctum', 'app:kv-retail'])->group(function () {
     Route::get('/kv-retail/assignees', [TaskController::class, 'accessUsers'])->middleware('permission:kv-retail.tasks.create|kv-retail.settings.manage');
     Route::post('/kv-retail/uploads', [TaskController::class, 'uploadTempFile'])->middleware('permission:kv-retail.tasks.create');
     Route::get('/kv-retail/tasks', [TaskController::class, 'index'])->middleware('permission:kv-retail.tasks.view');
+    Route::get('/kv-retail/tasks/{task}/creative-agent', [TaskController::class, 'taskCreativeAgent'])->middleware('permission:kv-retail.tasks.view');
+    Route::post('/kv-retail/tasks/{task}/creative-agent/generate', [TaskController::class, 'generateTaskCreativeAgent'])->middleware('permission:kv-retail.tasks.update-status');
     Route::get('/kv-retail/performance/creative-agent', [TaskController::class, 'latestPerformanceAiReport'])->middleware('permission:kv-retail.tasks.create');
     Route::post('/kv-retail/performance/ai-report', [TaskController::class, 'performanceAiReport'])->middleware('permission:kv-retail.tasks.create');
     Route::post('/kv-retail/tasks', [TaskController::class, 'store'])->middleware('permission:kv-retail.tasks.create');

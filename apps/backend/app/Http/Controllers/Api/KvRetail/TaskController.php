@@ -163,7 +163,7 @@ class TaskController extends BaseApiController
 
         $prompt = <<<PROMPT
 KV Retail, Bahasa Indonesia. Data ringkas: {$reportJson}
-Berikan HANYA rekomendasi tindakan dalam Markdown: mulai dengan ## Rekomendasi Bulan Ini, lalu tepat 3 bullet. Setiap bullet hanya boleh membahas kumpulan task berdasarkan status, deadline, atau tahap proses bulan ini; sertakan angka yang relevan bila tersedia. Gunakan gaya seperti: "Tuntaskan 2 task terlambat ...", "Dorong 4 task di ACC Draft ...", atau "Pantau 5 task dalam proses ...". DILARANG menyarankan tindakan terhadap orang atau tim, termasuk anggota, staf, sumber daya, reviewer, pembagian beban kerja, rapat, reminder, atau evaluasi performa orang. Jangan menulis ringkasan, temuan, prioritas, angka yang berdiri sendiri, JSON, atau proses berpikir. Terlambat = Kirim Email melewati deadline. Bottleneck hanya ACC Draft, Progress Design, Approval Design.
+Berikan HANYA rekomendasi tindakan dalam Markdown: mulai dengan ## Rekomendasi Terkini, lalu tepat 3 bullet. Setiap bullet hanya boleh membahas kumpulan task berdasarkan status, deadline, atau tahap proses saat ini; sertakan angka yang relevan bila tersedia. Gunakan gaya seperti: "Tuntaskan 2 task terlambat ...", "Dorong 4 task di ACC Draft ...", atau "Pantau 5 task dalam proses ...". DILARANG menyarankan tindakan terhadap orang atau tim, termasuk anggota, staf, sumber daya, reviewer, pembagian beban kerja, rapat, reminder, atau evaluasi performa orang. Jangan menulis ringkasan, temuan, prioritas, angka yang berdiri sendiri, JSON, atau proses berpikir. Terlambat = Kirim Email melewati deadline. Bottleneck hanya ACC Draft, Progress Design, Approval Design.
 PROMPT;
 
         try {
@@ -180,6 +180,48 @@ PROMPT;
         $this->ensureTaskRouteAccess($request->user());
 
         return $this->sendResponse($creativeAgent->latest(), 'Creative Agent terbaru berhasil diambil.');
+    }
+
+    public function taskCreativeAgent(Request $request, \App\SubApps\KvRetail\Models\KvRetailTask $task, KvRetailCreativeAgentService $creativeAgent)
+    {
+        $this->ensureTaskRouteAccess($request->user());
+        $user = $request->user();
+
+        abort_unless(
+            $user?->hasRole(['Root', 'Manajer', 'SPV']) || $task->users()->whereKey($user?->id)->exists(),
+            403,
+            'Unauthorized action.',
+        );
+
+        $suggestion = $creativeAgent->latestTaskSuggestion((int) $task->id);
+        $generated = $creativeAgent->hasCurrentTaskSuggestion($task);
+
+        return $this->sendResponse([
+            'generated' => $generated,
+            'content' => $suggestion['content'] ?? null,
+            'generated_at' => $suggestion['generated_at'] ?? null,
+        ], 'Creative Agent task terbaru berhasil diambil.');
+    }
+
+    public function generateTaskCreativeAgent(Request $request, \App\SubApps\KvRetail\Models\KvRetailTask $task, KvRetailCreativeAgentService $creativeAgent)
+    {
+        $this->ensureTaskRouteAccess($request->user());
+        $user = $request->user();
+
+        abort_unless(
+            $user?->hasRole(['Root', 'Manajer', 'SPV']) || $task->users()->whereKey($user?->id)->exists(),
+            403,
+            'Unauthorized action.',
+        );
+
+        $creativeAgent->generateTaskSuggestionIfChanged($task);
+        $suggestion = $creativeAgent->latestTaskSuggestion((int) $task->id);
+
+        return $this->sendResponse([
+            'generated' => $creativeAgent->hasCurrentTaskSuggestion($task),
+            'content' => $suggestion['content'] ?? null,
+            'generated_at' => $suggestion['generated_at'] ?? null,
+        ], 'Creative Agent task berhasil dibuat.');
     }
 
     public function updateStatus(Request $request, $id, KvRetailTaskTimingService $timing)

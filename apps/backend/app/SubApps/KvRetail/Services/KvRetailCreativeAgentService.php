@@ -58,6 +58,58 @@ class KvRetailCreativeAgentService
         return is_array($report) ? $report : null;
     }
 
+    /** @return array{content: string, generated_at: string}|null */
+    public function latestTaskSuggestion(int $taskId): ?array
+    {
+        $suggestion = Cache::get($this->taskSuggestionKey($taskId));
+
+        return is_array($suggestion) ? $suggestion : null;
+    }
+
+    public function hasCurrentTaskSuggestion(KvRetailTask $task): bool
+    {
+        $suggestion = $this->latestTaskSuggestion((int) $task->id);
+
+        return $suggestion !== null
+            && hash_equals(
+                (string) Cache::get($this->taskSuggestionHashKey((int) $task->id), ''),
+                $this->sourceHash($this->taskSuggestionData($task)),
+            );
+    }
+
+    /**
+     * Generates recommendations for one task after its persisted data changes.
+     * The source hash prevents repeated Groq requests for unchanged task data.
+     */
+    public function generateTaskSuggestionIfChanged(KvRetailTask $task): bool
+    {
+        $data = $this->taskSuggestionData($task);
+        $sourceHash = $this->sourceHash($data);
+        $lock = Cache::lock("kv-retail:creative-agent:task:{$task->id}:lock", 120);
+
+        if (! $lock->get()) {
+            return false;
+        }
+
+        try {
+            if (hash_equals((string) Cache::get($this->taskSuggestionHashKey((int) $task->id), ''), $sourceHash)) {
+                return false;
+            }
+
+            $suggestion = [
+                'content' => $this->groqService->generateResponse($this->taskSuggestionPrompt($data)),
+                'generated_at' => now()->toIso8601String(),
+            ];
+
+            Cache::put($this->taskSuggestionKey((int) $task->id), $suggestion, now()->addDays(31));
+            Cache::put($this->taskSuggestionHashKey((int) $task->id), $sourceHash, now()->addDays(31));
+
+            return true;
+        } finally {
+            $lock->release();
+        }
+    }
+
     private function reportData(): array
     {
         $tasks = KvRetailTask::query()
@@ -128,6 +180,55 @@ class KvRetailCreativeAgentService
         return hash('sha256', json_encode($reportData, JSON_UNESCAPED_UNICODE) ?: '{}');
     }
 
+    /** @return array<string, mixed> */
+    private function taskSuggestionData(KvRetailTask $task): array
+    {
+        $evaluation = $task->timing_evaluation;
+        $timestamps = $task->task_timestamps ?? [];
+        $stages = ['ACC Draft' => 'ACC Draft', 'Progress Design' => 'Progress', 'Approval Design' => 'Approve', 'Kirim Email' => 'Email'];
+        $activeStage = collect($stages)->first(fn (string $timestamp) => blank($timestamps[$timestamp] ?? null));
+
+        return [
+            'status' => $task->status,
+            'deadline' => optional($task->deadline_date)->toDateString(),
+            'deadline_terlewati' => (bool) data_get($evaluation, 'late'),
+            'bottleneck' => (bool) data_get($evaluation, 'bottleneck'),
+            'tahap_aktif' => $activeStage ?: 'Selesai',
+            'tahap_selesai' => collect($stages)
+                ->filter(fn (string $timestamp) => filled($timestamps[$timestamp] ?? null))
+                ->keys()
+                ->values()
+                ->all(),
+            'pelanggaran_tahap' => collect(data_get($evaluation, 'violations', []))
+                ->filter(fn (mixed $violation) => (bool) data_get($violation, 'late'))
+                ->keys()
+                ->values()
+                ->all(),
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    private function taskSuggestionPrompt(array $data): string
+    {
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE) ?: '{}';
+
+        return <<<PROMPT
+KV Retail, Bahasa Indonesia. Data ringkas satu task: {$json}
+Berikan tepat 3 saran tindakan yang singkat dan spesifik hanya untuk task ini. Tulis HANYA tiga bullet Markdown dengan awalan "- ". Maksimal 16 kata tiap bullet. Jangan menyebut orang, tim, reviewer, pembagian kerja, rapat, reminder, evaluasi performa, atau data/proses berpikir. Jangan menambah judul, ringkasan, penomoran, atau Markdown lain. Terlambat berarti Kirim Email melewati deadline; bottleneck hanya tahap ACC Draft, Progress Design, Approval Design.
+PROMPT;
+    }
+
+    private function taskSuggestionKey(int $taskId): string
+    {
+        return "kv-retail:creative-agent:task:{$taskId}";
+    }
+
+    private function taskSuggestionHashKey(int $taskId): string
+    {
+        return "kv-retail:creative-agent:task:{$taskId}:source-hash";
+    }
+
+
     /** @param array<string, mixed> $reportData */
     private function prompt(array $reportData): string
     {
@@ -135,7 +236,7 @@ class KvRetailCreativeAgentService
 
         return <<<PROMPT
 KV Retail, Bahasa Indonesia. Data ringkas: {$reportJson}
-Berikan HANYA rekomendasi tindakan dalam Markdown: mulai dengan ## Rekomendasi Bulan Ini, lalu tepat 3 bullet. Setiap bullet hanya boleh membahas kumpulan task berdasarkan status, deadline, atau tahap proses bulan ini; sertakan angka yang relevan bila tersedia. Gunakan gaya seperti: "Tuntaskan 2 task terlambat ...", "Dorong 4 task di ACC Draft ...", atau "Pantau 5 task dalam proses ...". DILARANG menyarankan tindakan terhadap orang atau tim, termasuk anggota, staf, sumber daya, reviewer, pembagian beban kerja, rapat, reminder, atau evaluasi performa orang. Jangan menulis ringkasan, temuan, prioritas, angka yang berdiri sendiri, JSON, atau proses berpikir. Terlambat = Kirim Email melewati deadline. Bottleneck hanya ACC Draft, Progress Design, Approval Design.
+Berikan HANYA rekomendasi tindakan dalam Markdown: mulai dengan ## Rekomendasi Terkini, lalu tepat 3 bullet. Setiap bullet hanya boleh membahas kumpulan task berdasarkan status, deadline, atau tahap proses saat ini; sertakan angka yang relevan bila tersedia. Gunakan gaya seperti: "Tuntaskan 2 task terlambat ...", "Dorong 4 task di ACC Draft ...", atau "Pantau 5 task dalam proses ...". DILARANG menyarankan tindakan terhadap orang atau tim, termasuk anggota, staf, sumber daya, reviewer, pembagian beban kerja, rapat, reminder, atau evaluasi performa orang. Jangan menulis ringkasan, temuan, prioritas, angka yang berdiri sendiri, JSON, atau proses berpikir. Terlambat = Kirim Email melewati deadline. Bottleneck hanya ACC Draft, Progress Design, Approval Design.
 PROMPT;
     }
 }

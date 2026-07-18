@@ -1472,3 +1472,367 @@ Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
   220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
 [browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
 Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+⚠ Fast Refresh had to perform a full reload when \\apps\\frontend\\src\\features\\kv-retail\\components\\task-page.tsx","ids":["TaskPage"]} changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Gagal memuat performa task: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:41:17)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error inlining remote css file SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error while reading CSS rules from https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error inlining remote css file SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error while reading CSS rules from https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] ./src/components/taskcard/task-card.tsx
+Error:   x Expected '</', got 'ident'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\components\taskcard\task-card.tsx:603:1]
+ 600 |             <div className="rounded-2xl border border-[#ececf4] bg-[#fcfcff] p-6">
+ 601 |               <p className="text-sm font-medium text-[#85889a]">Deadline</p>
+ 602 |               <p className="mt-2 text-[30px] font-semibold tracking-[-0.5px]">{formattedDeadline || "-"}</p>
+ 603 |               <p className={`mt-3 text-base font-medium ${isLate ? "text-[#d94a67]" : "text-[#707484]}`}>{isDone ? "Task telah diselesaikan" : daysLeftText}</p>
+     :                                                                                                                     ^^^^
+ 604 |             </div>
+ 605 |             <div className="rounded-2xl bg-[#282445] p-6 text-white">
+ 606 |               <div className="flex items-center justify-between"><p className="text-sm font-medium text-white/65">Progress task</p><p className="text-lg font-semibold">{PROGRESS_PERCENTAGE[state]}%</p></div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/taskcard/task-card.tsx
+./src/components/taskcard/index.ts
+./src/components/task-card.tsx
+./src/features/kv-retail/components/task-page.tsx 
+[browser] ./src/components/taskcard/task-card.tsx
+Error:   x Expected '</', got 'ident'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\components\taskcard\task-card.tsx:603:1]
+ 600 |             <div className="rounded-2xl border border-[#ececf4] bg-[#fcfcff] p-6">
+ 601 |               <p className="text-sm font-medium text-[#85889a]">Deadline</p>
+ 602 |               <p className="mt-2 text-[30px] font-semibold tracking-[-0.5px]">{formattedDeadline || "-"}</p>
+ 603 |               <p className={`mt-3 text-base font-medium ${isLate ? "text-[#d94a67]" : "text-[#707484]}`}>{isDone ? "Task telah diselesaikan" : daysLeftText}</p>
+     :                                                                                                                     ^^^^
+ 604 |             </div>
+ 605 |             <div className="rounded-2xl bg-[#282445] p-6 text-white">
+ 606 |               <div className="flex items-center justify-between"><p className="text-sm font-medium text-white/65">Progress task</p><p className="text-lg font-semibold">{PROGRESS_PERCENTAGE[state]}%</p></div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/taskcard/task-card.tsx
+./src/components/taskcard/index.ts
+./src/components/task-card.tsx
+./src/features/kv-retail/components/task-page.tsx 
+⨯ ./src/components/taskcard/task-card.tsx
+Error:   x Expected '</', got 'ident'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\components\taskcard\task-card.tsx:603:1]
+ 600 |             <div className="rounded-2xl border border-[#ececf4] bg-[#fcfcff] p-6">
+ 601 |               <p className="text-sm font-medium text-[#85889a]">Deadline</p>
+ 602 |               <p className="mt-2 text-[30px] font-semibold tracking-[-0.5px]">{formattedDeadline || "-"}</p>
+ 603 |               <p className={`mt-3 text-base font-medium ${isLate ? "text-[#d94a67]" : "text-[#707484]}`}>{isDone ? "Task telah diselesaikan" : daysLeftText}</p>
+     :                                                                                                                     ^^^^
+ 604 |             </div>
+ 605 |             <div className="rounded-2xl bg-[#282445] p-6 text-white">
+ 606 |               <div className="flex items-center justify-between"><p className="text-sm font-medium text-white/65">Progress task</p><p className="text-lg font-semibold">{PROGRESS_PERCENTAGE[state]}%</p></div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/taskcard/task-card.tsx
+./src/components/taskcard/index.ts
+./src/components/task-card.tsx
+./src/features/kv-retail/components/task-page.tsx
+[browser] ./src/components/taskcard/task-card.tsx
+Error:   x Expected '</', got 'ident'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\components\taskcard\task-card.tsx:603:1]
+ 600 |             <div className="rounded-2xl border border-[#ececf4] bg-[#fcfcff] p-6">
+ 601 |               <p className="text-sm font-medium text-[#85889a]">Deadline</p>
+ 602 |               <p className="mt-2 text-[30px] font-semibold tracking-[-0.5px]">{formattedDeadline || "-"}</p>
+ 603 |               <p className={`mt-3 text-base font-medium ${isLate ? "text-[#d94a67]" : "text-[#707484]}`}>{isDone ? "Task telah diselesaikan" : daysLeftText}</p>
+     :                                                                                                                     ^^^^
+ 604 |             </div>
+ 605 |             <div className="rounded-2xl bg-[#282445] p-6 text-white">
+ 606 |               <div className="flex items-center justify-between"><p className="text-sm font-medium text-white/65">Progress task</p><p className="text-lg font-semibold">{PROGRESS_PERCENTAGE[state]}%</p></div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/taskcard/task-card.tsx
+./src/components/taskcard/index.ts
+./src/components/task-card.tsx
+./src/features/kv-retail/components/task-page.tsx 
+[browser] ./src/components/taskcard/task-card.tsx
+Error:   x Expected '</', got 'ident'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\components\taskcard\task-card.tsx:603:1]
+ 600 |             <div className="rounded-2xl border border-[#ececf4] bg-[#fcfcff] p-6">
+ 601 |               <p className="text-sm font-medium text-[#85889a]">Deadline</p>
+ 602 |               <p className="mt-2 text-[30px] font-semibold tracking-[-0.5px]">{formattedDeadline || "-"}</p>
+ 603 |               <p className={`mt-3 text-base font-medium ${isLate ? "text-[#d94a67]" : "text-[#707484]}`}>{isDone ? "Task telah diselesaikan" : daysLeftText}</p>
+     :                                                                                                                     ^^^^
+ 604 |             </div>
+ 605 |             <div className="rounded-2xl bg-[#282445] p-6 text-white">
+ 606 |               <div className="flex items-center justify-between"><p className="text-sm font-medium text-white/65">Progress task</p><p className="text-lg font-semibold">{PROGRESS_PERCENTAGE[state]}%</p></div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/taskcard/task-card.tsx
+./src/components/taskcard/index.ts
+./src/components/task-card.tsx
+./src/features/kv-retail/components/task-page.tsx 
+[browser] ./src/components/taskcard/task-card.tsx
+Error:   x Expected '</', got 'ident'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\components\taskcard\task-card.tsx:603:1]
+ 600 |             <div className="rounded-2xl border border-[#ececf4] bg-[#fcfcff] p-6">
+ 601 |               <p className="text-sm font-medium text-[#85889a]">Deadline</p>
+ 602 |               <p className="mt-2 text-[30px] font-semibold tracking-[-0.5px]">{formattedDeadline || "-"}</p>
+ 603 |               <p className={`mt-3 text-base font-medium ${isLate ? "text-[#d94a67]" : "text-[#707484]}`}>{isDone ? "Task telah diselesaikan" : daysLeftText}</p>
+     :                                                                                                                     ^^^^
+ 604 |             </div>
+ 605 |             <div className="rounded-2xl bg-[#282445] p-6 text-white">
+ 606 |               <div className="flex items-center justify-between"><p className="text-sm font-medium text-white/65">Progress task</p><p className="text-lg font-semibold">{PROGRESS_PERCENTAGE[state]}%</p></div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/taskcard/task-card.tsx
+./src/components/taskcard/index.ts
+./src/components/task-card.tsx
+./src/features/kv-retail/components/task-page.tsx 
+[browser] ./src/components/taskcard/task-card.tsx
+Error:   x Expected '</', got 'ident'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\components\taskcard\task-card.tsx:603:1]
+ 600 |             <div className="rounded-2xl border border-[#ececf4] bg-[#fcfcff] p-6">
+ 601 |               <p className="text-sm font-medium text-[#85889a]">Deadline</p>
+ 602 |               <p className="mt-2 text-[30px] font-semibold tracking-[-0.5px]">{formattedDeadline || "-"}</p>
+ 603 |               <p className={`mt-3 text-base font-medium ${isLate ? "text-[#d94a67]" : "text-[#707484]}`}>{isDone ? "Task telah diselesaikan" : daysLeftText}</p>
+     :                                                                                                                     ^^^^
+ 604 |             </div>
+ 605 |             <div className="rounded-2xl bg-[#282445] p-6 text-white">
+ 606 |               <div className="flex items-center justify-between"><p className="text-sm font-medium text-white/65">Progress task</p><p className="text-lg font-semibold">{PROGRESS_PERCENTAGE[state]}%</p></div>
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/taskcard/task-card.tsx
+./src/components/taskcard/index.ts
+./src/components/task-card.tsx
+./src/features/kv-retail/components/task-page.tsx 
+[browser] Error inlining remote css file SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error while reading CSS rules from https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error inlining remote css file SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error while reading CSS rules from https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error inlining remote css file SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error while reading CSS rules from https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error inlining remote css file SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error while reading CSS rules from https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error inlining remote css file SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error while reading CSS rules from https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error inlining remote css file SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Error while reading CSS rules from https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap SecurityError: Failed to read the 'cssRules' property from 'CSSStyleSheet': Cannot access rules
+    at async handleDownloadImage (src\components\taskcard\task-card.tsx:307:24)
+  305 |     try {
+  306 |       const { toPng } = await import("html-to-image");
+> 307 |       const imageUrl = await toPng(taskCardRef.current, {
+      |                        ^
+  308 |         cacheBust: true,
+  309 |         pixelRatio: 2,
+  310 |         filter: (node) => !(node instanceof HTMLElement && node.dataset.exportExclude ===... (src\components\taskcard\task-card.tsx:307:24)
+[browser] Gagal mengunduh gambar task: Error: Attempting to parse an unsupported color function "oklab" (src\components\taskcard\task-card.tsx:341:15)
+[browser] Gagal mengunduh gambar task: Error: Attempting to parse an unsupported color function "oklab" (src\components\taskcard\task-card.tsx:341:15)
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack failed from C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback.pack.gz: Error: incorrect header check
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack failed from C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback.pack.gz: Error: incorrect header check
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack failed from C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback.pack.gz: Error: incorrect header check
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack failed from C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback.pack.gz: Error: incorrect header check
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz'
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:355:22)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:369:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] Gagal memuat tugas KV Retail: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)

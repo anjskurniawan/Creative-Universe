@@ -17,7 +17,7 @@ import { useKvRetailTasks } from "@/features/kv-retail/hooks";
 import { getEchoClient } from "@/core/realtime";
 import { useAuth } from "@/providers/auth-provider";
 
-type MetricState = "Total" | "Progress" | "Mendesak" | "Done";
+type MetricState = "Total" | "Progress" | "OnTrack" | "Terlambat" | "Done";
 type MobileTaskFilterMenu = "vendor" | "sort" | null;
 export type TaskPageScope = "all" | "unfinished" | "current-month";
 
@@ -142,16 +142,16 @@ const TASK_CARD_STATES: TaskCardState[] = [
 
 const PRIMARY_MENU: SideMenuItem[] = [
   {
-    label: "Tugas Hari Ini",
+    label: "Tugas Harian",
     icon: "today",
     href: "/kv-retail",
     status: "Active",
   },
-  { label: "Tugas Belum Selesai", icon: "assignment_late", href: "/kv-retail/unfinished" },
-  { label: "Tugas Bulan Ini", icon: "calendar_month", href: "/kv-retail/month" },
-  { label: "Rekap Performa", icon: "analytics", href: "/kv-retail/performance" },
+  { label: "Tugas Tertunda", icon: "assignment_late", href: "/kv-retail/unfinished" },
+  { label: "Tugas Bulanan", icon: "calendar_month", href: "/kv-retail/month" },
+  { label: "Laporan Performa", icon: "analytics", href: "/kv-retail/performance" },
   {
-    label: "Option Page",
+    label: "Pengaturan",
     icon: "settings",
     href: "/kv-retail/option",
   },
@@ -166,7 +166,11 @@ const metricToneClasses: Record<MetricState, { iconBox: string; icon: string }> 
     iconBox: "bg-[#fff8ee]",
     icon: "text-[#f18728]",
   },
-  Mendesak: {
+  OnTrack: {
+    iconBox: "bg-[#e5f6fd]",
+    icon: "text-[#0288d1]",
+  },
+  Terlambat: {
     iconBox: "bg-[#ffe2dd]",
     icon: "text-[#ff5b55]",
   },
@@ -176,44 +180,50 @@ const metricToneClasses: Record<MetricState, { iconBox: string; icon: string }> 
   },
 };
 
-function MetricCard({
-  title,
-  value,
-  icon,
-  state,
-}: {
-  title: string;
-  value: number;
-  icon: string;
-  state: MetricState;
+function CombinedMetricCard({ 
+  metrics,
+  actionButton 
+}: { 
+  metrics: { title: string; value: number; icon: string; state: MetricState }[];
+  actionButton?: React.ReactNode;
 }) {
-  const tone = metricToneClasses[state];
-
+  if (metrics.length === 0 && !actionButton) return null;
   return (
-    <div className="flex h-[76px] shrink-0 items-center gap-4 rounded-2xl border border-[#e5e7eb] bg-white px-5 py-3 shadow-sm min-w-[150px]">
-      <div
-        className={[
-          "flex size-11 shrink-0 items-center justify-center rounded-xl",
-          tone.iconBox,
-        ].join(" ")}
-      >
-        <MaterialIcon
-          name={icon}
-          size="auto"
-          weight={400}
-          filled={false}
-          className={["text-[22px] leading-none", tone.icon].join(" ")}
-        />
-      </div>
-
-      <div className="flex flex-col">
-        <p className="text-[22px] font-bold leading-none text-[#111827]">
-          {value}
-        </p>
-        <p className="text-[12px] font-medium text-[#6b7280] mt-1.5 whitespace-nowrap">
-          {title}
-        </p>
-      </div>
+    <div className="flex items-center rounded-2xl border border-[#e5e7eb] bg-white shadow-sm overflow-x-auto no-scrollbar divide-x divide-[#e5e7eb]">
+      {actionButton && (
+        <div className="flex shrink-0 items-center justify-center">
+          {actionButton}
+        </div>
+      )}
+      {metrics.map((metric) => {
+        const tone = metricToneClasses[metric.state];
+        return (
+          <div key={metric.state} className="flex h-[76px] items-center gap-4 px-5 py-3 min-w-[150px] shrink-0">
+            <div
+              className={[
+                "flex size-11 shrink-0 items-center justify-center rounded-xl",
+                tone.iconBox,
+              ].join(" ")}
+            >
+              <MaterialIcon
+                name={metric.icon}
+                size="auto"
+                weight={400}
+                filled={false}
+                className={["text-[22px] leading-none", tone.icon].join(" ")}
+              />
+            </div>
+            <div className="flex flex-col">
+              <p className="text-[22px] font-bold leading-none text-[#111827]">
+                {metric.value}
+              </p>
+              <p className="text-[12px] font-medium text-[#6b7280] mt-1.5 whitespace-nowrap">
+                {metric.title}
+              </p>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -224,14 +234,14 @@ function AddTaskButton({ onClick }: { onClick?: () => void }) {
       type="button"
       onClick={onClick}
       aria-label="Add Button"
-      className="flex size-20 shrink-0 items-center justify-center rounded-xl bg-[#ec4899] text-white transition-colors hover:bg-[#db2777] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899]/40"
+      className="flex h-[76px] w-[76px] shrink-0 items-center justify-center bg-[#ec4899] text-white transition-colors hover:bg-[#db2777] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ec4899]/40"
     >
       <MaterialIcon
         name="add"
         size="auto"
         weight={300}
         filled={false}
-        className="text-[56px] leading-none"
+        className="text-[48px] leading-none"
       />
     </button>
   );
@@ -312,7 +322,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
   const [pageTitle, setPageTitle] = useState("Branding Key Visual Retail");
   const [pageSubtitle, setPageSubtitle] = useState("Kelola dan selesaikan tugas yang belum beres tepat waktu.");
   const [taskConfig, setTaskConfig] = useState<TaskCardConfig>({});
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
   const summaryScrollDrag = useRef({ pointerId: -1, startX: 0, scrollLeft: 0 });
   const scopedPageSubtitle = scope === "current-month"
     ? getCurrentMonthTaskSubtitle()
@@ -320,14 +330,14 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
     ? "Daftar tugas yang belum selesai."
     : pageSubtitle;
   const activeTaskMenuLabel = scope === "unfinished"
-    ? "Tugas Belum Selesai"
+    ? "Tugas Tertunda"
     : scope === "current-month"
-    ? "Tugas Bulan Ini"
-    : "Tugas Hari Ini";
+    ? "Tugas Bulanan"
+    : "Tugas Harian";
   const isTaskAdministrator = hasPermission("kv-retail.tasks.create");
   const isMentionOnlyUser = Boolean(user && !isTaskAdministrator);
   const primaryMenuItems = PRIMARY_MENU
-    .filter((item) => !isMentionOnlyUser || item.label === "Tugas Hari Ini")
+    .filter((item) => !isMentionOnlyUser || item.label === "Tugas Harian")
     .map((item) => ({
     ...item,
     status: item.label === activeTaskMenuLabel ? "Active" as const : undefined,
@@ -502,19 +512,21 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
 
   const totalTasks = scopedTasks.length;
   const inProgress = scopedTasks.filter(t => t.status !== "Done").length;
-  const mendesak = scopedTasks.filter(t => {
+  const terlambat = scopedTasks.filter(t => {
     if (t.status === "Done") return false;
     if (!t.deadline_date) return false;
     const d = new Date(t.deadline_date);
     const diff = Math.ceil((d.getTime() - currentTime) / (1000 * 3600 * 24));
-    return diff <= 1; // 1 day left, or negative (past deadline)
+    return diff < 0; // past deadline
   }).length;
+  const onTrack = inProgress - terlambat;
   const selesai = scopedTasks.filter(t => t.status === "Done").length;
 
   const dynamicMetrics = [
     { state: "Total" as MetricState, title: "Total Tugas", value: totalTasks, icon: "assignment" },
     { state: "Progress" as MetricState, title: "In Progress", value: inProgress, icon: "hourglass_bottom" },
-    { state: "Mendesak" as MetricState, title: "Mendesak", value: mendesak, icon: "warning_amber" },
+    { state: "OnTrack" as MetricState, title: "On Track", value: onTrack, icon: "track_changes" },
+    { state: "Terlambat" as MetricState, title: "Terlambat", value: terlambat, icon: "warning_amber" },
     { state: "Done" as MetricState, title: "Selesai", value: selesai, icon: "check_circle" },
   ];
   const mobileMetrics = scope === "unfinished"
@@ -792,10 +804,10 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
               </div>
 
               <div className="mt-8 flex flex-wrap items-center gap-[15px] 2xl:mt-0 2xl:w-[996px] 2xl:justify-end">
-                {scope === "all" && !isMentionOnlyUser && <AddTaskButton onClick={() => setIsModalOpen(true)} />}
-                {desktopMetrics.map((metric) => (
-                  <MetricCard key={metric.state} {...metric} />
-                ))}
+                <CombinedMetricCard 
+                  metrics={desktopMetrics} 
+                  actionButton={scope === "all" && !isMentionOnlyUser ? <AddTaskButton onClick={() => setIsModalOpen(true)} /> : undefined}
+                />
               </div>
             </header>
 
