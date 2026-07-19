@@ -7,6 +7,7 @@ use App\Models\Core\User;
 use App\Services\Core\FileStorageService;
 use App\SubApps\Cai\Services\GroqService;
 use App\SubApps\KvRetail\Events\KvRetailTaskAssigned;
+use App\SubApps\KvRetail\Events\KvRetailTaskDeleted;
 use App\SubApps\KvRetail\Events\KvRetailTaskUpdated;
 use App\SubApps\KvRetail\Services\KvRetailCreativeAgentService;
 use App\SubApps\KvRetail\Services\KvRetailTaskTimingService;
@@ -178,6 +179,18 @@ PROMPT;
     public function latestPerformanceAiReport(Request $request, KvRetailCreativeAgentService $creativeAgent)
     {
         $this->ensureTaskRouteAccess($request->user());
+
+        // The report page is also the read model for Creative Agent. Revalidate
+        // the aggregate source here so a report never depends solely on an
+        // external queue worker being alive. The service hash prevents a Groq
+        // request when the task summary is unchanged.
+        try {
+            $creativeAgent->generateAndStoreIfChanged();
+        } catch (\Throwable $exception) {
+            Log::warning('KV Retail Creative Agent refresh failed.', [
+                'message' => $exception->getMessage(),
+            ]);
+        }
 
         return $this->sendResponse($creativeAgent->latest(), 'Creative Agent terbaru berhasil diambil.');
     }
@@ -359,7 +372,10 @@ PROMPT;
             abort(403, 'Unauthorized action.');
         }
 
+        $audience = $this->realtimeAudience($task);
+        $taskId = (int) $task->id;
         $task->delete();
+        $this->broadcastTaskDeleted($taskId, $audience);
 
         return $this->sendResponse(null, 'Task KV Retail berhasil dihapus.');
     }
@@ -385,7 +401,7 @@ PROMPT;
     private function broadcastTaskAssigned(\App\SubApps\KvRetail\Models\KvRetailTask $task, array $userIds): void
     {
         try {
-            KvRetailTaskAssigned::dispatch($task, $userIds);
+            KvRetailTaskAssigned::dispatch($task, $this->realtimeAudience($task, $userIds));
         } catch (Throwable $e) {
             Log::warning('Homework task assignment broadcast failed.', [
                 'task_id' => $task->id,
@@ -419,10 +435,43 @@ PROMPT;
     private function broadcastTaskUpdated(\App\SubApps\KvRetail\Models\KvRetailTask $task, array $userIds): void
     {
         try {
-            KvRetailTaskUpdated::dispatch($task, $userIds);
+            KvRetailTaskUpdated::dispatch($task, $this->realtimeAudience($task, $userIds));
         } catch (Throwable $e) {
             Log::warning('Homework task update broadcast failed.', [
                 'task_id' => $task->id,
+                'user_ids' => $userIds,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /** @param array<int, int> $userIds
+     *  @return array<int, int>
+     */
+    private function realtimeAudience(\App\SubApps\KvRetail\Models\KvRetailTask $task, array $userIds = []): array
+    {
+        $administrators = User::query()
+            ->whereHas('roles', fn ($query) => $query->whereIn('name', ['Root', 'Manajer', 'SPV']))
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+        $assignees = $task->users()->pluck('users.id')->map(fn ($id) => (int) $id)->all();
+
+        return collect([...$userIds, ...$assignees, ...$administrators])
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /** @param array<int, int> $userIds */
+    private function broadcastTaskDeleted(int $taskId, array $userIds): void
+    {
+        try {
+            KvRetailTaskDeleted::dispatch($taskId, $userIds);
+        } catch (Throwable $e) {
+            Log::warning('KV Retail task deletion broadcast failed.', [
+                'task_id' => $taskId,
                 'user_ids' => $userIds,
                 'message' => $e->getMessage(),
             ]);

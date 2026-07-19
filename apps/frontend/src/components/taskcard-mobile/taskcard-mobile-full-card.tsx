@@ -6,15 +6,17 @@ import { TaskcardMobileLayoutCard } from "./taskcard-mobile-layout-card";
 import { TaskcardMobileConfirmOverlay } from "./taskcard-mobile-confirm-overlay";
 import { TaskcardMobileFileSlotsOverlay } from "./taskcard-mobile-file-slots-overlay";
 import { TaskcardMobileOverlay } from "./taskcard-mobile-overlay";
-import type { TaskcardMobileChange, TaskcardMobileTone } from "./types";
+import type { TaskcardMobileAvatar, TaskcardMobileChange, TaskcardMobileTheme, TaskcardMobileTone } from "./types";
 
 type TaskcardMobileFullCardProps = {
   title: string;
   dateRange?: string;
   vendor: string;
   assignedTo?: string;
+  assignedAvatars?: TaskcardMobileAvatar[];
   status: string;
   tone?: TaskcardMobileTone;
+  theme?: TaskcardMobileTheme;
   changes?: TaskcardMobileChange[];
   countdownLabel: string;
   fileLabels?: string[];
@@ -36,8 +38,10 @@ export function TaskcardMobileFullCard({
   dateRange,
   vendor,
   assignedTo,
+  assignedAvatars,
   status,
   tone = "default",
+  theme = "light",
   changes,
   countdownLabel,
   fileLabels,
@@ -70,11 +74,12 @@ export function TaskcardMobileFullCard({
   };
 
   return (
-    <article className={["w-full overflow-hidden rounded-xl shadow-[0_2px_10px_rgba(59,68,70,0.10)]", className].filter(Boolean).join(" ")}>
+    <article className={["w-full shrink-0 overflow-hidden rounded-xl shadow-[0_2px_10px_rgba(59,68,70,0.10)]", className].filter(Boolean).join(" ")}>
       <TaskcardMobileHeader
         title={title}
         dateRange={dateRange}
-        tone={tone}
+          tone={tone}
+          theme={theme}
         open={open}
         onToggle={() => setOpen((current) => !current)}
       />
@@ -82,7 +87,9 @@ export function TaskcardMobileFullCard({
         <TaskcardMobileLayoutCard
           vendor={vendor}
           assignedTo={assignedTo}
+          assignedAvatars={assignedAvatars}
           status={status}
+          theme={theme}
           changes={changes}
           countdownLabel={countdownLabel}
           fileLabels={fileLabels}
@@ -105,6 +112,7 @@ export function TaskcardMobileFullCard({
         <TaskcardMobileOverlay
           type="upload-file"
           uploadLabel={fileLabels?.[fileGroupIndex]}
+          theme={theme}
           isSaving={isSaving}
           onBack={() => setOverlay(null)}
           onConfirm={(value) => runAction(() => value instanceof File ? onUpload?.(value, fileGroupIndex, uploadIndex) : undefined)}
@@ -114,6 +122,7 @@ export function TaskcardMobileFullCard({
         <TaskcardMobileFileSlotsOverlay
           title={fileLabels?.[fileGroupIndex] || "File"}
           files={fileSlotFiles?.[fileGroupIndex]}
+          theme={theme}
           canUpload={status !== "Done"}
           onBack={() => setOverlay(null)}
           onUploadSlot={(index) => {
@@ -127,6 +136,7 @@ export function TaskcardMobileFullCard({
         <TaskcardMobileOverlay
           type="file-link"
           initialLink={fileLink}
+          theme={theme}
           isSaving={isSaving}
           onBack={() => setOverlay(null)}
         />
@@ -135,6 +145,7 @@ export function TaskcardMobileFullCard({
         <TaskcardMobileOverlay
           type="submit-link"
           delayReasonStage={delayReasonStage}
+          theme={theme}
           isSaving={isSaving}
           onBack={() => setOverlay(null)}
           onConfirm={(value, delayReason) => runAction(() => typeof value === "string" ? onSubmitLink?.(value, delayReason) : undefined)}
@@ -144,6 +155,7 @@ export function TaskcardMobileFullCard({
         <TaskcardMobileConfirmOverlay
           action={overlay}
           delayReasonStage={delayReasonStage}
+          theme={theme}
           isSaving={isSaving}
           onCancel={() => setOverlay(null)}
           onConfirm={(delayReason) => runAction(overlay === "delete" ? onDelete : () => onChangeStatus?.(delayReason))}

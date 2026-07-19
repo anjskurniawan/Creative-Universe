@@ -21,6 +21,7 @@ export interface KvRetailTask {
 }
 
 export interface KvRetailTaskEvent { task?: KvRetailTask }
+export interface KvRetailTaskDeletedEvent { task_id: number }
 
 export interface KvRetailTemporaryUpload {
   path: string;

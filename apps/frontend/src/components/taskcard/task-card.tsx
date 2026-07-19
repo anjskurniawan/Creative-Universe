@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toBlob } from "html-to-image";
 import TaskCardDate from "./date";
 import TaskCardNextButton from "./next-button";
@@ -14,6 +14,7 @@ import TaskCardSubmitLinkOverlay from "./submit-link-overlay";
 import TaskCardViewLinkOverlay from "./view-link-overlay";
 import TaskCardUploadOverlay from "./upload-overlay";
 import TaskCardDelayReasonOverlay from "./delay-reason-overlay";
+import { TaskcardMobileLayoutCard, type TaskcardMobileAvatar, type TaskcardMobileChange } from "@/components/taskcard-mobile";
 import { resolveStorageUrl } from "@/core/api/client";
 import { kvRetailApi } from "@/features/kv-retail/api";
 import { MaterialIcon } from "@/components/material-icon";
@@ -84,6 +85,7 @@ export type TaskCardProps = {
   delayReasonStage?: string;
   isLate?: boolean;
   onTitleSave?: (title: string) => Promise<void>;
+  theme?: "light" | "dark" | "retro";
 };
 
 export default function TaskCard({ 
@@ -109,6 +111,7 @@ export default function TaskCard({
   delayReasonStage,
   isLate = false,
   onTitleSave,
+  theme = "light",
 }: TaskCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSubmittingFile, setIsSubmittingFile] = useState(false);
@@ -122,7 +125,36 @@ export default function TaskCard({
   const [delayReason, setDelayReason] = useState("");
   const [pendingStep, setPendingStep] = useState<TaskCardButtonStatusState | null>(null);
   const [isExportingImage, setIsExportingImage] = useState(false);
+  const [isCompactDesktop, setIsCompactDesktop] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const cardShellRef = useRef<HTMLDivElement>(null);
   const exportCardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const cardShell = cardShellRef.current;
+    if (!cardShell) return;
+
+    // Use the actual card width, not window.innerWidth. Device-preview tools
+    // can keep the browser window wide while shrinking only the app canvas.
+    const observer = new ResizeObserver(([entry]) => {
+      const compact = entry.contentRect.width < 1200;
+      setIsCompactDesktop((current) => {
+        if (current === compact) return current;
+        setIsCollapsed(compact);
+        return compact;
+      });
+    });
+    observer.observe(cardShell);
+    return () => observer.disconnect();
+  }, []);
+
+  // Compact desktop has an expandable body. Any overlay first returns the card
+  // to its cover height so the dialog never inherits the tall mobile-detail area.
+  const collapseForOverlay = () => {
+    if (isCompactDesktop) {
+      setIsCollapsed(true);
+    }
+  };
 
   const canManageTask = !currentUser || !createdBy || currentUser.id === createdBy || ["Root", "Manajer", "SPV"].some((role) =>
     currentUser.roles?.some((currentRole: string | { name?: string }) => typeof currentRole === "string" ? currentRole === role : currentRole.name === role),
@@ -154,6 +186,7 @@ export default function TaskCard({
     }
 
     if (delayReasonStage) {
+      collapseForOverlay();
       setPendingStep(stepName);
       return;
     }
@@ -169,6 +202,7 @@ export default function TaskCard({
   const isAccDraft = state === "ACC Draft";
   const isProgressDesign = state === "Progress Design";
   const isApprovalDesign = state === "Approval Design";
+  const currentStatusLabel = state === "0" ? "Belum dimulai" : state;
 
   const nextButtonState: TaskCardNextButtonState = isDone
     ? "Done"
@@ -196,6 +230,14 @@ export default function TaskCard({
 
   const getTimestampColorClass = (stepName: TaskCardButtonStatusState) => {
     const stepType = getStepType(stepName);
+    if (theme === "dark") {
+      if (stepType === "Done" || stepType === "Progress") return "text-[#b0ff5e]";
+      return "text-[#9da59f]";
+    }
+    if (theme === "retro") {
+      if (stepType === "Done" || stepType === "Progress") return "text-[#ba0dcb]";
+      return "text-[#687065]";
+    }
     if (stepType === "Done") return "text-[#2b9915]";
     if (stepType === "Progress") return "text-[#8474f9]";
     return "text-[#6b7280]";
@@ -269,6 +311,7 @@ export default function TaskCard({
       if (!canManageTask) {
         return;
       }
+      collapseForOverlay();
       setUploadingDocType(type);
       return;
     }
@@ -488,44 +531,113 @@ export default function TaskCard({
     window.open(`/kv-retail/print/?task=${id}`, "_blank", "noopener,noreferrer");
   };
 
+  const compactAssignedAvatars: TaskcardMobileAvatar[] = assignedUsers.flatMap((assignedUser) => {
+    if (!assignedUser || typeof assignedUser !== "object") return [];
+    const user = assignedUser as { name?: unknown; avatar?: unknown; photo_url?: unknown };
+    if (typeof user.name !== "string" || !user.name.trim()) return [];
+    return [{
+      name: user.name,
+      photoUrl: typeof user.photo_url === "string" ? user.photo_url : typeof user.avatar === "string" ? user.avatar : null,
+    }];
+  });
+  const compactChanges: TaskcardMobileChange[] = [
+    ["ACC Draft", "ACC Draft"],
+    ["Progress", "Progress Design"],
+    ["Approve", "Approval Design"],
+    ["Email", "Kirim Email"],
+  ].flatMap(([timestamp, label]) => internalTimestamps[timestamp] ? [{ label, timestamp: internalTimestamps[timestamp] }] : []);
+
   return (
-    <div className="relative w-full rounded-2xl bg-white shadow-sm border border-[#e5e7eb] hover:z-10 focus-within:z-10">
+    <div ref={cardShellRef} className={`relative w-full rounded-2xl hover:z-10 focus-within:z-10 ${theme === "dark" ? "border border-white/10 bg-[#171717] shadow-[0_10px_26px_rgba(0,0,0,0.22)]" : theme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6] shadow-[3px_3px_0_#24252b]" : "border border-[#e5e7eb] bg-white shadow-sm"}`}>
       {/* Main Card Content */}
-      <div className={`flex flex-col xl:flex-row items-stretch xl:items-center w-full transition-all duration-300 ${isDeleting || isSubmittingFile || uploadingDocType ? "opacity-30 blur-[1px] pointer-events-none" : "opacity-100"}`}>
+      <div className={`flex ${isCompactDesktop ? "flex-row flex-wrap items-start" : "flex-col xl:flex-row items-stretch xl:items-center"} w-full transition-all duration-300 ${isDeleting || isSubmittingFile || uploadingDocType ? "opacity-30 blur-[1px] pointer-events-none" : "opacity-100"}`}>
         {/* Task Card - Date */}
         <TaskCardDate
           state={isDone ? "Done" : "Default"}
+          theme={theme}
           day={parsedDay}
           date={parsedDate}
           monthYear={parsedMonthYear}
-          className="flex flex-row xl:flex-col justify-between xl:justify-center items-center p-4 xl:p-[16px] w-full xl:w-[122px] shrink-0 xl:h-[122px] rounded-t-2xl xl:rounded-t-none xl:rounded-l-[16px]"
+          className={isCompactDesktop ? "flex min-h-[92px] w-[118px] shrink-0 flex-col items-center justify-center rounded-l-2xl rounded-tr-none p-3" : "flex flex-row xl:flex-col justify-between xl:justify-center items-center p-4 xl:p-[16px] w-full xl:w-[122px] shrink-0 xl:h-[122px] rounded-t-2xl xl:rounded-t-none xl:rounded-l-[16px]"}
         />
 
         {/* Main Container */}
-        <div className="flex flex-col xl:flex-row flex-1 items-stretch xl:items-center self-stretch">
+        <div className={`flex ${isCompactDesktop ? "min-w-0 flex-1 items-stretch" : "flex-col xl:flex-row flex-1 items-stretch xl:items-center"} self-stretch`}>
           <div
             className={[
-              "flex flex-col xl:flex-row flex-1 items-stretch xl:items-center justify-between px-5 py-5 xl:px-[32px] xl:py-0 xl:h-full rounded-b-2xl xl:rounded-b-none xl:rounded-r-[16px]",
-              isDone ? "bg-[#e8faea]" : "bg-white",
+              isCompactDesktop ? "flex min-w-0 flex-1 items-center justify-between rounded-r-2xl px-4 py-3" : "flex flex-col xl:flex-row flex-1 items-stretch xl:items-center justify-between px-5 py-5 xl:px-[32px] xl:py-0 xl:h-full rounded-b-2xl xl:rounded-b-none xl:rounded-r-[16px] xl:rounded-br-2xl xl:rounded-tr-2xl",
+              theme === "dark" ? "bg-[#171717]" : theme === "retro" ? "bg-[#eceee6]" : isDone ? "bg-[#e8faea]" : "bg-white",
             ].join(" ")}
           >
             {/* Task Info Container */}
-            <div className="flex flex-col sm:flex-row gap-4 xl:gap-4 2xl:gap-6 items-stretch sm:items-center relative min-w-0 xl:flex-none xl:mr-6">
+            <div className={`flex ${isCompactDesktop ? "min-w-0 flex-1 items-center gap-2" : "flex-col sm:flex-row gap-4 xl:gap-4 2xl:gap-6 items-stretch sm:items-center relative min-w-0 xl:flex-none xl:mr-6"}`}>
               {/* Title */}
-              <div className="flex flex-col items-start relative flex-1 min-w-0 xl:w-[420px] xl:flex-none">
-                <TaskCardTitleTask title={title} editable={canManageTask} onSave={onTitleSave} className="w-full px-0 py-0 xl:p-[10px]" />
+              <div className={`flex min-w-0 flex-1 ${isCompactDesktop ? "flex-row items-center justify-between gap-3" : "flex-col items-start relative xl:w-[420px] xl:flex-none"}`}>
+                <TaskCardTitleTask title={title} editable={canManageTask} onSave={onTitleSave} theme={theme} className={`${isCompactDesktop ? "min-w-0 flex-1" : "w-full"} px-0 py-0 xl:p-[10px]`} />
                 {isDone && isLate && (
                   <span className="mt-1 rounded-full bg-[#fee2e2] px-2 py-1 text-xs font-semibold text-[#b91c1c]">Terlambat</span>
                 )}
               </div>
 
+              {isCompactDesktop && (
+                <>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {!isDone && <TaskCardDetail variant="Count Down" value={daysLeftText} config={config} theme={theme} />}
+                    <span className={`flex h-[24px] items-center rounded-[8px] px-[8px] text-[12px] font-normal leading-normal whitespace-nowrap ${theme === "dark" ? "bg-[#202820] text-[#b0ff5e]" : theme === "retro" ? "bg-[#dfe2d3] text-[#24252b]" : "bg-[#eeebff] text-[#8474f9]"}`}>
+                      {currentStatusLabel}
+                    </span>
+                  </div>
+                  <div className="ml-3 flex shrink-0 flex-col items-start gap-1">
+                  <TaskCardDetailStatus
+                    status="3D Gambar Kerja"
+                    isDone={isDone}
+                    files={supportFileUrl}
+                    onUploadClick={(idx) => {
+                      collapseForOverlay();
+                      setUploadingDocType("support_file");
+                      setUploadFileIndex(idx);
+                    }}
+                    onViewClick={(url) => window.open(resolveStorageUrl(url) ?? undefined, "_blank")}
+                    config={config}
+                    theme={theme}
+                  />
+                  <TaskCardDetailStatus
+                    status="Draft Final"
+                    isDone={isDone}
+                    files={draftFileUrl}
+                    onUploadClick={(idx) => {
+                      collapseForOverlay();
+                      setUploadingDocType("draft_file");
+                      setUploadFileIndex(idx);
+                    }}
+                    onViewClick={(url) => window.open(resolveStorageUrl(url) ?? undefined, "_blank")}
+                    config={config}
+                    theme={theme}
+                  />
+                  </div>
+                </>
+              )}
+
+              {isCompactDesktop && (
+                <button
+                  type="button"
+                  aria-label={isCollapsed ? `Buka detail ${title}` : `Tutup detail ${title}`}
+                  aria-expanded={!isCollapsed}
+                  onClick={() => setIsCollapsed((current) => !current)}
+                  className={`ml-3 flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 ${theme === "dark" ? "border border-white/10 bg-[#202820] text-[#b0ff5e] focus-visible:ring-[#b0ff5e]/35" : theme === "retro" ? "border-2 border-[#24252b] bg-[#dfe2d3] text-[#24252b] focus-visible:ring-[#ba0dcb]/35" : "border border-[#d7dcdd] bg-white text-[#525e61] focus-visible:ring-[#8474f9]/35"}`}
+                >
+                  <MaterialIcon name={isCollapsed ? "keyboard_arrow_down" : "keyboard_arrow_up"} size="auto" className="text-xl" />
+                </button>
+              )}
+
               {/* Files */}
-              <div className="flex flex-col gap-[7px] items-start relative shrink-0 mt-3 sm:mt-0 xl:w-[150px] px-[10px]">
+              <div className={`${isCompactDesktop ? "hidden" : "flex"} flex-col gap-[7px] items-start relative shrink-0 mt-3 sm:mt-0 xl:w-[150px] px-[10px]`}>
                 <TaskCardDetailStatus
                   status="3D Gambar Kerja"
                   isDone={isDone}
                   files={supportFileUrl}
                   onUploadClick={(idx) => {
+                    collapseForOverlay();
                     setUploadingDocType("support_file");
                     setUploadFileIndex(idx);
                   }}
@@ -533,12 +645,14 @@ export default function TaskCard({
                     window.open(resolveStorageUrl(url) ?? undefined, '_blank');
                   }}
                   config={config}
+                  theme={theme}
                 />
                 <TaskCardDetailStatus
                   status="Draft Final"
                   isDone={isDone}
                   files={draftFileUrl}
                   onUploadClick={(idx) => {
+                    collapseForOverlay();
                     setUploadingDocType("draft_file");
                     setUploadFileIndex(idx);
                   }}
@@ -546,31 +660,33 @@ export default function TaskCard({
                     window.open(resolveStorageUrl(url) ?? undefined, '_blank');
                   }}
                   config={config}
+                  theme={theme}
                 />
               </div>
 
               {/* Vendor Info */}
-              <div className="flex flex-col gap-[7px] items-start relative shrink-0 mt-3 sm:mt-0 xl:w-[130px]">
-                <TaskCardDetail variant="Vendor" value={picVendor} config={config} />
-                <TaskCardDetail variant="Date" value={formattedDeadline} config={config} />
+              <div className={`${isCompactDesktop ? "hidden" : "flex"} flex-col gap-[7px] items-start relative shrink-0 mt-3 sm:mt-0 xl:w-[130px]`}>
+                <TaskCardDetail variant="Vendor" value={picVendor} config={config} theme={theme} />
+                <TaskCardDetail variant="Date" value={formattedDeadline} config={config} theme={theme} />
                 {!isDone && (
-                  <TaskCardDetail variant="Count Down" value={daysLeftText} config={config} />
+                  <TaskCardDetail variant="Count Down" value={daysLeftText} config={config} theme={theme} />
                 )}
                 {isDone && fileLink && (
                   <TaskCardDetail 
                     variant="Variant4" 
-                    onClick={() => setIsViewingLink(true)} 
+                    onClick={() => { collapseForOverlay(); setIsViewingLink(true); }}
                     config={config}
+                    theme={theme}
                   />
                 )}
               </div>
             </div>
 
             {/* Progress Info */}
-            <div className="flex flex-col lg:flex-row gap-4 xl:gap-3 2xl:gap-8 items-stretch lg:items-center relative mt-6 xl:mt-0 w-full lg:w-auto shrink-0">
+            <div className={`${isCompactDesktop ? "hidden" : "flex"} flex-col lg:flex-row gap-4 xl:gap-3 2xl:gap-8 items-stretch lg:items-center relative mt-6 xl:mt-0 w-full lg:w-auto shrink-0`}>
               {/* Progress Details */}
-              <div className="flex flex-col gap-[12px] items-start relative w-full xl:w-[410px]">
-                <div className="grid grid-cols-2 sm:grid-cols-4 xl:flex xl:items-center xl:justify-between w-full gap-2">
+              <div className={`flex flex-col gap-[12px] items-start relative w-full ${isCompactDesktop ? "!w-full" : "xl:w-[410px]"}`}>
+                <div className={`grid grid-cols-2 sm:grid-cols-4 ${isCompactDesktop ? "!grid" : "xl:flex xl:items-center xl:justify-between"} w-full gap-2`}>
                   <div className="relative flex-1 xl:flex-none w-full xl:w-[95px] pt-3.5">
                     {internalTimestamps["ACC Draft"] && (
                       <span className={`absolute top-0 right-0 text-[8px] font-medium leading-none whitespace-nowrap ${getTimestampColorClass("ACC Draft")}`}>
@@ -583,6 +699,7 @@ export default function TaskCard({
                       className={`w-full ${getNextAllowedStep() === "ACC Draft" ? "" : "pointer-events-none"}`}
                       onClick={() => handleStepClick("ACC Draft")}
                       config={config}
+                      theme={theme}
                     />
                   </div>
 
@@ -598,6 +715,7 @@ export default function TaskCard({
                       className={`w-full ${getNextAllowedStep() === "Progress" ? "" : "pointer-events-none"}`}
                       onClick={() => handleStepClick("Progress")}
                       config={config}
+                      theme={theme}
                     />
                   </div>
 
@@ -613,6 +731,7 @@ export default function TaskCard({
                       className={`w-full ${getNextAllowedStep() === "Approve" ? "" : "pointer-events-none"}`}
                       onClick={() => handleStepClick("Approve")}
                       config={config}
+                      theme={theme}
                     />
                   </div>
 
@@ -628,10 +747,11 @@ export default function TaskCard({
                       className={`w-full ${getNextAllowedStep() === "Email" ? "" : "pointer-events-none"}`}
                       onClick={() => handleStepClick("Email")}
                       config={config}
+                      theme={theme}
                     />
                   </div>
                 </div>
-                <TaskCardLoadingBar percentage={PROGRESS_PERCENTAGE[state]} className="w-full" />
+                <TaskCardLoadingBar percentage={PROGRESS_PERCENTAGE[state]} theme={theme} className="w-full" />
               </div>
               <div data-export-exclude="true" className="flex shrink-0 justify-end gap-2">
                 <button
@@ -639,22 +759,26 @@ export default function TaskCard({
                   aria-label={`Buka preview task ${title}`}
                   title="Buka preview task"
                   onClick={handleOpenPrintPreview}
-                  className="flex size-[38px] shrink-0 items-center justify-center rounded-lg border border-[#d7dcdd] bg-white text-[#525e61] transition-colors duration-200 hover:border-[#8474f9] hover:text-[#8474f9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8474f9]/35"
+                  className={`flex size-[38px] shrink-0 items-center justify-center rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 ${theme === "dark" ? "border border-white/10 bg-[#202820] text-[#b0ff5e] hover:bg-[#2b352d] focus-visible:ring-[#b0ff5e]/35" : theme === "retro" ? "border-2 border-[#24252b] bg-[#dfe2d3] text-[#24252b] hover:bg-[#c9ccc0] focus-visible:ring-[#ba0dcb]/35" : "border border-[#d7dcdd] bg-white text-[#525e61] hover:border-[#8474f9] hover:text-[#8474f9] focus-visible:ring-[#8474f9]/35"}`}
                 >
                   <MaterialIcon name="open_in_new" size="auto" weight={400} filled={false} className="text-[20px] leading-none" />
                 </button>
                 <TaskCardNextButton 
                   state={nextButtonState} 
                   className={`size-[38px] ${!canManageTask ? "opacity-50 pointer-events-none" : ""}`}
+                  theme={theme}
                   onClick={() => {
                     if (!canManageTask) {
                        return;
                     }
                     if (nextButtonState === "Delete") {
+                      collapseForOverlay();
                       setIsDeleting(true);
                     } else if (nextButtonState === "On") {
+                      collapseForOverlay();
                       setIsSubmittingFile(true);
                     } else if (isDone && fileLink) {
+                      collapseForOverlay();
                       setIsViewingLink(true);
                     } else {
                       onNextClick?.(fileLink || "");
@@ -665,6 +789,55 @@ export default function TaskCard({
             </div>
           </div>
         </div>
+        {isCompactDesktop && !isCollapsed && (
+          <div className="w-full border-t border-black/5">
+            <TaskcardMobileLayoutCard
+              vendor={picVendor}
+              assignedTo={compactAssignedAvatars.map((user) => user.name).join(", ") || undefined}
+              assignedAvatars={compactAssignedAvatars}
+              status={state === "0" ? "Belum dimulai" : state}
+              theme={theme}
+              changes={compactChanges}
+              countdownLabel={daysLeftText}
+              fileLabels={[]}
+              uploadedFileStates={[]}
+              showCountdown={false}
+              canChangeStatus={canManageTask && !isDone}
+              canDelete={canManageTask && !isDone}
+              actionLabel={isKirimEmail ? "Input Link File" : "Ganti Status"}
+              hasFileLink={isDone && Boolean(fileLink)}
+              onFileAction={(index) => {
+                const files = index === 0 ? supportFileUrl : draftFileUrl;
+                const existingFile = files.find(Boolean);
+                if (existingFile) {
+                  window.open(resolveStorageUrl(existingFile) ?? undefined, "_blank");
+                  return;
+                }
+                collapseForOverlay();
+                setUploadingDocType(index === 0 ? "support_file" : "draft_file");
+                setUploadFileIndex(0);
+              }}
+              onFileLink={() => { collapseForOverlay(); setIsViewingLink(true); }}
+              onChangeStatus={() => {
+                const nextStep = getNextAllowedStep();
+                if (delayReasonStage && nextStep) {
+                  collapseForOverlay();
+                  setPendingStep(nextStep);
+                  return;
+                }
+                if (isKirimEmail) {
+                  collapseForOverlay();
+                  setIsSubmittingFile(true);
+                  return;
+                }
+                if (nextStep) {
+                  handleStepClick(nextStep);
+                }
+              }}
+              onDelete={() => { collapseForOverlay(); setIsDeleting(true); }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Overlay */}

@@ -12,5 +12,6 @@ export type {
   TaskcardMobileButtonIcon,
   TaskcardMobileButtonStyle,
   TaskcardMobileChange,
+  TaskcardMobileAvatar,
   TaskcardMobileTone,
 } from "./types";

@@ -1,5 +1,5 @@
 import { MaterialIcon } from "@/components/material-icon";
-import type { TaskcardMobileButtonColor, TaskcardMobileButtonIcon, TaskcardMobileButtonStyle } from "./types";
+import type { TaskcardMobileButtonColor, TaskcardMobileButtonIcon, TaskcardMobileButtonStyle, TaskcardMobileTheme } from "./types";
 
 type TaskcardMobileButtonProps = {
   children: React.ReactNode;
@@ -8,7 +8,29 @@ type TaskcardMobileButtonProps = {
   icon?: TaskcardMobileButtonIcon;
   onClick?: () => void;
   disabled?: boolean;
+  theme?: TaskcardMobileTheme;
   className?: string;
+};
+
+const themePrimaryAppearance: Record<TaskcardMobileTheme, Record<TaskcardMobileButtonStyle, string>> = {
+  light: {
+    outlined: "border border-[#00a4ff] bg-[#f3faff] text-[#0077bf]",
+    filled: "bg-[#00a4ff] text-white",
+    ghost: "bg-white text-[#0077bf]",
+    light: "bg-[#eaf8ff] text-[#0077bf]",
+  },
+  dark: {
+    outlined: "border border-[#b0ff5e] bg-[#b0ff5e]/10 text-[#b0ff5e]",
+    filled: "bg-[#b0ff5e] text-[#181818]",
+    ghost: "bg-[#171717] text-[#b0ff5e]",
+    light: "bg-[#b0ff5e]/10 text-[#b0ff5e]",
+  },
+  retro: {
+    outlined: "border-2 border-[#ba0dcb] bg-[#f2b8f6]/35 text-[#9c0bac]",
+    filled: "bg-[#ba0dcb] text-white",
+    ghost: "bg-[#eceee6] text-[#9c0bac]",
+    light: "bg-[#f2b8f6]/45 text-[#9c0bac]",
+  },
 };
 
 const appearance: Record<TaskcardMobileButtonStyle, Record<TaskcardMobileButtonColor, string>> = {
@@ -69,10 +91,15 @@ export function TaskcardMobileButton({
   icon = "none",
   onClick,
   disabled = false,
+  theme = "light",
   className,
 }: TaskcardMobileButtonProps) {
   const iconPosition = icon === "link" || icon === "upload" ? "justify-between" : "justify-center";
   const materialIcon = iconName[icon];
+  const useThemePrimary = color !== "red" && color !== "gray";
+  const buttonAppearance = theme === "dark" && color === "red"
+    ? "border border-[#ff5e5e] bg-transparent text-[#ff7e87]"
+    : useThemePrimary ? themePrimaryAppearance[theme][style] : appearance[style][color];
 
   return (
     <button
@@ -82,7 +109,7 @@ export function TaskcardMobileButton({
       className={[
         "flex h-11 w-full items-center rounded-xl px-4 py-2 text-base leading-6 transition-opacity disabled:cursor-not-allowed disabled:opacity-60",
         iconPosition,
-        appearance[style][color],
+        buttonAppearance,
         className,
       ].filter(Boolean).join(" ")}
     >

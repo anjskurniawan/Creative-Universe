@@ -10,6 +10,7 @@ export type TaskCardDetailProps = {
   value?: string;
   onClick?: () => void;
   config?: TaskCardConfig;
+  theme?: "light" | "dark" | "retro";
 };
 
 export default function TaskCardDetail({
@@ -19,6 +20,7 @@ export default function TaskCardDetail({
   value,
   onClick,
   config = {},
+  theme = "light",
 }: TaskCardDetailProps) {
   const isCountDown = variant === "Count Down";
   const isVariant4 = variant === "Variant4"; // Done variant
@@ -26,23 +28,26 @@ export default function TaskCardDetail({
   const isVendor = variant === "Vendor";
 
   if (isCountDown || isVariant4) {
-    const doneBg = config.color_done_bg || "#e8faea";
-    const doneText = config.color_done_text || "#2b9915";
     const progressText = config.color_progress_text || "#8474f9";
-    const progressBgLight = "#eeebff"; // fallback
     const isOverdue = isCountDown && value?.startsWith("Terlambat");
 
     let badgeBg = "";
     let style = {};
 
+    const defaultCountdownBadge = theme === "dark"
+      ? { backgroundColor: "transparent", color: "#b0ff5e", borderColor: "#b0ff5e" }
+      : theme === "retro"
+      ? { backgroundColor: "transparent", color: "#24252b", borderColor: "#24252b" }
+      : { backgroundColor: "transparent", color: progressText, borderColor: progressText };
+
     if (isVariant4) {
-      style = { backgroundColor: doneBg, color: doneText, borderColor: doneText };
+      style = defaultCountdownBadge;
       badgeBg = "hover:opacity-80";
     } else if (isOverdue) {
-      style = { backgroundColor: "#fff0f1", color: "#ef4444", borderColor: "#ef4444" };
+      style = { ...defaultCountdownBadge, color: "#ef4444", borderColor: "#ef4444" };
       badgeBg = "hover:opacity-80";
     } else {
-      style = { backgroundColor: progressBgLight, color: progressText, borderColor: progressText };
+      style = defaultCountdownBadge;
       badgeBg = "hover:opacity-80";
     }
       
@@ -69,9 +74,9 @@ export default function TaskCardDetail({
   const displayIcon = icon || defaultIcon;
   const displayValue = value || (isDate ? "13/07/2026" : "Fusion");
   
-  const textColor = isVendor ? "text-[#8474f9]" : "text-[#222222]";
+  const textColor = theme === "dark" ? "text-[#f1f1f1]" : isVendor ? "text-[#8474f9]" : "text-[#222222]";
   const textWeight = isVendor ? "font-semibold" : "font-normal";
-  const iconColor = isVendor ? "text-[#8474f9]" : "text-[#1E1E1E]";
+  const iconColor = theme === "dark" ? "text-[#b0ff5e]" : isVendor ? "text-[#8474f9]" : "text-[#1E1E1E]";
 
   return (
     <div

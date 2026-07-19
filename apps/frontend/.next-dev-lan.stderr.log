@@ -1836,3 +1836,1647 @@ Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
   216 |   }
   217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
   218 |   if (response.status === 422) { (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] Gagal memuat performa task: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:41:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Error loading counts for sidebar: ForbiddenError: Anda tidak memiliki hak akses untuk tindakan ini.
+    at handleResponse (src\core\api\client.ts:217:38)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:56:24)
+  215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+  216 |   }
+> 217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+      |                                      ^
+  218 |   if (response.status === 422) {
+  219 |     const errors = isRecord(payload) && isRecord(payload.errors)
+  220 |       ? normalizeValidationErrors(payload.errors) (src\app\odds\layout.tsx:75:15)
+[browser] Gagal memuat performa task: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\app\kv-retail\performance\page.tsx:119:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:135:33)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat performa task: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:119:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat performa task: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:119:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/kv-retail/option/page.tsx 
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/kv-retail/option/page.tsx 
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/kv-retail/option/page.tsx 
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/kv-retail/option/page.tsx 
+⨯ ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/kv-retail/option/page.tsx
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/kv-retail/option/page.tsx 
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/kv-retail/option/page.tsx 
+⨯ ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/kv-retail/option/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/kv-retail/option/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:1]
+ 684 |       </TaskDesktopPageTransition>
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     : ^
+     `----
+  x Expected '</', got '<eof>'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\kv-retail\option\page.tsx:687:3]
+ 685 |     </div>
+ 686 |   );
+ 687 | }
+     `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] Gagal memuat pengaturan: ReferenceError: set_task_page_title is not defined
+    at loadSettings (src\app\kv-retail\option\page.tsx:74:9)
+  72 |       try {
+  73 |         const data = await coreApi.settings.get<Record<string, string>>([...KV_RETAIL_SETT...
+> 74 |         setTaskPageTitleToday(data?.task_page_title_today || "Hari ini");
+     |         ^
+  75 |         setTaskPageTitleUnfinished(data?.task_page_title_unfinished || "Belum selesai");
+  76 |         setTaskPageTitleMonth(data?.task_page_title_month || "Bulan ini");
+  77 |          (src\app\kv-retail\option\page.tsx:85:16)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\app\kv-retail\option\page.tsx:73:22)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\option\page.tsx:86:17)
+[browser] Gagal memuat performa task: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:119:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:135:33)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:20:18)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:79:45)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:372:22)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:387:17)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\app\kv-retail\option\page.tsx:73:22)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\option\page.tsx:86:17)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\app\kv-retail\option\page.tsx:73:22)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\option\page.tsx:86:17)
+[browser] Gagal memuat pengaturan: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\app\kv-retail\option\page.tsx:73:22)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\app\kv-retail\option\page.tsx:86:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:228:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  226 |     throw new ApiError(message, 503, payload);
+  227 |   }
+> 228 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  229 | }
+  230 |
+  231 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat pengaturan: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:372:22)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\features\kv-retail\components\task-page.tsx:387:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] React has detected a change in the order of Hooks called by TaskPage. This will lead to bugs and errors if not fixed. For more information, read the Rules of Hooks: https://react.dev/link/rules-of-hooks
+
+   Previous render            Next render
+   ------------------------------------------------------
+1. useState                   useState
+2. useState                   useState
+3. useState                   useState
+4. useState                   useState
+5. useEffect                  useState
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 
+    at useKvRetailTasks (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:11:37)
+    at TaskPage (src\features\kv-retail\components\task-page.tsx:321:143)
+   9 |
+  10 | export function useKvRetailTasks() {
+> 11 |   const [tasks, setTasks] = useState<KvRetailTask[]>([]);
+     |                                     ^
+  12 |   const [isLoading, setIsLoading] = useState(true);
+  13 |   const requestSequence = useRef(0);
+  14 |   const stateEpoch = useRef(0); (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:11:37)
+[browser] Gagal memuat tugas KV Retail: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat pengaturan: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:372:22)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\features\kv-retail\components\task-page.tsx:387:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat pengaturan: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:215:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:372:22)
+  213 |     const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+  214 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 215 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  216 |   }
+  217 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  218 |   if (response.status === 422) { (src\features\kv-retail\components\task-page.tsx:387:17)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:372:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:387:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:138:33)
+[browser] Gagal memuat performa task: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:121:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at main (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/kv-retail..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/kv-retail..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/kv-retail..." notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:372:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:387:17)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at main (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+    at div (<anonymous>)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/kv-retail/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/kv-retail/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/kv-retail/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/kv-retail/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:372:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:387:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/kv-retail/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:372:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:387:17)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:378:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:393:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:400:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:415:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:400:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:415:17)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:400:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:415:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:400:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:415:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:84:45)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:400:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:415:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat performa task: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:149:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:238:33)
+[browser] Gagal memuat performa task: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\kv-retail\performance\page.tsx:203:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformancePage.useCallback[refreshCreativeAgent] (src\app\kv-retail\performance\page.tsx:248:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:251:15)
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformanceDesktop.useEffect.loadLatestCreativeAgent (src\components\task-performance-desktop.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\components\task-performance-desktop.tsx:137:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:88:45)

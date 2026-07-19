@@ -1057,3 +1057,185 @@
   width: 0;
   height: 0;
 }
+
+/* KPI stays swipe-scrollable on narrow KV Retail viewports without exposing a browser scrollbar. */
+.kv-retail-kpi-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.kv-retail-kpi-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Keep KPI trend copy on one line: each card decides from its own usable width. */
+.performance-metric-card {
+  container-type: inline-size;
+}
+
+@container (max-width: 238px) {
+  .performance-metric-card__trend-copy {
+    display: none;
+  }
+}
+
+/* KV Retail performance navbar: keep message and notification menus aligned with its app-menu palette. */
+.cu-performance-bell-light > :first-child {
+  border-color: #bdeaff !important;
+}
+
+.cu-performance-bell-light [role="menu"] > a,
+.cu-performance-bell-light [role="menu"] > button,
+.cu-performance-bell-light > a:last-child {
+  color: #04044a !important;
+}
+
+.cu-performance-bell-light [role="menu"] > a > div,
+.cu-performance-bell-light [role="menu"] > button > div {
+  background-color: transparent !important;
+}
+
+.cu-performance-bell-light [role="menu"] > a:hover > div,
+.cu-performance-bell-light [role="menu"] > button:hover > div,
+.cu-performance-bell-light > a:last-child:hover {
+  background-color: #dff6ff !important;
+}
+
+.cu-performance-bell-light [role="menu"] p,
+.cu-performance-bell-light > :first-child p {
+  color: #04044a !important;
+}
+
+.cu-performance-bell-dark > :first-child {
+  border-color: rgba(176, 255, 94, 0.25) !important;
+}
+
+.cu-performance-bell-dark [role="menu"] > a,
+.cu-performance-bell-dark [role="menu"] > button,
+.cu-performance-bell-dark > a:last-child,
+.cu-performance-bell-dark [role="menu"] p,
+.cu-performance-bell-dark > :first-child p {
+  color: #f1f1f1 !important;
+}
+
+.cu-performance-bell-dark [role="menu"] > a > div,
+.cu-performance-bell-dark [role="menu"] > button > div {
+  background-color: transparent !important;
+}
+
+.cu-performance-bell-dark [role="menu"] > a:hover > div,
+.cu-performance-bell-dark [role="menu"] > button:hover > div,
+.cu-performance-bell-dark > a:last-child:hover {
+  background-color: rgba(176, 255, 94, 0.1) !important;
+}
+
+.cu-performance-bell-retro > :first-child {
+  border-color: #24252b !important;
+}
+
+.cu-performance-bell-retro [role="menu"] > a,
+.cu-performance-bell-retro [role="menu"] > button,
+.cu-performance-bell-retro > a:last-child,
+.cu-performance-bell-retro [role="menu"] p,
+.cu-performance-bell-retro > :first-child p {
+  color: #24252b !important;
+}
+
+.cu-performance-bell-retro [role="menu"] > a > div,
+.cu-performance-bell-retro [role="menu"] > button > div {
+  background-color: transparent !important;
+}
+
+.cu-performance-bell-retro [role="menu"] > a:hover > div,
+.cu-performance-bell-retro [role="menu"] > button:hover > div,
+.cu-performance-bell-retro > a:last-child:hover {
+  background-color: #dfe2d3 !important;
+}
+
+.cu-performance-bell-light [role="menu"] p,
+.cu-performance-bell-light [role="menu"] a,
+.cu-performance-bell-light [role="menu"] button,
+.cu-performance-bell-light > :first-child p,
+.cu-performance-bell-light > a:last-child,
+.cu-performance-bell-dark [role="menu"] p,
+.cu-performance-bell-dark [role="menu"] a,
+.cu-performance-bell-dark [role="menu"] button,
+.cu-performance-bell-dark > :first-child p,
+.cu-performance-bell-dark > a:last-child,
+.cu-performance-bell-retro [role="menu"] p,
+.cu-performance-bell-retro [role="menu"] a,
+.cu-performance-bell-retro [role="menu"] button,
+.cu-performance-bell-retro > :first-child p,
+.cu-performance-bell-retro > a:last-child {
+  font-weight: 400 !important;
+}
+
+/* KV Retail settings form: all editable content follows the active locked theme. */
+.cu-kv-option-card--dark :is(h2, h3, label) {
+  color: #f1f1f1 !important;
+}
+
+.cu-kv-option-card--dark :is(p, .text-gray-500, .text-gray-600, .text-gray-700) {
+  color: #b9b9b9 !important;
+}
+
+.cu-kv-option-card--dark :is(input, textarea) {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: #202820 !important;
+  color: #f1f1f1 !important;
+}
+
+.cu-kv-option-card--dark hr,
+.cu-kv-option-card--dark .border-t {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.cu-kv-option-card--retro :is(h2, h3, label, p) {
+  color: #24252b !important;
+}
+
+.cu-kv-option-card--retro :is(input, textarea) {
+  border: 1px solid #24252b !important;
+  background: #dfe2d3 !important;
+  color: #24252b !important;
+}
+
+.cu-kv-option-card--retro hr,
+.cu-kv-option-card--retro .border-t {
+  border-color: #24252b !important;
+}
+
+@keyframes cu-option-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cu-option-content-enter {
+  animation: cu-option-content-enter 220ms ease-out both;
+}
+
+/* KV Retail compact navbar: account menu follows the full-width mobile dropdown pattern. */
+@media (max-width: 1023px) {
+  [data-kv-retail-navbar][data-compact] [aria-label="Menu profil"] + div {
+    position: fixed !important;
+    top: 4.75rem !important;
+    right: 1rem !important;
+    left: 1rem !important;
+    z-index: 110 !important;
+    width: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cu-option-content-enter {
+    animation: none;
+  }
+}

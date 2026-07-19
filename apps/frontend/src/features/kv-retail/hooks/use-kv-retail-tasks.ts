@@ -9,6 +9,7 @@ type TaskUpdater = (task: KvRetailTask) => KvRetailTask;
 
 export function useKvRetailTasks() {
   const [tasks, setTasks] = useState<KvRetailTask[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const requestSequence = useRef(0);
   const stateEpoch = useRef(0);
   const versions = useRef(new Map<number, number>());
@@ -17,11 +18,15 @@ export function useKvRetailTasks() {
   const refresh = useCallback(async () => {
     const sequence = ++requestSequence.current;
     const epoch = stateEpoch.current;
-    const data = await kvRetailApi.tasks.list();
-    if (sequence !== requestSequence.current || epoch !== stateEpoch.current) return;
-    stateEpoch.current += 1;
-    setTasks(data);
-    data.forEach((task) => versions.current.set(task.id, (versions.current.get(task.id) ?? 0) + 1));
+    try {
+      const data = await kvRetailApi.tasks.list();
+      if (sequence !== requestSequence.current || epoch !== stateEpoch.current) return;
+      stateEpoch.current += 1;
+      setTasks(data);
+      data.forEach((task) => versions.current.set(task.id, (versions.current.get(task.id) ?? 0) + 1));
+    } finally {
+      if (sequence === requestSequence.current) setIsLoading(false);
+    }
   }, []);
 
   const merge = useCallback((incoming: KvRetailTask) => {
@@ -53,7 +58,11 @@ export function useKvRetailTasks() {
 
     try {
       const saved = await request();
-      if (pending.current.get(taskId) === token) merge(saved);
+      // Pusher can deliver a newer version while this PATCH is in flight.
+      // Never let the older HTTP response overwrite that newer task state.
+      if (pending.current.get(taskId) === token && versions.current.get(taskId) === optimisticVersion) {
+        merge(saved);
+      }
       return saved;
     } catch (error) {
       // Jangan menimpa event realtime atau mutation lebih baru dengan snapshot lama.
@@ -79,5 +88,5 @@ export function useKvRetailTasks() {
     void refresh().catch((error) => console.error("Gagal memuat tugas KV Retail:", error));
   }, [refresh]);
 
-  return { tasks, refresh, merge, mutate, remove };
+  return { tasks, isLoading, refresh, merge, mutate, remove };
 }

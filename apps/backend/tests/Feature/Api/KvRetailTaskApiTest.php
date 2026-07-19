@@ -67,9 +67,9 @@ class KvRetailTaskApiTest extends TestCase
 
         $response->assertCreated();
 
-        Event::assertDispatched(KvRetailTaskAssigned::class, function (KvRetailTaskAssigned $event) use ($firstAssignee, $secondAssignee) {
+        Event::assertDispatched(KvRetailTaskAssigned::class, function (KvRetailTaskAssigned $event) use ($creator, $firstAssignee, $secondAssignee) {
             return $event->task->task_name === 'Realtime task assignment'
-                && $event->userIds === [$firstAssignee->id, $secondAssignee->id];
+                && collect($event->userIds)->sort()->values()->all() === collect([$creator->id, $firstAssignee->id, $secondAssignee->id])->sort()->values()->all();
         });
     }
 

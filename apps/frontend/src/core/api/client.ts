@@ -163,7 +163,11 @@ export async function apiFetch<T = unknown>(
         continue;
       }
 
-      return await handleResponse<T>(response, { responseType, skipAuthRedirect });
+      return await handleResponse<T>(response, {
+        responseType,
+        skipAuthRedirect,
+        isCanonicalSessionRequest: path === "/auth/me",
+      });
     } catch (error) {
       if (error instanceof ApiError) throw error;
       if (didTimeout()) throw new RequestTimeoutError(timeoutMs);
@@ -189,7 +193,7 @@ export function apiBlob(path: string, options: ApiRequestOptions = {}): Promise<
 
 async function handleResponse<T>(
   response: Response,
-  options: { responseType: ResponseType; skipAuthRedirect: boolean }
+  options: { responseType: ResponseType; skipAuthRedirect: boolean; isCanonicalSessionRequest: boolean }
 ): Promise<T> {
   if (options.responseType === "response") return response as T;
 
@@ -210,7 +214,11 @@ async function handleResponse<T>(
     // still valid (for example during a reload or a transient proxy failure).
     // Only force a full-page logout after the canonical session endpoint also
     // confirms that the cookie session is no longer authenticated.
-    const sessionExpired = options.skipAuthRedirect || await isSessionExpired();
+    // `skipAuthRedirect` means this request must not navigate to login by
+    // itself. It does not mean its 401 is proof that the browser session has
+    // expired (message, notification, and login requests use this option).
+    const sessionExpired = options.isCanonicalSessionRequest
+      || (!options.skipAuthRedirect && await isSessionExpired());
     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
   }

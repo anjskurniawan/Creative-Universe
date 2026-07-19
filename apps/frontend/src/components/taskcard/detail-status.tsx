@@ -12,6 +12,7 @@ export type TaskCardDetailStatusProps = {
   onUploadClick?: (index: number) => void;
   onViewClick?: (url: string) => void;
   config?: TaskCardConfig;
+  theme?: "light" | "dark" | "retro";
 };
 
 export default function TaskCardDetailStatus({
@@ -22,6 +23,7 @@ export default function TaskCardDetailStatus({
   onUploadClick,
   onViewClick,
   config = {},
+  theme = "light",
 }: TaskCardDetailStatusProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -45,12 +47,12 @@ export default function TaskCardDetailStatus({
   let bgStyle = {};
   let textStyle = {};
   
-  let bgClasses = "bg-[#eeebff]";
-  let textClasses = "text-[#8474f9]";
+  let bgClasses = theme === "dark" ? "bg-[#202820]" : theme === "retro" ? "bg-[#dfe2d3]" : "bg-[#eeebff]";
+  let textClasses = theme === "dark" ? "text-[#b0ff5e]" : theme === "retro" ? "text-[#24252b]" : "text-[#8474f9]";
 
   if (!hasAnyFile) {
-    bgClasses = "bg-[#f3f4f6]";
-    textClasses = "text-[#6b7280]";
+    bgClasses = theme === "dark" ? "bg-[#272b29]" : theme === "retro" ? "bg-[#c9ccc0]" : "bg-[#f3f4f6]";
+    textClasses = theme === "dark" ? "text-[#9da59f]" : theme === "retro" ? "text-[#687065]" : "text-[#6b7280]";
   } else if (isDone) {
     bgClasses = "";
     bgStyle = { backgroundColor: doneBg };
@@ -99,7 +101,7 @@ export default function TaskCardDetailStatus({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-[130px] bg-white border border-cu-line rounded-[8px] shadow-sm z-50 flex flex-col overflow-hidden">
+        <div className={`absolute top-full left-0 z-50 mt-1 flex w-[130px] flex-col overflow-hidden rounded-[8px] shadow-sm ${theme === "dark" ? "border border-white/10 bg-[#202820]" : theme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6]" : "border border-cu-line bg-white"}`}>
           {files.map((file, idx) => (
             <div
               key={idx}
@@ -108,7 +110,7 @@ export default function TaskCardDetailStatus({
                 if (file && onViewClick) onViewClick(file);
                 if (!file && onUploadClick) onUploadClick(idx);
               }}
-              className="flex items-center gap-2 px-3 py-2 text-xs text-cu-ink hover:bg-gray-50 cursor-pointer border-b border-cu-line last:border-0"
+              className={`flex cursor-pointer items-center gap-2 border-b px-3 py-2 text-xs last:border-0 ${theme === "dark" ? "border-white/10 text-[#f1f1f1] hover:bg-[#2b352d]" : theme === "retro" ? "border-[#24252b]/20 text-[#24252b] hover:bg-[#dfe2d3]" : "border-cu-line text-cu-ink hover:bg-gray-50"}`}
             >
               <MaterialIcon 
                 name={file ? "visibility" : "upload"} 

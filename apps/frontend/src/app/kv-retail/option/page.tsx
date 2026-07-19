@@ -6,18 +6,21 @@ import { coreApi } from "@/core/api";
 import { type TaskCardConfig } from "@/components/taskcard";
 import { useAuth } from "@/providers/auth-provider";
 import { TaskDesktopPageTransition } from "@/components/task-desktop-page-transition";
+import { PerformanceNavbar } from "@/features/kv-retail/components/performance-navbar";
+import { PerformanceSidebar } from "@/features/kv-retail/components/performance-sidebar";
+import { useKvRetailDesktopSidebar } from "@/features/kv-retail/hooks";
 
 const PRIMARY_MENU: SideMenuItem[] = [
   {
-    label: "Tugas Hari Ini",
+    label: "Hari ini",
     icon: "today",
     href: "/kv-retail",
   },
-  { label: "Tugas Belum Selesai", icon: "assignment_late", href: "/kv-retail/unfinished" },
-  { label: "Tugas Bulan Ini", icon: "calendar_month", href: "/kv-retail/month" },
-  { label: "Rekap Performa", icon: "analytics", href: "/kv-retail/performance" },
+  { label: "Belum selesai", icon: "assignment_late", href: "/kv-retail/unfinished" },
+  { label: "Bulan ini", icon: "calendar_month", href: "/kv-retail/month" },
+  { label: "Report", icon: "analytics", href: "/kv-retail/performance" },
   {
-    label: "Option Page",
+    label: "Pengaturan",
     icon: "settings",
     href: "/kv-retail/option",
     status: "Active",
@@ -25,29 +28,31 @@ const PRIMARY_MENU: SideMenuItem[] = [
 ];
 
 const KV_RETAIL_SETTING_KEYS = [
-  "task_page_title", "task_page_subtitle", "vendor_options",
+  "task_page_title_today", "task_page_title_unfinished", "task_page_title_month", "vendor_options",
   "delete_overlay_title", "delete_overlay_cancel", "delete_overlay_confirm",
   "upload_overlay_title_support", "upload_overlay_title_draft", "upload_overlay_cancel", "upload_overlay_submit", "upload_overlay_saving",
   "submit_link_title", "submit_link_desc", "submit_link_placeholder", "submit_link_cancel", "submit_link_submit",
   "view_link_title", "view_link_desc", "view_link_cancel", "view_link_copy",
   "btn_status_draft", "btn_status_progress", "btn_status_approve", "btn_status_email",
   "detail_status_1", "detail_status_2", "detail_dropdown_file", "detail_dropdown_upload", "detail_link_file",
-  "task_empty_state", "color_done_bg", "color_done_text", "color_progress_bg", "color_progress_text",
-  "color_delete_bg", "color_delete_text", "icon_file_empty", "icon_file_filled",
+  "task_empty_state",
 ] as const;
 
 export default function OptionPage() {
   const [mobileSidebarVariant, setMobileSidebarVariant] = useState<SideMenuVariant>("Collaps");
   const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Expand");
+  const [desktopTheme, setDesktopTheme] = useState<"light" | "dark" | "retro">("light");
+  const { expanded: desktopShellExpanded, toggleExpanded: toggleDesktopShellExpanded } = useKvRetailDesktopSidebar();
 
-  const [activeTab, setActiveTab] = useState<"General" | "Overlays" | "Status" | "Colors" | "FormInput">("General");
+  const [activeTab, setActiveTab] = useState<"General" | "Overlays" | "Status" | "FormInput">("General");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const { hasPermission, user, isLoading: isAuthLoading } = useAuth();
 
   // States
-  const [task_page_title, set_task_page_title] = useState("");
-  const [task_page_subtitle, set_task_page_subtitle] = useState("");
+  const [task_page_title_today, setTaskPageTitleToday] = useState("Hari ini");
+  const [task_page_title_unfinished, setTaskPageTitleUnfinished] = useState("Belum selesai");
+  const [task_page_title_month, setTaskPageTitleMonth] = useState("Bulan ini");
   
   const [config, setConfig] = useState<TaskCardConfig>({});
 
@@ -67,13 +72,14 @@ export default function OptionPage() {
       
       try {
         const data = await coreApi.settings.get<Record<string, string>>([...KV_RETAIL_SETTING_KEYS]);
-        set_task_page_title(data?.task_page_title || "Branding Key Visual Retail");
-        set_task_page_subtitle(data?.task_page_subtitle || "Kelola dan selesaikan tugas yang belum beres tepat waktu.");
+        setTaskPageTitleToday(data?.task_page_title_today || "Hari ini");
+        setTaskPageTitleUnfinished(data?.task_page_title_unfinished || "Belum selesai");
+        setTaskPageTitleMonth(data?.task_page_title_month || "Bulan ini");
         
         const loadedConfig: TaskCardConfig = {};
         for (const key of KV_RETAIL_SETTING_KEYS) {
-          if (key !== "task_page_title" && key !== "task_page_subtitle" && data?.[key]) {
-            loadedConfig[key] = data[key];
+          if (!key.startsWith("task_page_title_") && data?.[key]) {
+            loadedConfig[key as keyof TaskCardConfig] = data[key];
           }
         }
         setConfig(loadedConfig);
@@ -87,7 +93,19 @@ export default function OptionPage() {
   }, [hasPermission, user, isAuthLoading]);
 
   if (isAuthLoading || isLoading) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f6faff] p-6 lg:bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]">
+        <div className="flex min-h-[calc(100vh-48px)] w-full flex-col overflow-hidden rounded-[26px] border border-white/80 bg-white/80 shadow-[0_14px_42px_rgba(44,42,39,0.16)] backdrop-blur-md">
+          <div className="h-16 shrink-0 border-b border-black/[0.045] bg-white/55" />
+          <div className="flex flex-1 items-center justify-center">
+            <div className="flex items-center gap-3">
+              <span className="size-5 animate-spin rounded-full border-2 border-[#00a4ff]/25 border-t-[#00a4ff]" aria-hidden="true" />
+              <p className="text-sm font-medium text-[#000675]">Memuat pengaturan...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!hasPermission("kv-retail.settings.manage")) {
@@ -100,8 +118,9 @@ export default function OptionPage() {
     try {
       await coreApi.settings.update({
           settings: {
-            task_page_title,
-            task_page_subtitle,
+            task_page_title_today,
+            task_page_title_unfinished,
+            task_page_title_month,
             ...config
           }
       });
@@ -115,49 +134,55 @@ export default function OptionPage() {
   };
 
   const tabs = [
-    { id: "General", label: "Teks Umum" },
+    { id: "General", label: "Halaman" },
     { id: "Overlays", label: "Teks Overlay" },
     { id: "Status", label: "Teks Status" },
-    { id: "Colors", label: "Warna & Ikon" },
     { id: "FormInput", label: "Form Input" },
   ] as const;
 
   return (
-    <div className="grid min-h-screen grid-cols-[auto_minmax(0,1fr)] bg-[#f6faff] text-[#222]">
+    <>
+      <div className={`h-dvh overflow-hidden p-3 lg:hidden ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)]" : desktopTheme === "retro" ? "bg-[#dfe2d3] font-mono" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}>
+        <div className={`flex h-[calc(100dvh-24px)] flex-col overflow-hidden rounded-[22px] ${desktopTheme === "dark" ? "border border-white/10 bg-[#111413]/90" : desktopTheme === "retro" ? "border-[3px] border-[#24252b] bg-[#c9ccc0] shadow-[0_6px_0_#24252b]" : "border border-white/80 bg-white/80 shadow-[0_12px_32px_rgba(0,4,117,0.2)] backdrop-blur-md"}`}>
+          <PerformanceNavbar theme={desktopTheme} title="Pengaturan" compact compactMenuItems={PRIMARY_MENU} />
+          <main className="flex min-h-0 flex-1 px-5 pt-6">
+            <h1 className={`text-4xl font-medium leading-none tracking-[-0.05em] ${desktopTheme === "dark" ? "text-[#f1f1f1]" : "text-[#181818]"}`}>Pengaturan</h1>
+          </main>
+        </div>
+      </div>
+      <div className={`hidden text-[#222] lg:flex lg:h-screen lg:min-h-0 lg:flex-col lg:p-6 ${desktopTheme === "dark" ? "lg:bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)]" : desktopTheme === "retro" ? "lg:bg-[#dfe2d3]" : "bg-[#f6faff] lg:bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}>
       <SideMenu
         variant={mobileSidebarVariant}
         primaryItems={PRIMARY_MENU}
         onVariantChange={setMobileSidebarVariant}
         className="lg:hidden"
       />
-      <SideMenu
-        variant={desktopSidebarVariant}
-        primaryItems={PRIMARY_MENU}
-        onVariantChange={setDesktopSidebarVariant}
-        className="hidden lg:flex"
-      />
+      <SideMenu variant={desktopSidebarVariant} primaryItems={PRIMARY_MENU} onVariantChange={setDesktopSidebarVariant} className="hidden" />
 
-      <TaskDesktopPageTransition className="min-w-0 overflow-visible px-4 py-8 sm:px-8 lg:pl-12 lg:pr-16">
-        <div className="w-full max-w-4xl">
-          <header className="min-h-[140px] gap-6 2xl:flex 2xl:items-center 2xl:justify-between">
-            <div className="w-full max-w-[590px] shrink-0">
-              <h1 className="text-[44px] font-semibold leading-[52px] tracking-[-0.96px] text-[#222] sm:text-[48px] sm:leading-[60px]">
-                Option Page
+      <div className={`cu-option-content-enter min-h-screen lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden ${desktopTheme === "light" ? "lg:rounded-[26px] lg:border lg:border-white/80 lg:bg-white/80 lg:shadow-[0_14px_42px_rgba(44,42,39,0.16)] lg:backdrop-blur-md" : desktopTheme === "dark" ? "lg:rounded-[26px] lg:border lg:border-white/10 lg:bg-[#111413]/90 lg:shadow-[0_14px_42px_rgba(0,0,0,0.45)] lg:backdrop-blur-md" : "lg:rounded-[30px] lg:border-[3px] lg:border-[#24252b] lg:bg-[#c9ccc0] lg:font-mono lg:shadow-[0_8px_0_#24252b]"}`}>
+        <div className="hidden lg:block"><PerformanceNavbar theme={desktopTheme} title="Pengaturan" /></div>
+        <div className="lg:flex lg:min-h-0 lg:flex-1">
+          <PerformanceSidebar className="hidden lg:flex" theme={desktopTheme} activeHref="/kv-retail/option" ariaLabel="Navigasi Pengaturan" onToggleTheme={() => setDesktopTheme((theme) => theme === "dark" ? "light" : "dark")} onToggleRetro={() => setDesktopTheme((theme) => theme === "retro" ? "light" : "retro")} expanded={desktopShellExpanded} onToggleExpanded={toggleDesktopShellExpanded} />
+      <TaskDesktopPageTransition className="min-w-0 overflow-visible px-4 py-8 sm:px-8 lg:relative lg:m-4 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-y-auto lg:px-0 lg:py-0">
+        <div className="w-full max-w-4xl lg:max-w-none">
+          <header className="min-h-[45px]">
+            <div>
+              <h1 className={`text-4xl font-medium leading-none tracking-[-0.72px] ${desktopTheme === "dark" ? "text-[#f1f1f1]" : desktopTheme === "retro" ? "text-[#24252b]" : "text-[#181818]"}`}>
+                Pengaturan
               </h1>
-              <p className="mt-3 text-base leading-5 tracking-[0.32px] text-[#6b7280]">
-                Pengaturan dan Opsi Khusus (CMS) untuk halaman Task dan TaskCard.
-              </p>
             </div>
           </header>
 
-          <section className="mt-8 w-full rounded-2xl border border-gray-200 bg-white shadow-sm overflow-visible mb-20">
-            <div className="flex overflow-x-auto border-b border-gray-200">
+          <section className={`cu-kv-option-card cu-kv-option-card--${desktopTheme} mt-4 mb-20 w-full overflow-visible rounded-[20px] p-2 shadow-sm ${desktopTheme === "dark" ? "border border-white/10 bg-[#171717]" : desktopTheme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6] shadow-[3px_3px_0_#24252b]" : "border border-[#dbe9f3] bg-white"}`}>
+            <div className={`flex gap-1 overflow-x-auto rounded-xl p-1 ${desktopTheme === "dark" ? "bg-[#202820]" : desktopTheme === "retro" ? "border border-[#24252b] bg-[#dfe2d3]" : "bg-[#f3faff]"}`}>
               {tabs.map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-6 py-4 text-sm font-semibold whitespace-nowrap focus:outline-none transition-colors border-b-2 ${
-                    activeTab === tab.id ? "border-[#8474f9] text-[#8474f9]" : "border-transparent text-gray-500 hover:text-gray-700"
+                  className={`rounded-lg px-4 py-2.5 text-sm font-semibold whitespace-nowrap focus:outline-none transition-colors ${
+                    activeTab === tab.id
+                      ? desktopTheme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : desktopTheme === "retro" ? "bg-[#ba0dcb] text-white" : "bg-white text-[#000675] shadow-sm"
+                      : desktopTheme === "dark" ? "text-[#b9b9b9] hover:bg-white/5 hover:text-[#f1f1f1]" : desktopTheme === "retro" ? "text-[#24252b] hover:bg-[#c9ccc0]" : "text-[#61717a] hover:bg-white hover:text-[#000675]"
                   }`}
                   type="button"
                 >
@@ -169,31 +194,45 @@ export default function OptionPage() {
             {isLoading ? (
               <div className="p-12 flex justify-center text-gray-500">Memuat pengaturan...</div>
             ) : (
-              <form onSubmit={handleSave} className="p-6">
+              <form onSubmit={handleSave} className="p-5 md:p-8">
                 
                 {/* GENERAL TAB */}
                 {activeTab === "General" && (
                   <div className="flex flex-col gap-5">
-                    <h2 className="text-xl font-semibold mb-2">Teks Halaman Task</h2>
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#00a4ff]">Navigasi task</p>
+                      <h2 className="mt-1 text-xl font-semibold text-[#181818]">Nama halaman</h2>
+                      <p className="mt-1 text-sm text-gray-500">Nama ini digunakan pada heading desktop dan breadcrumb halaman terkait.</p>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-3">
                       <div className="flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700">Judul Halaman</label>
+                        <label className="text-sm font-semibold text-gray-700">Hari ini</label>
                         <input
                           type="text"
-                          value={task_page_title}
-                          onChange={(e) => set_task_page_title(e.target.value)}
+                          value={task_page_title_today}
+                          onChange={(e) => setTaskPageTitleToday(e.target.value)}
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8474f9]"
-                          placeholder="Branding Key Visual Retail"
+                          placeholder="Hari ini"
                         />
                       </div>
                       <div className="flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700">Sub-Judul Halaman</label>
+                        <label className="text-sm font-semibold text-gray-700">Belum selesai</label>
                         <input
                           type="text"
-                          value={task_page_subtitle}
-                          onChange={(e) => set_task_page_subtitle(e.target.value)}
+                          value={task_page_title_unfinished}
+                          onChange={(e) => setTaskPageTitleUnfinished(e.target.value)}
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8474f9]"
-                          placeholder="Kelola dan selesaikan tugas..."
+                          placeholder="Belum selesai"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-gray-700">Bulan ini</label>
+                        <input
+                          type="text"
+                          value={task_page_title_month}
+                          onChange={(e) => setTaskPageTitleMonth(e.target.value)}
+                          className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8474f9]"
+                          placeholder="Bulan ini"
                         />
                       </div>
                       
@@ -549,127 +588,11 @@ export default function OptionPage() {
                   </div>
                 )}
 
-                {/* COLORS & ICONS TAB */}
-                {activeTab === "Colors" && (
-                  <div className="flex flex-col gap-8">
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3">Pengaturan Warna Aksen (HEX)</h3>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        {/* Done Colors */}
-                        <div className="flex items-center gap-4 border rounded-xl p-4">
-                          <input 
-                            type="color" 
-                            value={config.color_done_bg || "#e8faea"} 
-                            onChange={(e) => handleConfigChange("color_done_bg", e.target.value)}
-                            className="w-12 h-12 rounded cursor-pointer border-none"
-                          />
-                          <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-semibold text-gray-600">Selesai (Done) Background</label>
-                            <span className="text-xs font-mono text-gray-500">{config.color_done_bg || "#e8faea"}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 border rounded-xl p-4">
-                          <input 
-                            type="color" 
-                            value={config.color_done_text || "#2b9915"} 
-                            onChange={(e) => handleConfigChange("color_done_text", e.target.value)}
-                            className="w-12 h-12 rounded cursor-pointer border-none"
-                          />
-                          <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-semibold text-gray-600">Selesai (Done) Teks</label>
-                            <span className="text-xs font-mono text-gray-500">{config.color_done_text || "#2b9915"}</span>
-                          </div>
-                        </div>
-
-                        {/* Progress Colors */}
-                        <div className="flex items-center gap-4 border rounded-xl p-4">
-                          <input 
-                            type="color" 
-                            value={config.color_progress_bg || "#8474f9"} 
-                            onChange={(e) => handleConfigChange("color_progress_bg", e.target.value)}
-                            className="w-12 h-12 rounded cursor-pointer border-none"
-                          />
-                          <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-semibold text-gray-600">Proses (Progress) Background</label>
-                            <span className="text-xs font-mono text-gray-500">{config.color_progress_bg || "#8474f9"}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 border rounded-xl p-4">
-                          <input 
-                            type="color" 
-                            value={config.color_progress_text || "#ffffff"} 
-                            onChange={(e) => handleConfigChange("color_progress_text", e.target.value)}
-                            className="w-12 h-12 rounded cursor-pointer border-none"
-                          />
-                          <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-semibold text-gray-600">Proses (Progress) Teks</label>
-                            <span className="text-xs font-mono text-gray-500">{config.color_progress_text || "#ffffff"}</span>
-                          </div>
-                        </div>
-
-                        {/* Delete Colors */}
-                        <div className="flex items-center gap-4 border rounded-xl p-4">
-                          <input 
-                            type="color" 
-                            value={config.color_delete_bg || "#ff5b55"} 
-                            onChange={(e) => handleConfigChange("color_delete_bg", e.target.value)}
-                            className="w-12 h-12 rounded cursor-pointer border-none"
-                          />
-                          <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-semibold text-gray-600">Hapus (Delete) Background</label>
-                            <span className="text-xs font-mono text-gray-500">{config.color_delete_bg || "#ff5b55"}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 border rounded-xl p-4">
-                          <input 
-                            type="color" 
-                            value={config.color_delete_text || "#ffffff"} 
-                            onChange={(e) => handleConfigChange("color_delete_text", e.target.value)}
-                            className="w-12 h-12 rounded cursor-pointer border-none"
-                          />
-                          <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs font-semibold text-gray-600">Hapus (Delete) Teks</label>
-                            <span className="text-xs font-mono text-gray-500">{config.color_delete_text || "#ffffff"}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <hr />
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-3">Pengaturan Ikon File (Material Icons)</h3>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="flex flex-col gap-2">
-                          <label className="text-xs font-semibold text-gray-600">Ikon Slot Kosong</label>
-                          <input
-                            type="text"
-                            value={config.icon_file_empty || ""}
-                            onChange={(e) => handleConfigChange("icon_file_empty", e.target.value)}
-                            className="border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#8474f9]"
-                            placeholder="add_circle"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                          <label className="text-xs font-semibold text-gray-600">Ikon Slot Terisi</label>
-                          <input
-                            type="text"
-                            value={config.icon_file_filled || ""}
-                            onChange={(e) => handleConfigChange("icon_file_filled", e.target.value)}
-                            className="border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#8474f9]"
-                            placeholder="arrow_drop_down_circle"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 <div className="flex justify-end mt-12 pt-6 border-t border-gray-200">
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="px-8 py-3 bg-[#8474f9] text-white font-semibold rounded-xl shadow-sm hover:bg-[#6c5bde] transition-colors disabled:opacity-50"
+                    className={`rounded-xl px-8 py-3 font-semibold shadow-sm transition-colors disabled:opacity-50 ${desktopTheme === "dark" ? "bg-[#b0ff5e] text-[#181818] hover:bg-[#c6ff89]" : desktopTheme === "retro" ? "bg-[#ba0dcb] text-white hover:bg-[#9c0bac]" : "bg-[#00a4ff] text-white hover:bg-[#008ee0]"}`}
                   >
                     {isSaving ? "Menyimpan..." : "Simpan Pengaturan"}
                   </button>
@@ -679,6 +602,9 @@ export default function OptionPage() {
           </section>
         </div>
       </TaskDesktopPageTransition>
-    </div>
+        </div>
+      </div>
+      </div>
+    </>
   );
 }

@@ -6,6 +6,7 @@ export type TaskCardDateProps = {
   day?: string;
   date?: string;
   monthYear?: string;
+  theme?: "light" | "dark" | "retro";
 };
 
 export default function TaskCardDate({
@@ -14,14 +15,15 @@ export default function TaskCardDate({
   day = "Kamis",
   date = "09",
   monthYear = "JUL 2026",
+  theme = "light",
 }: TaskCardDateProps) {
   const isDone = state === "Done";
   
   return (
     <div
       className={[
-        "flex flex-col items-center justify-center p-4 text-white w-[122px] shrink-0",
-        isDone ? "bg-[#4ee546]" : "bg-[#8474f9]",
+        "flex w-[122px] shrink-0 flex-col items-center justify-center p-4",
+        theme === "dark" ? (isDone ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#202820] text-[#b0ff5e]") : theme === "retro" ? (isDone ? "bg-[#ba0dcb] text-white" : "bg-[#24252b] text-white") : isDone ? "bg-[#4ee546] text-[#181818]" : "bg-[#8474f9] text-white",
         className
       ].filter(Boolean).join(" ")}
     >

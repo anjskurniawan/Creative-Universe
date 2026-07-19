@@ -12,6 +12,7 @@ export type TaskCardButtonStatusProps = {
   label?: string;
   onClick?: () => void;
   config?: TaskCardConfig;
+  theme?: "light" | "dark" | "retro";
 };
 
 export default function TaskCardButtonStatus({
@@ -21,15 +22,16 @@ export default function TaskCardButtonStatus({
   label,
   onClick,
   config = {},
+  theme = "light",
 }: TaskCardButtonStatusProps) {
   const isDone = type === "Done";
   const isProgress = type === "Progress";
 
   // Use config colors or fallback to original
-  const doneBg = config.color_done_bg || "#e8faea";
-  const progressBg = config.color_progress_bg || "#8474f9";
-  const doneText = config.color_done_text || "#2b9915";
-  const progressText = config.color_progress_text || "#ffffff";
+  const doneBg = theme === "dark" ? "#202820" : theme === "retro" ? "#eceee6" : config.color_done_bg || "#e8faea";
+  const progressBg = theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : config.color_progress_bg || "#8474f9";
+  const doneText = theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#24252b" : config.color_done_text || "#2b9915";
+  const progressText = theme === "dark" ? "#181818" : theme === "retro" ? "#ffffff" : config.color_progress_text || "#ffffff";
 
   let bgStyle = {};
   let bgClasses = "border-[0.5px] border-solid transition-colors duration-200 ";
@@ -41,7 +43,7 @@ export default function TaskCardButtonStatus({
     bgStyle = { backgroundColor: progressBg, borderColor: "transparent" };
     bgClasses += "hover:opacity-80";
   } else {
-    bgClasses += "bg-[#d9dbde] border-transparent hover:bg-[#cfd2d6]";
+    bgClasses += theme === "dark" ? "bg-[#272b29] border-transparent hover:bg-[#333a35]" : theme === "retro" ? "bg-[#dfe2d3] border-[#24252b] hover:bg-[#c9ccc0]" : "bg-[#d9dbde] border-transparent hover:bg-[#cfd2d6]";
   }
 
   let textStyle = {};
@@ -52,7 +54,7 @@ export default function TaskCardButtonStatus({
   } else if (isProgress) {
     textStyle = { color: progressText };
   } else {
-    textClasses += "text-[#6b7280]";
+    textClasses += theme === "dark" ? "text-[#9da59f]" : theme === "retro" ? "text-[#24252b]" : "text-[#6b7280]";
   }
 
   let defaultLabel = "";

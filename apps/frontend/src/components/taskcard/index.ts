@@ -33,6 +33,8 @@ export { default as TaskCardUploadOverlay } from "./upload-overlay";
 
 export { default as TaskCard } from "./task-card";
 export type { TaskCardState, TaskCardProps } from "./task-card";
+export { TaskCardMobile } from "./task-card-mobile";
+export type { TaskCardMobileProps, TaskCardMobileTheme } from "./task-card-mobile";
 
 export type TaskCardConfig = {
   vendor_options?: string;

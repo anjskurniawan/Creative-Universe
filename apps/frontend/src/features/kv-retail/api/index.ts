@@ -38,4 +38,4 @@ export const kvRetailApi = {
     apiFetch<KvRetailTemporaryUpload>(`${PREFIX}/uploads`, { ...options, method: "POST", body }),
 } as const;
 
-export type { KvRetailTask, KvRetailTaskEvent, KvRetailTemporaryUpload } from "../types";
+export type { KvRetailTask, KvRetailTaskEvent, KvRetailTaskDeletedEvent, KvRetailTemporaryUpload } from "../types";
