@@ -17,7 +17,7 @@ const PRIMARY_ITEMS: readonly PerformanceSidebarItem[] = [
   { href: "/kv-retail", icon: "calendar_today", label: "Hari ini" },
   { href: "/kv-retail/unfinished", icon: "priority_high", label: "Belum selesai" },
   { href: "/kv-retail/month", icon: "calendar_month", label: "Bulan ini" },
-  { href: "/kv-retail/performance", icon: "analytics", label: KV_RETAIL_PERFORMANCE_PAGE.navLabel, isActive: true },
+  { href: "/kv-retail/performance", icon: "analytics", label: KV_RETAIL_PERFORMANCE_PAGE.navLabel },
 ] as const;
 
 function SidebarLink({ href, icon, label, active = false, highlight = false, theme, expanded, badge }: { href: string; icon: string; label: string; active?: boolean; highlight?: boolean; theme: "dark" | "light" | "retro"; expanded: boolean; badge?: number | string }) {

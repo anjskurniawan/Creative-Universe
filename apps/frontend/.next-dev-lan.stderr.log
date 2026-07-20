@@ -5274,3 +5274,5 @@ Caused by:
   224 |   }
   225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
   226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
