@@ -2,11 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MaterialIcon } from "@/components/material-icon";
-import { Navbar } from "@/components/navbar";
-import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/side-menu";
-import { TaskMobileNavigation } from "@/components/task-mobile-navigation";
+import { type SideMenuItem } from "@/components/side-menu";
 import { TaskDesktopPageTransition } from "@/components/task-desktop-page-transition";
-import { TaskcardMobileFullCard, type TaskcardMobileChange, type TaskcardMobileTone } from "@/components/taskcard-mobile";
+import { type TaskcardMobileChange, type TaskcardMobileTone } from "@/components/taskcard-mobile";
 import { TaskCardMobile, type TaskCardConfig } from "@/components/taskcard";
 import { TaskCard, type TaskCardState } from "@/components/task-card";
 import { TaskFormModal } from "@/components/task-form-modal";
@@ -21,7 +19,7 @@ import { useAuth } from "@/providers/auth-provider";
 
 type MetricState = "Total" | "Progress" | "OnTrack" | "Terlambat" | "Done";
 type DesktopTheme = "light" | "dark" | "retro";
-type MobileTaskFilterMenu = "vendor" | "sort" | null;
+
 export type TaskPageScope = "all" | "unfinished" | "current-month";
 
 type TaskSettings = Partial<TaskCardConfig> & {
@@ -335,10 +333,6 @@ function ToolbarDropdown({
 }
 
 export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
-  const [mobileSidebarVariant, setMobileSidebarVariant] =
-    useState<SideMenuVariant>("Collaps");
-  const [desktopSidebarVariant, setDesktopSidebarVariant] =
-    useState<SideMenuVariant>("Expand");
   const [desktopTheme, setDesktopTheme] = useState<"light" | "dark" | "retro">("light");
   const { expanded: desktopShellExpanded, toggleExpanded: toggleDesktopShellExpanded } = useKvRetailDesktopSidebar();
   
@@ -349,7 +343,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
   const { user, hasPermission } = useAuth();
   const [filterVendor, setFilterVendor] = useState("Semua Vendor");
   const [sortOption, setSortOption] = useState("Tenggat Waktu Terdekat");
-  const [mobileFilterMenu, setMobileFilterMenu] = useState<MobileTaskFilterMenu>(null);
+
 
   const [todayTitle, setTodayTitle] = useState("Hari ini");
   const [unfinishedTitle, setUnfinishedTitle] = useState("Belum selesai");
@@ -366,11 +360,6 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
     : scope === "unfinished"
     ? unfinishedTitle
     : todayTitle;
-  const activeTaskMenuLabel = scope === "unfinished"
-    ? "Belum selesai"
-    : scope === "current-month"
-    ? "Bulan ini"
-    : "Hari ini";
   const desktopTaskRoute = scope === "unfinished"
     ? "/kv-retail/unfinished"
     : scope === "current-month"
@@ -379,12 +368,6 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
   const desktopNavigationTitle = scopedPageTitle;
   const isTaskAdministrator = hasPermission("kv-retail.tasks.create");
   const isMentionOnlyUser = Boolean(user && !isTaskAdministrator);
-  const primaryMenuItems = PRIMARY_MENU
-    .filter((item) => !isMentionOnlyUser || item.label === "Hari ini")
-  .map((item) => ({
-    ...item,
-    status: item.label === activeTaskMenuLabel ? "Active" as const : undefined,
-  }));
   const compactMobileMenuItems = useMemo(
     () => PRIMARY_MENU
       .filter((item) => !isMentionOnlyUser || item.label === "Hari ini")
@@ -581,9 +564,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
     { state: "Terlambat" as MetricState, title: "Terlambat", value: terlambat, icon: "warning_amber" },
     { state: "Done" as MetricState, title: "Selesai", value: selesai, icon: "check_circle" },
   ];
-  const mobileMetrics = scope === "unfinished"
-    ? dynamicMetrics.filter((metric) => metric.state === "Total")
-    : dynamicMetrics;
+
   const desktopMetrics = scope === "unfinished"
     ? dynamicMetrics.filter((metric) => metric.state === "Total")
     : dynamicMetrics;
@@ -791,220 +772,10 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
         </div>
       </div>
 
-      {false && (
-        <>
-          <div>
-            <Navbar />
-          </div>
 
-      <main>
-        <header>
-          <h1 className="text-lg font-semibold leading-6 text-black">
-            {scopedPageTitle}
-          </h1>
-        </header>
-
-        <section
-          aria-label="Ringkasan tugas"
-          className="mt-3 flex touch-pan-x select-none overflow-x-auto border-b-2 border-[#aeb6b8] no-scrollbar cursor-grab active:cursor-grabbing"
-          onPointerDown={(event) => {
-            if ((event.target as HTMLElement).closest("button")) return;
-
-            summaryScrollDrag.current = {
-              pointerId: event.pointerId,
-              startX: event.clientX,
-              scrollLeft: event.currentTarget.scrollLeft,
-            };
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            if (summaryScrollDrag.current.pointerId !== event.pointerId) return;
-
-            event.currentTarget.scrollLeft =
-              summaryScrollDrag.current.scrollLeft -
-              (event.clientX - summaryScrollDrag.current.startX);
-          }}
-          onPointerUp={(event) => {
-            if (summaryScrollDrag.current.pointerId !== event.pointerId) return;
-            summaryScrollDrag.current.pointerId = -1;
-            event.currentTarget.releasePointerCapture(event.pointerId);
-          }}
-          onPointerCancel={() => {
-            summaryScrollDrag.current.pointerId = -1;
-          }}
-        >
-          {scope === "all" && !isMentionOnlyUser && (
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="flex shrink-0 items-center gap-1 border-b-2 border-[#ea4c89] px-2 py-2 text-xs leading-4 text-[#3b4446]"
-            >
-              <MaterialIcon name="add" size="auto" weight={400} className="text-base leading-none" />
-              Buat Tugas
-            </button>
-          )}
-          {mobileMetrics.map((metric) => (
-            <div
-              key={metric.state}
-              className="flex shrink-0 items-center gap-1 px-2 py-2 text-xs leading-4 text-[#aeb6b8]"
-            >
-              <span>{metric.value}</span>
-              <span>{metric.title}</span>
-            </div>
-          ))}
-        </section>
-
-        <section aria-label="Filter tugas" className="mt-3 flex items-center gap-1">
-          <label className="relative min-w-0 flex-1">
-            <span className="sr-only">Cari tugas, proyek, atau lokasi ...</span>
-            <MaterialIcon
-              name="search"
-              size="auto"
-              weight={400}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xl leading-none text-[#525e61]"
-            />
-            <input
-              type="search"
-              placeholder="Cari tugas, proyek, atau lokasi ..."
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              className="h-9 w-full rounded-xl border border-[#d7dcdd] bg-white py-2 pl-10 pr-3 text-xs tracking-[0.24px] text-[#3b4446] outline-none placeholder:text-[#aeb6b8] focus:border-[#ea4c89] focus:ring-2 focus:ring-[#ea4c89]/15"
-            />
-          </label>
-          <div className="relative flex shrink-0 items-center gap-1">
-            <button
-              type="button"
-              aria-label="Filter vendor"
-              aria-expanded={mobileFilterMenu === "vendor"}
-              onClick={() => setMobileFilterMenu((current) => current === "vendor" ? null : "vendor")}
-              className="flex size-9 items-center justify-center rounded-xl border border-[#d7dcdd] text-[#525e61]"
-            >
-              <MaterialIcon name="storefront" size="auto" weight={400} className="text-xl leading-none" />
-            </button>
-            <button
-              type="button"
-              aria-label="Urutkan tugas"
-              aria-expanded={mobileFilterMenu === "sort"}
-              onClick={() => setMobileFilterMenu((current) => current === "sort" ? null : "sort")}
-              className="flex size-9 items-center justify-center rounded-xl border border-[#d7dcdd] text-[#525e61]"
-            >
-              <MaterialIcon name="filter_list" size="auto" weight={400} className="text-xl leading-none" />
-            </button>
-
-            {mobileFilterMenu && (
-              <>
-                <button
-                  type="button"
-                  aria-label="Tutup menu filter"
-                  onClick={() => setMobileFilterMenu(null)}
-                  className="fixed inset-0 z-10 cursor-default"
-                />
-                <div className="absolute right-0 top-11 z-20 flex w-56 flex-col gap-1 rounded-xl border border-[#d7dcdd] bg-white p-1.5 shadow-lg">
-                  <p className="px-2 py-1 text-xs font-semibold text-[#525e61]">
-                    {mobileFilterMenu === "vendor" ? "Filter Vendor" : "Urutkan Tugas"}
-                  </p>
-                  {(mobileFilterMenu === "vendor" ? vendorOptions : sortOptions).map((option) => {
-                    const selected = mobileFilterMenu === "vendor" ? filterVendor === option : sortOption === option;
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => {
-                          if (mobileFilterMenu === "vendor") setFilterVendor(option);
-                          else setSortOption(option);
-                          setMobileFilterMenu(null);
-                        }}
-                        className={[
-                          "rounded-lg px-2 py-2 text-left text-xs leading-4",
-                          selected ? "bg-[#eeebff] font-semibold text-[#8474f9]" : "text-[#3b4446] hover:bg-[#f3f4f6]",
-                        ].join(" ")}
-                      >
-                        {option}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-        </section>
-
-        <section aria-label="Daftar tugas" className="mt-4 flex flex-col gap-2 pb-20">
-          {filteredTasks.map((task) => (
-            <TaskcardMobileFullCard
-              key={task.id}
-              title={task.task_name || "Tugas tanpa judul"}
-              dateRange={`${formatMobileTaskDate(task.task_given_date)} - ${formatMobileTaskDate(task.deadline_date)}`}
-              vendor={task.pic_vendor || "-"}
-              assignedTo={getMobileAssignedUsers(task.users)}
-              status={task.status === "0" ? "-" : task.status}
-              tone={getMobileTaskTone(task)}
-              delayReasonStage={requiredDelayReasonStage(task)}
-              changes={getMobileTaskChanges(task)}
-              countdownLabel={getMobileCountdown(task)}
-              fileLabels={[
-                taskConfig.detail_status_1 || "3D Gambar Kerja",
-                taskConfig.detail_status_2 || "Draft Final",
-              ]}
-              uploadedFileStates={[
-                Boolean(normalizeFileList(task.support_file_path)?.some(Boolean)),
-                Boolean(normalizeFileList(task.draft_file_path)?.some(Boolean)),
-              ]}
-              fileSlotFiles={[
-                normalizeFileList(task.support_file_path) || [null, null, null],
-                normalizeFileList(task.draft_file_path) || [null, null, null],
-              ]}
-              fileLink={task.file_link}
-              defaultOpen={false}
-              onChangeStatus={(delayReason) => {
-                const nextStep: Record<string, "ACC Draft" | "Progress" | "Approve" | "Email" | null> = {
-                  "0": "ACC Draft",
-                  "ACC Draft": "Progress",
-                  "Progress Design": "Approve",
-                  "Approval Design": "Email",
-                  "Kirim Email": null,
-                  Done: null,
-                };
-                const step = nextStep[task.status];
-                if (step) return handleStepClick(task.id, step, delayReason);
-                return handleNextClick(task.id, undefined, delayReason);
-              }}
-              onDelete={() => handleDelete(task.id)}
-              onUpload={(file, groupIndex, fileIndex) => handleMobileFileUpload(task.id, groupIndex === 0 ? "support_file" : "draft_file", fileIndex, file)}
-              onViewFile={handleMobileViewFile}
-              onSubmitLink={(fileLink, delayReason) => handleMobileSubmitLink(task.id, fileLink, delayReason)}
-            />
-          ))}
-          {filteredTasks.length === 0 && (
-            <p className="py-8 text-center text-xs text-[#7b868a]">
-              {taskConfig.task_empty_state || "Belum ada tugas yang sesuai."}
-            </p>
-          )}
-        </section>
-      </main>
-
-      <div className="hidden">
-        <TaskMobileNavigation
-          items={primaryMenuItems}
-          activeLabel={activeTaskMenuLabel}
-        />
-      </div>
-        </>
-      )}
 
       <div className={`hidden h-screen min-h-0 flex-col text-[#222] lg:flex ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)] p-6" : desktopTheme === "retro" ? "bg-[#dfe2d3] p-6" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)] p-6"}`}>
-      <SideMenu
-        variant={mobileSidebarVariant}
-        primaryItems={primaryMenuItems}
-        onVariantChange={setMobileSidebarVariant}
-        className="lg:hidden"
-      />
-      <SideMenu
-        variant={desktopSidebarVariant}
-        primaryItems={primaryMenuItems}
-        onVariantChange={setDesktopSidebarVariant}
-        className="hidden"
-      />
+
 
       <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${desktopTheme === "light" ? "rounded-[26px] border border-white/80 bg-white/80 shadow-[0_14px_42px_rgba(44,42,39,0.16)] backdrop-blur-md" : desktopTheme === "dark" ? "rounded-[26px] border border-white/10 bg-[#111413]/90 shadow-[0_14px_42px_rgba(0,0,0,0.45)] backdrop-blur-md" : "rounded-[30px] border-[3px] border-[#24252b] bg-[#c9ccc0] font-mono shadow-[0_8px_0_#24252b]"}`}>
       <PerformanceNavbar theme={desktopTheme} title={desktopNavigationTitle} />

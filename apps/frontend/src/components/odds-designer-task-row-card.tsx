@@ -114,7 +114,7 @@ export function OddsDesignerTaskRowCard({ task }: OddsDesignerTaskRowCardProps) 
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:grid-cols-4 xl:grid-cols-2">
           <MetaItem label="Designer" value={assignedDesigner?.name ?? "-"} />
           <MetaItem label="Queue" value={queue?.queue_status ? statusLabel(queue.queue_status) : "-"} />
-          <MetaItem label="Point" value={`${task.workload_point ?? 0}`} />
+          <MetaItem label="SLA" value={`${task.category_snapshot?.sla_minutes ?? 0} mnt`} />
           <MetaItem label="Revisi" value={`${revisionCount}`} />
           <MetaItem label="Timer" value={hasRunningTimer ? "Berjalan" : "Idle"} />
           <MetaItem label="Priority" value={Number(task.priority_score ?? 0).toFixed(1)} />

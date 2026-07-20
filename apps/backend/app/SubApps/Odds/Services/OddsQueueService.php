@@ -38,9 +38,7 @@ class OddsQueueService
                     || in_array($task->category_snapshot['name'] ?? null, $specializations, true);
             })
             ->sortBy(fn (DesignerProfile $profile) => [
-                $profile->assignment_priority,
                 $this->priority->activeWorkload($profile),
-                $profile->status === 'semi_off' ? 1 : 0,
             ])
             ->first();
     }

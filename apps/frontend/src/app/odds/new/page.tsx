@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { MaterialIcon } from "@/components/material-icon";
 import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
+import { useOddsTheme } from "../odds-theme-context";
+import { ModernWizard } from "@/features/odds/components/modern-wizard";
 import { stripRichText } from "@/components/odds-rich-text-editor";
 import { useAuth } from "@/providers/auth-provider";
 import { briefWithReferenceAliases, extractOddsBriefReferences } from "@/features/odds/brief-references";
@@ -15,6 +17,7 @@ import {
   createOddsTask,
   getOddsCategories,
   getOddsDesignerProfiles,
+  getOddsSystemRules,
   oddsError,
   type OddsTaskAttachment,
   uploadOddsTaskAttachment,
@@ -72,6 +75,7 @@ export default function NewOddsTaskPage() {
   const [gameStarted, setGameStarted] = useState(false);
   const [launchSequence, setLaunchSequence] = useState<"idle" | "transmitting" | "success">("idle");
   const [selectedRequestType, setSelectedRequestType] = useState<"design" | null>(null);
+  const [todayCapacity, setTodayCapacity] = useState(420);
 
   const playerName = useMemo(() => {
     const firstName = user?.name.trim().split(/\s+/)[0] ?? "";
@@ -126,12 +130,30 @@ export default function NewOddsTaskPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [categoryData, designerData] = await Promise.all([
+        const [categoryData, designerData, rulesRes] = await Promise.all([
           getOddsCategories(),
           getOddsDesignerProfiles(),
+          getOddsSystemRules(),
         ]);
         const activeDesigners = designerData.filter((profile) => profile.is_active);
 
+        let todayCap = 420;
+        const capRule = rulesRes.find((r) => r.key === 'global_daily_capacity');
+        const calRule = rulesRes.find((r) => r.key === 'holiday_calendar');
+        
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const holidays = (calRule?.value as any)?.dates || [];
+        
+        if (holidays.includes(dateStr)) {
+          todayCap = 0;
+        } else if (capRule?.value) {
+          const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+          const todayName = days[now.getDay()];
+          todayCap = (capRule.value as any)[todayName] ?? 0;
+        }
+
+        setTodayCapacity(todayCap);
         setCategories(categoryData);
         setDesignerProfiles(activeDesigners);
       } catch (err) {
@@ -151,7 +173,7 @@ export default function NewOddsTaskPage() {
   const selectableDesigners = useMemo(() => {
     return designerProfiles
       .filter((profile) => matchesSpecialization(profile, form.category_id))
-      .sort((left, right) => designerSort(left, right, selectedCategory));
+      .sort((left, right) => designerSort(left, right, todayCapacity));
   }, [designerProfiles, form.category_id, selectedCategory]);
 
   const recommendedDesigner = useMemo(() => {
@@ -247,8 +269,61 @@ export default function NewOddsTaskPage() {
     }
   };
 
+  const { theme } = useOddsTheme();
+
+  if (theme !== "retro") {
+    return (
+      <div ref={pageRef} className="relative min-h-0 w-full flex-1 flex flex-col p-4">
+        {launchSequence !== "idle" && (
+          <div ref={launchSplashRef} className={`absolute inset-0 z-50 flex items-center justify-center overflow-hidden rounded-2xl p-6 text-center backdrop-blur-md ${
+            theme === "dark" ? "bg-[#111413]/90 text-white" : "bg-white/95 text-slate-900"
+          }`}>
+            {launchSequence === "transmitting" ? (
+              <div className="flex flex-col items-center">
+                <MaterialIcon name="satellite_alt" size="lg" className={`animate-pulse ${theme === "dark" ? "text-[#b0ff5e]" : "text-[#00a4ff]"}`} />
+                <p className="mt-4 text-xs font-semibold text-slate-400">Mengirim Request Data...</p>
+                <h2 className="mt-2 text-xl font-bold">Transmitting Request</h2>
+                <p className="mt-4 animate-pulse text-xs text-slate-500">Mohon tidak menutup halaman ini...</p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <span className={`flex size-20 items-center justify-center rounded-full text-white shadow-lg ${
+                  theme === "dark" ? "bg-[#b0ff5e]/90 text-[#181818]" : "bg-[#00a4ff]"
+                }`}><MaterialIcon name="check" size="lg" className="scale-150" /></span>
+                <p className="mt-6 text-xs font-semibold text-slate-400">Pengiriman Selesai</p>
+                <h2 className="mt-2 text-2xl font-bold">Request Terdaftar!</h2>
+                <p className="mt-4 text-xs text-slate-400">Membuka daftar tugas...</p>
+              </div>
+            )}
+          </div>
+        )}
+        <ModernWizard
+          theme={theme}
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+          form={form}
+          update={update}
+          categories={categories}
+          selectedCategory={selectedCategory ?? undefined}
+          selectableDesigners={selectableDesigners}
+          todayCapacity={todayCapacity}
+          selectedDesigner={selectedDesigner ?? undefined}
+          recommendedDesignerId={recommendedDesigner ? String(recommendedDesigner.user_id) : null}
+          uploadedAttachments={uploadedAttachments}
+          uploadingAttachments={uploadingAttachments}
+          addAttachmentFiles={addAttachmentFiles}
+          onRemoveAttachment={(id) => setUploadedAttachments((items) => items.filter((item) => item.id !== id))}
+          loading={loading}
+          initializing={initializing}
+          error={error}
+          submit={submit}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div ref={pageRef} className="relative h-full min-h-0 w-full font-mono text-[#24252b]">
+    <div ref={pageRef} className="relative h-full min-h-0 w-full font-mono text-[#24252b] p-4">
       {launchSequence !== "idle" && (
         <div ref={launchSplashRef} className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden rounded-[30px] border-[3px] border-[#24252b] bg-[#24252b] p-6 text-center text-[#eceee6]">
           <span className="absolute inset-x-0 top-0 h-2 bg-[#ba0dcb]" />
@@ -309,6 +384,7 @@ export default function NewOddsTaskPage() {
           {currentStep === 3 && (
             <DesignerCharacterSelectStage
               profiles={selectableDesigners}
+              todayCapacity={todayCapacity}
               selectedUserId={form.preferred_designer_id}
               recommendedUserId={recommendedDesigner ? String(recommendedDesigner.user_id) : null}
               onSelect={(profile) => update("preferred_designer_id", String(profile.user_id))}
@@ -835,6 +911,7 @@ function CategoryInventoryStage({
 
 function DesignerCharacterSelectStage({
   profiles,
+  todayCapacity,
   selectedUserId,
   recommendedUserId,
   onSelect,
@@ -842,6 +919,7 @@ function DesignerCharacterSelectStage({
   onContinue,
 }: {
   profiles: OddsDesignerProfile[];
+  todayCapacity: number;
   selectedUserId: string;
   recommendedUserId: string | null;
   onSelect: (profile: OddsDesignerProfile) => void;
@@ -920,8 +998,7 @@ function DesignerCharacterSelectStage({
 
                   <span className={`absolute inset-x-0 bottom-0 z-20 bg-[#24252b]/95 px-2 py-2 text-left text-[#dfe2d3] transition-transform duration-150 ${selected ? "translate-y-0" : "translate-y-full group-hover:translate-y-0"}`}>
                     <span className="block text-[7px] font-black uppercase tracking-[0.12em] text-[#f2b8f6]">{profile.status.replace("_", " ")}</span>
-                    <span className="mt-1 block text-[7px] font-black uppercase tracking-[0.08em]">Capacity {profile.daily_capacity_points}</span>
-                    <span className="mt-0.5 block text-[7px] font-black uppercase tracking-[0.08em]">Max Active {profile.max_active_tasks}</span>
+                    <span className="mt-1 block text-[7px] font-black uppercase tracking-[0.08em]">Status: {capacityLabel(profile, todayCapacity)}</span>
                   </span>
 
                   {!available && (
@@ -983,33 +1060,32 @@ function matchesSpecialization(profile: OddsDesignerProfile, categoryId: string)
     || specializations.includes(categoryId);
 }
 
-function capacityLabel(profile: OddsDesignerProfile, category: OddsCategory | null): string {
-  if (!category) return "Available";
-  if (Number(category.workload_point) > profile.daily_capacity_points) return "At capacity";
-  if (profile.status === "semi_off") return "Longer estimate";
+function capacityLabel(profile: OddsDesignerProfile, todayCapacity: number): string {
+  const todayStr = new Date().toLocaleDateString("en-CA");
+  if (profile.leave_dates?.includes(todayStr)) return "Sedang Cuti";
+  if (profile.current_load_minutes >= todayCapacity) return "Full Load Today";
   return "Available";
 }
 
-function designerSort(left: OddsDesignerProfile, right: OddsDesignerProfile, category: OddsCategory | null): number {
+function designerSort(left: OddsDesignerProfile, right: OddsDesignerProfile, todayCapacity: number): number {
   const leftOff = left.status === "off" ? 1 : 0;
   const rightOff = right.status === "off" ? 1 : 0;
-  const leftFull = capacityLabel(left, category) === "At capacity" ? 1 : 0;
-  const rightFull = capacityLabel(right, category) === "At capacity" ? 1 : 0;
-  const leftSemi = left.status === "semi_off" ? 1 : 0;
-  const rightSemi = right.status === "semi_off" ? 1 : 0;
+  const leftLeave = capacityLabel(left, todayCapacity) === "Sedang Cuti" ? 1 : 0;
+  const rightLeave = capacityLabel(right, todayCapacity) === "Sedang Cuti" ? 1 : 0;
+  const leftFull = capacityLabel(left, todayCapacity) === "Full Load Today" ? 1 : 0;
+  const rightFull = capacityLabel(right, todayCapacity) === "Full Load Today" ? 1 : 0;
 
   return leftOff - rightOff
-    || leftFull - rightFull
-    || leftSemi - rightSemi
-    || left.assignment_priority - right.assignment_priority
-    || right.daily_capacity_points - left.daily_capacity_points;
+    || leftLeave - rightLeave
+    || leftFull - rightFull;
 }
 
 function recommendDesigner(profiles: OddsDesignerProfile[], category: OddsCategory | null | undefined): OddsDesignerProfile | null {
+  const todayStr = new Date().toLocaleDateString("en-CA");
   const matching = profiles
-    .filter((profile) => profile.is_active && profile.status === "available")
+    .filter((profile) => profile.is_active && profile.status === "available" && !profile.leave_dates?.includes(todayStr))
     .filter((profile) => matchesSpecialization(profile, category ? String(category.id) : ""))
-    .sort((left, right) => designerSort(left, right, category ?? null));
+    .sort((left, right) => designerSort(left, right, 420));
 
   return matching[0] ?? null;
 }

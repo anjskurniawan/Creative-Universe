@@ -16,9 +16,7 @@ class DesignerProfile extends OddsModel
         'user_id',
         'status',
         'specializations',
-        'daily_capacity_points',
-        'max_active_tasks',
-        'assignment_priority',
+        'leave_dates',
         'is_active',
         'created_by',
         'updated_by',
@@ -26,14 +24,31 @@ class DesignerProfile extends OddsModel
 
     protected $casts = [
         'specializations' => 'array',
-        'daily_capacity_points' => 'integer',
-        'max_active_tasks' => 'integer',
-        'assignment_priority' => 'integer',
+        'leave_dates' => 'array',
         'is_active' => 'boolean',
+    ];
+
+    protected $appends = [
+        'current_load_minutes',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_designer_id', 'user_id');
+    }
+
+    public function getCurrentLoadMinutesAttribute(): int
+    {
+        return $this->tasks()
+            ->whereIn('status', ['queued', 'ready_to_start', 'in_progress'])
+            ->get()
+            ->sum(function ($task) {
+                return $task->category_snapshot['sla_minutes'] ?? 0;
+            });
     }
 }

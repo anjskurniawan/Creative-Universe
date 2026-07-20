@@ -266,7 +266,7 @@ function DetailContent() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 py-6">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4">
       <header className="flex flex-col gap-4 border-b border-cu-border pb-5 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-3">
           <Link
@@ -439,7 +439,7 @@ function DetailContent() {
           <section className="rounded-lg border border-cu-border bg-white p-5">
             <h2 className="mb-4 text-lg font-semibold text-cu-ink">Status</h2>
             <InfoRow label="Task type" value={statusLabel(task.task_type)} />
-            <InfoRow label="Workload" value={`${task.workload_point} point`} />
+            <InfoRow label="SLA" value={`${task.category_snapshot?.sla_minutes ?? 0} menit`} />
             <InfoRow label="Priority" value={Number(task.priority_score).toFixed(1)} />
             <InfoRow label="Queue" value={queue?.queue_status ?? "-"} />
             <InfoRow label="Est. mulai" value={formatOddsDate(queue?.estimated_start_at, true)} />

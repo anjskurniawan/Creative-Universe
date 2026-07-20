@@ -1,10 +1,10 @@
 ---
 id: KV-RETAIL-06
 title: Sembunyikan UI rekap performa
-status: HANDOFF
+status: DONE
 owner: antigravity
 branch: feature/kv-retail-06
-updated: 2026-07-19T01:14:53Z
+updated: 2026-07-19T01:41:27Z
 ---
 
 ## Scope

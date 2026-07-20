@@ -17,8 +17,7 @@ class Category extends OddsModel
         'name',
         'score_weight',
         'normal_revision_limit',
-        'workload_point',
-        'sla_days',
+        'sla_minutes',
         'is_active',
         'created_by',
         'updated_by',
@@ -27,8 +26,7 @@ class Category extends OddsModel
     protected $casts = [
         'score_weight' => 'decimal:2',
         'normal_revision_limit' => 'integer',
-        'workload_point' => 'integer',
-        'sla_days' => 'integer',
+        'sla_minutes' => 'integer',
         'is_active' => 'boolean',
     ];
 

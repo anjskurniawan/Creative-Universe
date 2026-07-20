@@ -35,11 +35,6 @@ class OddsWorkReviewService
             $profile = $task->assignedDesigner
                 ? DesignerProfile::where('user_id', $designerId)->first()
                 : null;
-            $active = Task::where('assigned_designer_id', $designerId)->where('status', TaskStatusEnum::IN_PROGRESS->value)->count();
-            if ($profile && $active >= $profile->max_active_tasks) {
-                $this->notifications->send($task->assignedDesigner, 'capacity_full', 'Kapasitas ODDS penuh', 'Max active task sudah tercapai.', $task);
-                throw ValidationException::withMessages(['capacity' => 'Kapasitas desainer hari ini penuh.']);
-            }
 
             $task->currentQueue?->update([
                 'queue_status' => 'ready_to_start',

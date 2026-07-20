@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/side-menu";
+import { type SideMenuItem } from "@/components/side-menu";
 import { coreApi } from "@/core/api";
 import { type TaskCardConfig } from "@/components/taskcard";
 import { useAuth } from "@/providers/auth-provider";
@@ -39,8 +39,6 @@ const KV_RETAIL_SETTING_KEYS = [
 ] as const;
 
 export default function OptionPage() {
-  const [mobileSidebarVariant, setMobileSidebarVariant] = useState<SideMenuVariant>("Collaps");
-  const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Expand");
   const [desktopTheme, setDesktopTheme] = useState<"light" | "dark" | "retro">("light");
   const { expanded: desktopShellExpanded, toggleExpanded: toggleDesktopShellExpanded } = useKvRetailDesktopSidebar();
 
@@ -151,13 +149,7 @@ export default function OptionPage() {
         </div>
       </div>
       <div className={`hidden text-[#222] lg:flex lg:h-screen lg:min-h-0 lg:flex-col lg:p-6 ${desktopTheme === "dark" ? "lg:bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)]" : desktopTheme === "retro" ? "lg:bg-[#dfe2d3]" : "bg-[#f6faff] lg:bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}>
-      <SideMenu
-        variant={mobileSidebarVariant}
-        primaryItems={PRIMARY_MENU}
-        onVariantChange={setMobileSidebarVariant}
-        className="lg:hidden"
-      />
-      <SideMenu variant={desktopSidebarVariant} primaryItems={PRIMARY_MENU} onVariantChange={setDesktopSidebarVariant} className="hidden" />
+
 
       <div className={`cu-option-content-enter min-h-screen lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden ${desktopTheme === "light" ? "lg:rounded-[26px] lg:border lg:border-white/80 lg:bg-white/80 lg:shadow-[0_14px_42px_rgba(44,42,39,0.16)] lg:backdrop-blur-md" : desktopTheme === "dark" ? "lg:rounded-[26px] lg:border lg:border-white/10 lg:bg-[#111413]/90 lg:shadow-[0_14px_42px_rgba(0,0,0,0.45)] lg:backdrop-blur-md" : "lg:rounded-[30px] lg:border-[3px] lg:border-[#24252b] lg:bg-[#c9ccc0] lg:font-mono lg:shadow-[0_8px_0_#24252b]"}`}>
         <div className="hidden lg:block"><PerformanceNavbar theme={desktopTheme} title="Pengaturan" /></div>

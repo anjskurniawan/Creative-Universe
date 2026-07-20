@@ -3,13 +3,15 @@
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
-import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/side-menu";
-import { Navbar } from "@/components/navbar";
-import { TaskMobileNavigation } from "@/components/task-mobile-navigation";
+import { type SideMenuItem } from "@/components/side-menu";
+import { PerformanceNavbar } from "@/features/kv-retail/components/performance-navbar";
+import { PerformanceSidebar, type PerformanceSidebarItem } from "@/features/kv-retail/components/performance-sidebar";
+import { useKvRetailDesktopSidebar } from "@/features/kv-retail/hooks/use-kv-retail-desktop-sidebar";
 import {
   getOddsTasks,
   OddsTask,
 } from "@/features/odds/api";
+import { OddsThemeContext } from "./odds-theme-context";
 
 type OddsMenuItem = {
   id: string;
@@ -48,7 +50,8 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
 
   // State to hold counts
   const [counts, setCounts] = useState<Record<string, number>>({});
-  const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Expand");
+  const [desktopTheme, setDesktopTheme] = useState<"light" | "dark" | "retro">("light");
+  const { expanded: desktopShellExpanded, toggleExpanded: toggleDesktopShellExpanded } = useKvRetailDesktopSidebar();
 
   // Load counts for menu badges
   const loadCounts = useCallback(async () => {
@@ -59,6 +62,10 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
         all_tasks: taskPage.data.length,
         spv_review: taskPage.data.filter((t: OddsTask) => t.status === "spv_review").length,
         client_review: taskPage.data.filter((t: OddsTask) => t.status === "client_review").length,
+        client_all_requests: taskPage.data.length,
+        client_action_required: taskPage.data.filter((t: OddsTask) => t.status === "client_review").length,
+        client_in_progress: taskPage.data.filter((t: OddsTask) => ["queued", "in_progress", "spv_review", "revision"].includes(t.status)).length,
+        client_archive: taskPage.data.filter((t: OddsTask) => ["done", "cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(t.status)).length,
         special_revisions: taskPage.data
           .flatMap((t: OddsTask) => t.revisions ?? [])
           .filter((r: { status: string; revision_type: string }) => r.status === "pending_spv" && ["extra", "urgent_final"].includes(r.revision_type)).length,
@@ -88,11 +95,10 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
   // Next can preserve a trailing slash in the local URL. Normalize it so the
   // request page consistently receives its contained-scroll shell.
   const normalizedPathname = pathname.replace(/\/$/, "") || "/";
-  const usesContainedScroll = normalizedPathname === "/odds/new"
-    || (normalizedPathname === "/odds" && (
-      activeSection === "all_tasks"
-      || (!activeSection && (canViewAllTasks || canReviewSpv))
-    ));
+  const usesContainedScroll = normalizedPathname === "/odds" && (
+    activeSection === "all_tasks"
+    || (!activeSection && (canViewAllTasks || canReviewSpv))
+  );
   const sidebarClassName = usesContainedScroll
     ? "!static !m-0 !h-full !min-h-0 !p-4"
     : "!m-0 !h-screen !p-4";
@@ -102,28 +108,30 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
 
     if (!canShowConfigSections && !canReviewSpv && !canViewAllTasks && !canReviewQueueSkip) {
       if (canViewAssignedTasks) {
-        items.push({
-          id: "workspace",
-          label: "Tugas Hari Ini",
-          icon: "today",
-          href: "/odds",
-          group: "tasks",
-        });
+        items.push(
+          { id: "workspace", label: "Tugas Hari Ini", icon: "today", href: "/odds", group: "tasks" },
+          { id: "designer_all_tasks", label: "Semua Tugas", icon: "assignment", href: "/odds?section=designer_all_tasks", group: "tasks" },
+          { id: "designer_review", label: "Menunggu Review", icon: "pending_actions", href: "/odds?section=designer_review", group: "tasks" },
+          { id: "designer_revisions", label: "Revisi", icon: "error", href: "/odds?section=designer_revisions", group: "tasks" },
+          { id: "designer_report", label: "Laporan Kinerja", icon: "monitoring", href: "/odds?section=designer_report", group: "reports" },
+          { id: "designer_settings", label: "Pengaturan & Jadwal", icon: "manage_accounts", href: "/odds?section=designer_settings", group: "manage" }
+        );
       } else {
-        items.push({
-          id: "workspace",
-          label: "Daftar Request",
-          icon: "request_page",
-          href: "/odds",
-          group: "tasks",
-        });
+        items.push(
+          { id: "workspace", label: "Dashboard", icon: "dashboard", href: "/odds", group: "tasks" },
+          { id: "client_all_requests", label: "Semua Request", icon: "assignment", href: "/odds?section=client_all_requests", group: "tasks" },
+          { id: "client_action_required", label: "Perlu Review", icon: "pending_actions", href: "/odds?section=client_action_required", group: "tasks" },
+          { id: "client_in_progress", label: "Sedang Diproses", icon: "autorenew", href: "/odds?section=client_in_progress", group: "tasks" },
+          { id: "client_archive", label: "Arsip", icon: "archive", href: "/odds?section=client_archive", group: "reports" }
+        );
       }
     } else {
       if (canShowConfigSections) {
         items.push(
           { id: "categories", label: "Kategori", icon: "category", href: "/odds?section=categories", group: "manage" },
           { id: "rules", label: "System Rules", icon: "rule", href: "/odds?section=rules", group: "manage" },
-          { id: "designers", label: "Profil Designer", icon: "groups", href: "/odds?section=designers", group: "manage" }
+          { id: "designers", label: "Profil Designer", icon: "groups", href: "/odds?section=designers", group: "manage" },
+          { id: "schedules", label: "Jadwal & Libur", icon: "calendar_month", href: "/odds?section=schedules", group: "manage" }
         );
       }
       if (canReviewSpv) {
@@ -177,14 +185,14 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     return item.id === defaultItem?.id;
   }, [activeSection, menuItems, normalizedPathname]);
 
-  const sidebarItems = useMemo<SideMenuItem[]>(() => [
+  const sidebarItems = useMemo<PerformanceSidebarItem[]>(() => [
     ...(canCreateTask ? [{
       label: "Request Baru",
       icon: "add",
       href: "/odds/new",
       group: ODDS_GROUP_LABELS.tasks,
-      status: "Highlight" as const,
       isActive: normalizedPathname === "/odds/new",
+      isHighlighted: true,
     }] : []),
     ...ODDS_GROUP_ORDER.flatMap((group) => menuItems
       .filter((item) => item.group === group)
@@ -193,43 +201,68 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
         icon: item.icon,
         href: item.href,
         group: ODDS_GROUP_LABELS[group],
-        badge: item.group === "manage" ? undefined : counts[item.id] > 0 ? counts[item.id] : undefined,
-        status: isSectionActive(item) ? "Active" as const : "Default" as const,
+        badge: item.group === "manage" || item.id === "workspace" ? undefined : counts[item.id] > 0 ? counts[item.id] : undefined,
         isActive: isSectionActive(item),
+        isHighlighted: false,
       }))),
   ], [canCreateTask, counts, isSectionActive, menuItems, normalizedPathname]);
 
   const activeMobileLabel = sidebarItems.find((item) => item.isActive)?.label;
 
+  const navigationTitle = sidebarItems.find((item) => item.isActive)?.label ?? "Dashboard";
+  const activeHref = sidebarItems.find((item) => item.isActive)?.href ?? pathname;
+  const compactMobileMenuItems = useMemo(
+    () => sidebarItems.map(({ label, href }) => ({ label, href })),
+    [sidebarItems]
+  );
+
   return (
-    <div className={`${usesContainedScroll ? "h-screen overflow-hidden" : "min-h-screen"} bg-[#f6faff] font-sans text-cu-ink antialiased`}>
-      <div className="lg:hidden">
-        <Navbar />
-      </div>
-
-      <div className={`${usesContainedScroll ? "h-[calc(100dvh-72px)] overflow-hidden" : "min-h-[calc(100dvh-72px)]"} lg:hidden`}>
-        <main className={`min-w-0 px-4 py-4 ${usesContainedScroll ? "h-full overflow-hidden" : ""}`}>
-          <div className={`${usesContainedScroll ? "h-full min-h-0" : "min-h-full"} text-slate-800`}>
-            {children}
-          </div>
-        </main>
-      </div>
-
-      <div className="lg:hidden">
-        <TaskMobileNavigation
-          items={sidebarItems.map(({ label, icon, href }) => ({ label, icon, href }))}
-          activeLabel={activeMobileLabel}
-        />
-      </div>
-
-      <div className={`hidden ${usesContainedScroll ? "h-full" : "min-h-screen"} grid-cols-[auto_minmax(0,1fr)] lg:grid`}>
-        <SideMenu variant={desktopSidebarVariant} primaryItems={sidebarItems} onVariantChange={setDesktopSidebarVariant} className={`${sidebarClassName} hidden lg:flex`} />
-        <main className={`min-w-0 px-4 py-6 sm:px-8 lg:px-12 lg:py-8 ${usesContainedScroll ? "h-full overflow-hidden" : ""}`}>
-        <div className={`${usesContainedScroll ? "h-full min-h-0" : "min-h-full"} text-slate-800`}>
-          {children}
+    <OddsThemeContext.Provider value={{ theme: desktopTheme, setTheme: setDesktopTheme }}>
+      {/* Mobile view */}
+      <div
+        className={`h-dvh overflow-hidden p-3 lg:hidden ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)]" : desktopTheme === "retro" ? "bg-[#dfe2d3] font-mono" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}
+        data-kv-retail-mobile-theme={desktopTheme}
+      >
+        <div className={`flex h-[calc(100dvh-24px)] flex-col overflow-hidden rounded-[22px] ${desktopTheme === "dark" ? "border border-white/10 bg-[#111413]/90 shadow-[0_12px_32px_rgba(0,0,0,0.34)]" : desktopTheme === "retro" ? "border-[3px] border-[#24252b] bg-[#c9ccc0] shadow-[0_6px_0_#24252b]" : "border border-white/80 bg-white/80 shadow-[0_12px_32px_rgba(0,4,117,0.2)] backdrop-blur-md"}`}>
+          <PerformanceNavbar
+            theme={desktopTheme}
+            title={navigationTitle}
+            parentTitle="ODDS"
+            compact
+            compactMenuItems={compactMobileMenuItems}
+          />
+          <main aria-label="ODDS mobile" className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6 pt-6">
+            <div className={`flex-1 min-h-0 ${usesContainedScroll ? "h-full overflow-hidden flex flex-col w-full" : "overflow-y-auto"} text-slate-800`}>
+              {children}
+            </div>
+          </main>
         </div>
-      </main>
       </div>
-    </div>
+
+      {/* Desktop view */}
+      <div className={`hidden h-screen min-h-0 flex-col text-[#222] lg:flex ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)] p-6" : desktopTheme === "retro" ? "bg-[#dfe2d3] p-6" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)] p-6"}`}>
+        <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${desktopTheme === "light" ? "rounded-[26px] border border-white/80 bg-white/80 shadow-[0_14px_42px_rgba(44,42,39,0.16)] backdrop-blur-md" : desktopTheme === "dark" ? "rounded-[26px] border border-white/10 bg-[#111413]/90 shadow-[0_14px_42px_rgba(0,0,0,0.45)] backdrop-blur-md" : "rounded-[30px] border-[3px] border-[#24252b] bg-[#c9ccc0] font-mono shadow-[0_8px_0_#24252b]"}`}>
+          <PerformanceNavbar theme={desktopTheme} title={navigationTitle} parentTitle="ODDS" />
+          <div className="flex min-h-0 flex-1">
+            <PerformanceSidebar
+              theme={desktopTheme}
+              primaryItems={sidebarItems}
+              activeHref={activeHref}
+              settingsHref=""
+              ariaLabel="Navigasi ODDS"
+              onToggleTheme={() => setDesktopTheme((t) => t === "dark" ? "light" : "dark")}
+              onToggleRetro={() => setDesktopTheme((t) => t === "retro" ? "light" : "retro")}
+              expanded={desktopShellExpanded}
+              onToggleExpanded={toggleDesktopShellExpanded}
+            />
+            <main className={`relative min-w-0 flex min-h-0 flex-1 flex-col ${usesContainedScroll ? "h-full" : "overflow-y-auto"}`}>
+              <div className={`${usesContainedScroll ? "h-full min-h-0 flex flex-col flex-1 w-full" : "min-h-full flex flex-col flex-1 w-full"} text-slate-800`}>
+                {children}
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </OddsThemeContext.Provider>
   );
 }

@@ -37,8 +37,8 @@ class ProductionDatabaseSeederTest extends TestCase
         $this->assertSame(10, Role::count());
         $this->assertSame(38, Permission::count());
         $this->assertSame(32, Division::count());
-        $this->assertSame(2, Category::count());
-        $this->assertSame(4, SystemRule::count());
+        $this->assertSame(12, Category::count());
+        $this->assertSame(6, SystemRule::count());
         $this->assertSame(7, Application::count());
 
         $this->assertSame(0, PricetagProduct::count());

@@ -50,7 +50,7 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::post('/cancel-requests/{cancelRequest}/review', [EscalationController::class, 'reviewCancel'])->middleware('can:manage-odds-escalations');
     Route::post('/tasks/{task}/reassign', [TaskController::class, 'reassign'])->middleware('can:manage-odds-escalations');
     Route::post('/tasks/{task}/extend-deadline', [TaskController::class, 'extendDeadline'])->middleware('can:manage-odds-escalations');
-    Route::get('/reports/daily', [ReportController::class, 'daily'])->middleware('can:view-odds-reports');
+    Route::get('/reports/daily', [ReportController::class, 'daily']);
     Route::get('/reports/summary', [ReportController::class, 'summary'])->middleware('can:view-odds-reports');
     Route::get('/rankings', [ReportController::class, 'rankings'])->middleware('can:view-odds-rankings');
 });

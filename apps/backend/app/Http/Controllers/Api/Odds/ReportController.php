@@ -17,6 +17,14 @@ class ReportController extends BaseApiController
     {
         $query = DesignerDailyReport::query()->with('designer:id,name,email,username');
 
+        if (!$request->user()->can('view-odds-reports')) {
+            $designerProfile = $request->user()->oddsDesignerProfile;
+            if (!$designerProfile) {
+                return $this->sendResponse(collect(), 'Bukan desainer.');
+            }
+            $query->where('designer_id', $designerProfile->id);
+        }
+
         if ($request->query('from')) {
             $query->where('report_date', '>=', $request->query('from'));
         }

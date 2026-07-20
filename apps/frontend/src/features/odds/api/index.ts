@@ -23,20 +23,18 @@ export interface OddsCategory {
   name: string;
   score_weight: string | number;
   normal_revision_limit: number;
-  workload_point: number;
-  sla_days: number;
+  sla_minutes: number;
   is_active: boolean;
 }
 
 export interface OddsDesignerProfile {
   id: number;
   user_id: number;
-  status: "available" | "semi_off" | "off";
+  status: "available" | "off";
   specializations: Array<number | string> | null;
-  daily_capacity_points: number;
-  max_active_tasks: number;
-  assignment_priority: number;
+  leave_dates: Array<string> | null;
   is_active: boolean;
+  current_load_minutes: number;
   user?: OddsUser;
 }
 
@@ -141,11 +139,14 @@ export interface OddsTask {
   design_purpose: string;
   brief_text: string;
   reference_visual: string | null;
+  category_snapshot?: {
+    sla_minutes?: number;
+    [key: string]: any;
+  };
   deadline: string;
   important_matrix: string;
   status: string;
   task_type: string;
-  workload_point: number;
   priority_score: string | number;
   brief_return_count: number;
   leader_revision_count: number;
@@ -172,6 +173,9 @@ export interface OddsTask {
   skipRequests?: OddsTaskSkipRequest[];
   time_logs?: OddsTaskTimeLog[];
   timeLogs?: OddsTaskTimeLog[];
+  rating?: number | null;
+  overdue?: boolean;
+  updated_at?: string;
 }
 
 export interface OddsDailyReport {
@@ -337,8 +341,7 @@ export async function createOddsCategory(input: {
   name: string;
   score_weight: number;
   normal_revision_limit: number;
-  workload_point: number;
-  sla_days: number;
+  sla_minutes: number;
 }): Promise<OddsCategory> {
   return apiFetch<OddsCategory>("/odds/categories", {
     method: "POST",
@@ -352,8 +355,7 @@ export async function updateOddsCategory(
     name: string;
     score_weight: number;
     normal_revision_limit: number;
-    workload_point: number;
-    sla_days: number;
+    sla_minutes: number;
     is_active: boolean;
   }>
 ): Promise<OddsCategory> {
@@ -369,11 +371,9 @@ export async function deleteOddsCategory(id: string | number): Promise<void> {
 
 export async function createOddsDesignerProfile(input: {
   user_id: number;
-  status: "available" | "semi_off" | "off";
+  status: "available" | "off";
   specializations?: Array<number | string>;
-  daily_capacity_points: number;
-  max_active_tasks: number;
-  assignment_priority?: number;
+  leave_dates?: Array<string>;
   is_active?: boolean;
 }): Promise<OddsDesignerProfile> {
   return apiFetch<OddsDesignerProfile>("/odds/designer-profiles", {
@@ -386,11 +386,9 @@ export async function updateOddsDesignerProfile(
   id: string | number,
   input: Partial<{
     user_id: number;
-    status: "available" | "semi_off" | "off";
+    status: "available" | "off";
     specializations: Array<number | string>;
-    daily_capacity_points: number;
-    max_active_tasks: number;
-    assignment_priority: number;
+    leave_dates: Array<string>;
     is_active: boolean;
   }>
 ): Promise<OddsDesignerProfile> {

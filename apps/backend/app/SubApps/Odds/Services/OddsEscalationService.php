@@ -272,11 +272,5 @@ class OddsEscalationService
                 'designer_id' => 'Desainer tujuan tidak cocok dengan kategori task ini.',
             ]);
         }
-
-        if ($task->workload_point > $profile->daily_capacity_points) {
-            throw ValidationException::withMessages([
-                'designer_id' => 'Workload task melebihi daily capacity desainer tujuan.',
-            ]);
-        }
     }
 }

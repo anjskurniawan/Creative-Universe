@@ -63,7 +63,7 @@ class OddsWorkflowApiTest extends TestCase
             'score_weight' => 2,
             'normal_revision_limit' => 1,
             'workload_point' => 2,
-            'sla_days' => 3,
+            'sla_minutes' => 3,
             'is_active' => true,
         ]);
 
@@ -71,9 +71,6 @@ class OddsWorkflowApiTest extends TestCase
             'user_id' => $this->designer->id,
             'status' => 'available',
             'specializations' => [$this->category->id],
-            'daily_capacity_points' => 8,
-            'max_active_tasks' => 3,
-            'assignment_priority' => 1,
             'is_active' => true,
         ]);
 
@@ -119,7 +116,7 @@ class OddsWorkflowApiTest extends TestCase
                 'score_weight' => 3,
                 'normal_revision_limit' => 2,
                 'workload_point' => 3,
-                'sla_days' => 4,
+                'sla_minutes' => 4,
             ])
             ->assertCreated()
             ->assertJsonPath('data.name', 'Product Visual');
@@ -127,11 +124,8 @@ class OddsWorkflowApiTest extends TestCase
         $profileResponse = $this->actingAs($this->manager)
             ->postJson('/api/v1/odds/designer-profiles', [
                 'user_id' => $this->designer->id,
-                'status' => 'semi_off',
+                'status' => 'off',
                 'specializations' => [$this->category->id],
-                'daily_capacity_points' => 6,
-                'max_active_tasks' => 2,
-                'assignment_priority' => 2,
             ])
             ->assertUnprocessable();
 
@@ -231,7 +225,7 @@ class OddsWorkflowApiTest extends TestCase
             'score_weight' => 1,
             'normal_revision_limit' => 1,
             'workload_point' => 1,
-            'sla_days' => 1,
+            'sla_minutes' => 1,
             'is_active' => false,
         ]);
 
@@ -251,7 +245,7 @@ class OddsWorkflowApiTest extends TestCase
             'score_weight' => 1,
             'normal_revision_limit' => 1,
             'workload_point' => 1,
-            'sla_days' => 1,
+            'sla_minutes' => 1,
             'is_active' => true,
         ]);
 
@@ -276,8 +270,7 @@ class OddsWorkflowApiTest extends TestCase
                 'design_purpose' => 'Heavy task',
                 'brief_text' => 'Brief',
             ])
-            ->assertUnprocessable()
-            ->assertJsonPath('errors.preferred_designer_id.0', 'Workload kategori melebihi daily capacity desainer.');
+            ->assertCreated();
     }
 
     public function test_task_flow_from_request_to_done_generates_report_and_ranking(): void
@@ -593,9 +586,6 @@ class OddsWorkflowApiTest extends TestCase
             'user_id' => $newDesigner->id,
             'status' => 'available',
             'specializations' => [$this->category->id],
-            'daily_capacity_points' => 8,
-            'max_active_tasks' => 3,
-            'assignment_priority' => 2,
             'is_active' => true,
         ]);
 
@@ -659,9 +649,6 @@ class OddsWorkflowApiTest extends TestCase
             'user_id' => $newDesigner->id,
             'status' => 'available',
             'specializations' => [$this->category->id],
-            'daily_capacity_points' => 8,
-            'max_active_tasks' => 3,
-            'assignment_priority' => 2,
             'is_active' => true,
         ]);
 
@@ -814,7 +801,7 @@ class OddsWorkflowApiTest extends TestCase
                 'score_weight' => 2,
                 'normal_revision_limit' => 0,
                 'workload_point' => 2,
-                'sla_days' => 3,
+                'sla_minutes' => 3,
             ],
             'requester_id' => $this->client->id,
             'assigned_designer_id' => $this->designer->id,
@@ -921,7 +908,7 @@ class OddsWorkflowApiTest extends TestCase
                 'score_weight' => 2,
                 'normal_revision_limit' => 0,
                 'workload_point' => 2,
-                'sla_days' => 3,
+                'sla_minutes' => 3,
             ],
             'requester_id' => $this->client->id,
             'assigned_designer_id' => $this->designer->id,

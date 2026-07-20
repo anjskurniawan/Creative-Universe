@@ -9,6 +9,7 @@ use App\SubApps\Odds\Models\Task;
 use App\Models\Core\StoredFile;
 use App\Services\Core\FileStorageService;
 use App\SubApps\Odds\Support\BriefHtmlSanitizer;
+use App\SubApps\Odds\Services\OddsScheduleService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -19,6 +20,7 @@ class OddsTaskIntakeService
         private OddsNotificationService $notifications,
         private FileStorageService $files,
         private BriefHtmlSanitizer $briefHtml,
+        private OddsScheduleService $schedule,
     ) {}
 
     public function create(array $data, int $userId): Task
@@ -72,11 +74,6 @@ class OddsTaskIntakeService
                     ]);
                 }
 
-                if ($category->workload_point > $profile->daily_capacity_points) {
-                    throw ValidationException::withMessages([
-                        'preferred_designer_id' => 'Workload kategori melebihi daily capacity desainer.',
-                    ]);
-                }
             }
 
             $task = Task::create([
@@ -88,8 +85,7 @@ class OddsTaskIntakeService
                     'name' => $category->name,
                     'score_weight' => (float) $category->score_weight,
                     'normal_revision_limit' => $category->normal_revision_limit,
-                    'workload_point' => $category->workload_point,
-                    'sla_days' => $category->sla_days,
+                    'sla_minutes' => $category->sla_minutes,
                 ],
                 'requester_id' => $userId,
                 'preferred_designer_id' => $preferredDesignerId,
@@ -97,11 +93,10 @@ class OddsTaskIntakeService
                 'design_purpose' => $data['design_purpose'],
                 'brief_text' => $data['brief_text'],
                 'reference_visual' => $data['reference_visual'] ?? null,
-                'deadline' => $data['deadline'] ?? now()->addDays($category->sla_days),
+                'deadline' => $data['deadline'] ?? $this->schedule->calculateDeadline(now()->toImmutable(), $category->sla_minutes),
                 'important_matrix' => $data['important_matrix'] ?? 'normal',
                 'attachment_notes' => $data['attachment_notes'] ?? null,
                 'status' => TaskStatusEnum::SUBMITTED->value,
-                'workload_point' => $category->workload_point,
                 'created_by' => $userId,
                 'updated_by' => $userId,
             ]);

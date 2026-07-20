@@ -21,9 +21,8 @@ class SaveDesignerProfileRequest extends OddsFormRequest
             ],
             'status' => [$presence, Rule::in(DesignerAvailabilityEnum::values())],
             'specializations' => ['sometimes', 'array'],
-            'daily_capacity_points' => [$presence, 'integer', 'min:1'],
-            'max_active_tasks' => [$presence, 'integer', 'min:1'],
-            'assignment_priority' => ['sometimes', 'integer', 'min:1'],
+            'leave_dates' => ['sometimes', 'array'],
+            'leave_dates.*' => ['date_format:Y-m-d'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

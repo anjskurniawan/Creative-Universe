@@ -1,9 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SideMenu, type SideMenuItem, type SideMenuVariant } from "@/components/side-menu";
 import { type TaskPerformanceTask } from "@/components/task-performance-mobile";
-import { TaskPerformanceDesktop } from "@/components/task-performance-desktop";
 import { ApiError } from "@/core/api/client";
 import { kvRetailApi, type KvRetailTaskDeletedEvent, type KvRetailTaskEvent } from "@/features/kv-retail/api";
 import { getEchoClient } from "@/core/realtime";
@@ -27,10 +25,7 @@ const TASK_NAVIGATION_ITEMS = [
   { label: "Pengaturan", icon: "settings", href: "/kv-retail/option" },
 ];
 
-const DESKTOP_PRIMARY_MENU: SideMenuItem[] = TASK_NAVIGATION_ITEMS.map((item) => ({
-  ...item,
-  status: item.label === KV_RETAIL_PERFORMANCE_PAGE.navLabel ? "Active" : undefined,
-}));
+
 
 function toDate(value?: string | null) {
   if (!value) return null;
@@ -165,7 +160,6 @@ function MobilePriorityActionsCard({ priorities, theme }: { priorities: Array<{ 
 export default function TaskPerformancePage() {
   const [tasks, setTasks] = useState<TaskPerformanceTask[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [desktopSidebarVariant, setDesktopSidebarVariant] = useState<SideMenuVariant>("Expand");
   const [performanceTheme, setPerformanceTheme] = useState<"dark" | "light" | "retro">("light");
   const [mobilePeriodOpen, setMobilePeriodOpen] = useState(false);
   const mobileReportScrollRef = useRef<HTMLDivElement>(null);
@@ -357,7 +351,6 @@ export default function TaskPerformancePage() {
       </div>
 
       <div className={`hidden h-screen min-h-0 flex-col text-[#222] lg:flex ${performanceTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)] p-6" : performanceTheme === "retro" ? "bg-[#dfe2d3] p-6" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)] p-6"}`}>
-        <div className="hidden" aria-hidden="true"><SideMenu variant={desktopSidebarVariant} primaryItems={DESKTOP_PRIMARY_MENU} onVariantChange={setDesktopSidebarVariant} /></div>
         <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${performanceTheme === "light" ? "rounded-[26px] border border-white/80 bg-white/80 shadow-[0_14px_42px_rgba(44,42,39,0.16)] backdrop-blur-md" : performanceTheme === "dark" ? "rounded-[26px] border border-white/10 bg-[#111413]/90 shadow-[0_14px_42px_rgba(0,0,0,0.45)] backdrop-blur-md" : "rounded-[30px] border-[3px] border-[#24252b] bg-[#c9ccc0] font-mono shadow-[0_8px_0_#24252b]"}`}>
         <PerformanceNavbar theme={performanceTheme} />
         <div className="flex min-h-0 flex-1">
@@ -401,14 +394,6 @@ export default function TaskPerformancePage() {
             <PerformanceSideSummary totalTasks={currentTasks.length} rating={performanceRating} creativeAgentContent={creativeAgentContent} theme={performanceTheme} />
           </div>
           </>}
-          {/* Existing recap UI is intentionally hidden while the replacement layout is designed. */}
-          <div className="hidden" aria-hidden="true">
-          <header className="relative min-h-[140px] gap-6 2xl:flex 2xl:items-center 2xl:justify-between">
-            <div className="w-full max-w-[590px] shrink-0"><h1 className="text-[44px] font-semibold leading-[52px] tracking-[-0.96px] text-[#222] sm:text-[48px] sm:leading-[60px]">{KV_RETAIL_PERFORMANCE_PAGE.title}</h1><p className="mt-3 text-base leading-5 tracking-[0.32px] text-[#6b7280]">Ringkasan performa seluruh task.</p></div>
-            <div className="absolute right-0 top-1/2 flex -translate-y-1/2 shrink-0 items-center gap-3"><button type="button" className="flex h-11 items-center gap-2 rounded-xl border border-[#e2e6e9] bg-white px-4 text-sm font-medium text-[#3b4446]"><MaterialIcon name="calendar_month" size="auto" className="text-xl" />Bulan Ini<MaterialIcon name="keyboard_arrow_down" size="auto" className="text-xl" /></button><button type="button" className="flex h-11 items-center gap-2 rounded-xl bg-[#6d46eb] px-4 text-sm font-semibold text-white shadow-sm"><MaterialIcon name="download" size="auto" className="text-xl" />Export Report</button></div>
-          </header>
-          <TaskPerformanceDesktop tasks={tasks} showToolbar={false} />
-          </div>
         </TaskDesktopPageTransition>
         </div>
         </div>

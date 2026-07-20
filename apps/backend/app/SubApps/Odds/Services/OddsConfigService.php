@@ -36,7 +36,7 @@ class OddsConfigService
         return DesignerProfile::query()
             ->with('user:id,name,email,username')
             ->when(isset($filters['active']), fn ($query) => $query->where('is_active', (bool) $filters['active']))
-            ->orderBy('assignment_priority')
+            ->orderBy('id', 'desc')
             ->paginate((int) ($filters['per_page'] ?? 25));
     }
 
