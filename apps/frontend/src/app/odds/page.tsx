@@ -269,6 +269,120 @@ const configSections: Array<{
   },
 ];
 
+function PerformanceChart({ points, theme }: { points: number[]; theme: string }) {
+  const accentColor = theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : "#00a4ff";
+  const svgWidth = 500;
+  const svgHeight = 80;
+  const maxVal = Math.max(...points, 100);
+  const minVal = 0;
+  const range = maxVal - minVal || 1;
+  
+  const coords = points.map((val, idx) => {
+    const x = (idx / (points.length - 1)) * (svgWidth - 20) + 10;
+    const y = svgHeight - ((val - minVal) / range) * (svgHeight - 20) - 10;
+    return { x, y, val };
+  });
+  
+  const pathData = coords.reduce((acc, c, idx) => {
+    return acc + `${idx === 0 ? "M" : "L"} ${c.x} ${c.y}`;
+  }, "");
+  
+  return (
+    <div className="relative w-full h-[80px]">
+      <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-full overflow-visible" fill="none">
+        <path d={pathData} stroke={accentColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        {coords.map((c, idx) => (
+          <g key={idx}>
+            <circle cx={c.x} cy={c.y} r="3.5" fill={accentColor} />
+            <circle cx={c.x} cy={c.y} r="6.5" stroke={accentColor} strokeWidth="1.2" className="opacity-35" />
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function DesignerMetric({
+  label,
+  value,
+  icon = "check_circle",
+  bottomLeft,
+  bottomRight,
+}: {
+  label: string;
+  value: string | number;
+  icon?: string;
+  bottomLeft?: React.ReactNode;
+  bottomRight?: React.ReactNode;
+}) {
+  const { theme } = useOddsTheme();
+  const light = theme !== "dark";
+  const retro = theme === "retro";
+
+  const panelClass = retro
+    ? "border-2 border-[#24252b] bg-[#eceee6] shadow-[inset_0_0_0_2px_#c9ccc0]"
+    : light
+    ? "border border-white/80 bg-white/90 shadow-[0_5px_14px_rgba(44,42,39,0.06)]"
+    : "border border-white/[0.05] bg-[#171717] shadow-[0_5px_14px_rgba(0,0,0,0.24)]";
+
+  const innerBoxClass = retro
+    ? "border border-[#24252b] bg-[#dfe2d3]"
+    : light
+    ? "bg-[#f3faff]"
+    : "bg-[#0e0e0e]";
+
+  const labelColorClass = retro
+    ? "font-bold uppercase tracking-wide text-[#24252b]"
+    : light
+    ? "text-[#6e5264]"
+    : "text-[#f1f1f1]";
+
+  const valueColorClass = light ? "text-[#181818]" : "text-white";
+
+  const bottomColorClass = retro ? "text-[#555850]" : light ? "text-[#806272]" : "text-[#b9b9b9]";
+
+  const primaryIconColor = light ? (retro ? "#ba0dcb" : "#00a4ff") : "#e4e4e4";
+
+  return (
+    <article className={`relative flex h-[139px] w-full min-w-0 flex-col gap-1 rounded-2xl p-2 transition ${panelClass}`}>
+      {/* Top row */}
+      <div className="flex items-center justify-between px-1">
+        <p className={`text-xs leading-4 ${labelColorClass}`}>{label}</p>
+        <button 
+          type="button" 
+          aria-label={`Detail ${label}`} 
+          className={`flex size-6 items-center justify-center rounded-md transition hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 ${bottomColorClass}`}
+        >
+          <MaterialIcon name="more_horiz" size="auto" className="text-xl" />
+        </button>
+      </div>
+
+      {/* Middle row (Inner Box: Value + Icon) */}
+      <div className={`flex min-h-0 flex-1 items-center justify-between rounded-xl px-2 py-1 ${innerBoxClass}`}>
+        <p className={`flex items-baseline gap-1 text-[28px] font-medium leading-none ${valueColorClass}`}>
+          {value}
+        </p>
+        <span className="size-10 flex items-center justify-center" style={{ color: primaryIconColor }}>
+          <MaterialIcon name={icon} size="auto" className="text-[40px]" filled={false} />
+        </span>
+      </div>
+
+      {/* Bottom row */}
+      <div className={`flex items-center px-1 text-[8px] leading-4 ${bottomColorClass}`}>
+        <div>
+          {bottomLeft}
+        </div>
+        {bottomRight && (
+          <div className="ml-auto flex items-center gap-[5px] text-xs leading-4">
+            {bottomRight}
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+
 function OddsPageContent() {
   const { hasPermission, user } = useAuth();
   const { theme } = useOddsTheme();
@@ -739,6 +853,7 @@ function OddsPageContent() {
     const headingClass = theme === "dark" ? "text-[#f1f1f1]" : "text-[#181818]";
     const accentColor = theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : "#00a4ff";
     const subBgClass = theme === "dark" ? "bg-[#0e0e0e]" : theme === "retro" ? "border border-[#24252b] bg-[#dfe2d3]" : "bg-[#f3faff]";
+    const highlightColor = theme === "dark" ? "text-[#b0ff5e]" : theme === "retro" ? "text-[#ba0dcb]" : "text-[#00a4ff]";
 
     const formatActivityDate = (iso?: string) => {
       if (!iso) return "";
@@ -764,12 +879,65 @@ function OddsPageContent() {
       cancelled_by_spv: "dibatalkan oleh SPV",
     };
 
+    const getGreeting = (name: string) => {
+      const hr = new Date().getHours();
+      const firstName = name.trim().split(/\s+/)[0] ?? "";
+      if (hr < 12) return `Morning, ${firstName}`;
+      if (hr < 17) return `Afternoon, ${firstName}`;
+      return `Evening, ${firstName}`;
+    };
+
+    const todayStr = new Date().toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" });
+    const monthYearStr = new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+
+    // Designer task derivations
+    const activeTasks = tasks.filter(t => !["done", "cancelled", "cancelled_by_spv"].includes(t.status));
+    const todayTasksCount = tasks.filter(t => t.status === "in_progress").length;
+    const queuedTasksCount = tasks.filter(t => t.status === "queued").length;
+    const doneTasksCount = tasks.filter(t => t.status === "done").length;
+    const revisionTasksCount = tasks.filter(t => t.status === "revision").length;
+
+    const queuedTasks = tasks.filter(t => t.status === "queued");
+    const reviewTasks = tasks.filter(t => ["spv_review", "client_review"].includes(t.status));
+
+    const designerScore = doneTasks.reduce((sum, t) => sum + (t.category?.score_weight ? Math.round(Number(t.category.score_weight) * 100) : 100), 0);
+
+    const performancePoints = (() => {
+      const points = [];
+      const now = new Date();
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        const dateStr = d.toDateString();
+        const dayScore = doneTasks
+          .filter(t => t.updated_at && new Date(t.updated_at).toDateString() === dateStr)
+          .reduce((sum, t) => sum + (t.category?.score_weight ? Math.round(Number(t.category.score_weight) * 100) : 100), 0);
+        points.push(dayScore);
+      }
+      if (points.every(p => p === 0)) {
+        return [100, 150, 220, 310, 280, designerScore || 200];
+      }
+      return points;
+    })();
+
+    const notificationItems = activeTasks.slice(0, 8).map(task => ({
+      id: task.id,
+      title: `Tugas ${task.task_number} diperbarui`,
+      sub: `${task.design_purpose} - ${statusActivityLabel[task.status] ?? task.status}`
+    }));
+
+    const messageItems = activeTasks.slice(0, 8).map(task => ({
+      id: task.id,
+      title: `Pesan baru di ${task.task_number}`,
+      sub: `Diskusi brief: ${task.design_purpose}`
+    }));
+
     return (
       <div className="flex flex-col gap-5 p-4">
         {/* Header */}
         <header>
           <h1 className={`text-4xl font-medium leading-none tracking-[-0.72px] ${theme === "dark" ? "text-[#f1f1f1]" : theme === "retro" ? "text-[#24252b]" : "text-[#181818]"}`}>
-            Dashboard
+            {!canViewAssignedTasks ? "Dashboard" : getGreeting(user?.name ?? "Designer")}
           </h1>
         </header>
 
@@ -779,300 +947,620 @@ function OddsPageContent() {
           </div>
         )}
 
-        {/* Main layout: left = metrics + categories, right = 5 last requests */}
+        {/* Main layout */}
         {!canViewAssignedTasks ? (
-          <div className="flex gap-4">
-            {/* Left: 4 Metrics + Kategori Terpopuler */}
-            <div className="flex w-1/2 shrink-0 flex-col gap-4">
-              {/* 4 Metric cards + create button — semua dalam 1 baris square */}
-              <div className={`grid gap-2.5 ${canCreateTask ? "grid-cols-5" : "grid-cols-4"}`}>
-                <MiniMetric icon="pending_actions" label="Aktif" value={taskMetrics.active} />
-                <MiniMetric icon="assignment" label="Submit" value={taskMetrics.submitted} />
-                <MiniMetric icon="rate_review" label="Review" value={taskMetrics.review} />
-                <MiniMetric icon="task_alt" label="Done" value={taskMetrics.done} />
-                {canCreateTask && (
-                  <Link
-                    href="/odds/new"
-                    className={`group aspect-square flex flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed transition ${
-                      theme === "dark"
-                        ? "border-white/10 hover:border-[#b0ff5e]/40 hover:bg-[#b0ff5e]/5"
-                        : theme === "retro"
-                        ? "border-[#24252b]/30 hover:border-[#ba0dcb]/50 hover:bg-[#ba0dcb]/5"
-                        : "border-[#d7dcdd] hover:border-[#00a4ff]/40 hover:bg-[#00a4ff]/5"
-                    }`}
-                  >
-                    <span
-                      className={`flex size-8 shrink-0 items-center justify-center rounded-full transition group-hover:scale-110 ${
-                        theme === "dark" ? "bg-[#b0ff5e]/10 text-[#b0ff5e]" : theme === "retro" ? "bg-[#ba0dcb]/10 text-[#ba0dcb]" : "bg-[#00a4ff]/10 text-[#00a4ff]"
+          /* =========================================================================
+             CLIENT VIEW
+             ========================================================================= */
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              {/* Left: 4 Metrics + Kategori Terpopuler */}
+              <div className="flex w-1/2 shrink-0 flex-col gap-4">
+                {/* 4 Metric cards + create button — semua dalam 1 baris square */}
+                <div className={`grid gap-2.5 ${canCreateTask ? "grid-cols-5" : "grid-cols-4"}`}>
+                  <MiniMetric icon="pending_actions" label="Aktif" value={taskMetrics.active} />
+                  <MiniMetric icon="assignment" label="Submit" value={taskMetrics.submitted} />
+                  <MiniMetric icon="rate_review" label="Review" value={taskMetrics.review} />
+                  <MiniMetric icon="task_alt" label="Done" value={taskMetrics.done} />
+                  {canCreateTask && (
+                    <Link
+                      href="/odds/new"
+                      className={`group aspect-square flex flex-col items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed transition ${
+                        theme === "dark"
+                          ? "border-white/10 hover:border-[#b0ff5e]/40 hover:bg-[#b0ff5e]/5"
+                          : theme === "retro"
+                          ? "border-[#24252b]/30 hover:border-[#ba0dcb]/50 hover:bg-[#ba0dcb]/5"
+                          : "border-[#d7dcdd] hover:border-[#00a4ff]/40 hover:bg-[#00a4ff]/5"
                       }`}
                     >
-                      <MaterialIcon name="add" size="auto" className="text-xl" />
-                    </span>
-                    <span className={`text-[10px] font-bold leading-tight text-center ${
-                      theme === "dark" ? "text-[#b0ff5e]" : theme === "retro" ? "text-[#ba0dcb]" : "text-[#00a4ff]"
-                    }`}>Request<br/>Baru</span>
-                  </Link>
-                )}
+                      <span
+                        className={`flex size-8 shrink-0 items-center justify-center rounded-full transition group-hover:scale-110 ${
+                          theme === "dark" ? "bg-[#b0ff5e]/10 text-[#b0ff5e]" : theme === "retro" ? "bg-[#ba0dcb]/10 text-[#ba0dcb]" : "bg-[#00a4ff]/10 text-[#00a4ff]"
+                        }`}
+                      >
+                        <MaterialIcon name="add" size="auto" className="text-xl" />
+                      </span>
+                      <span className={`text-[10px] font-bold leading-tight text-center ${
+                        theme === "dark" ? "text-[#b0ff5e]" : theme === "retro" ? "text-[#ba0dcb]" : "text-[#00a4ff]"
+                      }`}>Request<br/>Baru</span>
+                    </Link>
+                  )}
+                </div>
+
+                {/* Kategori Terpopuler */}
+                <div className={`rounded-2xl p-4 ${panelClass}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Distribusi</p>
+                      <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>Kategori Terpopuler</h2>
+                    </div>
+                    <MaterialIcon name="category" size="auto" className="text-2xl" style={{ color: accentColor }} />
+                  </div>
+                  <div className="mt-3 space-y-2.5">
+                    {topCategories.length > 0 ? topCategories.map(([name, count]) => (
+                      <div key={name}>
+                        <div className={`mb-1 flex items-center justify-between text-[11px] ${mutedClass}`}>
+                          <span className={headingClass}>{name}</span>
+                          <b>{count} request</b>
+                        </div>
+                        <div className={`h-1.5 overflow-hidden rounded-full ${theme === "dark" ? "bg-white/10" : "bg-[#e6edf2]"}`}>
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${Math.max(6, (count / totalCatCount) * 100)}%`, backgroundColor: accentColor }}
+                          />
+                        </div>
+                      </div>
+                    )) : (
+                      <p className={`text-sm ${mutedClass}`}>Belum ada data kategori.</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              {/* Kategori Terpopuler */}
-              <div className={`rounded-2xl p-4 ${panelClass}`}>
+              {/* Right: 5 Request Terakhir — flex-1 fills remaining width */}
+              <div className={`flex-1 min-w-0 rounded-2xl p-4 ${panelClass}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Distribusi</p>
-                    <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>Kategori Terpopuler</h2>
+                    <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Request Terbaru</p>
+                    <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>5 Request Terakhir</h2>
                   </div>
-                  <MaterialIcon name="category" size="auto" className="text-2xl" style={{ color: accentColor }} />
+                  <MaterialIcon name="receipt_long" size="auto" className="text-2xl" style={{ color: accentColor }} />
                 </div>
-                <div className="mt-3 space-y-2.5">
-                  {topCategories.length > 0 ? topCategories.map(([name, count]) => (
-                    <div key={name}>
-                      <div className={`mb-1 flex items-center justify-between text-[11px] ${mutedClass}`}>
-                        <span className={headingClass}>{name}</span>
-                        <b>{count} request</b>
-                      </div>
-                      <div className={`h-1.5 overflow-hidden rounded-full ${theme === "dark" ? "bg-white/10" : "bg-[#e6edf2]"}`}>
-                        <div
-                          className="h-full rounded-full"
-                          style={{ width: `${Math.max(6, (count / totalCatCount) * 100)}%`, backgroundColor: accentColor }}
-                        />
-                      </div>
-                    </div>
-                  )) : (
-                    <p className={`text-sm ${mutedClass}`}>Belum ada data kategori.</p>
+                <div className="mt-3 space-y-2">
+                  {loading ? (
+                    <p className={`text-sm ${mutedClass}`}>Memuat request...</p>
+                  ) : tasks.length > 0 ? [...tasks]
+                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                      .slice(0, 5)
+                      .map((task) => {
+                        const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
+                        const statusColor: Record<string, string> = {
+                          done: "#22c55e",
+                          client_review: "#f59e0b",
+                          in_progress: accentColor,
+                          queued: "#94a3b8",
+                          cancelled: "#ef4444",
+                          cancelled_by_spv: "#ef4444",
+                          revision: "#f97316",
+                          spv_review: "#a78bfa",
+                        };
+                        const statusDot = statusColor[task.status] ?? "#94a3b8";
+                        return (
+                          <Link
+                            key={task.id}
+                            href={`/odds/detail?id=${task.id}`}
+                            className={`flex items-center gap-3 rounded-xl px-3 py-3 transition hover:opacity-80 ${subBgClass}`}
+                          >
+                            <span className="mt-0.5 flex size-2 shrink-0 rounded-full" style={{ backgroundColor: statusDot }} />
+                            <div className="min-w-0 flex-1">
+                              <p className={`truncate text-xs font-semibold ${headingClass}`}>{task.design_purpose}</p>
+                              <p className={`mt-0.5 text-[10px] ${mutedClass}`}>
+                                {task.task_number}
+                                {task.category?.name ? ` · ${task.category.name}` : ""}
+                                {assignedDesigner ? ` · ${assignedDesigner.name}` : ""}
+                              </p>
+                            </div>
+                            <div className="flex shrink-0 flex-col items-end gap-1">
+                              <StatusBadge status={task.status} />
+                              <span className={`text-[10px] ${mutedClass}`}>{formatOddsDate(task.deadline, true)}</span>
+                            </div>
+                          </Link>
+                        );
+                      }) : (
+                    <p className={`text-sm ${mutedClass}`}>Belum ada request yang dibuat.</p>
+                  )}
+                  {!loading && tasks.length > 5 && (
+                    <Link
+                      href="/odds?section=client_all_requests"
+                      className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition hover:opacity-70 ${mutedClass}`}
+                    >
+                      Lihat semua {tasks.length} request
+                      <MaterialIcon name="arrow_forward" size="auto" className="text-base" />
+                    </Link>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Right: 5 Request Terakhir — flex-1 fills remaining width */}
-            <div className={`flex-1 min-w-0 rounded-2xl p-4 ${panelClass}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Request Terbaru</p>
-                  <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>5 Request Terakhir</h2>
+            {/* Calendar widget + 4 content cards */}
+            <div className="flex gap-4">
+              {/* Calendar widget square */}
+              {(() => {
+                const now = new Date();
+                const dayName = now.toLocaleDateString("id-ID", { weekday: "long" });
+                const dayNum = now.getDate();
+                const monthName = now.toLocaleDateString("id-ID", { month: "long" });
+                const year = now.getFullYear();
+                return (
+                  <div className="shrink-0 self-stretch">
+                    <div className={`h-full aspect-square flex flex-col items-center justify-center gap-1 rounded-2xl p-3 ${panelClass}`}>
+                      <p className={`text-[14px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>{dayName}</p>
+                      <p className="text-[90px] font-black leading-none" style={{ color: accentColor }}>{dayNum}</p>
+                      <p className={`text-[20px] font-bold ${headingClass}`}>{monthName}</p>
+                      <p className={`text-[14px] font-medium ${mutedClass}`}>{year}</p>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 4 cards in 2x2 grid */}
+              <div className="grid flex-1 grid-cols-2 gap-4">
+                {/* Rating */}
+                <div className={`rounded-2xl p-4 ${panelClass}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Kepuasan</p>
+                      <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>Rata-rata Rating</h2>
+                    </div>
+                    <MaterialIcon name="star" size="auto" className="text-2xl" style={{ color: accentColor }} />
+                  </div>
+                  <div className={`mt-3 flex items-center justify-between rounded-xl px-4 py-3 ${subBgClass}`}>
+                    {avgRating !== null ? (
+                      <>
+                        <div>
+                          <p className={`text-[32px] font-bold leading-none ${headingClass}`}>{avgRating.toFixed(1)}</p>
+                          <p className={`mt-1 text-[10px] ${mutedClass}`}>dari {ratedTasks.length} tugas selesai</p>
+                        </div>
+                        <div className="flex gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <MaterialIcon
+                              key={star}
+                              name="star"
+                              size="auto"
+                              className="text-xl"
+                              style={{ color: star <= Math.round(avgRating) ? accentColor : theme === "dark" ? "#333" : "#dde3e8" }}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p className={`text-sm ${mutedClass}`}>Belum ada rating dari tugas selesai.</p>
+                    )}
+                  </div>
                 </div>
-                <MaterialIcon name="receipt_long" size="auto" className="text-2xl" style={{ color: accentColor }} />
-              </div>
-              <div className="mt-3 space-y-2">
-                {loading ? (
-                  <p className={`text-sm ${mutedClass}`}>Memuat request...</p>
-                ) : tasks.length > 0 ? [...tasks]
-                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                    .slice(0, 5)
-                    .map((task) => {
-                      const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
-                      const statusColor: Record<string, string> = {
-                        done: "#22c55e",
-                        client_review: "#f59e0b",
-                        in_progress: accentColor,
-                        queued: "#94a3b8",
-                        cancelled: "#ef4444",
-                        cancelled_by_spv: "#ef4444",
-                        revision: "#f97316",
-                        spv_review: "#a78bfa",
-                      };
-                      const statusDot = statusColor[task.status] ?? "#94a3b8";
-                      return (
-                        <Link
-                          key={task.id}
-                          href={`/odds/detail?id=${task.id}`}
-                          className={`flex items-center gap-3 rounded-xl px-3 py-3 transition hover:opacity-80 ${subBgClass}`}
+
+                {/* SLA Performance */}
+                <div className={`rounded-2xl p-4 ${panelClass}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Ketepatan Waktu</p>
+                      <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>SLA Performance</h2>
+                    </div>
+                    <MaterialIcon name="target" size="auto" className="text-2xl" style={{ color: accentColor }} />
+                  </div>
+                  <div className={`mt-3 rounded-xl px-4 py-3 ${subBgClass}`}>
+                    {slaRate !== null ? (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <p className={`text-[32px] font-bold leading-none ${headingClass}`}>{slaRate}%</p>
+                          <p className={`text-[11px] font-medium ${slaRate >= 80 ? "text-green-500" : slaRate >= 50 ? "text-yellow-500" : "text-red-400"}`}>
+                            {slaRate >= 80 ? "Sangat Baik" : slaRate >= 50 ? "Cukup" : "Perlu Perhatian"}
+                          </p>
+                        </div>
+                        <div className={`mt-2 h-2 w-full overflow-hidden rounded-full ${theme === "dark" ? "bg-white/10" : "bg-[#e6edf2]"}`}>
+                          <div className="h-full rounded-full transition-all" style={{ width: `${slaRate}%`, backgroundColor: accentColor }} />
+                        </div>
+                        <p className={`mt-1.5 text-[10px] ${mutedClass}`}>{slaOnTime} dari {slaTotal} tugas selesai tepat waktu</p>
+                      </>
+                    ) : (
+                      <p className={`text-sm ${mutedClass}`}>Belum ada data tugas selesai untuk dihitung.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Top Designers */}
+                <div className={`rounded-2xl p-4 ${panelClass}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Tim Desain</p>
+                      <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>Desainer Pendukung</h2>
+                    </div>
+                    <MaterialIcon name="groups" size="auto" className="text-2xl" style={{ color: accentColor }} />
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    {topDesigners.length > 0 ? topDesigners.map((d) => (
+                      <div key={d.name} className={`flex items-center justify-between rounded-xl px-3 py-2 ${subBgClass}`}>
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className="flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
+                            style={{ backgroundColor: accentColor, color: theme === "dark" ? "#181818" : "white" }}
+                          >
+                            {d.name.charAt(0).toUpperCase()}
+                          </span>
+                          <span className={`text-sm font-medium ${headingClass}`}>{d.name}</span>
+                        </div>
+                        <span className={`text-[11px] font-semibold ${mutedClass}`}>{d.count} tugas</span>
+                      </div>
+                    )) : (
+                      <p className={`text-sm ${mutedClass}`}>Belum ada desainer yang ditugaskan.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className={`rounded-2xl p-4 ${panelClass}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Live Feed</p>
+                      <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>Aktivitas Terbaru</h2>
+                    </div>
+                    <MaterialIcon name="timeline" size="auto" className="text-2xl" style={{ color: accentColor }} />
+                  </div>
+                  <div className="mt-3 space-y-2">
+                    {loading ? (
+                      <p className={`text-sm ${mutedClass}`}>Memuat aktivitas...</p>
+                    ) : recentActivity.length > 0 ? recentActivity.map((task) => (
+                      <Link
+                        key={task.id}
+                        href={`/odds/detail?id=${task.id}`}
+                        className={`flex items-start gap-3 rounded-xl px-3 py-2.5 transition hover:opacity-80 ${subBgClass}`}
+                      >
+                        <span
+                          className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full"
+                          style={{ backgroundColor: `${accentColor}22`, color: accentColor }}
                         >
-                          <span className="mt-0.5 flex size-2 shrink-0 rounded-full" style={{ backgroundColor: statusDot }} />
-                          <div className="min-w-0 flex-1">
-                            <p className={`truncate text-xs font-semibold ${headingClass}`}>{task.design_purpose}</p>
-                            <p className={`mt-0.5 text-[10px] ${mutedClass}`}>
-                              {task.task_number}
-                              {task.category?.name ? ` · ${task.category.name}` : ""}
-                              {assignedDesigner ? ` · ${assignedDesigner.name}` : ""}
-                            </p>
-                          </div>
-                          <div className="flex shrink-0 flex-col items-end gap-1">
-                            <StatusBadge status={task.status} />
-                            <span className={`text-[10px] ${mutedClass}`}>{formatOddsDate(task.deadline, true)}</span>
-                          </div>
-                        </Link>
-                      );
-                    }) : (
-                  <p className={`text-sm ${mutedClass}`}>Belum ada request yang dibuat.</p>
-                )}
-                {!loading && tasks.length > 5 && (
-                  <Link
-                    href="/odds?section=client_all_requests"
-                    className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition hover:opacity-70 ${mutedClass}`}
-                  >
-                    Lihat semua {tasks.length} request
-                    <MaterialIcon name="arrow_forward" size="auto" className="text-base" />
-                  </Link>
-                )}
+                          <MaterialIcon name="fiber_manual_record" size="auto" className="text-[10px]" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className={`truncate text-xs font-semibold ${headingClass}`}>{task.design_purpose}</p>
+                          <p className={`mt-0.5 text-[10px] ${mutedClass}`}>
+                            {task.task_number} · {statusActivityLabel[task.status] ?? task.status}
+                          </p>
+                        </div>
+                        <span className={`shrink-0 text-[10px] ${mutedClass}`}>{formatActivityDate(task.updated_at ?? task.created_at)}</span>
+                      </Link>
+                    )) : (
+                      <p className={`text-sm ${mutedClass}`}>Belum ada aktivitas.</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         ) : (
-          /* Designer: plain 4 metrics */
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <MiniMetric icon="pending_actions" label="Aktif" value={taskMetrics.active} />
-            <MiniMetric icon="assignment" label="Submit" value={taskMetrics.submitted} />
-            <MiniMetric icon="rate_review" label="Review" value={taskMetrics.review} />
-            <MiniMetric icon="task_alt" label="Done" value={taskMetrics.done} />
+          /* =========================================================================
+             DESIGNER VIEW
+             ========================================================================= */
+          <div className="flex flex-col gap-4">
+            {/* Row 1: Metrics + Score + Chart */}
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+              {/* Flexible Metrics Group (4 cards) */}
+              <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <DesignerMetric
+                  label="Total Tugas Hari Ini"
+                  value={`${todayTasksCount} task`}
+                  icon="assignment"
+                  bottomRight={
+                    <span className={`flex items-center gap-0.5 ${highlightColor}`}>
+                      <MaterialIcon name="trending_up" size="auto" className="text-[14px]" />
+                      15% <span className={`font-medium opacity-70 ml-0.5 text-[8px] ${theme === "dark" ? "text-[#a7ada8]" : theme === "retro" ? "text-[#687065]" : "text-[#6d7880]"}`}>vs Yesterday</span>
+                    </span>
+                  }
+                />
+                <DesignerMetric
+                  label="Total Dalam Antrian"
+                  value={`${queuedTasksCount} task`}
+                  icon="schedule"
+                  bottomLeft={
+                    <span>
+                      Data Update <span className={`${highlightColor} font-bold`}>{todayStr}</span>
+                    </span>
+                  }
+                />
+                <DesignerMetric
+                  label="Tugas Selesai"
+                  value={`${doneTasksCount} task`}
+                  icon="check_circle"
+                  bottomLeft={
+                    <span>
+                      Periode <span className={`${highlightColor} font-bold`}>{monthYearStr}</span>
+                    </span>
+                  }
+                />
+                <DesignerMetric
+                  label="Antrian Revisi"
+                  value={`${revisionTasksCount} task`}
+                  icon="rate_review"
+                  bottomLeft={
+                    <span>
+                      Data Update <span className={`${highlightColor} font-bold`}>{todayStr}</span>
+                    </span>
+                  }
+                />
+              </div>
+
+              {/* Score Kamu - aspect-square */}
+              <div className="shrink-0">
+                <div className={`flex aspect-square h-[139px] flex-col items-center justify-center rounded-2xl p-4 text-center ${
+                  theme === "retro"
+                    ? "border-2 border-[#24252b] bg-[#ba0dcb] text-white shadow-[inset_0_0_0_2px_#c9ccc0]"
+                    : theme === "dark"
+                    ? "bg-[#b0ff5e] text-[#181818]"
+                    : "bg-[#00a4ff] text-white"
+                }`}>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] opacity-80">Score Kamu</p>
+                  <h3 className="mt-1 text-3xl font-black leading-none">{designerScore}</h3>
+                </div>
+              </div>
+
+              {/* Grafik Performa */}
+              <div className={`relative flex h-[139px] w-full lg:w-[350px] shrink-0 flex-col gap-1 rounded-2xl p-2 transition ${
+                theme === "retro"
+                  ? "border-2 border-[#24252b] bg-[#eceee6] shadow-[inset_0_0_0_2px_#c9ccc0]"
+                  : theme === "dark"
+                  ? "border border-white/[0.05] bg-[#171717] shadow-[0_5px_14px_rgba(0,0,0,0.24)]"
+                  : "border border-white/80 bg-white/90 shadow-[0_5px_14px_rgba(44,42,39,0.06)]"
+              }`}>
+                {/* Top row */}
+                <div className="flex items-center justify-between px-1">
+                  <p className={`text-xs leading-4 ${
+                    theme === "retro"
+                      ? "font-bold uppercase tracking-wide text-[#24252b]"
+                      : theme === "dark"
+                      ? "text-[#f1f1f1]"
+                      : "text-[#6e5264]"
+                  }`}>
+                    Grafik Performa
+                  </p>
+                  <span className="size-6 flex items-center justify-center" style={{ color: theme === "retro" ? "#ba0dcb" : theme === "dark" ? "#e4e4e4" : "#00a4ff" }}>
+                    <MaterialIcon name="show_chart" size="auto" className="text-xl" />
+                  </span>
+                </div>
+
+                {/* Chart container (Inner Box) */}
+                <div className={`flex-1 min-h-0 rounded-xl overflow-hidden relative flex items-center justify-center ${subBgClass}`}>
+                  <PerformanceChart points={performancePoints} theme={theme} />
+                </div>
+
+                {/* Bottom row */}
+                <div className={`flex items-center px-1 text-[8px] leading-4 ${
+                  theme === "retro" ? "text-[#555850]" : theme === "dark" ? "text-[#b9b9b9]" : "text-[#806272]"
+                }`}>
+                  <p>
+                    Last <span className={`${highlightColor} font-bold`}>Six Day Ago</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Lists & Calendar */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+              {/* Column 1: Queue Jobs */}
+              <div className={`lg:col-span-3 flex h-full flex-col gap-1 rounded-2xl p-2 ${panelClass}`}>
+                <div className="flex items-center justify-between px-1 py-0.5 w-full">
+                  <p className={`text-[14px] font-normal leading-[20px] ${
+                    theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-[#b9b9b9]" : "text-[#6d7880]"
+                  }`}>
+                    Queue Jobs
+                  </p>
+                </div>
+                <div className="flex min-h-0 flex-1 flex-col gap-1 w-full overflow-hidden rounded-xl">
+                  {queuedTasks.length > 0 ? queuedTasks.slice(0, 12).map((task) => (
+                    <div key={task.id} className={`flex items-center justify-between p-[8px] rounded-xl ${
+                      theme === "retro"
+                        ? "border border-[#24252b] bg-[#dfe2d3]"
+                        : theme === "dark"
+                        ? "bg-[#0e0e0e]"
+                        : "bg-[#f3faff]"
+                    }`}>
+                      {/* Left: Title & Sub */}
+                      <div className="min-w-0 flex-1 flex flex-col gap-[3px] items-start">
+                        <h4 className={`w-full truncate text-[12px] font-semibold leading-[16px] ${
+                          theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-white" : "text-[#181818]"
+                        }`}>
+                          {task.design_purpose}
+                        </h4>
+                        <div className="flex items-center gap-[3px] text-[10px] leading-[12px] whitespace-nowrap">
+                          <span className={theme === "dark" ? "text-[#e3e3e3]" : "text-[#555850]"}>
+                            {task.category?.name ?? "Kategori"}
+                          </span>
+                          <span className={theme === "dark" ? "text-white" : "text-[#24252b]"}>|</span>
+                          <Link href={`/odds/detail?id=${task.id}`} className="text-[#b0ff5e] font-normal hover:opacity-85" style={{ color: theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : "#00a4ff" }}>
+                            Detail Brieft
+                          </Link>
+                        </div>
+                      </div>
+                      {/* Right: Actions */}
+                      <div className="flex items-center gap-[4px] shrink-0 ml-2">
+                        <Link href={`/odds/detail?id=${task.id}`} title="Chat" className="flex size-[24px] items-center justify-center rounded-[8px] hover:bg-white/5 transition">
+                          <MaterialIcon name="chat" size="auto" className="text-[16px]" style={{ color: theme === "dark" ? "#b9b9b9" : "#6d7880" }} />
+                        </Link>
+                        <Link href={`/odds/detail?id=${task.id}`} title="Mulai" className="flex size-[24px] items-center justify-center rounded-[8px] hover:bg-white/5 transition">
+                          <MaterialIcon name="play_circle" size="auto" className="text-[16px]" style={{ color: accentColor }} />
+                        </Link>
+                      </div>
+                    </div>
+                  )) : (
+                    <p className={`text-xs ${mutedClass} py-4 text-center`}>Tidak ada antrean tugas.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Column 2: Calendar + Need Review Brief */}
+              <div className="lg:col-span-5 flex h-full gap-4 flex-col sm:flex-row lg:flex-row">
+                {/* Calendar widget */}
+                {(() => {
+                  const now = new Date();
+                  const dayName = now.toLocaleDateString("id-ID", { weekday: "long" });
+                  const dayNum = now.getDate();
+                  const monthName = now.toLocaleDateString("id-ID", { month: "long" });
+                  const year = now.getFullYear();
+                  return (
+                    <div className="shrink-0 w-full sm:w-auto lg:w-auto h-[139px] sm:h-full lg:h-full">
+                      <div className={`h-full aspect-square flex flex-col items-center justify-center gap-1 rounded-2xl p-4 text-center ${
+                        theme === "retro"
+                          ? "border-2 border-[#24252b] bg-[#ba0dcb] text-white shadow-[0_3px_0_#24252b]"
+                          : theme === "dark"
+                          ? "bg-[#b0ff5e] text-[#181818]"
+                          : "bg-[#00a4ff] text-white"
+                      }`}>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.14em] opacity-80">{dayName}</p>
+                        <p className="text-[54px] font-black leading-none">{dayNum}</p>
+                        <p className="text-sm font-bold leading-tight mt-1">{monthName}</p>
+                        <p className="text-[10px] font-medium opacity-80">{year}</p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Need Review Brief */}
+                <div className={`flex h-full flex-1 flex-col gap-1 rounded-2xl p-2 ${panelClass}`}>
+                  <div className="flex items-center justify-between px-1 py-0.5 w-full">
+                    <p className={`text-[14px] font-normal leading-[20px] ${
+                      theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-[#b9b9b9]" : "text-[#6d7880]"
+                    }`}>
+                      Need Review Brief
+                    </p>
+                  </div>
+                  <div className="flex min-h-0 flex-1 flex-col gap-1 w-full overflow-y-auto pr-1 rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {reviewTasks.length > 0 ? reviewTasks.slice(0, 10).map((task) => (
+                      <div key={task.id} className={`flex items-center justify-between p-[8px] rounded-xl ${
+                        theme === "retro"
+                          ? "border border-[#24252b] bg-[#dfe2d3]"
+                          : theme === "dark"
+                          ? "bg-[#0e0e0e]"
+                          : "bg-[#f3faff]"
+                      }`}>
+                        {/* Left: Title & Sub */}
+                        <div className="min-w-0 flex-1 flex flex-col gap-[3px] items-start">
+                          <h4 className={`w-full truncate text-[12px] font-semibold leading-[16px] ${
+                            theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-white" : "text-[#181818]"
+                          }`}>
+                            {task.design_purpose}
+                          </h4>
+                          <div className="flex items-center gap-[3px] text-[10px] leading-[12px] whitespace-nowrap">
+                            <span className={theme === "dark" ? "text-[#e3e3e3]" : "text-[#555850]"}>
+                              {task.category?.name ?? "Kategori"}
+                            </span>
+                            <span className={theme === "dark" ? "text-white" : "text-[#24252b]"}>|</span>
+                            <Link href={`/odds/detail?id=${task.id}`} className="text-[#b0ff5e] font-normal hover:opacity-85" style={{ color: theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : "#00a4ff" }}>
+                              Detail Brieft
+                            </Link>
+                          </div>
+                        </div>
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-[4px] shrink-0 ml-2">
+                          <Link href={`/odds/detail?id=${task.id}`} title="Review" className="flex size-[24px] items-center justify-center rounded-[8px] hover:bg-white/5 transition">
+                            <MaterialIcon name="play_circle" size="auto" className="text-[16px]" style={{ color: accentColor }} />
+                          </Link>
+                        </div>
+                      </div>
+                    )) : (
+                      <p className={`text-xs ${mutedClass} py-4 text-center`}>Tidak ada tugas menunggu review.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 3: Notification + Message */}
+              <div className="lg:col-span-4 flex flex-col gap-4">
+                {/* Notification */}
+                <div className={`rounded-2xl p-2 flex flex-col gap-1 ${panelClass} flex-1`}>
+                  <div className="flex items-center justify-between px-1 py-0.5 w-full">
+                    <p className={`text-[14px] font-normal leading-[20px] ${
+                      theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-[#b9b9b9]" : "text-[#6d7880]"
+                    }`}>
+                      Notification
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-1 w-full overflow-y-auto max-h-[140px] pr-1 rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {notificationItems.length > 0 ? notificationItems.map((item) => (
+                      <div key={item.id} className={`flex items-center justify-between p-[8px] rounded-xl ${
+                        theme === "retro"
+                          ? "border border-[#24252b] bg-[#dfe2d3]"
+                          : theme === "dark"
+                          ? "bg-[#0e0e0e]"
+                          : "bg-[#f3faff]"
+                      }`}>
+                        {/* Left: Title & Sub */}
+                        <div className="min-w-0 flex-1 flex flex-col gap-[3px] items-start">
+                          <h4 className={`w-full truncate text-[12px] font-semibold leading-[16px] ${
+                            theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-white" : "text-[#181818]"
+                          }`}>
+                            {item.title}
+                          </h4>
+                          <p className={`text-[10px] leading-[12px] ${theme === "dark" ? "text-[#e3e3e3]" : mutedClass}`}>
+                            {item.sub}
+                          </p>
+                        </div>
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-[4px] shrink-0 ml-2">
+                          <Link href={`/odds/detail?id=${item.id}`} title="Detail" className="flex size-[24px] items-center justify-center rounded-[8px] hover:bg-white/5 transition">
+                            <MaterialIcon name="play_circle" size="auto" className="text-[16px]" style={{ color: accentColor }} />
+                          </Link>
+                        </div>
+                      </div>
+                    )) : (
+                      <p className={`text-xs ${mutedClass} py-4 text-center`}>Tidak ada notifikasi baru.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Message */}
+                <div className={`rounded-2xl p-2 flex flex-col gap-1 ${panelClass} flex-1`}>
+                  <div className="flex items-center justify-between px-1 py-0.5 w-full">
+                    <p className={`text-[14px] font-normal leading-[20px] ${
+                      theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-[#b9b9b9]" : "text-[#6d7880]"
+                    }`}>
+                      Message
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-1 w-full overflow-y-auto max-h-[140px] pr-1 rounded-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {messageItems.length > 0 ? messageItems.map((item) => (
+                      <div key={item.id} className={`flex items-center justify-between p-[8px] rounded-xl ${
+                        theme === "retro"
+                          ? "border border-[#24252b] bg-[#dfe2d3]"
+                          : theme === "dark"
+                          ? "bg-[#0e0e0e]"
+                          : "bg-[#f3faff]"
+                      }`}>
+                        {/* Left: Title & Sub */}
+                        <div className="min-w-0 flex-1 flex flex-col gap-[3px] items-start">
+                          <h4 className={`w-full truncate text-[12px] font-semibold leading-[16px] ${
+                            theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-white" : "text-[#181818]"
+                          }`}>
+                            {item.title}
+                          </h4>
+                          <p className={`text-[10px] leading-[12px] ${theme === "dark" ? "text-[#e3e3e3]" : mutedClass}`}>
+                            {item.sub}
+                          </p>
+                        </div>
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-[4px] shrink-0 ml-2">
+                          <Link href={`/odds/detail?id=${item.id}`} title="Detail" className="flex size-[24px] items-center justify-center rounded-[8px] hover:bg-white/5 transition">
+                            <MaterialIcon name="play_circle" size="auto" className="text-[16px]" style={{ color: accentColor }} />
+                          </Link>
+                        </div>
+                      </div>
+                    )) : (
+                      <p className={`text-xs ${mutedClass} py-4 text-center`}>Tidak ada pesan baru.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
-
-        {/* Calendar widget + 4 content cards */}
-        <div className="flex gap-4">
-          {/* Calendar widget square */}
-          {(() => {
-            const now = new Date();
-            const dayName = now.toLocaleDateString("id-ID", { weekday: "long" });
-            const dayNum = now.getDate();
-            const monthName = now.toLocaleDateString("id-ID", { month: "long" });
-            const year = now.getFullYear();
-            return (
-              <div className="shrink-0 self-stretch">
-                <div className={`h-full aspect-square flex flex-col items-center justify-center gap-1 rounded-2xl p-3 ${panelClass}`}>
-                <p className={`text-[14px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>{dayName}</p>
-                <p className="text-[90px] font-black leading-none" style={{ color: accentColor }}>{dayNum}</p>
-                <p className={`text-[20px] font-bold ${headingClass}`}>{monthName}</p>
-                <p className={`text-[14px] font-medium ${mutedClass}`}>{year}</p>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* 4 cards in 2x2 grid */}
-          <div className="grid flex-1 grid-cols-2 gap-4">
-            {/* Rating */}
-            <div className={`rounded-2xl p-4 ${panelClass}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Kepuasan</p>
-                  <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>Rata-rata Rating</h2>
-                </div>
-                <MaterialIcon name="star" size="auto" className="text-2xl" style={{ color: accentColor }} />
-              </div>
-              <div className={`mt-3 flex items-center justify-between rounded-xl px-4 py-3 ${subBgClass}`}>
-                {avgRating !== null ? (
-                  <>
-                    <div>
-                      <p className={`text-[32px] font-bold leading-none ${headingClass}`}>{avgRating.toFixed(1)}</p>
-                      <p className={`mt-1 text-[10px] ${mutedClass}`}>dari {ratedTasks.length} tugas selesai</p>
-                    </div>
-                    <div className="flex gap-0.5">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <MaterialIcon
-                          key={star}
-                          name="star"
-                          size="auto"
-                          className="text-xl"
-                          style={{ color: star <= Math.round(avgRating) ? accentColor : theme === "dark" ? "#333" : "#dde3e8" }}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className={`text-sm ${mutedClass}`}>Belum ada rating dari tugas selesai.</p>
-                )}
-              </div>
-            </div>
-
-            {/* SLA Performance */}
-            <div className={`rounded-2xl p-4 ${panelClass}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Ketepatan Waktu</p>
-                  <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>SLA Performance</h2>
-                </div>
-                <MaterialIcon name="target" size="auto" className="text-2xl" style={{ color: accentColor }} />
-              </div>
-              <div className={`mt-3 rounded-xl px-4 py-3 ${subBgClass}`}>
-                {slaRate !== null ? (
-                  <>
-                    <div className="flex items-center justify-between">
-                      <p className={`text-[32px] font-bold leading-none ${headingClass}`}>{slaRate}%</p>
-                      <p className={`text-[11px] font-medium ${slaRate >= 80 ? "text-green-500" : slaRate >= 50 ? "text-yellow-500" : "text-red-400"}`}>
-                        {slaRate >= 80 ? "Sangat Baik" : slaRate >= 50 ? "Cukup" : "Perlu Perhatian"}
-                      </p>
-                    </div>
-                    <div className={`mt-2 h-2 w-full overflow-hidden rounded-full ${theme === "dark" ? "bg-white/10" : "bg-[#e6edf2]"}`}>
-                      <div className="h-full rounded-full transition-all" style={{ width: `${slaRate}%`, backgroundColor: accentColor }} />
-                    </div>
-                    <p className={`mt-1.5 text-[10px] ${mutedClass}`}>{slaOnTime} dari {slaTotal} tugas selesai tepat waktu</p>
-                  </>
-                ) : (
-                  <p className={`text-sm ${mutedClass}`}>Belum ada data tugas selesai untuk dihitung.</p>
-                )}
-              </div>
-            </div>
-
-            {/* Top Designers */}
-            <div className={`rounded-2xl p-4 ${panelClass}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Tim Desain</p>
-                  <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>Desainer Pendukung</h2>
-                </div>
-                <MaterialIcon name="groups" size="auto" className="text-2xl" style={{ color: accentColor }} />
-              </div>
-              <div className="mt-3 space-y-2">
-                {topDesigners.length > 0 ? topDesigners.map((d) => (
-                  <div key={d.name} className={`flex items-center justify-between rounded-xl px-3 py-2 ${subBgClass}`}>
-                    <div className="flex items-center gap-2.5">
-                      <span
-                        className="flex size-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
-                        style={{ backgroundColor: accentColor, color: theme === "dark" ? "#181818" : "white" }}
-                      >
-                        {d.name.charAt(0).toUpperCase()}
-                      </span>
-                      <span className={`text-sm font-medium ${headingClass}`}>{d.name}</span>
-                    </div>
-                    <span className={`text-[11px] font-semibold ${mutedClass}`}>{d.count} tugas</span>
-                  </div>
-                )) : (
-                  <p className={`text-sm ${mutedClass}`}>Belum ada desainer yang ditugaskan.</p>
-                )}
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className={`rounded-2xl p-4 ${panelClass}`}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className={`text-[10px] font-bold uppercase tracking-[0.14em] ${mutedClass}`}>Live Feed</p>
-                  <h2 className={`mt-1 text-sm font-semibold ${headingClass}`}>Aktivitas Terbaru</h2>
-                </div>
-                <MaterialIcon name="timeline" size="auto" className="text-2xl" style={{ color: accentColor }} />
-              </div>
-              <div className="mt-3 space-y-2">
-                {loading ? (
-                  <p className={`text-sm ${mutedClass}`}>Memuat aktivitas...</p>
-                ) : recentActivity.length > 0 ? recentActivity.map((task) => (
-                  <Link
-                    key={task.id}
-                    href={`/odds/detail?id=${task.id}`}
-                    className={`flex items-start gap-3 rounded-xl px-3 py-2.5 transition hover:opacity-80 ${subBgClass}`}
-                  >
-                    <span
-                      className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full"
-                      style={{ backgroundColor: `${accentColor}22`, color: accentColor }}
-                    >
-                      <MaterialIcon name="fiber_manual_record" size="auto" className="text-[10px]" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className={`truncate text-xs font-semibold ${headingClass}`}>{task.design_purpose}</p>
-                      <p className={`mt-0.5 text-[10px] ${mutedClass}`}>
-                        {task.task_number} · {statusActivityLabel[task.status] ?? task.status}
-                      </p>
-                    </div>
-                    <span className={`shrink-0 text-[10px] ${mutedClass}`}>{formatActivityDate(task.updated_at ?? task.created_at)}</span>
-                  </Link>
-                )) : (
-                  <p className={`text-sm ${mutedClass}`}>Belum ada aktivitas.</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     );
   }

@@ -17,7 +17,7 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::post('/designer-profiles', [ConfigController::class, 'storeDesignerProfile'])->middleware('can:manage-odds-config');
     Route::patch('/designer-profiles/{designerProfile}', [ConfigController::class, 'updateDesignerProfile'])->middleware('can:manage-odds-config');
     Route::delete('/designer-profiles/{designerProfile}', [ConfigController::class, 'deleteDesignerProfile'])->middleware('can:manage-odds-config');
-    Route::get('/system-rules', [ConfigController::class, 'systemRules'])->middleware('can:manage-odds-config');
+    Route::get('/system-rules', [ConfigController::class, 'systemRules']);
     Route::post('/system-rules', [ConfigController::class, 'storeSystemRule'])->middleware('can:manage-odds-config');
     Route::patch('/system-rules/{systemRule}', [ConfigController::class, 'updateSystemRule'])->middleware('can:manage-odds-config');
     Route::delete('/system-rules/{systemRule}', [ConfigController::class, 'deleteSystemRule'])->middleware('can:manage-odds-config');
