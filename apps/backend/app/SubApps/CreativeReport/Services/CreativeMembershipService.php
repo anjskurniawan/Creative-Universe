@@ -90,8 +90,8 @@ class CreativeMembershipService
             }],
             ['sort_order' => match ($member->position_name) {
                 'SPV' => 1,
-                'Videographer' => 2,
-                default => 3,
+                'Videographer' => 3,
+                default => 2,
             }],
         );
 

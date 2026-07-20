@@ -41,9 +41,10 @@ class AssessmentController extends BaseApiController
         $groups = $query->get()->groupBy('creative_report_group_id')->map(fn ($rows) => [
             'id' => $rows->first()->group->id,
             'name' => $rows->first()->group->name,
+            'sort_order' => $rows->first()->group->sort_order,
             'staff_count' => $rows->count(),
             'assessments' => AssessmentResource::collection($rows)->resolve($request),
-        ])->values();
+        ])->sortBy('sort_order')->values();
 
         return $this->sendResponse(['month' => $period, 'groups' => $groups], 'Laporan creative berhasil diambil.');
     }
@@ -69,10 +70,10 @@ class AssessmentController extends BaseApiController
         Gate::authorize('viewAny', Assessment::class);
         $period = $request->string('month', now()->format('Y-m'))->toString();
         $assessment = Assessment::query()->with(['group', 'member', 'user.position.division'])
-            ->where(fn ($query) => $query->where('creative_report_member_id', $user)->orWhere('user_id', $user))
+            ->where('creative_report_member_id', $user)
             ->whereDate('period', $period.'-01')->firstOrFail();
         $detail = AssessmentResource::make($assessment)->resolve($request);
-        $detail['available_months'] = Assessment::query()->where(fn ($query) => $query->where('creative_report_member_id', $user)->orWhere('user_id', $user))
+        $detail['available_months'] = Assessment::query()->where('creative_report_member_id', $user)
             ->orderByDesc('period')->pluck('period')->map(fn ($item) => $item->format('Y-m'))->values();
 
         return $this->sendResponse($detail, 'Detail laporan user berhasil diambil.');

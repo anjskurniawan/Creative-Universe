@@ -5276,3 +5276,4 @@ Caused by:
   226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
 [browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
 Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Encountered two children with the same key, `2026-07`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version. 
