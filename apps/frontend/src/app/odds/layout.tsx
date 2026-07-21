@@ -109,10 +109,12 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     if (!canShowConfigSections && !canReviewSpv && !canViewAllTasks && !canReviewQueueSkip) {
       if (canViewAssignedTasks) {
         items.push(
-          { id: "workspace", label: "Tugas Hari Ini", icon: "today", href: "/odds", group: "tasks" },
+          { id: "workspace", label: "Dashboard", icon: "dashboard", href: "/odds", group: "tasks" },
+          { id: "designer_today_tasks", label: "Tugas Hari Ini", icon: "today", href: "/odds?section=designer_today_tasks", group: "tasks" },
           { id: "designer_all_tasks", label: "Semua Tugas", icon: "assignment", href: "/odds?section=designer_all_tasks", group: "tasks" },
           { id: "designer_review", label: "Menunggu Review", icon: "pending_actions", href: "/odds?section=designer_review", group: "tasks" },
           { id: "designer_revisions", label: "Revisi", icon: "error", href: "/odds?section=designer_revisions", group: "tasks" },
+          { id: "designer_done", label: "Selesai", icon: "task_alt", href: "/odds?section=designer_done", group: "tasks" },
           { id: "designer_report", label: "Laporan Kinerja", icon: "monitoring", href: "/odds?section=designer_report", group: "reports" },
           { id: "designer_settings", label: "Pengaturan & Jadwal", icon: "manage_accounts", href: "/odds?section=designer_settings", group: "manage" }
         );

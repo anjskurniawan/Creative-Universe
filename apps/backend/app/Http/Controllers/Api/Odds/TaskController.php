@@ -44,7 +44,7 @@ class TaskController extends BaseApiController
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'revisions', 'skipRequests', 'cancelRequests']);
+        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'revisions', 'skipRequests', 'cancelRequests', 'reviews']);
 
         if (! $user->can('view-all-odds-tasks')) {
             $query->where(function ($inner) use ($user) {

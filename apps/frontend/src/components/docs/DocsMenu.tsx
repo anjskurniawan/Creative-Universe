@@ -55,6 +55,7 @@ const MENU_DATA: DocCategory[] = [
           { label: "Frontend Pusher Configuration", slug: "core/frontend-pusher-configuration" },
           { label: "KV Retail Integration", slug: "core/frontend-kv-retail-integration" },
           { label: "KV Retail State Stability", slug: "core/frontend-kv-retail-state-stability" },
+          { label: "KV Retail Theme Tokens", slug: "core/kv-retail-theme-tokens" },
           { label: "Creative Report Integration", slug: "core/frontend-creative-report-integration" },
           { label: "ODDS Integration", slug: "core/frontend-odds-integration" },
           { label: "Core Chat Integration", slug: "core/frontend-core-chat-integration" },

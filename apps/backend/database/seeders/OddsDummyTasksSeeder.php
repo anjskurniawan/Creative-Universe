@@ -12,8 +12,20 @@ class OddsDummyTasksSeeder extends Seeder
 {
     public function run(): void
     {
-        // Clear all previous dummy tasks
-        Task::where('task_number', 'like', 'ODDS-DUMMY-%')->forceDelete();
+        // Clear all previous dummy tasks, conversations, messages, and task reviews
+        $dummyTaskIds = Task::where('task_number', 'like', 'ODDS-DUMMY-%')->pluck('id')->toArray();
+        if (!empty($dummyTaskIds)) {
+            \App\SubApps\Odds\Models\TaskReview::whereIn('task_id', $dummyTaskIds)->delete();
+            $conversations = \App\Models\Core\Conversation::where('context_type', \App\Models\Core\Conversation::CONTEXT_ODDS_TASK)
+                ->whereIn('context_id', $dummyTaskIds)
+                ->get();
+            foreach ($conversations as $convo) {
+                $convo->messages()->delete();
+                $convo->users()->detach();
+                $convo->delete();
+            }
+            Task::whereIn('id', $dummyTaskIds)->forceDelete();
+        }
 
         // Find users
         $client = User::where('email', 'client@test.com')->first();
@@ -24,13 +36,27 @@ class OddsDummyTasksSeeder extends Seeder
             return;
         }
 
-        // Find or create categories with various score weights
+        // Ensure Designer Test has a profile with ALL specializations
+        $allCategoryIds = \App\SubApps\Odds\Models\Category::pluck('id')->map(fn($id) => (string) $id)->toArray();
+        $designerProfile = \App\SubApps\Odds\Models\DesignerProfile::firstOrCreate(
+            ['user_id' => $designer->id],
+            ['status' => 'available', 'is_active' => true]
+        );
+        $designerProfile->update(['specializations' => $allCategoryIds]);
+
+        // Fetch 5 real categories from the database for dummy tasks
+        $realCategories = \App\SubApps\Odds\Models\Category::where('is_active', true)->inRandomOrder()->take(5)->get();
+        if ($realCategories->count() < 5) {
+             $this->command->error('Not enough active categories found. Run OddsCategorySeeder first.');
+             return;
+        }
+
         $categories = [
-            'story' => Category::firstOrCreate(['name' => 'Instagram Story'], ['score_weight' => 1.0, 'normal_revision_limit' => 2, 'sla_minutes' => 1, 'is_active' => true]),
-            'feed' => Category::firstOrCreate(['name' => 'Social Media Feed'], ['score_weight' => 1.5, 'normal_revision_limit' => 2, 'sla_minutes' => 2, 'is_active' => true]),
-            'banner' => Category::firstOrCreate(['name' => 'Marketplace Banner'], ['score_weight' => 2.0, 'normal_revision_limit' => 2, 'sla_minutes' => 3, 'is_active' => true]),
-            'hero' => Category::firstOrCreate(['name' => 'Website Hero Banner'], ['score_weight' => 2.5, 'normal_revision_limit' => 2, 'sla_minutes' => 4, 'is_active' => true]),
-            'kv' => Category::firstOrCreate(['name' => 'Product Launch Key Visual'], ['score_weight' => 3.0, 'normal_revision_limit' => 3, 'sla_minutes' => 5, 'is_active' => true]),
+            'story' => $realCategories[0],
+            'feed' => $realCategories[1],
+            'banner' => $realCategories[2],
+            'hero' => $realCategories[3],
+            'kv' => $realCategories[4],
         ];
 
         $taskCounter = 1;
@@ -69,6 +95,37 @@ class OddsDummyTasksSeeder extends Seeder
                     'created_at' => $updatedAt,
                 ]);
             }
+
+            if ($status === 'done') {
+                \App\SubApps\Odds\Models\TaskReview::create([
+                    'task_id' => $task->id,
+                    'reviewer_id' => $client->id,
+                    'review_type' => 'client',
+                    'decision' => 'approve',
+                    'notes' => 'Kerja bagus!',
+                    'rating' => rand(4, 5),
+                ]);
+            }
+
+            // Create Conversation and Dummy Messages
+            $conversation = \App\Models\Core\Conversation::create([
+                'context_type' => \App\Models\Core\Conversation::CONTEXT_ODDS_TASK,
+                'context_id' => $task->id,
+                'status' => \App\Models\Core\Conversation::STATUS_OPEN,
+            ]);
+            $conversation->users()->sync([$client->id, $designer->id]);
+
+            \App\Models\Core\Message::create([
+                'conversation_id' => $conversation->id,
+                'sender_id' => $client->id,
+                'body' => "Halo designer, berikut brief lengkap untuk task '{$purpose}'. Mohon segera diproses ya.",
+            ]);
+
+            \App\Models\Core\Message::create([
+                'conversation_id' => $conversation->id,
+                'sender_id' => $designer->id,
+                'body' => "Halo client, sudah saya terima. Saya akan proses secepatnya mengikuti antrean.",
+            ]);
 
             return $task;
         };
@@ -115,15 +172,15 @@ class OddsDummyTasksSeeder extends Seeder
         $createTask('Revisi Layout Catalog Cover Retail', 'revision', now()->addDays(1), 'hero');
 
 
-        // 5. OVERDUE TASKS (3 tasks, status = 'in_progress', deadline in the past)
-        $createTask('Design Banner Promo Gajian (Overdue)', 'in_progress', now()->subDays(2), 'banner');
+        // 5. OVERDUE TASKS (1 in_progress task, other 2 as queued with past deadlines)
+        $createTask('Design Banner Promo Gajian (Overdue)', 'queued', now()->subDays(2), 'banner');
         $createTask('KV Campaign Special Launch (Overdue)', 'in_progress', now()->subDays(3), 'kv', null, 'urgent');
-        $createTask('Revisi Story Instagram Brand A (Overdue)', 'in_progress', now()->subDays(1), 'story');
+        $createTask('Revisi Story Instagram Brand A (Overdue)', 'queued', now()->subDays(1), 'story');
 
 
-        // 6. REGULAR ACTIVE TASKS (5 tasks, status = 'in_progress', deadline in the future)
+        // 6. REGULAR ACTIVE TASKS (5 tasks, status = 'queued' to keep exactly 1 task in_progress per designer)
         for ($i = 1; $i <= 5; $i++) {
-            $createTask("Active Task In Progress #{$i}", 'in_progress', now()->addDays(2), 'feed');
+            $createTask("Active Task In Progress #{$i}", 'queued', now()->addDays(2), 'feed');
         }
 
         $this->command->info('Seeded extensive dummy ODDS tasks successfully to fully populate dashboard cards.');

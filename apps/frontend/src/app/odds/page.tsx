@@ -8,6 +8,7 @@ import { ScheduleConfig } from "@/features/odds/components/schedule-config";
 import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
 import { stripRichText } from "@/components/odds-rich-text-editor";
 import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-card";
+import { OddsTaskChat } from "@/components/odds-task-chat";
 import { useAuth } from "@/providers/auth-provider";
 import { useOddsTheme } from "./odds-theme-context";
 import {
@@ -43,6 +44,7 @@ import {
   reviewOddsExtraRevision,
   reviewOddsUrgentRevision,
   statusLabel,
+  startOddsTask,
   updateOddsCategory,
   updateOddsDesignerProfile,
   updateOddsSystemRule,
@@ -118,9 +120,11 @@ type ConfigSection =
   | "reports"
   | "rankings"
   | "all_tasks"
+  | "designer_today_tasks"
   | "designer_all_tasks"
   | "designer_review"
   | "designer_revisions"
+  | "designer_done"
   | "designer_report"
   | "designer_settings"
   | "client_all_requests"
@@ -176,6 +180,12 @@ const configSections: Array<{
     label: "Revisi",
     icon: "error",
     description: "Revisi dikembalikan.",
+  },
+  {
+    id: "designer_done",
+    label: "Selesai",
+    icon: "task_alt",
+    description: "Tugas selesai.",
   },
   {
     id: "designer_report",
@@ -418,6 +428,15 @@ function OddsPageContent() {
   const [saving, setSaving] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [activeChatTaskId, setActiveChatTaskId] = useState<number | null>(null);
+  const [timerNow, setTimerNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setTimerNow(Date.now());
+    }, 1000);
+    return () => window.clearInterval(interval);
+  }, []);
   const visibleConfigSections = useMemo(() => {
     return configSections.filter((section) => {
       if (["categories", "designers", "rules", "schedules"].includes(section.id)) return canShowConfigSections;
@@ -428,7 +447,7 @@ function OddsPageContent() {
       if (section.id === "skip_requests") return canReviewQueueSkip;
       if (section.id === "reports") return canViewReports;
       if (section.id === "rankings") return canViewRankings;
-      if (["designer_all_tasks", "designer_review", "designer_revisions", "designer_report", "designer_settings"].includes(section.id)) return canViewAssignedTasks && !canUseControl;
+      if (["designer_today_tasks", "designer_all_tasks", "designer_review", "designer_revisions", "designer_done", "designer_report", "designer_settings"].includes(section.id)) return canViewAssignedTasks && !canUseControl;
       if (["client_all_requests", "client_action_required", "client_in_progress", "client_archive"].includes(section.id)) return !canViewAssignedTasks && !canUseControl;
       return canViewAllTasks || canReviewSpv;
     });
@@ -1590,25 +1609,41 @@ function OddsPageContent() {
     return <LightAllTasksSection loading={loading} tasks={tasks} />;
   }
 
+  const sectionTitles: Record<string, string> = {
+    categories: "Kategori",
+    rules: "System Rules",
+    designers: "Profil Designer",
+    schedules: "Jadwal & Libur",
+    spv_review: "Review SPV",
+    client_review: "Review Client",
+    special_revisions: "Extra / Urgent",
+    cancel_requests: "Cancel",
+    skip_requests: "Skip Antrean",
+    reports: "Report",
+    rankings: "Ranking",
+    all_tasks: "Semua Tugas",
+    designer_today_tasks: "Tugas Hari Ini",
+    designer_all_tasks: "Semua Tugas",
+    designer_review: "Menunggu Review",
+    designer_revisions: "Revisi",
+    designer_done: "Selesai",
+    designer_report: "Laporan Kinerja",
+    designer_settings: "Pengaturan & Jadwal",
+    client_all_requests: "Semua Request",
+    client_action_required: "Perlu Review",
+    client_in_progress: "Sedang Diproses",
+    client_archive: "Arsip",
+    workspace: "Dashboard"
+  };
+
+  const pageTitle = sectionTitles[effectiveActiveSection] || (canShowConfigSections ? "Konfigurasi ODDS" : "Review ODDS");
+
   return (
     <div className="flex flex-col gap-6 p-4">
-      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between border-b border-cu-border pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            {canShowConfigSections ? "Konfigurasi ODDS" : "Review ODDS"}
-          </h1>
-          <p className="mt-1 text-xs text-slate-500 font-medium">Role aktif: {user?.roles.join(", ") || "-"}</p>
-        </div>
-        <div>
-          <button
-            type="button"
-            onClick={() => void loadConfig()}
-            className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#d4d4d8] bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
-          >
-            <MaterialIcon name="refresh" size="sm" />
-            Refresh
-          </button>
-        </div>
+      <header>
+        <h1 className={`text-4xl font-medium leading-none tracking-[-0.72px] ${theme === "dark" ? "text-[#f1f1f1]" : theme === "retro" ? "text-[#24252b]" : "text-[#181818]"}`}>
+          {pageTitle}
+        </h1>
       </header>
 
       {(error || notice) && (
@@ -1622,18 +1657,6 @@ function OddsPageContent() {
       )}
 
       <div className="min-w-0">
-          <div className="mb-4 rounded-lg border border-cu-border bg-white px-4 py-3">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">Area aktif</p>
-                <h2 className="mt-1 text-lg font-semibold text-cu-ink">{activeSectionMeta?.label ?? "ODDS"}</h2>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-cu-muted">
-                {activeSectionMeta && <MaterialIcon name={activeSectionMeta.icon} size="sm" className="text-cu-info" />}
-                <span>{activeSectionMeta?.description ?? "Monitoring ODDS."}</span>
-              </div>
-            </div>
-          </div>
       {effectiveActiveSection === "categories" && (
       <section className="grid gap-6 xl:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
         <ConfigPanel title={categoryForm.id ? "Edit Kategori" : "Tambah Kategori"} icon="category">
@@ -2103,22 +2126,317 @@ function OddsPageContent() {
         </ConfigPanel>
       )}
 
-      {effectiveActiveSection === "designer_all_tasks" && (
-        <ConfigPanel title="Semua Tugas" icon="assignment">
-          <DataTable
-            loading={loading}
-            empty="Belum ada riwayat tugas."
-            headers={["No", "Task", "Kategori", "Deadline", "Status"]}
-            rows={tasks.filter(t => String(t.assigned_designer?.id ?? t.assignedDesigner?.id) === String(user?.id)).map((task) => [
-              task.task_number ?? "-",
-              task.design_purpose,
-              task.category_snapshot?.name ?? "-",
-              formatOddsDate(task.deadline),
-              <StatusBadge key={`badge-${task.id}`} status={task.status} />
-            ])}
-          />
-        </ConfigPanel>
-      )}
+      {(effectiveActiveSection === "designer_all_tasks" || effectiveActiveSection === "designer_today_tasks") && (() => {
+        const isTodayOnly = effectiveActiveSection === "designer_today_tasks";
+        const accentColor = theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : "#00a4ff";
+        const mutedClass = theme === "dark" ? "text-[#a7ada8]" : theme === "retro" ? "text-[#687065]" : "text-[#6d7880]";
+        const headingClass = theme === "dark" ? "text-[#f1f1f1]" : "text-[#181818]";
+        const subBgClass = theme === "dark" ? "bg-[#0e0e0e]" : theme === "retro" ? "border border-[#24252b] bg-[#dfe2d3]" : "bg-[#f3faff]";
+        
+        let sortedTasks = tasks
+          .filter(t => String(t.assigned_designer?.id ?? t.assignedDesigner?.id) === String(user?.id) && t.status !== "done")
+          .sort((a, b) => {
+            // Level 1: in_progress
+            if (a.status === "in_progress" && b.status !== "in_progress") return -1;
+            if (b.status === "in_progress" && a.status !== "in_progress") return 1;
+
+            // Level 2: revision
+            if (a.status === "revision" && b.status !== "revision") return -1;
+            if (b.status === "revision" && a.status !== "revision") return 1;
+
+            // Level 3: others, sort by deadline (ascending)
+            const timeA = new Date(a.deadline).getTime();
+            const timeB = new Date(b.deadline).getTime();
+            if (timeA !== timeB) return timeA - timeB;
+
+            // Sort by priority score (descending)
+            return (Number(b.priority_score) || 0) - (Number(a.priority_score) || 0);
+          });
+          
+        if (isTodayOnly) {
+          const dailyCapacityMinutes = 480; // Standard daily capacity
+          let accumulatedSla = 0;
+          sortedTasks = sortedTasks.filter(t => {
+            if (t.status === "in_progress" || t.status === "revision") return true;
+            const sla = t.category_snapshot?.sla_minutes || 0;
+            if (accumulatedSla + sla <= dailyCapacityMinutes) {
+              accumulatedSla += sla;
+              return true;
+            }
+            return false;
+          });
+        }
+        
+        const myTasks = sortedTasks;
+        
+        // Find if there is an in-progress task for the active designer
+        const activeInProgressTask = myTasks.find(t => t.status === "in_progress");
+        
+        // Calculate timer values
+        const activeTaskDuration = (() => {
+          if (!activeInProgressTask) return 0;
+          const timeLogs = activeInProgressTask.time_logs ?? activeInProgressTask.timeLogs ?? [];
+          const designerTimeLogs = timeLogs.filter((log) => ["work", "revision"].includes(log.log_type));
+          
+          const durationSeconds = (log: typeof designerTimeLogs[0], nowMs = Date.now()) => {
+            if (log.stopped_at) return log.duration_seconds;
+            const started = new Date(log.started_at).getTime();
+            if (Number.isNaN(started)) return log.duration_seconds;
+            return Math.max(0, Math.floor((nowMs - started) / 1000));
+          };
+
+          const totalSeconds = designerTimeLogs.reduce((total, log) => total + durationSeconds(log, timerNow), 0);
+          return totalSeconds;
+        })();
+
+        const formatTimer = (totalSeconds: number) => {
+          const hours = Math.floor(totalSeconds / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+          return [
+            String(hours).padStart(2, "0"),
+            String(minutes).padStart(2, "0"),
+            String(seconds).padStart(2, "0"),
+          ].join(":");
+        };
+
+        const formatSubmitTime = (iso?: string) => {
+          if (!iso) return "-";
+          return new Intl.DateTimeFormat("id-ID", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date(iso)) + " WIB";
+        };
+
+        const handleStartTask = async (taskId: number) => {
+          setError(null);
+          setNotice(null);
+          try {
+            await startOddsTask(taskId);
+            setNotice("Tugas berhasil dimulai.");
+            await loadConfig();
+          } catch (err) {
+            setError(oddsError(err));
+          }
+        };
+
+        // Determine which task is currently selected for the chat box
+        const selectedChatTaskId = activeChatTaskId ?? myTasks[0]?.id ?? null;
+        const selectedChatTask = myTasks.find(t => t.id === selectedChatTaskId);
+
+        return (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            {/* Left Column: All Tasks Table (8 cols) */}
+            <div className="lg:col-span-8 flex flex-col gap-4">
+              <ConfigPanel title={isTodayOnly ? "Tugas Hari Ini" : "Semua Tugas"} icon={isTodayOnly ? "today" : "assignment"}>
+                <DataTable
+                  loading={loading}
+                  empty="Belum ada riwayat tugas."
+                  headers={["Prioritas", "Hari, Tanggal, Jam Submit Task", "Nama Perequest dan Divisi", "Judul tugas", "link detail brief", "Deadline", "status", "Aksi"]}
+                  rows={myTasks.map((task) => {
+                    const priorityWord = (() => {
+                      if (task.important_matrix === "urgent") return "Urgent";
+                      if (task.important_matrix === "high") return "Tinggi";
+                      return "Normal";
+                    })();
+                    return [
+                      priorityWord,
+                      formatSubmitTime(task.created_at),
+                    `${task.requester?.name ?? "Perequest"} (${(task.requester?.roles ?? []).join(", ") || "Client"})`,
+                    task.design_purpose,
+                    <Link key={`brief-link-${task.id}`} href={`/odds/detail?id=${task.id}`} className="text-xs hover:underline font-semibold" style={{ color: accentColor }}>
+                      Detail Brief
+                    </Link>,
+                    formatOddsDate(task.deadline),
+                    <StatusBadge key={`badge-${task.id}`} status={task.status} />,
+                    <div key={`actions-${task.id}`} className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        title="Chat"
+                        onClick={() => setActiveChatTaskId(task.id)}
+                        className={`flex size-8 items-center justify-center rounded-lg border transition ${
+                          selectedChatTaskId === task.id
+                            ? "text-white"
+                            : "border-cu-border text-cu-ink hover:bg-cu-panel-soft"
+                        }`}
+                        style={{
+                          backgroundColor: selectedChatTaskId === task.id ? accentColor : undefined,
+                          borderColor: selectedChatTaskId === task.id ? accentColor : undefined,
+                        }}
+                      >
+                        <MaterialIcon name="chat" size="auto" className="text-sm" />
+                      </button>
+                      {["queued", "ready_to_start"].includes(task.status) && (
+                        <button
+                          type="button"
+                          title={activeInProgressTask ? "Selesaikan tugas aktif terlebih dahulu untuk memulai tugas ini" : "Mulai"}
+                          disabled={Boolean(activeInProgressTask)}
+                          onClick={() => void handleStartTask(task.id)}
+                          className="flex size-8 items-center justify-center rounded-lg border border-cu-border text-cu-ink hover:bg-cu-panel-soft transition disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <MaterialIcon name="play_circle" size="auto" className="text-sm" style={{ color: activeInProgressTask ? "#9ca3af" : accentColor }} />
+                        </button>
+                      )}
+                    </div>
+                  ];
+                })}
+                />
+              </ConfigPanel>
+            </div>
+
+            {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+            <div className="lg:col-span-4 flex flex-col gap-6">
+              {/* Top: Message Box */}
+              <ConfigPanel title="Message Box" icon="info">
+                <div className="flex flex-col gap-4 p-4 text-xs">
+                  {/* Aturan Penyortiran */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 border-b border-cu-border pb-1.5">
+                      <span className="flex size-5 items-center justify-center rounded bg-emerald-500/10 text-emerald-500">
+                        <MaterialIcon name="sort" size="auto" className="text-xs" />
+                      </span>
+                      <h3 className="font-bold text-cu-ink">Aturan Penyortiran Antrean</h3>
+                    </div>
+                    <ul className="space-y-2 text-cu-muted">
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold text-emerald-500">1.</span>
+                        <span>Tugas dengan status <code className="rounded bg-cu-panel-soft px-1 py-0.5 text-xs text-cu-ink font-semibold">in_progress</code> wajib di urutan pertama.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold text-emerald-500">2.</span>
+                        <span>Tugas dengan status <code className="rounded bg-cu-panel-soft px-1 py-0.5 text-xs text-cu-ink font-semibold">revision</code> wajib di urutan kedua.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold text-emerald-500">3.</span>
+                        <span>Tugas lainnya diurutkan berdasarkan <span className="text-cu-ink font-medium">Deadline terdekat</span>, lalu <span className="text-cu-ink font-medium">Prioritas tertinggi</span>.</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Pertanyaan Kasus */}
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-center gap-2 border-b border-cu-border pb-1.5">
+                      <span className="flex size-5 items-center justify-center rounded bg-amber-500/10 text-amber-500">
+                        <MaterialIcon name="help_outline" size="auto" className="text-xs" />
+                      </span>
+                      <h3 className="font-bold text-cu-ink">Pertanyaan Kasus Terkait</h3>
+                    </div>
+                    <ul className="space-y-2 text-cu-muted list-decimal pl-4">
+                      <li>Apakah tugas revisi ber-deadline jauh tetap wajib di urutan ke-2 dibanding tugas biasa ber-deadline dekat?</li>
+                      <li>Jika tugas baru berkategori <strong>Urgent</strong> masuk, apakah posisinya tetap di bawah tugas revisi?</li>
+                    </ul>
+                  </div>
+                </div>
+              </ConfigPanel>
+
+              {/* Middle: Diskusi Tugas */}
+              <ConfigPanel title="Diskusi Tugas" icon="forum">
+                {selectedChatTask ? (
+                  <div className="flex flex-col min-h-[300px]">
+                    <div className="px-3 py-2 border-b border-cu-border bg-cu-panel-soft flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-semibold text-cu-ink">{selectedChatTask.task_number}</p>
+                        <p className="text-[10px] text-cu-muted truncate max-w-[200px]">{selectedChatTask.design_purpose}</p>
+                      </div>
+                      <Link href={`/odds/detail?id=${selectedChatTask.id}`} className="text-xs hover:underline flex items-center gap-0.5" style={{ color: accentColor }}>
+                        Detail <MaterialIcon name="chevron_right" size="xs" />
+                      </Link>
+                    </div>
+
+                    <div className="flex-1 min-h-0 overflow-y-auto">
+                      <OddsTaskChat
+                        taskId={selectedChatTask.id}
+                        userId={user?.id}
+                        taskStatus={selectedChatTask.status}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex h-[200px] flex-col items-center justify-center text-center p-4">
+                    <MaterialIcon name="forum" size="auto" className="text-3xl text-cu-muted mb-2" />
+                    <p className="text-sm text-cu-muted">Pilih tombol chat di tabel untuk melihat diskusi tugas.</p>
+                  </div>
+                )}
+              </ConfigPanel>
+
+              {/* Bottom: Timer */}
+              <ConfigPanel title="Timer Pekerjaan" icon="timer">
+                {activeInProgressTask ? (
+                  <div className="flex flex-col gap-3 p-4 text-center">
+                    <div className="inline-flex size-12 items-center justify-center rounded-full bg-cu-info/10 text-cu-info mx-auto">
+                      <MaterialIcon name="hourglass_empty" size="auto" className="text-2xl animate-spin" style={{ animationDuration: '3s', color: accentColor }} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-cu-ink">{activeInProgressTask.task_number}</p>
+                      <p className="text-xs text-cu-muted truncate max-w-xs mx-auto mt-0.5">{activeInProgressTask.design_purpose}</p>
+                    </div>
+                    <div className="text-3xl font-mono font-bold tracking-wider text-cu-ink bg-cu-panel-soft py-3 px-4 rounded-xl border border-cu-border mt-1">
+                      {formatTimer(activeTaskDuration)}
+                    </div>
+                    <p className="text-[10px] text-cu-muted">Timer berjalan otomatis sejak tugas dimulai.</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-center p-6">
+                    <MaterialIcon name="timer" size="auto" className="text-3xl text-cu-muted mb-2" />
+                    <p className="text-sm text-cu-muted">Tidak ada tugas yang sedang berjalan.</p>
+                    <p className="text-xs text-cu-muted mt-1">Klik tombol start (play) di tabel tugas untuk memulai pekerjaan.</p>
+                  </div>
+                )}
+              </ConfigPanel>
+            </div>
+          </div>
+        );
+      })()}
+
+      {effectiveActiveSection === "designer_done" && (() => {
+        const accentColor = theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : "#00a4ff";
+        
+        const formatSubmitTime = (iso?: string) => {
+          if (!iso) return "-";
+          return new Intl.DateTimeFormat("id-ID", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date(iso)) + " WIB";
+        };
+
+        const doneTasks = tasks.filter(t => String(t.assigned_designer?.id ?? t.assignedDesigner?.id) === String(user?.id) && t.status === "done");
+
+        return (
+          <ConfigPanel title="Selesai" icon="task_alt">
+            <DataTable
+              loading={loading}
+              empty="Belum ada tugas yang selesai."
+              headers={["Prioritas", "Hari, Tanggal, Jam Submit Task", "Nama Perequest dan Divisi", "Judul tugas", "link detail brief", "Deadline", "Rating"]}
+              rows={doneTasks.map((task) => {
+                const priorityWord = (() => {
+                  if (task.important_matrix === "urgent") return "Urgent";
+                  if (task.important_matrix === "high") return "Tinggi";
+                  return "Normal";
+                })();
+                return [
+                  priorityWord,
+                  formatSubmitTime(task.created_at),
+                  `${task.requester?.name ?? "Perequest"} (${(task.requester?.roles ?? []).join(", ") || "Client"})`,
+                  task.design_purpose,
+                  <Link key={`brief-link-${task.id}`} href={`/odds/detail?id=${task.id}`} className="text-xs hover:underline font-semibold" style={{ color: accentColor }}>
+                    Detail Brief
+                  </Link>,
+                  formatOddsDate(task.deadline),
+                  task.rating ? `${task.rating} ⭐` : "-"
+                ];
+              })}
+            />
+          </ConfigPanel>
+        );
+      })()}
 
       {effectiveActiveSection === "designer_review" && (
         <ConfigPanel title="Menunggu Review" icon="pending_actions">

@@ -70,6 +70,20 @@ class Task extends OddsModel
         'cancelled_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'rating',
+    ];
+
+    public function getRatingAttribute()
+    {
+        if ($this->relationLoaded('reviews')) {
+            $review = $this->reviews->where('review_type', 'client')->whereNotNull('rating')->last();
+            return $review ? $review->rating : null;
+        }
+
+        return $this->reviews()->where('review_type', 'client')->whereNotNull('rating')->latest()->value('rating');
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');

@@ -89,6 +89,10 @@ const documents = [
     source: "docs/08_operations/Emergency_Maintenance.md",
     target: "public/docs/core/emergency-maintenance.md",
   },
+  {
+    source: "docs/07_design_system/kv_retail_theme_tokens.md",
+    target: "public/docs/core/kv-retail-theme-tokens.md",
+  },
 ];
 
 function stripFrontmatter(content) {

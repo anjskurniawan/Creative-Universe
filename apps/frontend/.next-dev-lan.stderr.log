@@ -5381,3 +5381,872 @@ Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
   237 | }
   238 |
   239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     </div>
+ 2243 |                   ])}
+      :                    ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     </div>
+ 2243 |                   ])}
+      :                    ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     </div>
+ 2243 |                   ])}
+      :                    ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     </div>
+ 2243 |                   ])}
+      :                    ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     </div>
+ 2243 |                   ])}
+      :                    ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     </div>
+ 2243 |                   ])}
+      :                    ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     </div>
+ 2243 |                   ])}
+      :                    ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     </div>
+ 2243 |                   ])}
+      :                    ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] ./src/app/odds/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] ./src/app/odds/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ ./src/app/odds/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                   ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2243:1]
+ 2240 |                         </button>
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+      :                     ^
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Unexpected token. Did you mean `{'>'}` or `&gt;`?
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2244:1]
+ 2241 |                       )}
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      :                  ^
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      `----
+  x Expression expected
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :             ^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+  x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2246:1]
+ 2243 |                   })}
+ 2244 |                 />
+ 2245 |               </ConfigPanel>
+ 2246 |             </div>
+      :              ^^^^^
+ 2247 | 
+ 2248 |             {/* Right Column: Message Box & Timer stacked vertically (4 cols) */}
+ 2249 |             <div className="lg:col-span-4 flex flex-col gap-6">
+      `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] ./src/app/odds/page.tsx
+Error:   x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2241:1]
+ 2238 |                         >
+ 2239 |                           <MaterialIcon name="play_circle" size="auto" className="text-sm" style={{ color: accentColor }} />
+ 2240 |                         </button>
+ 2241 |                       </div>
+      :                        ^^^^^
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] ./src/app/odds/page.tsx
+Error:   x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2241:1]
+ 2238 |                         >
+ 2239 |                           <MaterialIcon name="play_circle" size="auto" className="text-sm" style={{ color: accentColor }} />
+ 2240 |                         </button>
+ 2241 |                       </div>
+      :                        ^^^^^
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Error:   x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2241:1]
+ 2238 |                         >
+ 2239 |                           <MaterialIcon name="play_circle" size="auto" className="text-sm" style={{ color: accentColor }} />
+ 2240 |                         </button>
+ 2241 |                       </div>
+      :                        ^^^^^
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2241:1]
+ 2238 |                         >
+ 2239 |                           <MaterialIcon name="play_circle" size="auto" className="text-sm" style={{ color: accentColor }} />
+ 2240 |                         </button>
+ 2241 |                       </div>
+      :                        ^^^^^
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2241:1]
+ 2238 |                         >
+ 2239 |                           <MaterialIcon name="play_circle" size="auto" className="text-sm" style={{ color: accentColor }} />
+ 2240 |                         </button>
+ 2241 |                       </div>
+      :                        ^^^^^
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Unterminated regexp literal
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2241:1]
+ 2238 |                         >
+ 2239 |                           <MaterialIcon name="play_circle" size="auto" className="text-sm" style={{ color: accentColor }} />
+ 2240 |                         </button>
+ 2241 |                       </div>
+      :                        ^^^^^
+ 2242 |                     ];
+ 2243 |                   })}
+ 2244 |                 />
+      `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:439:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
