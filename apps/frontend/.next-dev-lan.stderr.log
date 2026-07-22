@@ -8731,3 +8731,27 @@ Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
   237 | }
   238 |
   239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)

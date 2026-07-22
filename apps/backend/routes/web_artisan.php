@@ -98,6 +98,18 @@ Route::middleware(['artisan-token', 'throttle:5,1'])->prefix('_cmd')->group(func
         return response()->json(['output' => $output]);
     });
 
+    Route::post('/seed-test-accounts', function () {
+        Artisan::call('db:seed', ['--class' => 'LocalTestAccountsSeeder', '--force' => true]);
+        $output = Artisan::output();
+
+        activity()
+            ->tap(fn ($act) => $act->log_name = 'web-artisan')
+            ->withProperties(['ip' => request()->ip(), 'command' => 'db:seed --class=LocalTestAccountsSeeder', 'output' => $output])
+            ->log('Eksekusi remote command: db:seed --class=LocalTestAccountsSeeder');
+
+        return response()->json(['output' => $output]);
+    });
+
     Route::post('/seed', function () {
         if (app()->environment('production')) {
             activity()
