@@ -6250,3 +6250,2484 @@ Caused by:
   237 | }
   238 |
   239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async MessagesContent.useCallback[fetchContacts] (src\app\(core)\messages\page.tsx:157:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\(core)
+[browser] ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async MessagesContent.useCallback[fetchConversations] (src\app\(core)\messages\page.tsx:140:33)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\(core)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\features\kv-retail\components\task-page.tsx:387:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\components\task-page.tsx:402:17)
+[browser] Gagal memuat tugas KV Retail: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async useKvRetailTasks.useCallback[refresh] (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:22:20)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\features\kv-retail\hooks\use-kv-retail-tasks.ts:88:45)
+⚠ Blocked cross-origin request to Next.js dev resource /_next/webpack-hmr from "192.168.1.41".
+Cross-origin access to Next.js dev resources is blocked by default for safety.
+
+To allow this host in development, add it to "allowedDevOrigins" in next.config.js and restart the dev server:
+
+// next.config.js
+module.exports = {
+  allowedDevOrigins: ['192.168.1.41'],
+}
+
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+⚠ Specified "rewrites" will not automatically work with "output: export". See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
+[browser] Uncaught Error: Internal Next.js error: Router action dispatched before initialization.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Uncaught Error: Internal Next.js error: Router action dispatched before initialization.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+⚠ Specified "rewrites" will not automatically work with "output: export". See more info here: https://nextjs.org/docs/messages/export-no-custom-routes
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:441:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:445:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:445:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:445:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:445:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:446:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Gagal memuat pengaturan: ApiError: Pusher\Pusher::__construct(): Argument #1 ($auth_key) must be of type string, null given, called in C:\laragon\www\creativeuniverse\apps\backend\vendor\laravel\framework\src\Illuminate\Broadcasting\BroadcastManager.php on line 341
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\app\kv-retail\option\page.tsx:72:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\option\page.tsx:85:17)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\app\kv-retail\option\page.tsx:72:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\option\page.tsx:85:17)
+[browser] Gagal memuat pengaturan: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async loadSettings (src\app\kv-retail\option\page.tsx:72:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\option\page.tsx:85:17)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:446:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:446:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:446:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:446:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:446:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:446:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:446:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+⨯ ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] Error loading counts for sidebar: ApiError: Pusher\Pusher::__construct(): Argument #2 ($secret) must be of type string, null given, called in C:\laragon\www\creativeuniverse\apps\backend\vendor\laravel\framework\src\Illuminate\Broadcasting\BroadcastManager.php on line 341
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7871:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (7934:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Pusher\Pusher::__construct(): Argument #1 ($auth_key) must be of type string, null given, called in C:\laragon\www\creativeuniverse\apps\backend\vendor\laravel\framework\src\Illuminate\Broadcasting\BroadcastManager.php on line 341
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:448:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] ⨯ unhandledRejection: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async insertImages (src\components\odds-rich-text-editor.tsx:132:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk...
+[browser] ⨯ unhandledRejection: ValidationError: Validasi gagal
+    at handleResponse (src\core\api\client.ts:230:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async handleSpvResultReview (src\app\odds\page.tsx:2713:7)
+  228 |       ? normalizeValidationErrors(payload.errors)
+  229 |       : {};
+> 230 |     throw new ValidationError(errors, 422, payload);
+      |           ^
+  231 |   }
+  232 |   if (response.status === 503 && isRecord(payload) && payload.code === "EMERGENCY_MAINTEN...
+  233 |     if (typeof window !== "undefined") window.dispatchEvent(new Event(EMERGENCY_MAINTENAN...
+[browser] ⨯ unhandledRejection: ValidationError: Validasi gagal
+    at handleResponse (src\core\api\client.ts:230:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async handleSpvResultReview (src\app\odds\page.tsx:2713:7)
+  228 |       ? normalizeValidationErrors(payload.errors)
+  229 |       : {};
+> 230 |     throw new ValidationError(errors, 422, payload);
+      |           ^
+  231 |   }
+  232 |   if (response.status === 503 && isRecord(payload) && payload.code === "EMERGENCY_MAINTEN...
+  233 |     if (typeof window !== "undefined") window.dispatchEvent(new Event(EMERGENCY_MAINTENAN...
+⨯ SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>) {
+  page: '/odds'
+}
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8290:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8290:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8290:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8290:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8290:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8290:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8290:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8290:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] Uncaught ModuleParseError: Module parse failed: Identifier 'DARK_STATUS_MAP' has already been declared (8356:6)
+File was processed with these loaders:
+ * ./node_modules/next/dist/compiled/@next/react-refresh-utils/dist/loader.js
+ * ./node_modules/next/dist/build/webpack/loaders/next-flight-client-module-loader.js
+ * ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+You may need an additional loader to handle the result of these loaders.
+| // Glassmorphism, green accent (#B0FF5E), dense rows
+| // ─────────────────────────────────────────────
+> const DARK_STATUS_MAP = {
+|     pending: {
+|         label: "Pending",
+    at <unknown> (File was processed with these loaders:)
+    at <unknown> (File was processed with these loaders:)
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\laragon\www\creativeuniverse\apps\frontend\.next\dev\cache\webpack\client-development-fallback\0.pack.gz'
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Pusher\Pusher::__construct(): Argument #1 ($auth_key) must be of type string, null given, called in C:\laragon\www\creativeuniverse\apps\backend\vendor\laravel\framework\src\Illuminate\Broadcasting\BroadcastManager.php on line 341
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got '{'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:3478:1]
+ 3475 |                     </div>
+ 3476 |                   )}
+ 3477 |                   </div>
+ 3478 |                   {canClientCheckOutput && (
+      :                   ^
+ 3479 |                     <div className="mt-3 grid gap-3 rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+ 3480 |                       {clientRevisionOpen && (
+ 3481 |                         <div className="rounded-lg border border-cu-border bg-white p-3">
+      `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Image with src "/images/design-system/primary-action-arrow.svg" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async MessagesContent.useCallback[fetchMessages] (src\app\(core)\messages\page.tsx:167:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\(core)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)

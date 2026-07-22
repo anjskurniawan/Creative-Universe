@@ -21,7 +21,11 @@ return [
 
     'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000,https://creative.doran.id')),
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https?://192\.168\.\d+\.\d+(:\d+)?$#',
+        '#^https?://10\.\d+\.\d+\.\d+(:\d+)?$#',
+        '#^https?://172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+(:\d+)?$#',
+    ],
 
     'allowed_headers' => ['*'],
 

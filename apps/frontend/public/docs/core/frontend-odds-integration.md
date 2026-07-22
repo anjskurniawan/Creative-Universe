@@ -46,13 +46,56 @@ Backend menjadi sumber kebenaran dan menolak:
 - Mutation memakai adapter ODDS dan memuat ulang task dari backend setelah sukses.
 - Aksi deadline memakai tanggal baru dan catatan opsional, lalu menampilkan deadline hasil backend.
 
-## 6. Quality gate
+## 6. Dashboard Designer
+
+Dashboard Designer berada pada route `/odds` ketika user memiliki permission
+`view-assigned-odds-tasks` dan tidak sedang memakai mode control/administrasi.
+Title halaman memakai komponen global `HeaderTitle` dengan alignment kiri.
+
+Main content Dashboard Designer terdiri dari card berikut:
+
+| Card | Sumber data | Fungsi UI |
+|---|---|---|
+| Total Tugas Hari Ini | `tasks` dengan status `in_progress` | Menampilkan jumlah task aktif hari ini dan indikator perubahan performa. |
+| Total Dalam Antrian | `tasks` dengan status `queued` | Menampilkan jumlah task yang masih dalam antrean. |
+| Tugas Selesai | `tasks` dengan status `done` | Menampilkan jumlah task selesai pada periode berjalan. |
+| Antrian Revisi | `tasks` dengan status `revision` | Menampilkan jumlah task revisi yang menunggu pengerjaan. |
+| Request Terbaru | 5 task terbaru berdasarkan `created_at` | Menampilkan daftar request terbaru dalam panel scroll internal. |
+| Calendar | tanggal lokal browser | Menampilkan hari, tanggal, bulan, dan tahun saat ini sebagai kartu tanggal. |
+| Need Review Brief | `tasks` dengan status `spv_review` atau `client_review` | Menampilkan task yang menunggu review brief dalam panel scroll internal. |
+| Notification | task aktif, maksimal 8 item | Menampilkan ringkasan update status task aktif. |
+| Message | task aktif, maksimal 8 item | Menampilkan pintasan diskusi brief/task. |
+
+Card `Score Kamu`, `Grafik Performa`, dan `Queue Jobs` tidak dirender pada
+Dashboard Designer saat ini. Kode kalkulasi skor/performa boleh tetap ada
+sementara untuk memudahkan pengembalian UI, tetapi card tersebut tidak dihitung
+sebagai bagian dari main content aktif.
+
+### 6.1 ODDS Task Card
+
+Task card ODDS adalah komponen list task yang dipakai untuk menampilkan satu
+task dalam bentuk card horizontal. Dokumentasi visualnya terbaca di route
+`/docs?section=components/odds-task-card`.
+
+Task card disiapkan dalam tiga view:
+
+| View | Target pengguna | Catatan UI |
+|---|---|---|
+| Admin | Root, Admin, SPV, Manajer | Menonjolkan pengawasan status, overdue, dan akses operasional. |
+| Client | Requester/client | Menonjolkan progress, detail brief, dan action review dari sisi requester. |
+| Designer | Assigned designer | Menonjolkan antrean kerja, detail brief, chat task, start task, deadline, dan status pengerjaan. |
+
+View Designer saat ini digunakan pada menu Dashboard Designer `Semua Tugas`.
+View Admin dan Client disiapkan sebagai kontrak dokumentasi/library agar
+implementasi berikutnya tetap memakai anatomy card yang sama.
+
+## 7. Quality gate
 
 - Test ODDS mencakup pemisahan permission skip, payload list, larangan review ulang, dan deadline extension.
 - TypeScript dan ESLint file ODDS wajib lulus.
 - Production build dan regression backend penuh wajib lulus.
 - Dokumen ini disinkronkan ke `/docs` sebagai **ODDS Integration**.
 
-## 7. Batas F17
+## 8. Batas F17
 
 F17 menyelesaikan workflow ODDS. Konsolidasi halaman Messages, inbox, dan seluruh adapter Core Chat dilanjutkan pada F18 agar ownership Core tidak tercampur kembali ke Sub-App ODDS.

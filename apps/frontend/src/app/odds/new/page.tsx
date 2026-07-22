@@ -442,7 +442,7 @@ export default function NewOddsTaskPage() {
           )}
             </section>
 
-            <aside className="game-stage-panel hidden h-full min-h-0 flex-col gap-3 overflow-y-auto font-mono [scrollbar-color:#24252b_#c9ccc0] lg:flex">
+            <aside className="game-stage-panel odds-scroll-hidden hidden h-full min-h-0 flex-col gap-3 overflow-y-auto font-mono lg:flex">
               <RetroHudRoute steps={requestSteps} currentStep={currentStep} syncPercent={syncPercent} onSelect={setCurrentStep} />
               <div className="rounded-lg border-2 border-[#24252b] bg-[#eceee6] p-2 shadow-[inset_0_0_0_2px_#c9ccc0]">
                 <p className="mb-2 truncate text-center text-[9px] font-black uppercase tracking-[0.14em]" title={playerName}>{playerName}</p>
@@ -1218,8 +1218,8 @@ function MissionBriefStage({
     { label: "+3 Days", value: dateFromNow(3) },
   ];
   const operatorMessage = [
-    missionNamed ? "MISSION NAME SAVED. SELECT A THREAT LEVEL." : "ENTER A MISSION NAME TO BEGIN.",
-    `${form.important_matrix.toUpperCase()} THREAT LEVEL SELECTED.`,
+    missionNamed ? "MISSION NAME SAVED. CHECK MATRIX LEVEL." : "ENTER A MISSION NAME TO BEGIN.",
+    `${(form.important_matrix || "Q4").toUpperCase()} MATRIX LEVEL ASSIGNED.`,
     form.deadline ? "TARGET DATE LOCKED. KEEP MOVING." : "WE WILL SET THE BEST TIME AUTOMATICALLY.",
     briefReady ? "TRANSMISSION RECEIVED. OPEN THE MISSION SCROLL." : "WRITE A CLEAR BRIEF FOR THE CREATIVE.",
   ][missionStep - 1];
@@ -1230,7 +1230,7 @@ function MissionBriefStage({
       <header className="relative mb-2 flex shrink-0 items-center justify-between gap-2 border-b-2 border-[#24252b] bg-[#24252b] px-3 py-2 text-[#dfe2d3] sm:mb-3 sm:items-end sm:gap-3 sm:px-4 sm:py-3">
         <div className="min-w-0">
           <span className="hidden text-[10px] font-black uppercase tracking-[0.2em] text-[#f2b8f6] sm:block">Mission 0{missionStep}/04</span>
-          <h2 className="whitespace-nowrap text-xs font-black uppercase tracking-[0.02em] text-[#dfe2d3] min-[360px]:text-sm min-[360px]:tracking-[0.04em] sm:mt-1 sm:text-3xl sm:tracking-[0.06em]">{["Name The Mission", "Choose Threat Level", "Set Mission Timer", "Transmit The Brief"][missionStep - 1]}</h2>
+          <h2 className="whitespace-nowrap text-xs font-black uppercase tracking-[0.02em] text-[#dfe2d3] min-[360px]:text-sm min-[360px]:tracking-[0.04em] sm:mt-1 sm:text-3xl sm:tracking-[0.06em]">{["Name The Mission", "Important Matrix", "Set Mission Timer", "Transmit The Brief"][missionStep - 1]}</h2>
         </div>
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           {[1, 2, 3, 4].map((step) => <span key={step} className={`size-2 border border-[#eceee6] transition-colors sm:h-3 sm:w-10 ${step <= missionStep ? "bg-[#ba0dcb]" : "bg-[#555850]"}`} />)}
@@ -1250,7 +1250,7 @@ function MissionBriefStage({
                 onChange={(event) => onUpdate("design_purpose", event.target.value)}
                 placeholder="ENTER MISSION NAME_"
                 rows={3}
-                className="min-h-24 w-full resize-none overflow-y-auto border-2 border-[#24252b] bg-[#eceee6] px-4 py-3 text-lg font-black uppercase leading-7 tracking-[0.04em] outline-none shadow-[inset_2px_2px_0_#c9ccc0] placeholder:text-[#969a90] focus:border-[#ba0dcb] focus:bg-white sm:hidden"
+                className="odds-scroll-hidden min-h-24 w-full resize-none overflow-y-auto border-2 border-[#24252b] bg-[#eceee6] px-4 py-3 text-lg font-black uppercase leading-7 tracking-[0.04em] outline-none shadow-[inset_2px_2px_0_#c9ccc0] placeholder:text-[#969a90] focus:border-[#ba0dcb] focus:bg-white sm:hidden"
               />
               <input
                 value={form.design_purpose}
@@ -1260,25 +1260,22 @@ function MissionBriefStage({
               />
             </label>
 
-            {[
-              { value: "normal", label: "Normal", icon: "shield", description: "Standard timeline. Processed in the regular queue for this category." },
-              { value: "high", label: "High", icon: "bolt", description: "Prioritized for important requests with a shorter turnaround." },
-              { value: "urgent", label: "Urgent", icon: "priority_high", description: "Critical and immediate. Requires priority review and approval." },
-            ].map((option) => {
-                  const { value, label, icon, description } = option;
-                  const selected = form.important_matrix === value;
-                  return (
-                    <button key={value} type="button" onClick={() => onUpdate("important_matrix", value)} className={`${missionStep === 2 ? "flex" : "hidden"} relative min-h-20 items-center gap-2 border-[3px] border-[#24252b] p-2 text-left transition hover:-translate-y-1 hover:shadow-[5px_5px_0_#24252b] sm:min-h-60 sm:flex-col sm:items-start sm:gap-0 sm:p-6 ${selected ? "bg-[#ba0dcb] text-white shadow-[3px_3px_0_#24252b]" : "bg-[#eceee6] text-[#24252b] shadow-[3px_3px_0_#777a72]"}`}>
-                      <span className={`flex size-8 shrink-0 items-center justify-center border-2 border-[#24252b] sm:size-14 ${selected ? "bg-white text-[#ba0dcb]" : "bg-[#dfe2d3]"}`}><MaterialIcon name={icon} size="lg" className="scale-50 sm:scale-100" /></span>
-                      <span className={`min-w-0 flex-1 sm:contents ${selected ? "pr-14" : "pr-1"}`}>
-                        <span className="block text-sm font-black uppercase tracking-[0.04em] sm:mt-6 sm:text-2xl">{label}</span>
-                        <span className={`mt-0.5 block line-clamp-2 text-[8px] font-bold leading-3 sm:mt-3 sm:line-clamp-none sm:text-xs sm:leading-5 ${selected ? "text-white/85" : "text-[#666961]"}`}>{description}</span>
-                      </span>
-                      {selected && <span className="absolute right-1.5 top-1.5 border border-white/70 px-1.5 py-0.5 text-[6px] font-black uppercase tracking-[0.06em] sm:hidden">Selected</span>}
-                      <span className="mt-auto hidden pt-5 text-[9px] font-black uppercase tracking-[0.14em] sm:block">{selected ? "Selected" : "Choose Level"}</span>
-                    </button>
-                  );
-                })}
+            {(() => {
+              const matrixKey = (form.important_matrix || "Q4").toUpperCase();
+              const quadranDesc = 
+                matrixKey === "Q1" ? "Quadran I: Mendesak & Penting (High Priority)" :
+                matrixKey === "Q2" ? "Quadran II: Penting (Strategic Task)" :
+                matrixKey === "Q3" ? "Quadran III: Mendesak (Daily Queue)" :
+                "Quadran IV: Normal (Standard Timeline)";
+
+              return (
+                <div className={`${missionStep === 2 ? "flex" : "hidden"} min-h-40 flex-col items-center justify-center gap-3 border-[3px] border-[#24252b] bg-[#ba0dcb] p-6 text-center text-white shadow-[3px_3px_0_#24252b]`}>
+                  <span className="text-3xl font-black tracking-widest">{matrixKey} THREAT MATRIX</span>
+                  <p className="text-xs font-bold text-white/90">{quadranDesc}</p>
+                  <p className="text-[10px] uppercase text-white/70">Matrix level is automatically locked by selected category</p>
+                </div>
+              );
+            })()}
           </div>
 
           <div className={`${missionStep === 4 ? "flex" : "hidden"} min-h-0 flex-1 flex-col border border-[#24252b] bg-[#24252b] sm:min-h-[360px]`}>
@@ -1508,6 +1505,24 @@ function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; o
     setImageUploading(false);
   };
 
+  const pastePlainTextAsParagraphs = (text: string) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    const escapeHtml = (input: string) => input.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character] ?? character);
+    const normalizedText = text
+      .replace(/\r\n?/g, "\n")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n[ \t]+/g, "\n");
+    const paragraphs = normalizedText
+      .split(/\n{2,}/)
+      .map((paragraph) => paragraph.trim()
+        ? `<p>${paragraph.split("\n").map(escapeHtml).join("<br>")}</p>`
+        : "<p><br></p>")
+      .join("<p><br></p>");
+    document.execCommand("insertHTML", false, paragraphs || "<p><br></p>");
+    onChange(editor.innerHTML);
+  };
+
   return (
     <div className="mission-terminal-editor flex min-h-0 flex-1 flex-col bg-[#eceee6]">
       <div className="relative flex shrink-0 items-center border-b-2 border-[#24252b] bg-[#c9ccc0] p-1 sm:justify-between sm:gap-2 sm:p-2">
@@ -1571,7 +1586,7 @@ function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; o
           onFocus={syncActiveTools}
           onPaste={(event) => {
             event.preventDefault();
-            document.execCommand("insertText", false, event.clipboardData.getData("text/plain"));
+            pastePlainTextAsParagraphs(event.clipboardData.getData("text/plain"));
           }}
           className="retro-scrollbar h-full min-h-0 overflow-y-auto bg-[#eceee6] p-3 text-sm font-normal leading-6 text-[#24252b] outline-none [caret-color:#ba0dcb] focus:bg-white sm:min-h-[300px] sm:p-5 sm:leading-7 [&_a]:font-black [&_a]:text-[#ba0dcb] [&_a]:underline [&_figcaption]:border-x-2 [&_figcaption]:border-b-2 [&_figcaption]:border-[#24252b] [&_figcaption]:bg-[#c9ccc0] [&_figcaption]:px-3 [&_figcaption]:py-1 [&_figcaption]:text-[9px] [&_figcaption]:font-black [&_figcaption]:uppercase [&_figure]:my-4 [&_figure]:inline-block [&_figure]:max-w-md [&_figure]:align-top [&_img]:max-h-64 [&_img]:w-auto [&_img]:border-2 [&_img]:border-[#24252b] [&_img]:object-contain [&_li]:ml-6 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc"
         />

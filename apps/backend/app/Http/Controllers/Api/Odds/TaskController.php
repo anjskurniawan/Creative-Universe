@@ -44,7 +44,7 @@ class TaskController extends BaseApiController
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'revisions', 'skipRequests', 'cancelRequests', 'reviews']);
+        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'results.assetLinks', 'revisions', 'skipRequests', 'cancelRequests', 'reviews']);
 
         if (! $user->can('view-all-odds-tasks')) {
             $query->where(function ($inner) use ($user) {
@@ -70,12 +70,29 @@ class TaskController extends BaseApiController
 
     public function uploadAttachment(Request $request, FileStorageService $files): JsonResponse
     {
+        abort_unless(
+            $request->user()->can('create-odds-tasks') || $request->user()->can('submit-odds-results'),
+            403
+        );
+
         $request->validate([
             'file' => 'required|file|max:10240|mimes:jpg,jpeg,png,webp,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,zip',
+            'task_id' => ['nullable', 'integer', 'exists:odds_tasks,id'],
         ]);
 
+        $taskId = $request->integer('task_id') ?: null;
+        if ($taskId) {
+            $this->authorizeTaskView($request, Task::findOrFail($taskId));
+        }
+
         $file = $files->store(
-            $request->file('file'), 'odds', 'task_draft', $request->user()->id, 'attachments', $request->user()->id, 'public',
+            $request->file('file'),
+            'odds',
+            $taskId ? 'task' : 'task_draft',
+            $taskId ?: $request->user()->id,
+            $taskId ? 'outputs' : 'attachments',
+            $request->user()->id,
+            'public',
         );
 
         return $this->sendResponse([
@@ -171,6 +188,11 @@ class TaskController extends BaseApiController
     public function start(Request $request, Task $task): JsonResponse
     {
         return $this->sendResponse($this->workReviews->start($task, $request->user()->id), 'Task ODDS dimulai.');
+    }
+
+    public function pause(Request $request, Task $task): JsonResponse
+    {
+        return $this->sendResponse($this->workReviews->pause($task, $request->user()->id), 'Pengerjaan task ODDS dipause.');
     }
 
     public function submitResult(SubmitResultRequest $request, Task $task): JsonResponse

@@ -10,6 +10,10 @@ import { HeroHeadingDocumentation } from "@/design-system/templates/documentatio
 import { PrimaryActionLinkDocumentation } from "@/design-system/templates/documentation/primary-action-link-documentation";
 import { ErrorTetrisGameDocumentation } from "@/design-system/templates/documentation/error-tetris-game-documentation";
 import { UniversalErrorViewDocumentation } from "@/design-system/templates/documentation/universal-error-view-documentation";
+import { OddsDesignerDashboardCardsDocumentation } from "@/design-system/templates/documentation/odds-designer-dashboard-cards-documentation";
+import type { OddsDesignerDashboardCardId } from "@/design-system/templates/documentation/odds-designer-dashboard-cards-documentation";
+import { OddsTaskCardDocumentation } from "@/design-system/templates/documentation/odds-task-card-documentation";
+import type { OddsTaskCardView } from "@/design-system/templates/documentation/odds-task-card-documentation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -178,6 +182,18 @@ export default function DocsContent({ slug }: DocsContentProps) {
   if (slug === "components/primary-action-link") return <PrimaryActionLinkDocumentation />;
   if (slug === "components/error-tetris-game") return <ErrorTetrisGameDocumentation />;
   if (slug === "components/universal-error-view") return <UniversalErrorViewDocumentation />;
+  if (slug === "components/odds-designer-dashboard-cards") return <OddsDesignerDashboardCardsDocumentation />;
+  if (slug.startsWith("components/odds-designer-dashboard-cards-")) {
+    return (
+      <OddsDesignerDashboardCardsDocumentation
+        cardId={slug.replace("components/odds-designer-dashboard-cards-", "") as OddsDesignerDashboardCardId}
+      />
+    );
+  }
+  if (slug === "components/odds-task-card") return <OddsTaskCardDocumentation />;
+  if (slug.startsWith("components/odds-task-card-")) {
+    return <OddsTaskCardDocumentation view={slug.replace("components/odds-task-card-", "") as OddsTaskCardView} />;
+  }
 
   // ── Render states ──
   if (state.status === "idle") return <EmptyState />;

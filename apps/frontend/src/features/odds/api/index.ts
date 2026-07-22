@@ -24,6 +24,7 @@ export interface OddsCategory {
   score_weight: string | number;
   normal_revision_limit: number;
   sla_minutes: number;
+  important_matrix?: string;
   is_active: boolean;
 }
 
@@ -156,6 +157,8 @@ export interface OddsTask {
   urgent_revision_used_at?: string | null;
   normal_revision_count: number;
   created_at: string;
+  updated_at?: string;
+  done_at?: string | null;
   category?: OddsCategory;
   requester?: OddsUser;
   preferred_designer?: OddsUser;
@@ -175,7 +178,6 @@ export interface OddsTask {
   timeLogs?: OddsTaskTimeLog[];
   rating?: number | null;
   overdue?: boolean;
-  updated_at?: string;
 }
 
 export interface OddsDailyReport {
@@ -183,6 +185,7 @@ export interface OddsDailyReport {
   report_date: string;
   designer_id: number;
   output_done: boolean;
+  total_output?: number;
   revision_count: number;
   overdue: boolean;
   quality_issue_flag?: boolean;
@@ -299,7 +302,15 @@ export function formatOddsDate(value: string | null | undefined, includeTime = f
 }
 
 export function statusLabel(status: string): string {
-  return status.replace(/_/g, " ");
+  const labels: Record<string, string> = {
+    queued: "Dalam Antrian",
+    ready_to_start: "Proses Terjeda",
+    in_progress: "Proses Pengerjaan",
+    spv_review: "Review Leader Creative",
+    client_review: "Menunggu Review Client",
+  };
+
+  return labels[status] ?? status.replace(/_/g, " ");
 }
 
 export async function getOddsCategories(): Promise<OddsCategory[]> {
@@ -342,6 +353,8 @@ export async function createOddsCategory(input: {
   score_weight: number;
   normal_revision_limit: number;
   sla_minutes: number;
+  important_matrix?: string;
+  is_active?: boolean;
 }): Promise<OddsCategory> {
   return apiFetch<OddsCategory>("/odds/categories", {
     method: "POST",
@@ -356,6 +369,7 @@ export async function updateOddsCategory(
     score_weight: number;
     normal_revision_limit: number;
     sla_minutes: number;
+    important_matrix: string;
     is_active: boolean;
   }>
 ): Promise<OddsCategory> {
@@ -452,9 +466,10 @@ export async function createOddsTask(input: CreateOddsTaskInput): Promise<OddsTa
   });
 }
 
-export async function uploadOddsTaskAttachment(file: File): Promise<OddsTaskAttachment> {
+export async function uploadOddsTaskAttachment(file: File, taskId?: string | number): Promise<OddsTaskAttachment> {
   const body = new FormData();
   body.append("file", file);
+  if (taskId !== undefined) body.append("task_id", String(taskId));
   return apiFetch<OddsTaskAttachment>("/odds/uploads", { method: "POST", body });
 }
 
@@ -502,6 +517,10 @@ export async function getOddsNextQueue(): Promise<OddsQueueEntry | null> {
 
 export async function startOddsTask(id: string | number): Promise<OddsTask> {
   return apiFetch<OddsTask>(`/odds/tasks/${id}/start`, { method: "POST" });
+}
+
+export async function pauseOddsTask(id: string | number): Promise<OddsTask> {
+  return apiFetch<OddsTask>(`/odds/tasks/${id}/pause`, { method: "POST" });
 }
 
 export async function submitOddsResult(id: string | number, input: SubmitResultInput): Promise<OddsTaskResult> {

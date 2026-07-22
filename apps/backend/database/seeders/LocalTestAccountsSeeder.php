@@ -2,21 +2,29 @@
 
 namespace Database\Seeders;
 
+use App\Models\Core\Position;
 use App\Models\Core\User;
+use App\SubApps\CreativeReport\Models\CreativeMember;
+use App\SubApps\Odds\Models\DesignerProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class LocalTestAccountsSeeder extends Seeder
 {
     /**
-     * Seed local test accounts for odds testing.
+     * Seed local test accounts for offline login and ODDS testing.
+     * All accounts use password: 'admin'
      */
     public function run(): void
     {
+        // Ensure permissions & roles are seeded
+        $this->call(RolePermissionSeeder::class);
+        $this->call(OddsPermissionSeeder::class);
+
         $password = Hash::make('admin');
 
-        // Create Designer User
-        $designer = User::firstOrCreate(
+        // 1. Create Designer User (username: designer, password: admin)
+        $designer = User::updateOrCreate(
             ['username' => 'designer'],
             [
                 'name' => 'Designer Test',
@@ -32,24 +40,33 @@ class LocalTestAccountsSeeder extends Seeder
         }
 
         // Auto approve designer member for local testing
-        \App\SubApps\CreativeReport\Models\CreativeMember::updateOrCreate(
+        CreativeMember::updateOrCreate(
             ['user_id' => $designer->id],
             [
                 'name' => $designer->name,
                 'position_id' => $designer->position_id,
                 'position_name' => 'Designer',
-                'status' => \App\SubApps\CreativeReport\Models\CreativeMember::STATUS_ACTIVE,
+                'status' => CreativeMember::STATUS_ACTIVE,
                 'joined_at' => now(),
             ]
         );
 
-        // Dynamically create a Retail position for Client
-        $clientPosition = \App\Models\Core\Position::firstOrCreate(
+        // Ensure Designer Profile in ODDS
+        DesignerProfile::updateOrCreate(
+            ['user_id' => $designer->id],
+            [
+                'status' => 'available',
+                'specializations' => [],
+                'is_active' => true,
+            ]
+        );
+
+        // 2. Create Client User (username: client, password: admin)
+        $clientPosition = Position::firstOrCreate(
             ['division_id' => 21, 'name' => 'Staff Retail']
         );
 
-        // Create Client User
-        $client = User::firstOrCreate(
+        $client = User::updateOrCreate(
             ['username' => 'client'],
             [
                 'name' => 'Client Test',
@@ -62,6 +79,36 @@ class LocalTestAccountsSeeder extends Seeder
         );
         if (!$client->hasRole('Client')) {
             $client->assignRole('Client');
+        }
+
+        // 3. Create SPV User (username: spv, password: admin)
+        $spv = User::updateOrCreate(
+            ['username' => 'spv'],
+            [
+                'name' => 'SPV Creative',
+                'email' => 'spv@test.com',
+                'password' => $password,
+                'is_onboarded' => true,
+                'division_id' => 4,
+            ]
+        );
+        if (!$spv->hasRole('SPV')) {
+            $spv->assignRole('SPV');
+        }
+
+        // 4. Create Manajer User (username: manajer, password: admin)
+        $manajer = User::updateOrCreate(
+            ['username' => 'manajer'],
+            [
+                'name' => 'Manajer Creative',
+                'email' => 'manajer@test.com',
+                'password' => $password,
+                'is_onboarded' => true,
+                'division_id' => 4,
+            ]
+        );
+        if (!$manajer->hasRole('Manajer')) {
+            $manajer->assignRole('Manajer');
         }
     }
 }

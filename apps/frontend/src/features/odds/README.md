@@ -19,6 +19,35 @@ workspace ODDS. Inbox Core tidak ditampilkan di menu ODDS agar navigasi hanya
 memuat fungsi milik ODDS. Wrapper ODDS memakai padding sidebar 16 px yang
 simetris agar panel dan seluruh tombol menu memiliki jarak kiri/kanan seimbang.
 
+### Dashboard Designer Cards
+
+Dashboard Designer aktif untuk user dengan `view-assigned-odds-tasks` tanpa
+mode control. Main content aktif berisi card:
+
+- Total Tugas Hari Ini
+- Total Dalam Antrian
+- Tugas Selesai
+- Antrian Revisi
+- Request Terbaru
+- Calendar
+- Need Review Brief
+- Notification
+- Message
+
+Card `Score Kamu`, `Grafik Performa`, dan `Queue Jobs` sedang tidak dirender.
+Inventory lengkap dan sumber data tiap card dicatat di
+`docs/05_migration/Frontend_ODDS_Integration.md` dan terbaca di route
+`/docs?section=components/odds-designer-dashboard-cards` melalui menu
+`Design System > ODDS > Designer Dashboard Cards`.
+
+### ODDS Task Card
+
+Task card ODDS terdokumentasi sebagai komponen library di
+`/docs?section=components/odds-task-card`. Komponen ini disiapkan untuk 3 view:
+`Admin`, `Client`, dan `Designer`. View Designer dipakai pada menu Dashboard
+Designer `Semua Tugas`; view Admin dan Client menjadi kontrak library untuk
+implementasi berikutnya.
+
 ## Request Creation
 
 `/odds/new` adalah satu form request, bukan wizard. Semua informasi kategori,

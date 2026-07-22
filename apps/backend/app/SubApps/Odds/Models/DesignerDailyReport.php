@@ -15,6 +15,7 @@ class DesignerDailyReport extends OddsModel
         'task_id',
         'category_id',
         'output_done',
+        'total_output',
         'active_work_duration_seconds',
         'revision_duration_seconds',
         'review_waiting_duration_seconds',
@@ -30,6 +31,7 @@ class DesignerDailyReport extends OddsModel
     protected $casts = [
         'report_date' => 'date',
         'output_done' => 'boolean',
+        'total_output' => 'integer',
         'overdue' => 'boolean',
         'quality_issue_flag' => 'boolean',
         'done_at' => 'datetime',

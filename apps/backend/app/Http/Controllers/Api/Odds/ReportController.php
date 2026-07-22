@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\Odds;
 
 use App\Http\Controllers\Api\BaseApiController;
+use App\Enums\Odds\TaskStatusEnum;
 use App\SubApps\Odds\Models\DesignerDailyReport;
 use App\SubApps\Odds\Models\DesignerRanking;
+use App\SubApps\Odds\Models\Task;
 use App\SubApps\Odds\Services\OddsReportingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +17,16 @@ class ReportController extends BaseApiController
 
     public function daily(Request $request): JsonResponse
     {
+        $doneTasks = Task::query()
+            ->where('status', TaskStatusEnum::DONE->value)
+            ->when(! $request->user()->can('view-odds-reports'), fn ($query) => $query->where('assigned_designer_id', $request->user()->id))
+            ->whereNotNull('assigned_designer_id')
+            ->get();
+
+        foreach ($doneTasks as $task) {
+            $this->reports->fillDailyReport($task);
+        }
+
         $query = DesignerDailyReport::query()->with('designer:id,name,email,username');
 
         if (!$request->user()->can('view-odds-reports')) {
@@ -22,7 +34,7 @@ class ReportController extends BaseApiController
             if (!$designerProfile) {
                 return $this->sendResponse(collect(), 'Bukan desainer.');
             }
-            $query->where('designer_id', $designerProfile->id);
+            $query->where('designer_id', $request->user()->id);
         }
 
         if ($request->query('from')) {

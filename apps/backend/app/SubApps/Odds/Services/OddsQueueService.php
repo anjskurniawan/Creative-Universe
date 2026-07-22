@@ -129,18 +129,18 @@ class OddsQueueService
     {
         $cursor = $this->nextWorkingHour(now());
 
-        $activeHours = Task::query()
+        $activeCount = Task::query()
             ->where('assigned_designer_id', $designerProfile->user_id)
             ->where('status', TaskStatusEnum::IN_PROGRESS->value)
             ->whereKeyNot($task->id)
-            ->sum('workload_point');
+            ->count();
 
-        if ($activeHours > 0) {
-            $cursor = $this->addWorkingHours($cursor, (int) $activeHours);
+        if ($activeCount > 0) {
+            $cursor = $this->addWorkingHours($cursor, $activeCount * 2);
         }
 
         $queuedBefore = TaskQueue::query()
-            ->with('task:id,workload_point')
+            ->with('task')
             ->where('designer_id', $designerProfile->user_id)
             ->where('queue_status', 'queued')
             ->where('task_id', '!=', $task->id)
@@ -156,11 +156,15 @@ class OddsQueueService
             ->get();
 
         foreach ($queuedBefore as $queued) {
-            $cursor = $this->addWorkingHours($cursor, max(1, (int) ($queued->task?->workload_point ?? 1)));
+            $taskSla = (int) ($queued->task?->category_snapshot['sla_minutes'] ?? 120);
+            $taskHours = max(1, (int) ceil($taskSla / 60));
+            $cursor = $this->addWorkingHours($cursor, $taskHours);
         }
 
         $start = $cursor;
-        $finish = $this->addWorkingHours($start, max(1, (int) $task->workload_point));
+        $currentTaskSla = (int) ($task->category_snapshot['sla_minutes'] ?? 120);
+        $currentTaskHours = max(1, (int) ceil($currentTaskSla / 60));
+        $finish = $this->addWorkingHours($start, $currentTaskHours);
 
         return [$start, $finish];
     }
@@ -227,17 +231,17 @@ class OddsQueueService
 
         foreach ($designerIds as $queuedDesignerId) {
             $cursor = $this->nextWorkingHour(now());
-            $activeHours = Task::query()
+            $activeCount = Task::query()
                 ->where('assigned_designer_id', $queuedDesignerId)
                 ->where('status', TaskStatusEnum::IN_PROGRESS->value)
-                ->sum('workload_point');
+                ->count();
 
-            if ($activeHours > 0) {
-                $cursor = $this->addWorkingHours($cursor, (int) $activeHours);
+            if ($activeCount > 0) {
+                $cursor = $this->addWorkingHours($cursor, $activeCount * 2);
             }
 
             $queuedItems = TaskQueue::query()
-                ->with('task:id,workload_point')
+                ->with('task')
                 ->where('designer_id', $queuedDesignerId)
                 ->where('queue_status', 'queued')
                 ->orderByDesc('priority_score')
@@ -246,7 +250,9 @@ class OddsQueueService
 
             foreach ($queuedItems as $queued) {
                 $start = $cursor;
-                $finish = $this->addWorkingHours($start, max(1, (int) ($queued->task?->workload_point ?? 1)));
+                $taskSla = (int) ($queued->task?->category_snapshot['sla_minutes'] ?? 120);
+                $taskHours = max(1, (int) ceil($taskSla / 60));
+                $finish = $this->addWorkingHours($start, $taskHours);
                 $queued->update([
                     'estimated_start_at' => $start,
                     'estimated_finish_at' => $finish,

@@ -203,18 +203,18 @@ function DetailContent() {
     work: designerTimeLogs.filter((log) => log.log_type === "work").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
     revision: designerTimeLogs.filter((log) => log.log_type === "revision").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
   };
-  const outputTitle = isVisibleLeaderRevisionTask ? "Output Revisi SPV" : isClientRevisionTask ? "Output Revisi Client" : "Output";
+  const outputTitle = isVisibleLeaderRevisionTask ? "Output Revisi Leader Creative" : isClientRevisionTask ? "Output Revisi Client" : "Output";
   const outputNotice = isVisibleLeaderRevisionTask
-    ? "Task sedang dalam revisi SPV. Setelah disubmit, hasil revisi kembali masuk review SPV."
+    ? "Task sedang dalam revisi Leader Creative. Setelah disubmit, hasil revisi kembali masuk review Leader Creative."
     : isClientRevisionTask
       ? "Task sedang dalam revisi client. Kirim hasil revisi melalui form Output di sisi kiri."
       : "Task sedang dikerjakan. Kirim output melalui form Output di sisi kiri.";
   const submitButtonLabel = isVisibleLeaderRevisionTask || isClientRevisionTask ? "Submit Revisi" : "Submit";
   const submitResultMessage = isVisibleLeaderRevisionTask
-    ? "Revisi dikirim ke SPV."
+    ? "Revisi dikirim ke Leader Creative."
     : isClientRevisionTask
       ? "Revisi dikirim ke client."
-      : "Output dikirim ke SPV.";
+      : "Output dikirim ke Leader Creative.";
   const canEditBrief = canClientReview && isRequester && task.status === "brief_revision_requested";
   const canReturnBrief = canReviewBrief && isAssignedDesigner && task.status === "submitted";
   const canAcceptBrief = canReviewBrief && isAssignedDesigner && task.status === "submitted";

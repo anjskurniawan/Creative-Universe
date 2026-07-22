@@ -23,7 +23,7 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::delete('/system-rules/{systemRule}', [ConfigController::class, 'deleteSystemRule'])->middleware('can:manage-odds-config');
 
     Route::get('/tasks', [TaskController::class, 'index']);
-    Route::post('/uploads', [TaskController::class, 'uploadAttachment'])->middleware('can:create-odds-tasks');
+    Route::post('/uploads', [TaskController::class, 'uploadAttachment']);
     Route::get('/uploads/{storedFile}/content', [TaskController::class, 'attachmentContent']);
     Route::post('/tasks', [TaskController::class, 'store'])->middleware('can:create-odds-tasks');
     Route::get('/tasks/{task}', [TaskController::class, 'show']);
@@ -39,6 +39,7 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::post('/tasks/{task}/skip-requests', [QueueController::class, 'requestSkip'])->middleware('can:request-odds-queue-skip');
     Route::post('/skip-requests/{skipRequest}/review', [QueueController::class, 'reviewSkip'])->middleware('can:review-odds-queue-skip');
     Route::post('/tasks/{task}/start', [TaskController::class, 'start'])->middleware('can:start-odds-tasks');
+    Route::post('/tasks/{task}/pause', [TaskController::class, 'pause'])->middleware('can:review-odds-spv');
     Route::post('/tasks/{task}/results', [TaskController::class, 'submitResult'])->middleware('can:submit-odds-results');
     Route::post('/tasks/{task}/spv-review', [TaskController::class, 'spvReview'])->middleware('can:review-odds-spv');
     Route::post('/tasks/{task}/client-review', [TaskController::class, 'clientReview'])->middleware('can:review-odds-client');

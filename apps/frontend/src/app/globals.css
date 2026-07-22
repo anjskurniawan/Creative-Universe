@@ -1058,6 +1058,17 @@
   height: 0;
 }
 
+.odds-scroll-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.odds-scroll-hidden::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 /* KPI stays swipe-scrollable on narrow KV Retail viewports without exposing a browser scrollbar. */
 .kv-retail-kpi-scroll {
   -ms-overflow-style: none;

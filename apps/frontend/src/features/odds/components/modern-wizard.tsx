@@ -371,11 +371,21 @@ export function ModernWizard({
                 <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 max-h-[420px] overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {filteredCategories.map((cat) => {
                     const isSelected = form.category_id === String(cat.id);
+                    const matrix = (cat.important_matrix || "Q4").toUpperCase();
+                    const matrixBadgeColor = 
+                      matrix === "Q1" ? "bg-red-500/20 text-red-500 border-red-500/30" :
+                      matrix === "Q2" ? "bg-orange-500/20 text-orange-500 border-orange-500/30" :
+                      matrix === "Q3" ? "bg-blue-500/20 text-blue-500 border-blue-500/30" :
+                      "bg-slate-500/20 text-slate-400 border-slate-500/30";
+
                     return (
                       <button
                         key={cat.id}
                         type="button"
-                        onClick={() => update("category_id", String(cat.id))}
+                        onClick={() => {
+                          update("category_id", String(cat.id));
+                          update("important_matrix", cat.important_matrix || "Q4");
+                        }}
                         className={`group relative p-4 pl-6 rounded-2xl border text-left transition-all duration-200 overflow-hidden flex items-center justify-between ${
                           isSelected
                             ? dark
@@ -392,7 +402,12 @@ export function ModernWizard({
                             ? dark ? "bg-[#B0FF5E]" : "bg-[#00A4FF]"
                             : "bg-transparent"
                         }`} />
-                        <span className="font-semibold text-xs truncate mr-2">{cat.name}</span>
+                        <div className="flex items-center gap-2 truncate mr-2">
+                          <span className="font-semibold text-xs truncate">{cat.name}</span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold border shrink-0 ${matrixBadgeColor}`}>
+                            {matrix}
+                          </span>
+                        </div>
                         {isSelected && <MaterialIcon name="check_circle" size="auto" className={`text-lg shrink-0 ${dark ? "text-[#B0FF5E]" : "text-[#00A4FF]"}`} />}
                       </button>
                     );
@@ -541,51 +556,40 @@ export function ModernWizard({
                   </div>
                 )}
 
-                {/* Mini Step 2: Priority (Prioritas) */}
-                {miniStep === 2 && (
-                  <div className="space-y-5 flex-1 flex flex-col justify-center w-full">
-                    <div className="text-center sm:text-left">
-                      <h3 className={`text-lg font-semibold ${textTitle}`}>Skala Prioritas</h3>
-                      <p className={`text-xs ${textMuted} mt-1`}>Pilih tingkat urgensi pengerjaan tugas desain ini</p>
+                {/* Mini Step 2: Priority (Otomatis berdasarkan Kategori) */}
+                {miniStep === 2 && (() => {
+                  const matrixKey = (selectedCategory?.important_matrix || form.important_matrix || "Q4").toUpperCase();
+                  const quadranInfo = 
+                    matrixKey === "Q1" ? { code: "Q1", label: "Quadran I", desc: "Mendesak & Penting (Priority Utama Tim)", color: "text-red-500 border-red-500/40 bg-red-500/10", icon: "flash_on" } :
+                    matrixKey === "Q2" ? { code: "Q2", label: "Quadran II", desc: "Penting (Dikerjakan Lebih Awal)", color: "text-orange-500 border-orange-500/40 bg-orange-500/10", icon: "priority_high" } :
+                    matrixKey === "Q3" ? { code: "Q3", label: "Quadran III", desc: "Mendesak (Tugas Rutin Harian)", color: "text-blue-500 border-blue-500/40 bg-blue-500/10", icon: "schedule" } :
+                    { code: "Q4", label: "Quadran IV", desc: "Normal / Standar (Tugas Opsional)", color: "text-slate-400 border-slate-500/40 bg-slate-500/10", icon: "assignment" };
+
+                  return (
+                    <div className="space-y-5 flex-1 flex flex-col justify-center max-w-lg mx-auto w-full">
+                      <div className="text-center sm:text-left">
+                        <h3 className={`text-lg font-semibold ${textTitle}`}>Important Matrix Kategori</h3>
+                        <p className={`text-xs ${textMuted} mt-1`}>
+                          Skala prioritas ditentukan secara otomatis oleh sistem berdasarkan kategori <b className="text-slate-200">{selectedCategory?.name || "yang dipilih"}</b>.
+                        </p>
+                      </div>
+                      
+                      <div className={`p-6 rounded-2xl border-2 flex items-center justify-between ${quadranInfo.color}`}>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl font-black">{quadranInfo.label} ({quadranInfo.code})</span>
+                          </div>
+                          <p className="text-xs opacity-90 font-medium">{quadranInfo.desc}</p>
+                        </div>
+                        <MaterialIcon name={quadranInfo.icon} size="auto" className="text-3xl shrink-0 opacity-80" />
+                      </div>
+                      
+                      <p className={`text-[11px] text-center sm:text-left italic ${textMuted}`}>
+                        * Client tidak perlu memilih skala prioritas secara manual. Klik tombol "Lanjut" untuk melanjutkan ke tenggat waktu.
+                      </p>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      {[
-                        { value: "normal", label: "Normal", desc: "SLA standar antrean biasa", icon: "schedule" },
-                        { value: "high", label: "Penting (High)", desc: "Dikerjakan lebih awal", icon: "priority_high" },
-                        { value: "urgent", label: "Mendesak (Urgent)", desc: "Prioritas utama tim kreatif", icon: "flash_on" },
-                      ].map((opt) => {
-                        const isChosen = form.important_matrix === opt.value;
-                        return (
-                          <button
-                            key={opt.value}
-                            type="button"
-                            onClick={() => update("important_matrix", opt.value)}
-                            className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between min-h-[140px] ${
-                              isChosen
-                                ? dark
-                                  ? "border-[#B0FF5E] bg-[#B0FF5E]/10 text-white"
-                                  : "border-[#00A4FF] bg-[#00A4FF]/5 text-[#00A4FF]"
-                                : dark
-                                  ? "border-white/5 bg-[#171717] hover:border-white/10"
-                                  : "border-[#BDEAFF] bg-[#F3FAFF]/40 hover:border-[#00A4FF]"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <span className={`p-2 rounded-xl ${isChosen ? (dark ? "bg-[#B0FF5E]/20 text-[#B0FF5E]" : "bg-[#00A4FF]/25 text-[#00A4FF]") : "bg-black/5 dark:bg-white/5"}`}>
-                                <MaterialIcon name={opt.icon} size="auto" className="text-sm font-bold" />
-                              </span>
-                              {isChosen && <MaterialIcon name="check_circle" size="auto" className="text-lg" />}
-                            </div>
-                            <div>
-                              <h4 className={`font-bold text-xs ${textTitle}`}>{opt.label}</h4>
-                              <p className={`text-[10px] mt-1 leading-normal ${textBody}`}>{opt.desc}</p>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* Mini Step 3: Deadline */}
                 {miniStep === 3 && (
@@ -712,10 +716,13 @@ export function ModernWizard({
                       </div>
 
                       <div className="grid grid-cols-3 gap-2">
-                        <span className="text-slate-400 font-medium">priority</span>
-                        <span className={`col-span-2 font-semibold capitalize ${
-                          form.important_matrix === "urgent" ? "text-red-500 font-bold" : form.important_matrix === "high" ? "text-orange-500 font-bold" : "text-slate-900"
-                        }`}>{form.important_matrix}</span>
+                        <span className="text-slate-400 font-medium">matrix</span>
+                        <span className={`col-span-2 font-semibold uppercase ${
+                          (selectedCategory?.important_matrix || form.important_matrix) === "Q1" ? "text-red-500 font-bold" :
+                          (selectedCategory?.important_matrix || form.important_matrix) === "Q2" ? "text-orange-500 font-bold" :
+                          (selectedCategory?.important_matrix || form.important_matrix) === "Q3" ? "text-blue-500 font-bold" :
+                          "text-slate-700"
+                        }`}>{selectedCategory?.important_matrix || form.important_matrix || "Q4"}</span>
                       </div>
                     </div>
                   </div>
@@ -1036,6 +1043,24 @@ function ModernBriefEditor({
     setImageUploading(false);
   };
 
+  const pastePlainTextAsParagraphs = (text: string) => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    const escapeHtml = (input: string) => input.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character] ?? character);
+    const normalizedText = text
+      .replace(/\r\n?/g, "\n")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n[ \t]+/g, "\n");
+    const paragraphs = normalizedText
+      .split(/\n{2,}/)
+      .map((paragraph) => paragraph.trim()
+        ? `<p>${paragraph.split("\n").map(escapeHtml).join("<br>")}</p>`
+        : "<p><br></p>")
+      .join("<p><br></p>");
+    document.execCommand("insertHTML", false, paragraphs || "<p><br></p>");
+    onChange(editor.innerHTML);
+  };
+
   const toolbarBtnClass = `flex size-8 shrink-0 items-center justify-center rounded-lg border transition ${
     dark
       ? "border-white/10 bg-[#0E0E0E] text-[#B9B9B9] hover:bg-white/10"
@@ -1174,7 +1199,7 @@ function ModernBriefEditor({
           onFocus={syncActiveTools}
           onPaste={(event) => {
             event.preventDefault();
-            document.execCommand("insertText", false, event.clipboardData.getData("text/plain"));
+            pastePlainTextAsParagraphs(event.clipboardData.getData("text/plain"));
           }}
           className={`h-full overflow-y-auto p-4 text-sm leading-6 outline-none transition [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
             dark

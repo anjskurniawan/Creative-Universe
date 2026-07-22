@@ -11,11 +11,11 @@ type Tone = "danger" | "warning" | "info" | "success" | "neutral";
 const STATUS_LABELS: Record<string, string> = {
   submitted: "Brief baru",
   brief_revision_requested: "Update brief",
-  queued: "Dalam antrean",
-  ready_to_start: "Siap mulai",
-  in_progress: "Sedang dikerjakan",
-  spv_review: "Review SPV",
-  client_review: "Review client",
+  queued: "Dalam Antrian",
+  ready_to_start: "Proses Terjeda",
+  in_progress: "Proses Pengerjaan",
+  spv_review: "Review Leader Creative",
+  client_review: "Menunggu Review Client",
   done: "Selesai",
   cancelled: "Dibatalkan",
   cancelled_by_spv: "Dibatalkan SPV",
@@ -60,7 +60,7 @@ const TONE_CLASSES: Record<Tone, { accent: string; badge: string; icon: string }
 export function OddsDesignerTaskRowCard({ task }: OddsDesignerTaskRowCardProps) {
   const detailHref = `/odds/detail?id=${task.id}`;
   const deadline = deadlineMeta(task);
-  const status = statusMeta(task.status);
+  const status = statusMeta(task);
   const action = actionMeta(task.status);
   const tone = deadline.tone === "neutral" ? status.tone : deadline.tone;
   const classes = TONE_CLASSES[tone];
@@ -113,7 +113,7 @@ export function OddsDesignerTaskRowCard({ task }: OddsDesignerTaskRowCardProps) 
 
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:grid-cols-4 xl:grid-cols-2">
           <MetaItem label="Designer" value={assignedDesigner?.name ?? "-"} />
-          <MetaItem label="Queue" value={queue?.queue_status ? statusLabel(queue.queue_status) : "-"} />
+          <MetaItem label="Queue" value={queue?.queue_status ? designerTaskStatusLabel({ status: queue.queue_status, task_type: task.task_type }) : "-"} />
           <MetaItem label="SLA" value={`${task.category_snapshot?.sla_minutes ?? 0} mnt`} />
           <MetaItem label="Revisi" value={`${revisionCount}`} />
           <MetaItem label="Timer" value={hasRunningTimer ? "Berjalan" : "Idle"} />
@@ -183,20 +183,38 @@ function deadlineMeta(task: OddsTask): { label: string; icon: string; tone: Tone
   return { label: `${days} hari lagi`, icon: "event", tone: "neutral" };
 }
 
-function statusMeta(status: string): { label: string; tone: Tone } {
+function statusMeta(task: Pick<OddsTask, "status" | "task_type">): { label: string; tone: Tone } {
+  const status = task.status;
+
   if (["cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(status)) {
     return { label: STATUS_LABELS[status] ?? statusLabel(status), tone: "danger" };
   }
 
   if (status === "done") return { label: STATUS_LABELS[status], tone: "success" };
   if (["submitted", "queued", "ready_to_start", "in_progress"].includes(status)) {
-    return { label: STATUS_LABELS[status] ?? statusLabel(status), tone: "info" };
+    return { label: designerTaskStatusLabel(task), tone: "info" };
   }
   if (["brief_revision_requested", "spv_review", "client_review"].includes(status)) {
     return { label: STATUS_LABELS[status] ?? statusLabel(status), tone: "warning" };
   }
 
   return { label: STATUS_LABELS[status] ?? statusLabel(status), tone: "neutral" };
+}
+
+function designerTaskStatusLabel(task: Pick<OddsTask, "status" | "task_type">): string {
+  if (task.status === "ready_to_start") return "Proses Terjeda";
+
+  if (task.task_type === "leader_revision") {
+    if (task.status === "in_progress") return "Pengerjaan Revisi SPV";
+    if (task.status === "queued") return "Revisi SPV";
+  }
+
+  if (task.task_type === "client_revision") {
+    if (task.status === "in_progress") return "Pengerjaan Revisi Client";
+    if (task.status === "queued") return "Revisi Client";
+  }
+
+  return STATUS_LABELS[task.status] ?? statusLabel(task.status);
 }
 
 function actionMeta(status: string): { label: string; icon: string } {

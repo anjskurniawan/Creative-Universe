@@ -203,13 +203,15 @@ export default function DocsMenu() {
                         <div className="docs-menu-items">
                           {sub.children!.map((item) => {
                             const isItemActive = item.slug === activeSlug;
+                            const isNestedCardItem = item.slug.startsWith("components/odds-designer-dashboard-cards-") || item.slug.startsWith("components/odds-task-card-");
+                            const isCardParentItem = item.slug === "components/odds-designer-dashboard-cards" || item.slug === "components/odds-task-card";
                             return (
                               <button
                                 key={item.slug}
                                 type="button"
                                 id={`docs-item-${item.slug.replace(/\//g, "-")}`}
                                 onClick={() => navigateTo(item.slug)}
-                                className={`docs-menu-item${isItemActive ? " active" : ""}`}
+                                className={`docs-menu-item${isItemActive ? " active" : ""}${isNestedCardItem ? " nested-card" : ""}${isCardParentItem ? " parent-item" : ""}`}
                               >
                                 {item.label}
                               </button>
@@ -318,10 +320,10 @@ export default function DocsMenu() {
           border-radius: calc(var(--radius) - 2px);
           border: none;
           background: transparent;
-          color: hsl(var(--muted-foreground));
+          color: hsl(var(--foreground));
           font-family: var(--font-sans);
           font-size: 0.8125rem;
-          font-weight: 500;
+          font-weight: 650;
           cursor: pointer;
           text-align: left;
           transition: color 0.15s ease, background-color 0.15s ease;
@@ -341,10 +343,12 @@ export default function DocsMenu() {
         .docs-menu-items {
           display: flex;
           flex-direction: column;
-          padding-left: 0.5rem;
-          gap: 0.0625rem;
-          margin-top: 0.0625rem;
+          padding-left: 0.75rem;
+          gap: 0.125rem;
+          margin-top: 0.125rem;
           margin-bottom: 0.125rem;
+          border-left: 1px solid hsl(var(--border));
+          margin-left: 0.625rem;
         }
 
         .docs-menu-item {
@@ -371,6 +375,44 @@ export default function DocsMenu() {
         .docs-menu-item.active {
           color: hsl(var(--foreground));
           font-weight: 700;
+        }
+
+        .docs-menu-item.parent-item {
+          margin-top: 0.25rem;
+          color: hsl(var(--foreground));
+          font-weight: 650;
+          background-color: hsl(var(--secondary) / 0.45);
+        }
+
+        .docs-menu-item.parent-item.active {
+          background-color: hsl(var(--foreground));
+          color: hsl(var(--background));
+        }
+
+        .docs-menu-item.nested-card {
+          position: relative;
+          margin-left: 0.625rem;
+          width: calc(100% - 0.625rem);
+          padding-left: 0.875rem;
+          color: hsl(var(--muted-foreground));
+          font-size: 0.78125rem;
+          font-weight: 450;
+        }
+
+        .docs-menu-item.nested-card::before {
+          content: "";
+          position: absolute;
+          left: 0.25rem;
+          top: 50%;
+          width: 0.375rem;
+          height: 1px;
+          background-color: hsl(var(--border));
+        }
+
+        .docs-menu-item.nested-card.active {
+          color: hsl(var(--foreground));
+          font-weight: 700;
+          background-color: hsl(var(--secondary));
         }
       `}</style>
     </nav>

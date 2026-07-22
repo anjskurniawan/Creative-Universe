@@ -95,10 +95,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
   // Next can preserve a trailing slash in the local URL. Normalize it so the
   // request page consistently receives its contained-scroll shell.
   const normalizedPathname = pathname.replace(/\/$/, "") || "/";
-  const usesContainedScroll = normalizedPathname === "/odds" && (
-    activeSection === "all_tasks"
-    || (!activeSection && (canViewAllTasks || canReviewSpv))
-  );
+  const usesContainedScroll = normalizedPathname === "/odds";
   const sidebarClassName = usesContainedScroll
     ? "!static !m-0 !h-full !min-h-0 !p-4"
     : "!m-0 !h-screen !p-4";
@@ -137,7 +134,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
         );
       }
       if (canReviewSpv) {
-        items.push({ id: "spv_review", label: "Review SPV", icon: "rate_review", href: "/odds?section=spv_review", group: "tasks" });
+        items.push({ id: "spv_review", label: "Review Leader Creative", icon: "rate_review", href: "/odds?section=spv_review", group: "tasks" });
       }
       if (canReviewSpv || canViewAllTasks) {
         items.push({ id: "client_review", label: "Review Client", icon: "reviews", href: "/odds?section=client_review", group: "tasks" });
@@ -203,7 +200,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
         icon: item.icon,
         href: item.href,
         group: ODDS_GROUP_LABELS[group],
-        badge: item.group === "manage" || item.id === "workspace" ? undefined : counts[item.id] > 0 ? counts[item.id] : undefined,
+        badge: item.group === "manage" || item.id === "workspace" || item.id === "client_all_requests" ? undefined : counts[item.id] > 0 ? counts[item.id] : undefined,
         isActive: isSectionActive(item),
         isHighlighted: false,
       }))),
@@ -234,7 +231,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
             compactMenuItems={compactMobileMenuItems}
           />
           <main aria-label="ODDS mobile" className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6 pt-6">
-            <div className={`flex-1 min-h-0 ${usesContainedScroll ? "h-full overflow-hidden flex flex-col w-full" : "overflow-y-auto"} text-slate-800`}>
+            <div className={`flex-1 min-h-0 ${usesContainedScroll ? "h-full overflow-hidden flex flex-col w-full" : "odds-scroll-hidden overflow-y-auto"} text-slate-800`}>
               {children}
             </div>
           </main>
@@ -243,7 +240,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
 
       {/* Desktop view */}
       <div className={`hidden h-screen min-h-0 flex-col text-[#222] lg:flex ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)] p-6" : desktopTheme === "retro" ? "bg-[#dfe2d3] p-6" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)] p-6"}`}>
-        <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${desktopTheme === "light" ? "rounded-[26px] border border-white/80 bg-white/80 shadow-[0_14px_42px_rgba(44,42,39,0.16)] backdrop-blur-md" : desktopTheme === "dark" ? "rounded-[26px] border border-white/10 bg-[#111413]/90 shadow-[0_14px_42px_rgba(0,0,0,0.45)] backdrop-blur-md" : "rounded-[30px] border-[3px] border-[#24252b] bg-[#c9ccc0] font-mono shadow-[0_8px_0_#24252b]"}`}>
+        <div id="odds-shell-modal-root" className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${desktopTheme === "light" ? "rounded-[26px] border border-white/80 bg-white/80 shadow-[0_14px_42px_rgba(44,42,39,0.16)] backdrop-blur-md" : desktopTheme === "dark" ? "rounded-[26px] border border-white/10 bg-[#111413]/90 shadow-[0_14px_42px_rgba(0,0,0,0.45)] backdrop-blur-md" : "rounded-[30px] border-[3px] border-[#24252b] bg-[#c9ccc0] font-mono shadow-[0_8px_0_#24252b]"}`}>
           <PerformanceNavbar theme={desktopTheme} title={navigationTitle} parentTitle="ODDS" />
           <div className="flex min-h-0 flex-1">
             <PerformanceSidebar
@@ -257,7 +254,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
               expanded={desktopShellExpanded}
               onToggleExpanded={toggleDesktopShellExpanded}
             />
-            <main className={`relative min-w-0 flex min-h-0 flex-1 flex-col ${usesContainedScroll ? "h-full" : "overflow-y-auto"}`}>
+            <main className={`relative min-w-0 flex min-h-0 flex-1 flex-col ${usesContainedScroll ? "h-full" : "odds-scroll-hidden overflow-y-auto"}`}>
               <div className={`${usesContainedScroll ? "h-full min-h-0 flex flex-col flex-1 w-full" : "min-h-full flex flex-col flex-1 w-full"} text-slate-800`}>
                 {children}
               </div>

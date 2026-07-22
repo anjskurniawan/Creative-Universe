@@ -62,9 +62,10 @@ class OddsDummyTasksSeeder extends Seeder
         $taskCounter = 1;
 
         // Helper function to create tasks
-        $createTask = function ($purpose, $status, $deadline, $categoryKey, $updatedAt = null, $importantMatrix = 'normal') use ($client, $designer, $categories, &$taskCounter) {
+        $createTask = function ($purpose, $status, $deadline, $categoryKey, $updatedAt = null, $importantMatrix = null) use ($client, $designer, $categories, &$taskCounter) {
             $category = $categories[$categoryKey];
             $taskNumber = 'ODDS-DUMMY-' . str_pad($taskCounter++, 4, '0', STR_PAD_LEFT);
+            $matrixValue = $importantMatrix ?? $category->important_matrix ?? 'Q4';
             
             $task = Task::create([
                 'task_number' => $taskNumber,
@@ -76,6 +77,7 @@ class OddsDummyTasksSeeder extends Seeder
                     'score_weight' => $category->score_weight,
                     'normal_revision_limit' => $category->normal_revision_limit,
                     'sla_minutes' => $category->sla_minutes,
+                    'important_matrix' => $matrixValue,
                 ],
                 'requester_id' => $client->id,
                 'assigned_designer_id' => $designer->id,
@@ -84,7 +86,7 @@ class OddsDummyTasksSeeder extends Seeder
                 'deadline' => $deadline,
                 'status' => $status,
                 'done_at' => $status === 'done' ? ($updatedAt ?? now()) : null,
-                'important_matrix' => $importantMatrix,
+                'important_matrix' => $matrixValue,
                 'task_type' => 'new_task',
                 'priority_score' => 1.0,
             ]);

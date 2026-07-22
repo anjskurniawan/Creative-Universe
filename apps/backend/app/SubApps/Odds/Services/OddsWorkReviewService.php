@@ -58,6 +58,30 @@ class OddsWorkReviewService
         });
     }
 
+    public function pause(Task $task, int $userId): Task
+    {
+        return DB::transaction(function () use ($task, $userId) {
+            if ($task->status !== TaskStatusEnum::IN_PROGRESS->value) {
+                throw ValidationException::withMessages(['task_id' => 'Hanya task yang sedang dikerjakan yang bisa dipause.']);
+            }
+
+            $this->timeLogs->stopOpen($task, 'work');
+            $this->timeLogs->stopOpen($task, 'revision');
+
+            $task->currentQueue?->update([
+                'queue_status' => 'ready_to_start',
+            ]);
+
+            $task->update([
+                'status' => TaskStatusEnum::READY_TO_START->value,
+            ]);
+
+            activity('odds')->performedOn($task)->event('task_paused')->log('Task paused by control user #'.$userId);
+
+            return $task->refresh()->load(['currentQueue', 'timeLogs']);
+        });
+    }
+
     public function submitResult(Task $task, array $data, int $designerId): TaskResult
     {
         return DB::transaction(function () use ($task, $data, $designerId) {
@@ -104,8 +128,8 @@ class OddsWorkReviewService
             activity('odds')->performedOn($task)->event('task_finished')->log('Task work submitted');
 
             if ($requiresSpvReview) {
-                $this->notifications->sendToRoles(['Manajer', 'SPV'], 'spv_review_waiting', 'Hasil ODDS menunggu review', 'Hasil desain menunggu review SPV.', $task);
-                activity('odds')->performedOn($task)->event('result_submitted_to_spv')->log('Result submitted to SPV');
+                $this->notifications->sendToRoles(['Manajer', 'SPV'], 'spv_review_waiting', 'Hasil ODDS menunggu review', 'Hasil desain menunggu review Leader Creative.', $task);
+                activity('odds')->performedOn($task)->event('result_submitted_to_spv')->log('Result submitted to Leader Creative');
             } else {
                 $this->notifications->send($task->requester, 'client_review_waiting', 'Hasil ODDS siap ditinjau', 'Hasil revisi desain siap direview client.', $task);
                 activity('odds')->performedOn($task)->event('result_submitted_to_client')->log('Revision result submitted to client');
@@ -119,7 +143,7 @@ class OddsWorkReviewService
     {
         return DB::transaction(function () use ($task, $data, $reviewerId) {
             if ($task->status !== TaskStatusEnum::SPV_REVIEW->value) {
-                throw ValidationException::withMessages(['task_id' => 'Review SPV hanya bisa dilakukan saat status spv_review.']);
+                throw ValidationException::withMessages(['task_id' => 'Review hanya bisa dilakukan saat status spv_review.']);
             }
 
             $result = $task->results()->latest('version_number')->first();
@@ -143,7 +167,7 @@ class OddsWorkReviewService
                 $this->revisions->request($task, [
                     'revision_type' => 'leader',
                     'result_id' => $result?->id,
-                    'notes' => $data['notes'] ?? 'Revisi SPV.',
+                    'notes' => $data['notes'] ?? 'Revisi Leader Creative.',
                 ], $reviewerId);
                 $this->flagQualityIssueIfNeeded($task->refresh(), $data['notes'] ?? null);
                 activity('odds')->performedOn($task)->event('spv_revision_requested')->log($data['notes'] ?? 'Revision requested');

@@ -16,7 +16,11 @@ class OddsReportingService
         $task->loadMissing(['reviews', 'revisions', 'category', 'timeLogs']);
         $doneAt = $task->done_at ?? now();
         $rating = $task->reviews()->where('review_type', 'client')->whereNotNull('rating')->latest()->value('rating');
-        $score = $task->status === 'done' ? (float) data_get($task->category_snapshot, 'score_weight', 1) : 0;
+        $latestResultNotes = (string) ($task->results()->latest('version_number')->value('result_notes') ?? '');
+        preg_match('/Total Output:\s*([0-9]+)/i', $latestResultNotes, $matches);
+        $totalOutput = isset($matches[1]) ? (int) $matches[1] : 0;
+        $categoryWeight = (float) data_get($task->category_snapshot, 'score_weight', $task->category?->score_weight ?? 1);
+        $score = $task->status === 'done' ? $totalOutput * $categoryWeight : 0;
 
         $report = DesignerDailyReport::query()
             ->where('task_id', $task->id)
@@ -30,6 +34,7 @@ class OddsReportingService
             'designer_id' => $task->assigned_designer_id,
             'category_id' => $task->category_id,
             'output_done' => $task->status === 'done',
+            'total_output' => $totalOutput,
             'active_work_duration_seconds' => $this->timeLogs->duration($task, 'work'),
             'revision_duration_seconds' => $this->timeLogs->duration($task, 'revision'),
             'review_waiting_duration_seconds' => 0,
@@ -58,7 +63,7 @@ class OddsReportingService
         foreach ($periods as $periodType => [$start, $end]) {
             $rows = DesignerDailyReport::query()
                 ->select('designer_id')
-                ->selectRaw('COUNT(CASE WHEN output_done = 1 THEN 1 END) as total_output')
+                ->selectRaw('SUM(total_output) as total_output')
                 ->selectRaw('SUM(score) as total_score')
                 ->selectRaw('SUM(active_work_duration_seconds) as total_work_duration_seconds')
                 ->selectRaw('SUM(revision_duration_seconds) as total_revision_duration_seconds')
@@ -105,7 +110,7 @@ class OddsReportingService
         return [
             'from' => $from,
             'to' => $to,
-            'total_output' => (int) (clone $query)->where('output_done', true)->count(),
+            'total_output' => (int) (clone $query)->sum('total_output'),
             'total_score' => (float) (clone $query)->sum('score'),
             'overdue_count' => (int) (clone $query)->where('overdue', true)->count(),
             'quality_issue_count' => (int) (clone $query)->where('quality_issue_flag', true)->count(),

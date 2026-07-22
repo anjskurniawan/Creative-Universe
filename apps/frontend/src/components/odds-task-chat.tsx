@@ -33,10 +33,12 @@ export function OddsTaskChat({
   taskId,
   userId,
   taskStatus,
+  compact = false,
 }: {
   taskId: string | number;
   userId?: number | null;
   taskStatus?: string | null;
+  compact?: boolean;
 }) {
   const [conversation, setConversation] = useState<OddsTaskConversation | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -44,7 +46,8 @@ export function OddsTaskChat({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesPanelRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const loadConversation = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -86,7 +89,9 @@ export function OddsTaskChat({
   }, [conversation?.id, userId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const panel = messagesPanelRef.current;
+    if (!panel) return;
+    panel.scrollTop = panel.scrollHeight;
   }, [messages]);
 
   const submitMessage = async (event: FormEvent<HTMLFormElement>) => {
@@ -105,11 +110,13 @@ export function OddsTaskChat({
       setError(err instanceof Error ? err.message : "Gagal mengirim pesan.");
     } finally {
       setSending(false);
+      window.requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
     }
   };
 
   return (
-    <section className="rounded-lg border border-cu-border bg-white p-5">
+    <section className={compact ? "bg-transparent" : "rounded-lg border border-cu-border bg-white p-5"}>
+      {!compact && (
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
@@ -151,11 +158,12 @@ export function OddsTaskChat({
           )}
         </div>
       </div>
+      )}
 
       {loading ? (
-        <p className="rounded-lg border border-dashed border-cu-border px-3 py-4 text-sm text-cu-muted">Memuat chat task...</p>
+        <p className={`${compact ? "px-3 py-4" : "rounded-lg border border-dashed border-cu-border px-3 py-4"} text-sm text-cu-muted`}>Memuat chat task...</p>
       ) : !conversation ? (
-        <div className="rounded-lg border border-dashed border-cu-border px-3 py-4">
+        <div className={`${compact ? "px-3 py-4" : "rounded-lg border border-dashed border-cu-border px-3 py-4"}`}>
           {error ? (
             <p className="text-sm text-cu-danger">{error}</p>
           ) : (
@@ -163,14 +171,16 @@ export function OddsTaskChat({
               Room chat dibuat otomatis setelah brief diterima dan task masuk antrean.
             </p>
           )}
-          <button
-            type="button"
-            onClick={() => void loadConversation()}
-            className="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-cu-border bg-white px-3 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
-          >
-            <MaterialIcon name="sync" size="sm" />
-            Cek Room Chat
-          </button>
+          {!compact && (
+            <button
+              type="button"
+              onClick={() => void loadConversation()}
+              className="mt-3 inline-flex h-9 items-center gap-2 rounded-lg border border-cu-border bg-white px-3 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+            >
+              <MaterialIcon name="sync" size="sm" />
+              Cek Room Chat
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -180,7 +190,7 @@ export function OddsTaskChat({
             </p>
           )}
 
-          <div className="max-h-80 min-h-48 overflow-y-auto rounded-lg border border-cu-border bg-cu-panel-soft p-3">
+          <div ref={messagesPanelRef} className={`${compact ? "max-h-56 min-h-28 bg-white px-3 py-2" : "max-h-80 min-h-48 rounded-lg border border-cu-border bg-cu-panel-soft p-3"} overflow-y-auto`}>
             <div className="space-y-3">
               {messages.map((message) => {
                 const isMine = Number(message.sender_id) === Number(userId);
@@ -201,26 +211,26 @@ export function OddsTaskChat({
                 );
               })}
               {messages.length === 0 && (
-                <p className="py-8 text-center text-sm text-cu-muted">Belum ada pesan pada task ini.</p>
+                <p className={`${compact ? "py-5" : "py-8"} text-center text-sm text-cu-muted`}>Belum ada pesan pada task ini.</p>
               )}
-              <div ref={messagesEndRef} />
             </div>
           </div>
 
           {error && <p className="mt-3 text-sm text-cu-danger">{error}</p>}
 
           {conversation.can_send ? (
-            <form onSubmit={submitMessage} className="mt-3 flex items-center gap-2">
+            <form onSubmit={submitMessage} className={`${compact ? "border-t border-cu-border bg-white px-3 py-2" : "mt-3"} flex items-center gap-2`}>
               <input
+                ref={inputRef}
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 placeholder="Tulis pesan task..."
-                className="h-10 min-w-0 flex-1 rounded-lg border border-cu-border px-3 text-sm outline-none focus:border-cu-info"
+                className={`${compact ? "h-9" : "h-10"} min-w-0 flex-1 rounded-lg border border-cu-border px-3 text-sm outline-none focus:border-cu-info`}
               />
               <button
                 type="submit"
                 disabled={!draft.trim() || sending}
-                className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-cu-info text-white transition hover:bg-cu-info/90 disabled:opacity-50"
+                className={`${compact ? "size-9" : "size-10"} inline-flex shrink-0 items-center justify-center rounded-lg bg-cu-info text-white transition hover:bg-cu-info/90 disabled:opacity-50`}
                 aria-label="Kirim pesan"
               >
                 <MaterialIcon name="send" size="sm" />
