@@ -4452,7 +4452,7 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
         await clientReviewOddsTask(task.id, "approved", feedback || undefined);
         await rateOddsTask(task.id, clientRating, feedback || undefined);
       } else {
-      await clientReviewOddsTask(task.id, "revision", note || undefined, "normal");
+        await clientReviewOddsTask(task.id, "revision", note || undefined, "normal");
       }
       setClientApproveOpen(false);
       setClientApproveStep(1);
@@ -4461,6 +4461,9 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
       setClientFeedback("");
       setFileOpen(false);
       await onReviewed?.();
+    } catch (err: any) {
+      console.error(err);
+      alert(oddsError(err));
     } finally {
       setClientReviewBusy(null);
     }
