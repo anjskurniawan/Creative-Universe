@@ -685,31 +685,24 @@ function WelcomeScreen({
 
 function RequestTypeSelectStage({ onContinue }: { onContinue: () => void }) {
   return (
-    <section className="class-select-stage relative flex h-full min-h-0 flex-1 flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 shadow-[inset_0_0_0_2px_#eceee6] sm:min-h-[440px] sm:p-3">
+    <section className="class-select-stage relative flex h-auto max-w-4xl w-full mx-auto my-auto flex-col overflow-hidden border-2 border-[#24252b] bg-[#c9ccc0] p-2 shadow-[inset_0_0_0_2px_#eceee6] sm:p-3 rounded-lg">
       <span className="pointer-events-none absolute -left-8 -top-8 size-20 rotate-45 border-[12px] border-[#ba0dcb] opacity-40" />
       <span className="pointer-events-none absolute -bottom-10 -right-10 size-28 rotate-45 border-[14px] border-[#24252b] opacity-10" />
 
-      <header className="relative flex shrink-0 items-center justify-between gap-2 border-b-2 border-[#24252b] bg-[#24252b] px-3 py-2 text-[#dfe2d3] sm:items-end sm:gap-3 sm:px-4 sm:py-3">
-        <div className="min-w-0">
-          <p className="hidden text-[9px] font-black uppercase tracking-[0.22em] text-[#f2b8f6] sm:block">Request Type Select</p>
-          <h2 className="whitespace-nowrap text-xs font-black uppercase tracking-[0.02em] text-[#dfe2d3] min-[360px]:text-sm min-[360px]:tracking-[0.04em] sm:mt-1 sm:text-2xl sm:tracking-[0.06em]">Choose Request Type</h2>
-        </div>
-        <div className="flex shrink-0 items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.08em] sm:gap-2 sm:text-[9px] sm:tracking-[0.12em]">
-          <span className="size-2 animate-pulse bg-[#ba0dcb]" />
-          <span className="sm:hidden">1/2</span>
-          <span className="hidden sm:inline">01 / 02 Available</span>
-        </div>
+      <header className="relative flex shrink-0 flex-col items-center justify-center gap-1 border-b-2 border-[#24252b] bg-[#24252b] px-3 py-2 text-center text-[#dfe2d3] sm:px-4 sm:py-3 rounded-t">
+        <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#f2b8f6]">Request Type Select</p>
+        <h2 className="text-sm font-black uppercase tracking-[0.04em] text-[#dfe2d3] sm:text-2xl sm:tracking-[0.06em]">Mau buat project apa hari ini ?</h2>
       </header>
 
-      <div className="retro-scrollbar relative mt-2 grid min-h-0 flex-1 grid-rows-2 gap-2 overflow-y-auto p-0.5 pr-1 sm:mt-3 sm:gap-3 md:grid-cols-2 md:grid-rows-1 md:overflow-visible md:p-0">
-        <div className="group relative flex h-full flex-col overflow-hidden border-[3px] border-[#24252b] bg-[#dfe2d3] text-left shadow-[5px_5px_0_#24252b] transition-transform duration-150 hover:-translate-y-1" role="option" aria-selected="true">
+      <div className="retro-scrollbar relative mt-2 flex flex-col items-center justify-center gap-4 p-1 sm:mt-3 sm:gap-6 md:flex-row md:overflow-visible">
+        <div className="group relative flex w-full max-w-sm flex-col overflow-hidden border-[3px] border-[#24252b] bg-[#dfe2d3] text-left shadow-[5px_5px_0_#24252b] transition-transform duration-150 hover:-translate-y-1" role="option" aria-selected="true">
           <div className="flex items-center justify-between border-b-2 border-[#24252b] bg-[#ba0dcb] px-3 py-2 text-white">
             <span className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em]"><span className="animate-pulse">▶</span> Option 01</span>
             <span className="border border-white/70 px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.14em]">Available</span>
           </div>
 
           <div
-            className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border-b-2 border-[#24252b] sm:min-h-48"
+            className="relative flex min-h-0 items-center justify-center overflow-hidden border-b-2 border-[#24252b] py-8 sm:min-h-48"
             style={{
               backgroundImage: "linear-gradient(rgba(36,37,43,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(36,37,43,0.08) 1px, transparent 1px)",
               backgroundSize: "16px 16px",
@@ -732,13 +725,13 @@ function RequestTypeSelectStage({ onContinue }: { onContinue: () => void }) {
           </div>
         </div>
 
-        <div className="relative flex h-full cursor-not-allowed flex-col overflow-hidden border-[3px] border-[#24252b] bg-[#aeb1a7] text-left text-[#555850] shadow-[3px_3px_0_#24252b]" aria-label="Video type locked" aria-disabled="true">
+        <div className="relative flex w-full max-w-sm cursor-not-allowed flex-col overflow-hidden border-[3px] border-[#24252b] bg-[#aeb1a7] text-left text-[#555850] shadow-[3px_3px_0_#24252b]" aria-label="Video type locked" aria-disabled="true">
           <span className="absolute inset-0 z-10 opacity-15" style={{ backgroundImage: "repeating-linear-gradient(135deg, #24252b 0 2px, transparent 2px 10px)" }} />
           <div className="relative z-20 flex items-center justify-between border-b-2 border-[#24252b] bg-[#8f938a] px-3 py-2">
             <span className="text-[9px] font-black uppercase tracking-[0.16em]">Option 02</span>
             <span className="border border-[#24252b] bg-[#d4d7cc] px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.14em]">Locked</span>
           </div>
-          <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden border-b-2 border-[#24252b] sm:min-h-48">
+          <div className="relative flex min-h-0 items-center justify-center overflow-hidden border-b-2 border-[#24252b] py-8 sm:min-h-48">
             <span className="absolute left-3 top-3 border-2 border-[#24252b] bg-[#d4d7cc] px-2 py-1 text-[8px] font-black uppercase tracking-[0.14em]">Type 02</span>
             <RetroRequestTypeIcon icon="videocam" label="Video camera icon" muted />
             <span className="absolute bottom-4 right-4 z-20 border-2 border-[#24252b] bg-[#24252b] px-3 py-1 text-[8px] font-black uppercase tracking-[0.14em] text-[#dfe2d3]">Future Update</span>

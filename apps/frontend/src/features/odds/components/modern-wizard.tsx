@@ -168,6 +168,7 @@ export function ModernWizard({
     }
   };
 
+  const todayDate = useMemo(() => dateFromNow(0), []);
   const tomorrowDate = useMemo(() => dateFromNow(1), []);
   const threeDaysDate = useMemo(() => dateFromNow(3), []);
 
@@ -303,15 +304,15 @@ export function ModernWizard({
           
           {/* STEP 1: Format Medium */}
           {currentStep === 1 && (
-            <div className="space-y-5 flex-1 flex flex-col">
-              <div>
-                <h2 className={`text-xl font-bold tracking-tight ${textTitle}`}>Pilih Format Medium</h2>
+            <div className="space-y-6 flex-1 flex flex-col items-center justify-center my-auto w-full">
+              <div className="text-center">
+                <h2 className={`text-xl font-bold tracking-tight ${textTitle}`}>Mau buat project apa hari ini ?</h2>
                 <p className={`text-xs ${textMuted} mt-0.5`}>Pilih jenis request visual yang ingin diajukan</p>
               </div>
-              <div className="grid gap-6 sm:grid-cols-2 flex-1 min-h-0">
+              <div className="grid gap-6 sm:grid-cols-2 max-w-3xl w-full justify-center">
                 <button
                   type="button"
-                  className={`group relative flex h-full flex-col items-start p-6 rounded-3xl border-2 text-left transition-all duration-300 ${
+                  className={`group relative flex h-auto flex-col items-start p-6 rounded-3xl border-2 text-left transition-all duration-300 ${
                     dark
                       ? "border-[#B0FF5E] bg-[#B0FF5E]/5 shadow-[0_8px_32px_rgba(176,255,94,0.08)] hover:bg-[#B0FF5E]/10"
                       : "border-[#00A4FF] bg-[#00A4FF]/5 shadow-[0_8px_32px_rgba(0,164,255,0.08)] hover:bg-[#00A4FF]/10"
@@ -330,7 +331,7 @@ export function ModernWizard({
                 <button
                   type="button"
                   disabled
-                  className="relative flex h-full flex-col items-start p-6 rounded-3xl border border-dashed text-left opacity-35 cursor-not-allowed bg-black/[0.01] dark:bg-white/[0.01] border-black/10 dark:border-white/10"
+                  className="relative flex h-auto flex-col items-start p-6 rounded-3xl border border-dashed text-left opacity-35 cursor-not-allowed bg-black/[0.01] dark:bg-white/[0.01] border-black/10 dark:border-white/10"
                 >
                   <div className="p-4 rounded-2xl bg-black/5 text-slate-400 dark:bg-white/5 dark:text-slate-500">
                     <MaterialIcon name="videocam" size="lg" />
@@ -348,12 +349,12 @@ export function ModernWizard({
           {/* STEP 2: Category */}
           {currentStep === 2 && (
             <div className="space-y-5 flex-1 flex flex-col">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="shrink-0">
                   <h2 className={`text-xl font-bold tracking-tight ${textTitle}`}>Pilih Kategori Desain</h2>
                   <p className={`text-xs ${textMuted} mt-0.5`}>Pilih kategori spesifik yang mewakili request Anda</p>
                 </div>
-                <div className="relative w-full sm:w-64">
+                <div className="relative flex-1 w-full">
                   <span className="absolute left-3.5 top-3 text-slate-400"><MaterialIcon name="search" size="xs" /></span>
                   <input
                     type="text"
@@ -493,21 +494,7 @@ export function ModernWizard({
                             </span>
                           </div>
 
-                          {/* Capacity progress meter */}
-                          <div className="mt-3.5">
-                            <div className="flex items-center justify-between text-[9px] mb-1">
-                              <span className={textMuted}>Kapasitas Harian</span>
-                              <span className="font-semibold">{capacityMinutes} Menit</span>
-                            </div>
-                            <div className="w-full h-1.5 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full transition-all duration-500 ${
-                                  dark ? "bg-[#B0FF5E]" : "bg-[#00A4FF]"
-                                }`}
-                                style={{ width: `${Math.max(percentage, 15)}%` }}
-                              />
-                            </div>
-                          </div>
+
                         </div>
                       </button>
                     );
@@ -536,7 +523,7 @@ export function ModernWizard({
               <div className="flex-1 flex flex-col min-h-0">
                 {/* Mini Step 1: Purpose (Tujuan) */}
                 {miniStep === 1 && (
-                  <div className="space-y-5 flex-1 flex flex-col justify-center max-w-lg mx-auto w-full">
+                  <div className="space-y-5 flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full">
                     <div className="text-center sm:text-left">
                       <h3 className={`text-lg font-semibold ${textTitle}`}>Tujuan / Judul Request</h3>
                       <p className={`text-xs ${textMuted} mt-1`}>Beri nama deskriptif untuk request visual Anda (misal: campaign promo, posting rutin)</p>
@@ -545,10 +532,14 @@ export function ModernWizard({
                       <input
                         id="purpose"
                         type="text"
-                        placeholder="Contoh: Feed Promo Gajian Doran Gadget"
+                        placeholder="Contoh : Feed Instagram JETE"
                         value={form.design_purpose}
                         onChange={(e) => update("design_purpose", e.target.value)}
-                        className={inputClass}
+                        className={`w-full rounded-3xl border px-6 py-4.5 text-lg focus:outline-none transition ${
+                          dark
+                            ? "bg-[#0E0E0E] border-white/10 text-white focus:border-[#B0FF5E]"
+                            : "bg-white border-[#BDEAFF] text-[#04044A] focus:border-[#00A4FF] focus:bg-[#F3FAFF]/30"
+                        }`}
                         autoFocus
                         required
                       />
@@ -570,7 +561,7 @@ export function ModernWizard({
                       <div className="text-center sm:text-left">
                         <h3 className={`text-lg font-semibold ${textTitle}`}>Important Matrix Kategori</h3>
                         <p className={`text-xs ${textMuted} mt-1`}>
-                          Skala prioritas ditentukan secara otomatis oleh sistem berdasarkan kategori <b className="text-slate-200">{selectedCategory?.name || "yang dipilih"}</b>.
+                          Berdasarkan Important Matrix Kategori, tugas <b className="font-bold text-[#00A4FF]">{selectedCategory?.name || "yang dipilih"}</b> berada pada:
                         </p>
                       </div>
                       
@@ -585,60 +576,121 @@ export function ModernWizard({
                       </div>
                       
                       <p className={`text-[11px] text-center sm:text-left italic ${textMuted}`}>
-                        * Client tidak perlu memilih skala prioritas secara manual. Klik tombol "Lanjut" untuk melanjutkan ke tenggat waktu.
+                        * Anda tidak perlu memilih skala prioritas secara manual. Klik tombol "Lanjutkan" untuk melanjutkan ke tenggat waktu.
                       </p>
                     </div>
                   );
                 })()}
 
                 {/* Mini Step 3: Deadline */}
-                {miniStep === 3 && (
-                  <div className="space-y-5 flex-1 flex flex-col justify-center max-w-lg mx-auto w-full">
-                    <div className="text-center sm:text-left">
-                      <h3 className={`text-lg font-semibold ${textTitle}`}>Tenggat Waktu / Deadline</h3>
-                      <p className={`text-xs ${textMuted} mt-1`}>Pilih tenggat waktu pengerjaan. Kami akan otomatis menjadwalkan jika dikosongkan.</p>
-                    </div>
+                {miniStep === 3 && (() => {
+                  const matrixKey = (selectedCategory?.important_matrix || form.important_matrix || "Q4").toUpperCase();
+                  const isQ1 = matrixKey === "Q1";
+                  const isQ2 = matrixKey === "Q2";
+                  const isQ3orQ4 = matrixKey === "Q3" || matrixKey === "Q4";
 
-                    <div className="grid gap-3 grid-cols-2">
-                      <button
-                        type="button"
-                        onClick={() => update("deadline", tomorrowDate)}
-                        className={`p-4 rounded-2xl border text-center transition-all ${
-                          form.deadline === tomorrowDate
-                            ? dark ? "bg-[#B0FF5E] text-[#181818]" : "bg-[#00A4FF] text-white"
-                            : dark ? "bg-white/5 hover:bg-white/10" : "bg-[#F3FAFF] hover:bg-[#DFF6FF] border-[#BDEAFF]"
-                        }`}
-                      >
-                        <span className="block text-xs font-bold">Besok</span>
-                        <span className="text-[10px] opacity-75">{tomorrowDate}</span>
-                      </button>
+                  return (
+                    <div className="space-y-5 flex-1 flex flex-col justify-center max-w-lg mx-auto w-full">
+                      <div className="text-center sm:text-left">
+                        <h3 className={`text-lg font-semibold ${textTitle}`}>Tenggat Waktu / Deadline</h3>
+                        <p className={`text-xs ${textMuted} mt-1`}>Pilih tenggat waktu pengerjaan. Kami akan otomatis menjadwalkan jika dikosongkan.</p>
+                      </div>
 
-                      <button
-                        type="button"
-                        onClick={() => update("deadline", threeDaysDate)}
-                        className={`p-4 rounded-2xl border text-center transition-all ${
-                          form.deadline === threeDaysDate
-                            ? dark ? "bg-[#B0FF5E] text-[#181818]" : "bg-[#00A4FF] text-white"
-                            : dark ? "bg-white/5 hover:bg-white/10" : "bg-[#F3FAFF] hover:bg-[#DFF6FF] border-[#BDEAFF]"
-                        }`}
-                      >
-                        <span className="block text-xs font-bold">+3 Hari</span>
-                        <span className="text-[10px] opacity-75">{threeDaysDate}</span>
-                      </button>
-                    </div>
+                      {/* Buttons for Q1 */}
+                      {isQ1 && (
+                        <div className="grid gap-3 grid-cols-3">
+                          <button
+                            type="button"
+                            onClick={() => update("deadline", todayDate)}
+                            className={`p-4 rounded-2xl border text-center transition-all ${
+                              form.deadline === todayDate
+                                ? dark ? "bg-[#B0FF5E] text-[#181818]" : "bg-[#00A4FF] text-white"
+                                : dark ? "bg-white/5 hover:bg-white/10" : "bg-[#F3FAFF] hover:bg-[#DFF6FF] border-[#BDEAFF]"
+                            }`}
+                          >
+                            <span className="block text-xs font-bold">Hari ini</span>
+                            <span className="text-[10px] opacity-75">{todayDate}</span>
+                          </button>
 
-                    <div className="relative">
-                      <label htmlFor="custom-deadline" className="block text-[10px] font-bold uppercase tracking-wider mb-2 text-slate-400">Atur Tanggal Kustom</label>
-                      <input
-                        id="custom-deadline"
-                        type="date"
-                        value={form.deadline}
-                        onChange={(e) => update("deadline", e.target.value)}
-                        className={inputClass}
-                      />
+                          <button
+                            type="button"
+                            onClick={() => update("deadline", tomorrowDate)}
+                            className={`p-4 rounded-2xl border text-center transition-all ${
+                              form.deadline === tomorrowDate
+                                ? dark ? "bg-[#B0FF5E] text-[#181818]" : "bg-[#00A4FF] text-white"
+                                : dark ? "bg-white/5 hover:bg-white/10" : "bg-[#F3FAFF] hover:bg-[#DFF6FF] border-[#BDEAFF]"
+                            }`}
+                          >
+                            <span className="block text-xs font-bold">Besok</span>
+                            <span className="text-[10px] opacity-75">{tomorrowDate}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => update("deadline", threeDaysDate)}
+                            className={`p-4 rounded-2xl border text-center transition-all ${
+                              form.deadline === threeDaysDate
+                                ? dark ? "bg-[#B0FF5E] text-[#181818]" : "bg-[#00A4FF] text-white"
+                                : dark ? "bg-white/5 hover:bg-white/10" : "bg-[#F3FAFF] hover:bg-[#DFF6FF] border-[#BDEAFF]"
+                            }`}
+                          >
+                            <span className="block text-xs font-bold">+3 Hari</span>
+                            <span className="text-[10px] opacity-75">{threeDaysDate}</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Buttons for Q2 */}
+                      {isQ2 && (
+                        <div className="grid gap-3 grid-cols-2">
+                          <button
+                            type="button"
+                            onClick={() => update("deadline", tomorrowDate)}
+                            className={`p-4 rounded-2xl border text-center transition-all ${
+                              form.deadline === tomorrowDate
+                                ? dark ? "bg-[#B0FF5E] text-[#181818]" : "bg-[#00A4FF] text-white"
+                                : dark ? "bg-white/5 hover:bg-white/10" : "bg-[#F3FAFF] hover:bg-[#DFF6FF] border-[#BDEAFF]"
+                            }`}
+                          >
+                            <span className="block text-xs font-bold">Besok</span>
+                            <span className="text-[10px] opacity-75">{tomorrowDate}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => update("deadline", threeDaysDate)}
+                            className={`p-4 rounded-2xl border text-center transition-all ${
+                              form.deadline === threeDaysDate
+                                ? dark ? "bg-[#B0FF5E] text-[#181818]" : "bg-[#00A4FF] text-white"
+                                : dark ? "bg-white/5 hover:bg-white/10" : "bg-[#F3FAFF] hover:bg-[#DFF6FF] border-[#BDEAFF]"
+                            }`}
+                          >
+                            <span className="block text-xs font-bold">+3 Hari</span>
+                            <span className="text-[10px] opacity-75">{threeDaysDate}</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Custom Date picker: Show for Q2, Q3, Q4. For Q3 and Q4, min must be 3 days from now. */}
+                      {!isQ1 && (
+                        <div className="relative">
+                          <label htmlFor="custom-deadline" className="block text-[10px] font-bold uppercase tracking-wider mb-2 text-slate-400">Atur Tanggal Kustom</label>
+                          <input
+                            id="custom-deadline"
+                            type="date"
+                            min={isQ3orQ4 ? threeDaysDate : undefined}
+                            value={form.deadline}
+                            onChange={(e) => update("deadline", e.target.value)}
+                            className={inputClass}
+                          />
+                          {isQ3orQ4 && (
+                            <p className="text-[9px] text-red-500 mt-1">* Khusus Q3/Q4, tenggat waktu minimal 3 hari dari sekarang ({threeDaysDate})</p>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* Mini Step 4: WYSIWYG Brief Editor */}
                 {miniStep === 4 && (

@@ -3,54 +3,28 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/material-icon";
-import { Navbar } from "@/components/navbar";
 import { creativeReportApi } from "@/features/creative-report/api";
-import { CreativeMemberManagement } from "@/features/creative-report/creative-member-management";
 import type {
   CreativeReportGroup,
   CreativeReportIndex,
 } from "@/features/creative-report/types";
 import { useAuth } from "@/providers/auth-provider";
-import {
-  SideMenu,
-  type SideMenuItem,
-  type SideMenuVariant,
-} from "@/components/side-menu";
+import { useCreativeReportTheme } from "./theme-context";
+import { getCollabAspects, getPerfAspects } from "./settings";
 
-const PRIMARY_MENU: SideMenuItem[] = [
-  {
-    label: "Report",
-    icon: "monitoring",
-    href: "/creative-report",
-    status: "Active",
-  },
-];
 const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer"];
-const SCORE_MAXIMA = [6, 6, 6, 6, 6, 10, 10, 10, 10, 10];
-const HEADERS = [
-  "Aspek 1 (6)",
-  "Aspek 2 (6)",
-  "Aspek 3 (6)",
-  "Aspek 4 (6)",
-  "Aspek 5 (6)",
-  "Total nilai",
-  "Aspek 1 (10)",
-  "Aspek 2 (10)",
-  "Aspek 3 (10)",
-  "Aspek 4 (10)",
-  "Aspek 5 (10)",
-  "Total nilai",
-  "Cuti",
-  "Bolos",
-  "Telat",
-  "Total nilai",
-];
+
 
 type Draft = {
   creative_scores: number[];
   leave: number;
   absence: number;
   late: number;
+  hrd_review_history?: {
+    leave_dates?: string[];
+    absence_dates?: string[];
+    late_dates?: string[];
+  };
 };
 
 function Avatar({ name }: { name: string }) {
@@ -82,6 +56,31 @@ function AssessmentTable({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<number, Draft>>({});
+  const [activeDateAction, setActiveDateAction] = useState<{
+    assessmentId: number;
+    key: "leave" | "absence" | "late";
+    index: number;
+    dateStr: string;
+  } | null>(null);
+  
+  const collabAspects = useMemo(() => getCollabAspects(), []);
+  const perfAspects = useMemo(() => getPerfAspects(), []);
+  
+  const scoreMaxima = useMemo(() => [
+    ...collabAspects.map((a) => a.maxPoints),
+    ...perfAspects.map((a) => a.maxPoints),
+  ], [collabAspects, perfAspects]);
+
+  const headers = useMemo(() => [
+    ...collabAspects.map((a) => `${a.name} (${a.maxPoints})`),
+    "Total nilai",
+    ...perfAspects.map((a) => `${a.name} (${a.maxPoints})`),
+    "Total nilai",
+    "Cuti",
+    "Bolos",
+    "Telat",
+    "Total nilai",
+  ], [collabAspects, perfAspects]);
   const beginInput = () => {
     setDrafts(
       Object.fromEntries(
@@ -92,6 +91,11 @@ function AssessmentTable({
             leave: item.hrd_review.leave,
             absence: item.hrd_review.absence,
             late: item.hrd_review.late,
+            hrd_review_history: {
+              leave_dates: item.hrd_review.history?.leave_dates ?? [],
+              absence_dates: item.hrd_review.history?.absence_dates ?? [],
+              late_dates: item.hrd_review.history?.late_dates ?? [],
+            },
           },
         ]),
       ),
@@ -109,13 +113,65 @@ function AssessmentTable({
       const next = { ...current[id] };
       if (field === "score" && scoreIndex !== undefined)
         next.creative_scores = next.creative_scores.map((score, index) =>
-          index === scoreIndex ? Math.min(SCORE_MAXIMA[index], parsed) : score,
+          index === scoreIndex ? Math.min(scoreMaxima[index], parsed) : score,
         );
       else if (field === "leave" || field === "absence" || field === "late")
         next[field] = parsed;
       return { ...current, [id]: next };
     });
   };
+  const addDate = (id: number, key: "leave" | "absence" | "late", dateStr: string) => {
+    if (!dateStr) return;
+    setDrafts((current) => {
+      const next = { ...current[id] };
+      const history = { ...next.hrd_review_history };
+      const dateKey = `${key}_dates` as const;
+      const list = [...(history[dateKey] ?? [])];
+      list.push(dateStr);
+      list.sort();
+      history[dateKey] = list;
+      next.hrd_review_history = history;
+      next[key] = list.length;
+      return { ...current, [id]: next };
+    });
+  };
+
+  const updateDate = (id: number, key: "leave" | "absence" | "late", index: number, newDateStr: string) => {
+    if (!newDateStr) return;
+    setDrafts((current) => {
+      const next = { ...current[id] };
+      const history = { ...next.hrd_review_history };
+      const dateKey = `${key}_dates` as const;
+      const list = [...(history[dateKey] ?? [])];
+      list[index] = newDateStr;
+      list.sort();
+      history[dateKey] = list;
+      next.hrd_review_history = history;
+      next[key] = list.length;
+      return { ...current, [id]: next };
+    });
+  };
+
+  const deleteDate = (id: number, key: "leave" | "absence" | "late", index: number) => {
+    setDrafts((current) => {
+      const next = { ...current[id] };
+      const history = { ...next.hrd_review_history };
+      const dateKey = `${key}_dates` as const;
+      const list = [...(history[dateKey] ?? [])];
+      list.splice(index, 1);
+      history[dateKey] = list;
+      next.hrd_review_history = history;
+      next[key] = list.length;
+      return { ...current, [id]: next };
+    });
+  };
+
+  const formatDateShort = (dateStr: string) => {
+    const parts = dateStr.split("-");
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}`;
+    return dateStr;
+  };
+
   const save = async (complete = false) => {
     setSaving(true);
     setSaveError(null);
@@ -127,6 +183,7 @@ function AssessmentTable({
           leave_count: draft.leave,
           absence_count: draft.absence,
           late_count: draft.late,
+          hrd_review_history: draft.hrd_review_history,
         });
         if (complete) await creativeReportApi.assessments.complete(item.id);
       }));
@@ -140,8 +197,9 @@ function AssessmentTable({
   };
 
   return (
-    <div className="overflow-hidden rounded-b-xl border border-t-0 border-[#c9bbfc] bg-white">
-      <table className="w-full table-fixed border-collapse text-left">
+    <>
+      <div className="overflow-hidden rounded-b-xl border border-t-0 border-[#c9bbfc] bg-white">
+        <table className="w-full table-fixed border-collapse text-left">
         <thead>
           <tr className="bg-[#f7f5ff] text-xs font-semibold text-[#3b4446]">
             <th
@@ -182,7 +240,7 @@ function AssessmentTable({
             </th>
           </tr>
           <tr className="text-[11px] font-medium">
-            {HEADERS.map((aspect, index) => {
+            {headers.map((aspect, index) => {
               const [, label, maximum] = aspect.match(/^(.*) \((\d+)\)$/) ?? [
                 "",
                 aspect,
@@ -266,7 +324,7 @@ function AssessmentTable({
                         <input
                           type="number"
                           min={0}
-                          max={SCORE_MAXIMA[scoreIndex]}
+                          max={scoreMaxima[scoreIndex]}
                           value={value}
                           onChange={(event) =>
                             updateDraft(
@@ -278,17 +336,62 @@ function AssessmentTable({
                           }
                           className="h-7 w-9 [appearance:textfield] rounded-md border border-[#bdb0f5] bg-white text-center text-xs font-semibold outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         />
-                      ) : inputMode && editableHrd ? (
-                        <input
-                          type="number"
-                          min={0}
-                          value={value}
-                          onChange={(event) =>
-                            updateDraft(item.id, hrdKey, event.target.value)
-                          }
-                          className="h-7 w-9 [appearance:textfield] rounded-md border border-[#9ed5a7] bg-white text-center text-xs font-semibold outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                        />
-                      ) : (
+                      ) : inputMode && editableHrd ? (() => {
+                        const history = draft.hrd_review_history ?? {};
+                        const dateKey = `${hrdKey}_dates` as const;
+                        const dates = history[dateKey] ?? [];
+
+                        return (
+                          <div className="flex flex-col items-center gap-1.5 py-1">
+                            <span className="text-xs font-bold text-slate-700">{value}</span>
+
+                            {dates.length > 0 && (
+                              <div className="flex flex-col gap-1 w-full max-w-[70px] max-h-[80px] overflow-y-auto">
+                                {dates.map((dateStr, dIdx) => {
+                                  return (
+                                    <div key={dIdx} className="relative">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setActiveDateAction({
+                                            assessmentId: item.id,
+                                            key: hrdKey,
+                                            index: dIdx,
+                                            dateStr,
+                                          })
+                                        }
+                                        className="w-full text-[10px] py-0.5 px-1 bg-[#ede9fe] text-[#6d46eb] rounded border border-[#c9bbfc] hover:bg-[#6d46eb] hover:text-white transition font-medium"
+                                      >
+                                        {formatDateShort(dateStr)}
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const el = document.getElementById(
+                                  `add-${item.id}-${hrdKey}`
+                                ) as HTMLInputElement | null;
+                                el?.showPicker();
+                              }}
+                              className="size-5 rounded-full border border-dashed border-[#9ed5a7] text-[#248235] hover:bg-[#e8f7ea] transition flex items-center justify-center"
+                            >
+                              <MaterialIcon name="add" size="auto" className="text-xs font-bold" />
+                            </button>
+
+                            <input
+                              type="date"
+                              id={`add-${item.id}-${hrdKey}`}
+                              onChange={(e) => addDate(item.id, hrdKey, e.target.value)}
+                              className="sr-only"
+                            />
+                          </div>
+                        );
+                      })() : (
                         value
                       )}
                     </td>
@@ -350,15 +453,64 @@ function AssessmentTable({
         </tfoot>}
       </table>
     </div>
+    
+      {/* Date action modal */}
+      {activeDateAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+            <h3 className="text-sm font-bold text-slate-800 mb-2">Kelola Riwayat Tanggal</h3>
+            <p className="text-xs text-slate-500 mb-4">
+              Tanggal terpilih: <b className="text-slate-700">{formatDateShort(activeDateAction.dateStr)}</b>
+            </p>
+            
+            <div className="space-y-3">
+              <label className="block text-[11px] font-bold text-slate-600">Ganti Tanggal:</label>
+              <input
+                type="date"
+                value={activeDateAction.dateStr}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    updateDate(activeDateAction.assessmentId, activeDateAction.key, activeDateAction.index, e.target.value);
+                    setActiveDateAction(null);
+                  }
+                }}
+                className="w-full h-9 px-3 text-xs rounded-lg border border-slate-200 bg-white text-slate-800 focus:border-[#00a4ff] outline-none"
+              />
+            </div>
+
+            <div className="mt-5 flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  deleteDate(activeDateAction.assessmentId, activeDateAction.key, activeDateAction.index);
+                  setActiveDateAction(null);
+                }}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 hover:bg-red-100 transition"
+              >
+                <MaterialIcon name="delete" size="auto" className="text-sm" />
+                Hapus
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveDateAction(null)}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 transition"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
 export default function CreativeReportPage() {
+  const { theme } = useCreativeReportTheme();
   const { hasPermission, hasRole } = useAuth();
   const canEdit = hasPermission("creative-report.assessments.update");
-  const canManageMembers = hasRole("Root") || hasRole("Manajer");
-  const [sidebarVariant, setSidebarVariant] =
-    useState<SideMenuVariant>("Expand");
+
+
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [jobdesk, setJobdesk] = useState(JOBDESKS[0]);
   const [search, setSearch] = useState("");
@@ -442,21 +594,19 @@ export default function CreativeReportPage() {
         : [...current, id],
     );
   const content = (
-    <main className="min-w-0 flex-1 px-4 pb-8 pt-3 sm:px-8 lg:px-0 lg:pb-12 lg:pt-8">
+    <main className="min-w-0 flex-1">
       <div className="w-full">
-        <header className="flex flex-col gap-5 border-b border-[#e8eef1] pb-6 lg:flex-row lg:items-center lg:justify-between">
+        <header className="flex min-h-[45px] items-center justify-between gap-6 pb-4">
           <div>
-            <h1 className="text-[28px] font-semibold leading-tight text-[#222] sm:text-[40px]">
+            <h1 className={`text-4xl font-medium leading-none tracking-[-0.72px] ${theme === "dark" ? "text-white" : theme === "retro" ? "text-[#24252b]" : "text-[#24252b]"}`}>
               Creative Report
             </h1>
-            <p className="mt-2 text-sm text-[#7b868a] sm:text-base">
-              Laporan performa tim kreatif.
-            </p>
           </div>
-          <div className="flex gap-3">
-            <label className="relative flex h-11 items-center gap-2 rounded-xl border border-[#e2e6e9] bg-white px-3 text-sm font-medium text-[#3b4446]">
-              <MaterialIcon name="calendar_month" size="sm" />
+          <div className="flex gap-2">
+            <label className={`relative flex items-center gap-2 rounded-lg border p-2 text-sm font-medium leading-4 cursor-pointer ${theme === "dark" ? "border border-[#b0ff5e]/30 bg-[#121916] text-[#f1f1f1]" : theme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6] text-[#24252b] shadow-[0_2px_0_#24252b]" : "border border-[#bdeaff] bg-[#f3fbff] text-[#04044A]"}`}>
+              <MaterialIcon name="calendar_month" size="auto" className="text-xl" />
               <span className="capitalize">{monthLabel}</span>
+              <MaterialIcon name="keyboard_arrow_down" size="auto" className="text-xl" />
               <input
                 aria-label="Ganti bulan"
                 type="month"
@@ -468,14 +618,14 @@ export default function CreativeReportPage() {
             <button
               type="button"
               onClick={() => window.print()}
-              className="flex h-11 items-center gap-2 rounded-xl bg-[#6d46eb] px-4 text-sm font-semibold text-white"
+              className={`flex items-center gap-1 rounded-lg border p-2 text-sm font-medium leading-4 ${theme === "dark" ? "border-[rgba(123,123,123,0.25)] bg-[#b0ff5e] text-[#181818]" : theme === "retro" ? "border-2 border-[#24252b] bg-[#ba0dcb] text-white shadow-[0_2px_0_#24252b]" : "border-[rgba(123,123,123,0.25)] bg-[#00a4ff] text-white"}`}
             >
-              <MaterialIcon name="picture_as_pdf" size="sm" />
+              <MaterialIcon name="picture_as_pdf" size="auto" className="text-xl" />
               Export PDF
             </button>
           </div>
         </header>
-        {canManageMembers && <CreativeMemberManagement />}
+
         <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.2fr)_180px_repeat(3,minmax(170px,1fr))]">
           <label className="flex h-12 min-w-0 items-center gap-3 rounded-xl border border-[#e2e6e9] bg-white px-4">
             <MaterialIcon name="search" size="sm" className="text-[#7b868a]" />
@@ -573,24 +723,5 @@ export default function CreativeReportPage() {
       </div>
     </main>
   );
-  return (
-    <>
-      <div className="lg:hidden">
-        <Navbar />
-      </div>
-      <div className="min-h-[calc(100dvh-72px)] bg-[#f6faff] lg:hidden">
-        {content}
-      </div>
-      <div className="hidden min-h-screen grid-cols-[auto_minmax(0,1fr)] bg-[#f6faff] text-[#222] lg:grid">
-        <SideMenu
-          variant={sidebarVariant}
-          primaryItems={PRIMARY_MENU}
-          onVariantChange={setSidebarVariant}
-        />
-        <div className="flex min-w-0 flex-col overflow-y-auto px-4 py-8 sm:px-8 lg:pl-12 lg:pr-16">
-          {content}
-        </div>
-      </div>
-    </>
-  );
+  return content;
 }

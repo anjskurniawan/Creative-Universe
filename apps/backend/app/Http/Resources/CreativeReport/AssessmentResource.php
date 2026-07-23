@@ -22,7 +22,17 @@ class AssessmentResource extends JsonResource
                 'division' => 'Creative',
             ],
             'creative_scores' => $this->creative_scores,
-            'hrd_review' => ['leave' => $this->leave_count, 'absence' => $this->absence_count, 'late' => $this->late_count, 'score' => $this->hrdScore()],
+            'hrd_review' => [
+                'leave' => $this->leave_count,
+                'absence' => $this->absence_count,
+                'late' => $this->late_count,
+                'score' => $this->hrdScore(),
+                'history' => $this->hrd_review_history ?? [
+                    'leave_dates' => [],
+                    'absence_dates' => [],
+                    'late_dates' => [],
+                ]
+            ],
             'totals' => ['score_30' => $this->score30(), 'score_50' => $this->score50(), 'final' => $this->finalScore()],
         ];
     }

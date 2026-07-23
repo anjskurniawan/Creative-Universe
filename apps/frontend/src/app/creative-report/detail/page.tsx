@@ -6,35 +6,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportUserDetail } from "@/features/creative-report/types";
-
-const collaboration = [
-  "Komunikasi Aktif",
-  "Dapat Diandalkan",
-  "Inisiatif Tim",
-  "Pemahaman Brief",
-  "Skill & Powerful",
-];
-const performance = [
-  "Timeline On Time",
-  "Hasil Rapi",
-  "Responsif Revisi",
-  "Cepat Tanggap",
-  "Todo & Report",
-];
+import { useCreativeReportTheme } from "../theme-context";
+import { getCollabAspects, getPerfAspects } from "../settings";
 
 function ScorePanel({
   title,
   color,
   labels,
   scores,
-  maximum,
+  maxima,
   total,
 }: {
   title: string;
   color: string;
   labels: string[];
   scores: number[];
-  maximum: number;
+  maxima: number[];
   total: number;
 }) {
   return (
@@ -50,11 +37,11 @@ function ScorePanel({
             <span className="h-1.5 overflow-hidden rounded-full bg-[#edf0f3]">
               <span
                 className="block h-full rounded-full bg-current"
-                style={{ width: `${(scores[i] / maximum) * 100}%` }}
+                style={{ width: `${(scores[i] / (maxima[i] || 1)) * 100}%` }}
               />
             </span>
             <b className="text-right">
-              {scores[i]}/{maximum}
+              {scores[i]}/{maxima[i]}
             </b>
           </div>
         ))}
@@ -64,7 +51,7 @@ function ScorePanel({
       >
         <span>Σ Nilai</span>
         <span>
-          {total}/ {maximum * 5}
+          {total}/ {maxima.reduce((a, b) => a + b, 0)}
         </span>
       </div>
     </section>
@@ -72,6 +59,10 @@ function ScorePanel({
 }
 
 function CreativeReportDetailContent() {
+  const collabAspects = useMemo(() => getCollabAspects(), []);
+  const perfAspects = useMemo(() => getPerfAspects(), []);
+
+  const { theme } = useCreativeReportTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [detail, setDetail] = useState<CreativeReportUserDetail | null>(null);
@@ -134,7 +125,7 @@ function CreativeReportDetailContent() {
     );
   const final = detail.totals.final;
   return (
-    <main className="min-h-screen bg-[#f6faff] px-4 py-8 sm:px-8 lg:px-12">
+    <main className="w-full">
       <div className="mx-auto max-w-[1400px]">
         <Link
           href="/creative-report"
@@ -145,7 +136,7 @@ function CreativeReportDetailContent() {
         </Link>
         <header className="mt-5 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold text-[#222] sm:text-4xl">
+            <h1 className={`text-4xl font-medium leading-none tracking-[-0.05em] ${theme === "dark" ? "text-[#f1f1f1]" : "text-[#181818]"}`}>
               Creative Monthly Performance
             </h1>
             <p className="mt-2 text-sm text-[#7b868a]">
@@ -254,17 +245,17 @@ function CreativeReportDetailContent() {
           <ScorePanel
             title="A. Collaborative Review (30%)"
             color="text-[#6d46eb]"
-            labels={collaboration}
+            labels={collabAspects.map(a => a.name)}
             scores={detail.creative_scores.slice(0, 5)}
-            maximum={6}
+            maxima={collabAspects.map(a => a.maxPoints)}
             total={detail.totals.score_30}
           />
           <ScorePanel
             title="B. Performance Review (50%)"
             color="text-[#f18728]"
-            labels={performance}
+            labels={perfAspects.map(a => a.name)}
             scores={detail.creative_scores.slice(5)}
-            maximum={10}
+            maxima={perfAspects.map(a => a.maxPoints)}
             total={detail.totals.score_50}
           />
           <section className="rounded-2xl border border-[#e8edf0] bg-white p-5 shadow-sm">
@@ -340,7 +331,7 @@ function CreativeReportDetailContent() {
 
 export default function CreativeReportDetailPage() {
   return (
-    <Suspense fallback={<main className="min-h-screen bg-[#f6faff] p-8 text-[#7b868a]">Memuat report individual...</main>}>
+    <Suspense fallback={<main className="w-full p-8 text-[#7b868a]">Memuat report individual...</main>}>
       <CreativeReportDetailContent />
     </Suspense>
   );

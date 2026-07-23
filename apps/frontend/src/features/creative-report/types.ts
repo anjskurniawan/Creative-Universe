@@ -15,7 +15,17 @@ export interface CreativeReportAssessment {
   group: { id: number; name: string };
   user: CreativeReportUser;
   creative_scores: number[];
-  hrd_review: { leave: number; absence: number; late: number; score: number };
+  hrd_review: {
+    leave: number;
+    absence: number;
+    late: number;
+    score: number;
+    history?: {
+      leave_dates?: string[];
+      absence_dates?: string[];
+      late_dates?: string[];
+    };
+  };
   totals: { score_30: number; score_50: number; final: number };
 }
 
@@ -43,9 +53,14 @@ export interface CreativeReportFilters {
 
 export interface CreativeReportUpdateInput {
   creative_scores: number[];
-  leave_count: number;
-  absence_count: number;
-  late_count: number;
+  leave_count?: number;
+  absence_count?: number;
+  late_count?: number;
+  hrd_review_history?: {
+    leave_dates?: string[];
+    absence_dates?: string[];
+    late_dates?: string[];
+  };
 }
 
 export interface CreativeMember {

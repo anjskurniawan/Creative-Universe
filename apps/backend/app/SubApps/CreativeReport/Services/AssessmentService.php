@@ -9,6 +9,13 @@ class AssessmentService
 {
     public function saveDraft(Assessment $assessment, array $data): Assessment
     {
+        if (isset($data['hrd_review_history'])) {
+            $history = $data['hrd_review_history'];
+            $data['leave_count'] = count($history['leave_dates'] ?? []);
+            $data['absence_count'] = count($history['absence_dates'] ?? []);
+            $data['late_count'] = count($history['late_dates'] ?? []);
+        }
+
         $assessment->fill($data + [
             'status' => Assessment::STATUS_DRAFT,
             'completed_at' => null,

@@ -16,12 +16,12 @@ class Assessment extends Model
 
     protected $fillable = [
         'creative_report_group_id', 'user_id', 'period', 'creative_scores',
-        'creative_report_member_id', 'leave_count', 'absence_count', 'late_count', 'status', 'completed_at', 'completed_by',
+        'creative_report_member_id', 'leave_count', 'absence_count', 'late_count', 'hrd_review_history', 'status', 'completed_at', 'completed_by',
     ];
 
     protected function casts(): array
     {
-        return ['period' => 'date', 'creative_scores' => 'array', 'completed_at' => 'datetime'];
+        return ['period' => 'date', 'creative_scores' => 'array', 'completed_at' => 'datetime', 'hrd_review_history' => 'array'];
     }
 
     public function group(): BelongsTo

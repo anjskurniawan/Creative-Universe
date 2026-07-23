@@ -16862,3 +16862,518 @@ https://react.dev/link/hydration-mismatch
   237 | }
   238 |
   239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] ./src/app/creative-report/layout.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:1]
+ 83 |       </div>
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    : ^
+    `----
+  x Expected '</', got '<eof>'
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:3]
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/layout.tsx 
+[browser] ./src/app/creative-report/layout.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:1]
+ 83 |       </div>
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    : ^
+    `----
+  x Expected '</', got '<eof>'
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:3]
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/layout.tsx 
+⨯ ./src/app/creative-report/layout.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:1]
+ 83 |       </div>
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    : ^
+    `----
+  x Expected '</', got '<eof>'
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:3]
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/layout.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:1]
+ 83 |       </div>
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    : ^
+    `----
+  x Expected '</', got '<eof>'
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:3]
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:1]
+ 83 |       </div>
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    : ^
+    `----
+  x Expected '</', got '<eof>'
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:3]
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/creative-report/layout.tsx
+Error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:1]
+ 83 |       </div>
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    : ^
+    `----
+  x Expected '</', got '<eof>'
+    ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\layout.tsx:86:3]
+ 84 |     </div>
+ 85 |   );
+ 86 | }
+    `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] Gagal memuat Creative Agent terbaru: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async TaskPerformancePage.useCallback[refreshCreativeAgent] (src\app\kv-retail\performance\page.tsx:242:22)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\kv-retail\performance\page.tsx:245:15)
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:461:1]
+ 458 |             </button>
+ 459 |           </div>
+ 460 |         </header>
+ 461 |         {canManageMembers && <CreativeMemberManagement />}
+     :         ^
+ 462 |         <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.2fr)_180px_repeat(3,minmax(170px,1fr))]">
+ 463 |           <label className="flex h-12 min-w-0 items-center gap-3 rounded-xl border border-[#e2e6e9] bg-white px-4">
+ 464 |             <MaterialIcon name="search" size="sm" className="text-[#7b868a]" />
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx 
+⨯ ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:461:1]
+ 458 |             </button>
+ 459 |           </div>
+ 460 |         </header>
+ 461 |         {canManageMembers && <CreativeMemberManagement />}
+     :         ^
+ 462 |         <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.2fr)_180px_repeat(3,minmax(170px,1fr))]">
+ 463 |           <label className="flex h-12 min-w-0 items-center gap-3 rounded-xl border border-[#e2e6e9] bg-white px-4">
+ 464 |             <MaterialIcon name="search" size="sm" className="text-[#7b868a]" />
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:461:1]
+ 458 |             </button>
+ 459 |           </div>
+ 460 |         </header>
+ 461 |         {canManageMembers && <CreativeMemberManagement />}
+     :         ^
+ 462 |         <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.2fr)_180px_repeat(3,minmax(170px,1fr))]">
+ 463 |           <label className="flex h-12 min-w-0 items-center gap-3 rounded-xl border border-[#e2e6e9] bg-white px-4">
+ 464 |             <MaterialIcon name="search" size="sm" className="text-[#7b868a]" />
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:461:1]
+ 458 |             </button>
+ 459 |           </div>
+ 460 |         </header>
+ 461 |         {canManageMembers && <CreativeMemberManagement />}
+     :         ^
+ 462 |         <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.2fr)_180px_repeat(3,minmax(170px,1fr))]">
+ 463 |           <label className="flex h-12 min-w-0 items-center gap-3 rounded-xl border border-[#e2e6e9] bg-white px-4">
+ 464 |             <MaterialIcon name="search" size="sm" className="text-[#7b868a]" />
+     `----
+
+
+Caused by:
+    Syntax Error
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ ./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx
+
+./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx
+
+./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx
+[browser] ./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx
+[browser] ./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] ./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+[browser] ./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+[browser] ./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+[browser] ./src/app/creative-report/page.tsx
+Attempted import error: 'useCreativeReportTheme' is not exported from './layout' (imported as 'useCreativeReportTheme').
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx 
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx 
+⨯ ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx 
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⨯ ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/creative-report/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error 
+[browser] ./src/app/creative-report/page.tsx
+Error:   x Expected ',', got '{'
+     ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\creative-report\page.tsx:457:1]
+ 454 |       </table>
+ 455 |     </div>
+ 456 |     
+ 457 |       {/* Date action modal */}
+     :       ^
+ 458 |       {activeDateAction && (
+ 459 |         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+ 460 |           <div className="w-80 rounded-2xl bg-white p-5 shadow-xl border border-slate-100 text-slate-800">
+     `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload

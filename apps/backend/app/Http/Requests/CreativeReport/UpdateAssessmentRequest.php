@@ -14,9 +14,16 @@ class UpdateAssessmentRequest extends FormRequest
         return [
             'creative_scores' => ['required', 'array', 'size:10'],
             'creative_scores.*' => ['integer', 'min:0', 'max:10'],
-            'leave_count' => ['required', 'integer', 'min:0'],
-            'absence_count' => ['required', 'integer', 'min:0'],
-            'late_count' => ['required', 'integer', 'min:0'],
+            'leave_count' => ['sometimes', 'integer', 'min:0'],
+            'absence_count' => ['sometimes', 'integer', 'min:0'],
+            'late_count' => ['sometimes', 'integer', 'min:0'],
+            'hrd_review_history' => ['sometimes', 'array'],
+            'hrd_review_history.leave_dates' => ['sometimes', 'array'],
+            'hrd_review_history.leave_dates.*' => ['date'],
+            'hrd_review_history.absence_dates' => ['sometimes', 'array'],
+            'hrd_review_history.absence_dates.*' => ['date'],
+            'hrd_review_history.late_dates' => ['sometimes', 'array'],
+            'hrd_review_history.late_dates.*' => ['date'],
             'status' => ['sometimes', Rule::in([Assessment::STATUS_DRAFT])],
         ];
     }
