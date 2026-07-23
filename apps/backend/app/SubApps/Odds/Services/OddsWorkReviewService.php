@@ -61,8 +61,14 @@ class OddsWorkReviewService
     public function pause(Task $task, int $userId): Task
     {
         return DB::transaction(function () use ($task, $userId) {
-            if ($task->status !== TaskStatusEnum::IN_PROGRESS->value) {
-                throw ValidationException::withMessages(['task_id' => 'Hanya task yang sedang dikerjakan yang bisa dipause.']);
+            $pausableStatuses = [
+                TaskStatusEnum::IN_PROGRESS->value,
+                TaskStatusEnum::LEADER_REVISION_REQUESTED->value,
+                'revision',
+            ];
+
+            if (! in_array($task->status, $pausableStatuses, true)) {
+                throw ValidationException::withMessages(['task_id' => 'Hanya task yang sedang dikerjakan atau dalam revisi yang bisa dipause.']);
             }
 
             $this->timeLogs->stopOpen($task, 'work');
@@ -128,9 +134,11 @@ class OddsWorkReviewService
             activity('odds')->performedOn($task)->event('task_finished')->log('Task work submitted');
 
             if ($requiresSpvReview) {
+                $this->timeLogs->start($task, 'spv_review');
                 $this->notifications->sendToRoles(['Manajer', 'SPV'], 'spv_review_waiting', 'Hasil ODDS menunggu review', 'Hasil desain menunggu review Leader Creative.', $task);
                 activity('odds')->performedOn($task)->event('result_submitted_to_spv')->log('Result submitted to Leader Creative');
             } else {
+                $this->timeLogs->start($task, 'client_review');
                 $this->notifications->send($task->requester, 'client_review_waiting', 'Hasil ODDS siap ditinjau', 'Hasil revisi desain siap direview client.', $task);
                 activity('odds')->performedOn($task)->event('result_submitted_to_client')->log('Revision result submitted to client');
             }
@@ -146,6 +154,8 @@ class OddsWorkReviewService
                 throw ValidationException::withMessages(['task_id' => 'Review hanya bisa dilakukan saat status spv_review.']);
             }
 
+            $this->timeLogs->stopOpen($task, 'spv_review');
+
             $result = $task->results()->latest('version_number')->first();
             $decision = $data['decision'];
             $task->reviews()->create([
@@ -159,6 +169,7 @@ class OddsWorkReviewService
             if ($decision === 'approved') {
                 $result?->update(['status' => 'approved_by_spv']);
                 $task->update(['status' => TaskStatusEnum::CLIENT_REVIEW->value]);
+                $this->timeLogs->start($task, 'client_review');
                 $this->notifications->send($task->requester, 'client_review_waiting', 'Hasil ODDS siap ditinjau', 'Hasil desain siap direview client.', $task);
                 activity('odds')->performedOn($task)->event('spv_approved')->log($data['notes'] ?? 'Approved');
             } else {
@@ -183,6 +194,8 @@ class OddsWorkReviewService
             if ($task->status !== TaskStatusEnum::CLIENT_REVIEW->value) {
                 throw ValidationException::withMessages(['task_id' => 'Review client hanya bisa dilakukan saat status client_review.']);
             }
+
+            $this->timeLogs->stopOpen($task, 'client_review');
 
             $result = $task->results()->latest('version_number')->first();
             $decision = $data['decision'];

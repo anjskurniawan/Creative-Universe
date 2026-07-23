@@ -54,6 +54,18 @@ class ReportController extends BaseApiController
 
     public function rankings(Request $request): JsonResponse
     {
+        // Ensure daily reports and rankings are updated for done tasks
+        $doneTasks = Task::query()
+            ->where('status', TaskStatusEnum::DONE->value)
+            ->whereNotNull('assigned_designer_id')
+            ->get();
+
+        foreach ($doneTasks as $task) {
+            $this->reports->fillDailyReport($task);
+        }
+
+        $this->reports->recalculateRankings();
+
         $query = DesignerRanking::query()->with('designer:id,name,email,username');
 
         if ($request->query('period_type')) {

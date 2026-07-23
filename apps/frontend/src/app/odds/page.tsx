@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
+import { useCallback, useEffect, useMemo, useState, Suspense, useRef, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
 import { HeaderTitle } from "@/components/header-title";
@@ -13,6 +13,7 @@ import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-car
 import { OddsTaskChat } from "@/components/odds-task-chat";
 import { useAuth } from "@/providers/auth-provider";
 import { useOddsTheme } from "./odds-theme-context";
+import TaskCardDate from "@/components/taskcard/date";
 import {
   OddsAssignableUser,
   OddsCategory,
@@ -21,6 +22,7 @@ import {
   OddsRanking,
   OddsReportSummary,
   OddsTask,
+  OddsUser,
   OddsTaskCancelRequest,
   OddsTaskResult,
   OddsTaskSkipRequest,
@@ -45,6 +47,7 @@ import {
   acceptOddsBrief,
   clientReviewOddsTask,
   oddsError,
+  requestOddsCancel,
   returnOddsBrief,
   pauseOddsTask,
   spvReviewOddsTask,
@@ -451,7 +454,9 @@ function OddsPageContent() {
   const [outputTotal, setOutputTotal] = useState("");
   const [outputDragActive, setOutputDragActive] = useState(false);
   const [outputBusy, setOutputBusy] = useState(false);
+  const [adminTaskAction, setAdminTaskAction] = useState<{ taskId: number; type: "brief" | "file" | "check" | "delete" | "detail"; nonce: number } | null>(null);
   const [timerNow, setTimerNow] = useState(() => Date.now());
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -1379,8 +1384,49 @@ function OddsPageContent() {
   ].includes(effectiveActiveSection);
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-6 p-4">
-      <HeaderTitle>{pageTitle}</HeaderTitle>
+    <div className="flex h-full min-h-0 flex-col gap-4 lg:gap-6 lg:p-4">
+      {/* Desktop header title */}
+      <div className="hidden lg:block">
+        <HeaderTitle>{pageTitle}</HeaderTitle>
+      </div>
+
+      {/* Mobile header — kv-retail style */}
+      <div className="lg:hidden shrink-0">
+        <h1 className={`text-4xl font-medium leading-none tracking-[-0.05em] ${
+          theme === "dark" ? "text-[#f1f1f1]" : "text-[#181818]"
+        }`}>
+          {pageTitle}
+        </h1>
+        {/* Search bar — kv-retail style */}
+        {isDesignerTaskSection && (
+          <section aria-label="Cari task" className="mt-4 flex shrink-0 items-center">
+            <label className="relative w-full">
+              <span className="sr-only">Cari task</span>
+              <MaterialIcon
+                name="search"
+                size="auto"
+                weight={400}
+                className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl ${
+                  theme === "dark" ? "text-[#b0ff5e]" : theme === "retro" ? "text-[#24252b]" : "text-[#525e61]"
+                }`}
+              />
+              <input
+                type="search"
+                placeholder="Cari task..."
+                value={mobileSearchQuery}
+                onChange={(e) => setMobileSearchQuery(e.target.value)}
+                className={`h-12 w-full rounded-xl py-3 pl-11 pr-3 text-sm outline-none ${
+                  theme === "dark"
+                    ? "border border-white/10 bg-[#171717] text-[#f1f1f1] placeholder:text-[#7d827f] focus:border-[#b0ff5e]"
+                    : theme === "retro"
+                    ? "border-2 border-[#24252b] bg-[#eceee6] text-[#24252b] placeholder:text-[#687065] focus:border-[#ba0dcb]"
+                    : "border border-[#d7dcdd] bg-white text-[#222] placeholder:text-[#aeb6b8] focus:border-[#00a4ff]"
+                }`}
+              />
+            </label>
+          </section>
+        )}
+      </div>
 
       {(error || notice) && (
         <div
@@ -1919,6 +1965,13 @@ function OddsPageContent() {
             return task.status !== "done";
           })
           .sort((a, b) => {
+            if (isControlTaskSection) {
+              const aDone = a.status === "done";
+              const bDone = b.status === "done";
+              if (aDone && !bDone) return 1;
+              if (bDone && !aDone) return -1;
+            }
+
             // Level 1: in_progress
             if (a.status === "in_progress" && b.status !== "in_progress") return -1;
             if (b.status === "in_progress" && a.status !== "in_progress") return 1;
@@ -2074,6 +2127,15 @@ function OddsPageContent() {
         // Determine which task is currently selected for the chat box
         const selectedChatTaskId = activeChatTaskId;
 
+        // Mobile search filter
+        const mobileFilteredTasks = mobileSearchQuery.trim()
+          ? myTasks.filter((t) =>
+              t.design_purpose?.toLowerCase().includes(mobileSearchQuery.toLowerCase()) ||
+              t.requester?.name?.toLowerCase().includes(mobileSearchQuery.toLowerCase()) ||
+              ((t as any).assigned_designer?.name ?? (t as any).assignedDesigner?.name ?? "").toLowerCase().includes(mobileSearchQuery.toLowerCase())
+            )
+          : myTasks;
+
         return (
           <div className="flex min-h-0 min-w-0 flex-1 flex-col">
             <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
@@ -2083,71 +2145,184 @@ function OddsPageContent() {
                   ) : myTasks.length === 0 ? (
                   <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-8 text-center text-sm text-cu-muted">Belum ada riwayat tugas.</div>
                   ) : (
-                  <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-5 overflow-auto pb-1 pr-1">
-                    {myTasks.map((task) => (
-                      <div key={task.id} className="flex min-w-[900px] flex-col gap-3">
-                        <DesignerTaskQueueCard
-                          task={task}
-                          theme={theme}
-                          nowMs={timerNow}
-                          controlView={isControlTaskSection}
-                          selected={selectedChatTaskId === task.id}
-                          startDisabled={isControlTaskSection || Boolean(activeInProgressTask)}
-                          timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
-                          onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
-                          onStart={() => {
-                            if (isControlTaskSection) return;
-                            void handleStartTask(task.id);
-                          }}
-                          onPause={() => {
-                            if (!isControlTaskSection) return;
-                            void handlePauseTask(task.id);
-                          }}
-                          onDone={() => {
-                            if (isControlTaskSection) return;
-                            if (activeOutputTaskId === task.id) {
-                              closeOutputPanel();
-                              return;
-                            }
-                            setOutputFiles([]);
-                            setOutputShareLink("");
-                            setOutputTotal("");
-                            setOutputDragActive(false);
-                            setActiveOutputTaskId(task.id);
-                          }}
-                          onAcceptBrief={() => runOperationalAction(
-                            `brief-accept-${task.id}`,
-                            () => acceptOddsBrief(task.id),
-                            "Brief diterima dan masuk antrean."
-                          )}
-                          onReturnBrief={(note) => runOperationalAction(
-                            `brief-return-${task.id}`,
-                            () => returnOddsBrief(task.id, note),
-                            "Brief dikembalikan."
-                          )}
-                        />
-                        {selectedChatTaskId === task.id && (
-                          <div className={`overflow-hidden rounded-lg border ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"} shadow-[0_5px_14px_rgba(44,42,39,0.05)]`}>
-                            <div className="flex items-center justify-between border-b border-cu-border bg-cu-panel-soft px-3 py-2">
-                              <div className="flex min-w-0 items-center gap-2">
-                                <MaterialIcon name="forum" size="auto" className="text-lg" style={{ color: accentColor }} />
-                                <div className="min-w-0">
-                                  <p className="max-w-[560px] truncate text-xs font-semibold leading-none text-cu-ink">{task.design_purpose}</p>
-                                </div>
-                              </div>
-                              <button type="button" onClick={() => setActiveChatTaskId(null)} aria-label="Tutup diskusi" className="flex size-7 items-center justify-center rounded-lg border border-cu-border bg-white text-cu-ink transition hover:bg-cu-panel-soft">
-                                <MaterialIcon name="close" size="xs" />
-                              </button>
+                    <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-5 overflow-auto pb-1 pr-1">
+                      {/* Mobile: use mobileFilteredTasks */}
+                      {mobileFilteredTasks.map((task) => (
+                        <div key={task.id} className="flex flex-col gap-3">
+                          {/* ── Mobile Card ── */}
+                          {isControlTaskSection ? (() => {
+                            const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));
+                            const canCheckThisTask = Boolean((task.status === "spv_review" && canReviewSpv) || (task.status === "client_review" && isClientForTask));
+                            return (
+                            <div className="lg:hidden">
+                              <OddsMobileTaskCard
+                                task={task}
+                                theme={theme}
+                                nowMs={timerNow}
+                                timerSeconds={task.status === "in_progress" ? getTaskDuration(task) : undefined}
+                                canCheckRole={canCheckThisTask}
+                                chatOpen={selectedChatTaskId === task.id}
+                                onAction={(action) => {
+                                  if (action === "chat") {
+                                    setActiveChatTaskId((current) => current === task.id ? null : task.id);
+                                    return;
+                                  }
+                                  if (action === "pause") {
+                                    void handlePauseTask(task.id);
+                                    return;
+                                  }
+                                }}
+                              >
+                                {(activeTab) => (
+                                  <>
+                                    <DesignerTaskQueueCard
+                                      task={task}
+                                      theme={theme}
+                                      nowMs={timerNow}
+                                      controlView
+                                      selected={selectedChatTaskId === task.id}
+                                      startDisabled
+                                      timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
+                                      onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
+                                      onStart={() => undefined}
+                                      onPause={() => void handlePauseTask(task.id)}
+                                      onDone={() => undefined}
+                                      onAcceptBrief={() => runOperationalAction(
+                                        `brief-accept-${task.id}`,
+                                        () => acceptOddsBrief(task.id),
+                                        "Brief diterima dan masuk antrean."
+                                      )}
+                                      onReturnBrief={(note) => runOperationalAction(
+                                        `brief-return-${task.id}`,
+                                        () => returnOddsBrief(task.id, note),
+                                        "Brief dikembalikan."
+                                      )}
+                                      externalAction={activeTab ? { type: activeTab as any, nonce: Date.now() } : undefined}
+                                      detailOnly
+                                    />
+                                    {selectedChatTaskId === task.id && (
+                                      <div className={`overflow-hidden border-t ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"}`}>
+                                        <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} compact />
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                              </OddsMobileTaskCard>
                             </div>
-                            <OddsTaskChat
-                              taskId={task.id}
-                              userId={user?.id}
-                              taskStatus={task.status}
-                              compact
+                            );
+                          })() : null}
+
+                          {/* ── Desktop Card ── */}
+                          <div className="hidden min-w-[900px] flex-col gap-3 lg:flex">
+                          {isControlTaskSection ? (() => {
+                            const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));
+                            const canCheckThisTask = Boolean((task.status === "spv_review" && canReviewSpv) || (task.status === "client_review" && isClientForTask));
+                            
+                            return (
+                            <AdminKvRetailTaskCard
+                              task={task}
+                              theme={theme}
+                              nowMs={timerNow}
+                              timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
+                              timerSeconds={task.status === "in_progress" ? getTaskDuration(task) : undefined}
+                              chatOpen={selectedChatTaskId === task.id}
+                              canCheckRole={canCheckThisTask}
+                              onAction={(action) => {
+                                if (action === "chat") {
+                                  setActiveChatTaskId((current) => current === task.id ? null : task.id);
+                                  return;
+                                }
+                                if (action === "pause") {
+                                  void handlePauseTask(task.id);
+                                  return;
+                                }
+                                setAdminTaskAction({ taskId: task.id, type: action, nonce: Date.now() });
+                              }}
+                            >
+                              <DesignerTaskQueueCard
+                                task={task}
+                                theme={theme}
+                                nowMs={timerNow}
+                                controlView
+                                selected={selectedChatTaskId === task.id}
+                                startDisabled
+                                timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
+                                onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
+                                onStart={() => undefined}
+                                onPause={() => void handlePauseTask(task.id)}
+                                onDone={() => undefined}
+                                onAcceptBrief={() => runOperationalAction(
+                                  `brief-accept-${task.id}`,
+                                  () => acceptOddsBrief(task.id),
+                                  "Brief diterima dan masuk antrean."
+                                )}
+                                onReturnBrief={(note) => runOperationalAction(
+                                  `brief-return-${task.id}`,
+                                  () => returnOddsBrief(task.id, note),
+                                  "Brief dikembalikan."
+                                )}
+                                externalAction={adminTaskAction?.taskId === task.id ? adminTaskAction : undefined}
+                                detailOnly
+                              />
+                              {selectedChatTaskId === task.id && (
+                                <div className={`overflow-hidden rounded-lg border mt-3 ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"} shadow-[0_5px_14px_rgba(44,42,39,0.05)]`}>
+                                  <div className="flex items-center justify-between border-b border-cu-border bg-cu-panel-soft px-3 py-2">
+                                    <div className="flex min-w-0 items-center gap-2">
+                                      <MaterialIcon name="forum" size="auto" className="text-lg" style={{ color: accentColor }} />
+                                      <div className="min-w-0">
+                                        <p className="max-w-[560px] truncate text-xs font-semibold leading-none text-cu-ink">{task.design_purpose}</p>
+                                      </div>
+                                    </div>
+                                    <button type="button" onClick={() => setActiveChatTaskId(null)} aria-label="Tutup diskusi" className="flex size-7 items-center justify-center rounded-lg border border-cu-border bg-white text-cu-ink transition hover:bg-cu-panel-soft">
+                                      <MaterialIcon name="close" size="xs" />
+                                    </button>
+                                  </div>
+                                  <OddsTaskChat
+                                    taskId={task.id}
+                                    userId={user?.id}
+                                    taskStatus={task.status}
+                                    compact
+                                  />
+                                </div>
+                              )}
+                            </AdminKvRetailTaskCard>
+                            );
+                          })() : (
+                            <DesignerTaskQueueCard
+                              task={task}
+                              theme={theme}
+                              nowMs={timerNow}
+                              controlView={false}
+                              selected={selectedChatTaskId === task.id}
+                              startDisabled={Boolean(activeInProgressTask)}
+                              timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
+                              onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
+                              onStart={() => void handleStartTask(task.id)}
+                              onDone={() => {
+                                if (activeOutputTaskId === task.id) {
+                                  closeOutputPanel();
+                                  return;
+                                }
+                                setOutputFiles([]);
+                                setOutputShareLink("");
+                                setOutputTotal("");
+                                setOutputDragActive(false);
+                                setActiveOutputTaskId(task.id);
+                              }}
+                              onAcceptBrief={() => runOperationalAction(
+                                `brief-accept-${task.id}`,
+                                () => acceptOddsBrief(task.id),
+                                "Brief diterima dan masuk antrean."
+                              )}
+                              onReturnBrief={(note) => runOperationalAction(
+                                `brief-return-${task.id}`,
+                                () => returnOddsBrief(task.id, note),
+                                "Brief dikembalikan."
+                              )}
                             />
+                          )}
                           </div>
-                        )}
-                        {activeOutputTaskId === task.id && (
+                          {activeOutputTaskId === task.id && (
                           <div className={`overflow-hidden rounded-lg border ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"} shadow-[0_5px_14px_rgba(44,42,39,0.05)]`}>
                             <div className="flex h-10 items-center justify-between border-b border-cu-border bg-cu-panel-soft px-3">
                               <div className="flex min-w-0 items-center gap-2">
@@ -2603,6 +2778,677 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// ─── Mobile Task Card (Admin) ────────────────────────────────────────────────
+type OddsMobileTaskCardProps = {
+  task: OddsTask;
+  theme: "light" | "dark" | "retro";
+  nowMs: number;
+  timerSeconds?: number;
+  canCheckRole?: boolean;
+  chatOpen?: boolean;
+  onAction: (action: "chat" | "pause") => void;
+  children: (activeTab: string | null) => ReactNode;
+};
+
+function OddsMobileTaskCard({
+  task,
+  theme,
+  nowMs,
+  timerSeconds,
+  canCheckRole = false,
+  chatOpen = false,
+  onAction,
+  children,
+}: OddsMobileTaskCardProps) {
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const [isBriefModalOpen, setIsBriefModalOpen] = useState(false);
+
+  const toggleTab = (tab: "brief" | "file" | "check" | "delete") => {
+    if (tab === "brief") {
+      setIsBriefModalOpen(true);
+      return;
+    }
+    if (activeTab === tab && expanded) {
+      setActiveTab(null);
+      setExpanded(false);
+    } else {
+      setActiveTab(tab);
+      setExpanded(true);
+    }
+  };
+
+  const toggleExpandOnly = () => {
+    if (expanded) {
+      setActiveTab(null);
+      setExpanded(false);
+    } else {
+      // Inline expand when clicking main card
+      setActiveTab(null);
+      setExpanded(true);
+    }
+  };
+
+  const isDone = task.status === "done";
+  const isOverdue = task.deadline ? new Date(task.deadline).getTime() < nowMs : false;
+  const isReviewState = task.status === "spv_review" || task.status === "client_review";
+  const priorityShort = (task.status === "done"
+    ? ((task as any).important_matrix || task.category?.important_matrix || "Q4")
+    : (task.category?.important_matrix || (task as any).important_matrix || "Q4")
+  ).toUpperCase();
+  const assignedDesigner = (task as any).assigned_designer ?? (task as any).assignedDesigner;
+
+  const durationSec = timerSeconds ?? 0;
+  const hh = String(Math.floor(durationSec / 3600)).padStart(2, "0");
+  const mm = String(Math.floor((durationSec % 3600) / 60)).padStart(2, "0");
+  const ss = String(durationSec % 60).padStart(2, "0");
+
+  const deadlineDateParsed = task.deadline ? new Date(task.deadline) : null;
+  const isDeadlineValid = deadlineDateParsed && !Number.isNaN(deadlineDateParsed.getTime());
+  const deadlineStr = isDeadlineValid
+    ? new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short" }).format(deadlineDateParsed)
+    : "-";
+
+  // Theme tokens
+  const shellClass = theme === "retro"
+    ? "border-2 border-[#24252b] bg-[#eceee6] rounded-none shadow-[3px_3px_0_0_#24252b]"
+    : theme === "dark"
+    ? "border border-white/10 bg-[#171717] rounded-2xl"
+    : "border border-slate-200 bg-white rounded-2xl shadow-sm";
+  const innerBgClass = theme === "dark" ? "bg-[#171717]" : theme === "retro" ? "bg-[#eceee6]" : "bg-white";
+  const primaryText = theme === "dark" ? "text-[#f1f1f1]" : "text-[#181818]";
+  const mutedText = theme === "dark" ? "text-slate-400" : theme === "retro" ? "text-[#24252b]/60" : "text-slate-500";
+  const divider = theme === "dark" ? "border-white/10" : theme === "retro" ? "border-[#24252b]/20" : "border-slate-100";
+  const accentText = theme === "dark" ? "text-[#b0ff5e]" : theme === "retro" ? "text-[#ba0dcb]" : "text-[#00a4ff]";
+  const iconCircleClass = theme === "retro" ? "border border-[#24252b] bg-white text-[#24252b]" : theme === "dark" ? "bg-white/5 text-slate-300" : "bg-slate-100 text-slate-600";
+  const iconCircleClientClass = theme === "retro" ? "border border-[#24252b] bg-[#00a4ff] text-white" : theme === "dark" ? "bg-[#b0ff5e]/20 text-[#b0ff5e]" : "bg-sky-100 text-[#00a4ff]";
+
+  const getBtnClass = (color: "green" | "amber" | "rose", active = false) => {
+    if (theme === "retro") return `border-2 border-[#24252b] rounded-none ${active ? "bg-[#24252b] text-white" : "bg-white text-[#24252b]"}`;
+    if (theme === "dark") {
+      const map = {
+        green: active ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#b0ff5e]/10 text-[#b0ff5e]",
+        amber: active ? "bg-amber-500 text-white" : "bg-amber-500/10 text-amber-500",
+        rose: active ? "bg-rose-500 text-white" : "bg-rose-500/10 text-rose-400",
+      };
+      return map[color];
+    }
+    const map = {
+      green: active ? "bg-[#00a4ff] text-white" : "bg-sky-50 text-[#00a4ff]",
+      amber: active ? "bg-amber-500 text-white" : "bg-amber-50 text-amber-600",
+      rose: active ? "bg-rose-600 text-white" : "bg-rose-50 text-rose-600",
+    };
+    return map[color];
+  };
+
+  const ratingValue = Number(
+    ((task as OddsTask & { reviews?: Array<{ review_type: string; rating?: number | null }> }).reviews ?? [])
+      .find((r) => r.review_type === "client" && r.rating)?.rating ?? 5
+  );
+
+  // Status & Timer minimal tag color
+  const statusTimerTextClass = isDone
+    ? "text-emerald-500"
+    : isOverdue
+    ? "text-rose-500"
+    : theme === "dark"
+    ? "text-[#b0ff5e]"
+    : "text-sky-500";
+
+  return (
+    <article className={`overflow-hidden transition-all ${shellClass}`}>
+      {/* Main card — click to toggle expand */}
+      <div 
+        onClick={toggleExpandOnly}
+        className={`flex flex-col gap-2.5 p-4 cursor-pointer select-none ${innerBgClass}`}
+      >
+        {/* Row 1: Judul Tugas + Label Quartal Singkat */}
+        <div className="flex items-start justify-between gap-3">
+          <p className={`line-clamp-2 text-[15px] font-bold leading-snug ${primaryText}`} title={task.design_purpose}>
+            {task.design_purpose}
+          </p>
+          <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-black tracking-wider ${
+            isDone ? "bg-emerald-600 text-white" : theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#0077bf] text-white"
+          }`}>
+            {priorityShort}
+          </span>
+        </div>
+
+        {/* Row 2: avatar nama client ( Divisi ) - Salma Maghfira */}
+        <div className="flex items-center flex-wrap gap-2 text-xs font-semibold">
+          {/* Client Avatar + Name */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[9px] font-extrabold ${iconCircleClientClass}`}>
+              C
+            </span>
+            <span className={`truncate ${mutedText}`}>{task.requester?.name ?? "Client"}</span>
+          </div>
+
+          <span className={`text-[10px] ${mutedText}`}>-</span>
+
+          {/* Designer Avatar + Name */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold ${iconCircleClass}`}>
+              <MaterialIcon name="person" size="xs" />
+            </span>
+            <span className={`truncate ${mutedText}`}>{assignedDesigner?.name ?? "Belum Ada"}</span>
+          </div>
+        </div>
+
+        {/* Row 3: Status - Timer (if active) & Deadline */}
+        <div className={`flex items-center justify-between border-t pt-2 text-[11px] font-bold ${divider} ${statusTimerTextClass}`}>
+          <div className="flex items-center gap-1.5">
+            <span className="capitalize">
+              {isDone ? "Selesai" : isReviewState ? "Review" : "Pengerjaan"}
+            </span>
+            <span>•</span>
+            {isDone ? (
+              <span className="flex items-center gap-0.5">
+                {ratingValue}/5 ⭐
+              </span>
+            ) : isReviewState ? (
+              <span>Menunggu Review</span>
+            ) : (
+              <span className="font-mono">{hh}:{mm}:{ss}</span>
+            )}
+          </div>
+          <div className={`text-[10px] uppercase tracking-wider ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}>
+            DL: {deadlineStr}
+          </div>
+        </div>
+      </div>
+
+      {/* Expanded panel with details & actions */}
+      {expanded && (
+        <div className={`border-t p-3 ${divider} ${innerBgClass}`}>
+          {/* Action Buttons Row */}
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            className="flex items-center gap-1.5 mb-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {/* Brief Tab Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleTab("brief");
+              }}
+              className={`flex h-8 flex-1 min-w-[70px] items-center justify-center gap-1 rounded-lg text-xs font-semibold transition ${getBtnClass("green", activeTab === "brief")}`}
+            >
+              <MaterialIcon name="description" size="auto" className="text-sm" />
+              Brief
+            </button>
+            {/* File Tab Button */}
+            {isDone && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleTab("file");
+                }}
+                className={`flex h-8 flex-1 min-w-[70px] items-center justify-center gap-1 rounded-lg text-xs font-semibold transition ${getBtnClass("green", activeTab === "file")}`}
+              >
+                <MaterialIcon name="folder" size="auto" className="text-sm" />
+                File
+              </button>
+            )}
+            {/* Check Tab Button */}
+            {isReviewState && canCheckRole && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleTab("check");
+                }}
+                className={`flex h-8 flex-1 min-w-[75px] items-center justify-center gap-1 rounded-lg text-xs font-semibold transition ${getBtnClass("green", activeTab === "check")}`}
+              >
+                <MaterialIcon name="arrow_forward" size="auto" className="text-sm" />
+                Check
+              </button>
+            )}
+            {/* Chat Direct Toggle Button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAction("chat");
+              }}
+              className={`flex h-8 w-9 shrink-0 items-center justify-center rounded-lg transition ${getBtnClass("green", chatOpen)}`}
+            >
+              <MaterialIcon name="chat" size="auto" className="text-sm" />
+            </button>
+            {/* Detail Link Button */}
+            <Link
+              href={`/odds/detail?id=${task.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className={`flex h-8 w-9 shrink-0 items-center justify-center rounded-lg transition ${getBtnClass("green")}`}
+            >
+              <MaterialIcon name="open_in_new" size="auto" className="text-sm" />
+            </Link>
+            {/* Delete/Cancel Button */}
+            {!isDone && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleTab("delete");
+                }}
+                className={`flex h-8 w-9 shrink-0 items-center justify-center rounded-lg transition ${getBtnClass("rose", activeTab === "delete")}`}
+              >
+                <MaterialIcon name="delete_forever" size="auto" className="text-sm" />
+              </button>
+            )}
+          </div>
+
+          {/* Children panel render (Brief / File / Check panel details) */}
+          <div className="mt-2">
+            {children(activeTab)}
+          </div>
+        </div>
+      )}
+
+      {/* Full screen Brief Modal */}
+      {isBriefModalOpen && (
+        <div 
+          onClick={(e) => e.stopPropagation()}
+          className="fixed inset-0 z-50 flex flex-col bg-black/60 backdrop-blur-sm p-4 lg:hidden"
+        >
+          <div className={`flex flex-1 flex-col overflow-hidden rounded-2xl border ${
+            theme === "dark"
+              ? "border-white/10 bg-[#171717] text-[#f1f1f1]"
+              : theme === "retro"
+              ? "border-2 border-[#24252b] bg-[#eceee6] text-[#24252b]"
+              : "border-slate-200 bg-white text-[#181818]"
+          }`}>
+            {/* Modal Header */}
+            <div className={`flex items-center justify-between border-b p-4 ${divider}`}>
+              <div className="min-w-0 flex-1">
+                <span className={`text-[10px] font-black uppercase tracking-wider ${accentText}`}>Detail Brief</span>
+                <h3 className={`truncate text-base font-bold leading-normal ${primaryText}`}>
+                  {task.design_purpose}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBriefModalOpen(false)}
+                className={`flex size-8 items-center justify-center rounded-lg border transition ${
+                  theme === "dark"
+                    ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                    : theme === "retro"
+                    ? "border-2 border-[#24252b] bg-white text-[#24252b]"
+                    : "border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                <MaterialIcon name="close" size="xs" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <DesignerTaskQueueCard
+                task={task}
+                theme={theme}
+                nowMs={nowMs}
+                controlView
+                selected={false}
+                startDisabled
+                timerText={undefined}
+                onChat={() => undefined}
+                onStart={() => undefined}
+                onPause={() => undefined}
+                onDone={() => undefined}
+                onAcceptBrief={() => Promise.resolve()}
+                onReturnBrief={() => Promise.resolve()}
+                externalAction={{ type: "brief", nonce: Date.now() }}
+                detailOnly
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </article>
+  );
+}
+
+type AdminKvRetailTaskCardProps = {
+  task: OddsTask;
+  theme: "light" | "dark" | "retro";
+  nowMs: number;
+  timerText?: string;
+  timerSeconds?: number;
+  chatOpen?: boolean;
+  canCheckRole?: boolean;
+  onAction: (action: "brief" | "chat" | "file" | "check" | "pause" | "detail" | "delete") => void;
+  children?: ReactNode;
+};
+
+function AdminKvRetailTaskCard({
+  task,
+  theme,
+  nowMs,
+  timerText,
+  timerSeconds,
+  chatOpen = false,
+  canCheckRole = false,
+  onAction,
+  children,
+}: AdminKvRetailTaskCardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+
+  const toggleTab = (tab: "brief" | "file" | "check" | "delete") => {
+    if (activeTab === tab && expanded) {
+      setExpanded(false);
+      setActiveTab(null);
+    } else {
+      setExpanded(true);
+      setActiveTab(tab);
+      onAction(tab);
+    }
+  };
+
+  const isExpanded = expanded || chatOpen;
+
+  const requesterRole = task.requester?.roles?.[0] ?? "Client";
+  const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
+  const priorityRaw = (task.important_matrix || task.category?.important_matrix || "Q4").toUpperCase();
+  const priority = priorityRaw.replace(/^Q\s*(\d)$/, "QUARTAL $1");
+  const results = task.results ?? [];
+  const resultAssets = results.flatMap((result) => result.asset_links ?? ((result as OddsTaskResult & { assetLinks?: OddsTaskResult["asset_links"] }).assetLinks ?? []));
+  const isDone = task.status === "done";
+  const hasBriefContent = Boolean(stripRichText(task.brief_text));
+  const canCheckOutput = task.status === "spv_review";
+  const chatEnabled = task.status !== "submitted";
+  const fileEnabled = resultAssets.length > 0 || canCheckOutput;
+  const isPausable = ["in_progress", "leader_revision_requested", "revision"].includes(task.status);
+  const isOverdue = task.deadline ? new Date(task.deadline).getTime() < nowMs && !isDone : false;
+  const reviewsList = ((task as OddsTask & { reviews?: Array<{ review_type: string; rating?: number | null }> }).reviews ?? []);
+  const ratingValue = Number(reviewsList.find((review) => review.review_type === "client" && review.rating)?.rating ?? 5);
+
+  const parseTimerSecondsLocal = (totalSeconds: number) => {
+    const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+    const hours = String(Math.floor(safeSeconds / 3600)).padStart(2, "0");
+    const minutes = String(Math.floor((safeSeconds % 3600) / 60)).padStart(2, "0");
+    const seconds = String(safeSeconds % 60).padStart(2, "0");
+    return { hours, minutes, seconds };
+  };
+  const parsedCreatedDate = task.created_at ? new Date(task.created_at) : null;
+  const isCreatedDateValid = parsedCreatedDate && !Number.isNaN(parsedCreatedDate.getTime());
+  const parsedDay = isCreatedDateValid ? new Intl.DateTimeFormat("id-ID", { weekday: "long" }).format(parsedCreatedDate) : "-";
+  const parsedDate = isCreatedDateValid ? new Intl.DateTimeFormat("id-ID", { day: "2-digit" }).format(parsedCreatedDate) : "-";
+  const parsedMonthYear = isCreatedDateValid ? new Intl.DateTimeFormat("id-ID", { month: "short", year: "numeric" }).format(parsedCreatedDate).toUpperCase() : "-";
+
+  const deadlineDateParsed = task.deadline ? new Date(task.deadline) : null;
+  const isDeadlineValid = deadlineDateParsed && !Number.isNaN(deadlineDateParsed.getTime());
+  const deadlineDay = isDeadlineValid ? new Intl.DateTimeFormat("id-ID", { weekday: "long" }).format(deadlineDateParsed) : "-";
+  const deadlineDate = isDeadlineValid ? new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }).format(deadlineDateParsed) : "-";
+
+  const durationSec = timerSeconds ?? 0;
+  const timerParts = {
+    hours: String(Math.floor(durationSec / 3600)).padStart(2, "0"),
+    minutes: String(Math.floor((durationSec % 3600) / 60)).padStart(2, "0"),
+    seconds: String(durationSec % 60).padStart(2, "0"),
+  };
+
+  const displayStatus = designerTaskStatusLabel(task);
+
+  const groupDividerClass = theme === "dark" ? "border-white/10" : theme === "retro" ? "border-[#24252b]/25" : "border-[#e6edf2]";
+
+  const shellClass = theme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6] rounded-none shadow-[4px_4px_0_0_#24252b]" : theme === "dark" ? "border border-white/10 bg-[#171717] rounded-2xl shadow-sm" : "border border-slate-200/80 bg-white rounded-2xl shadow-sm";
+  const innerBgClass = theme === "retro" ? "bg-[#eceee6]" : theme === "dark" ? "bg-[#171717]" : "bg-white";
+  const primaryTextClass = theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-[#f1f1f1]" : "text-[#181818]";
+  const boldTextClass = theme === "retro" ? "text-[#24252b]" : theme === "dark" ? "text-slate-200" : "text-slate-800";
+  const mutedTextClass = theme === "retro" ? "text-[#24252b]/80" : theme === "dark" ? "text-slate-400" : "text-slate-500";
+  const mutedSmallClass = theme === "retro" ? "text-[#24252b]/60" : theme === "dark" ? "text-slate-500" : "text-slate-400";
+  const iconCircleClass = theme === "retro" ? "border-2 border-[#24252b] bg-white text-[#24252b]" : theme === "dark" ? "bg-white/5 text-slate-300" : "bg-slate-100 text-slate-600";
+  const iconCircleClientClass = theme === "retro" ? "border-2 border-[#24252b] bg-[#00a4ff] text-white" : theme === "dark" ? "bg-[#b0ff5e]/20 text-[#b0ff5e]" : "bg-sky-100 text-[#00a4ff]";
+  const accentTextClass = theme === "dark" ? "text-[#b0ff5e]" : "text-[#00a4ff]";
+  const deadlineLabelClass = theme === "dark" ? "text-[#b0ff5e]" : "text-rose-500";
+
+  const getBtnClass = (color: "blue" | "amber" | "emerald" | "rose", active = false) => {
+    if (theme === "retro") return `border-2 border-[#24252b] ${active ? "bg-[#24252b] text-white" : "bg-white text-[#24252b] hover:bg-[#eceee6]"}`;
+    if (theme === "dark") {
+      const colors = {
+        blue: active ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#b0ff5e]/10 text-[#b0ff5e] hover:bg-[#b0ff5e]/20",
+        amber: active ? "bg-amber-500 text-white" : "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20",
+        emerald: active ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#b0ff5e]/10 text-[#b0ff5e] hover:bg-[#b0ff5e]/20",
+        rose: active ? "bg-rose-500 text-white" : "bg-rose-500/10 text-rose-400 hover:bg-rose-500/20",
+      };
+      return colors[color];
+    }
+    const colors = {
+      blue: active ? "bg-[#00a4ff] text-white" : "bg-sky-50 text-[#00a4ff] hover:bg-sky-100",
+      amber: active ? "bg-amber-600 text-white" : "bg-amber-50 text-amber-600 hover:bg-amber-100",
+      emerald: active ? "bg-emerald-600 text-white" : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100",
+      rose: active ? "bg-rose-600 text-white" : "bg-rose-50 text-rose-600 hover:bg-rose-100",
+    };
+    return colors[color];
+  };
+
+  return (
+    <article className={`relative overflow-hidden transition-all hover:shadow-md ${shellClass}`}>
+      <div className="flex w-full items-stretch min-h-[110px]">
+        {/* Priority Q1-Q4 Strip */}
+        <div className={`flex w-9 shrink-0 items-center justify-center ${isDone ? "bg-[#15803d] text-white" : theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#0077bf] text-white"}`}>
+          <span className="select-none font-mono text-[11px] font-black uppercase tracking-[0.15em] [writing-mode:vertical-lr] rotate-180">
+            {priority}
+          </span>
+        </div>
+
+        {/* Submit Date Block */}
+        <TaskCardDate
+          state={isDone ? "Done" : "Default"}
+          theme={theme}
+          day={parsedDay}
+          date={parsedDate}
+          monthYear={parsedMonthYear}
+          bgColor={isDone ? "bg-[#16a34a] text-white" : theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#00a4ff] text-white"}
+          className="w-[122px] shrink-0"
+        />
+
+        {/* Main Content Area */}
+        <div className={`flex flex-1 items-stretch justify-start p-4 ${innerBgClass}`}>
+          {/* Title & Brief Link */}
+          <div className={`w-[315px] shrink-0 border-r ${groupDividerClass} pr-4 flex flex-col justify-center`}>
+            <h3 className={`line-clamp-2 text-[20px] font-semibold leading-normal ${primaryTextClass}`} title={task.design_purpose}>
+              {task.design_purpose}
+            </h3>
+            <button
+              type="button"
+              onClick={() => toggleTab("brief")}
+              className={`mt-1 inline-flex items-center text-xs font-bold hover:underline w-max ${accentTextClass}`}
+            >
+              Lihat Detail Brief
+            </button>
+          </div>
+
+          {/* Client Info */}
+          <div className={`w-[130px] shrink-0 border-r ${groupDividerClass} px-4 flex flex-col justify-center`}>
+            <div className="flex items-center gap-2">
+              <span className={`flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${iconCircleClientClass}`}>
+                c
+              </span>
+              <div className="min-w-0">
+                <p className={`truncate text-xs font-extrabold ${boldTextClass}`} title={task.requester?.name ?? "Client"}>
+                  {task.requester?.name ?? "Client Test"}
+                </p>
+                <p className={`text-[10px] font-medium ${mutedTextClass}`}>Client</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Designer Info */}
+          <div className={`w-[135px] shrink-0 border-r ${groupDividerClass} px-4 flex flex-col justify-center`}>
+            <div className="flex items-center gap-2">
+              <span className={`flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${iconCircleClass}`}>
+                <MaterialIcon name="person" size="xs" />
+              </span>
+              <div className="min-w-0">
+                <p className={`truncate text-xs font-extrabold ${boldTextClass}`} title={assignedDesigner ? assignedDesigner.name : "Belum Ada"}>
+                  {assignedDesigner ? assignedDesigner.name : "Belum Ada"}
+                </p>
+                <p className={`text-[10px] font-medium ${mutedTextClass}`}>Designer</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Deadline Info */}
+          <div className={`w-[120px] shrink-0 border-r ${groupDividerClass} px-4 flex flex-col justify-center`}>
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${deadlineLabelClass}`}>DEADLINE</p>
+            <p className={`mt-0.5 text-xs font-bold capitalize ${boldTextClass}`}>{deadlineDay}</p>
+            <p className={`text-[11px] font-medium ${mutedSmallClass}`}>{deadlineDate}</p>
+          </div>
+
+          {/* Action Buttons Box */}
+          <div className="flex items-center gap-2 shrink-0 px-4">
+            <button
+              type="button"
+              title="Brief Task"
+              onClick={() => toggleTab("brief")}
+              className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("blue")}`}
+            >
+              <MaterialIcon name="description" size="sm" />
+            </button>
+            <button
+              type="button"
+              title="Chat Task"
+              onClick={() => onAction("chat")}
+              className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("blue", chatOpen)}`}
+            >
+              <MaterialIcon name="chat" size="sm" />
+            </button>
+            {isPausable && (
+              <button
+                type="button"
+                title="Pause Task"
+                onClick={() => onAction("pause")}
+                className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("amber")}`}
+              >
+                <MaterialIcon name="pause" size="sm" />
+              </button>
+            )}
+            {fileEnabled && (
+              <button
+                type="button"
+                title="File Output"
+                onClick={() => toggleTab(canCheckOutput ? "check" : "file")}
+                className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("emerald")}`}
+              >
+                <MaterialIcon name="folder" size="sm" />
+              </button>
+            )}
+            <Link
+              href={`/odds/detail?id=${task.id}`}
+              title="Buka Detail Task"
+              className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("blue")}`}
+            >
+              <MaterialIcon name="open_in_new" size="sm" />
+            </Link>
+            {!isDone && (
+              <button
+                type="button"
+                title="Hapus / Cancel Task"
+                onClick={() => toggleTab("delete")}
+                className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("rose")}`}
+              >
+                <MaterialIcon name="delete_forever" size="sm" />
+              </button>
+            )}
+          </div>
+
+          {/* Right Status / Timer Block */}
+          {(() => {
+            const isReviewState = task.status === "spv_review" || task.status === "client_review";
+            // Dark mode, review state, no canCheck -> no bg, red border
+            const timerBlockClass = theme === "dark" && isReviewState && !canCheckRole
+              ? "ml-auto flex w-[210px] shrink-0 flex-col items-center justify-center rounded-2xl p-3 border border-rose-500/50 text-rose-400"
+              : isDone
+              ? "ml-auto flex w-[210px] shrink-0 flex-col items-center justify-center rounded-2xl p-3 text-white bg-[#22c55e]"
+              : theme === "dark"
+              ? "ml-auto flex w-[210px] shrink-0 flex-col items-center justify-center rounded-2xl p-3 text-white bg-[#ef4444]"
+              : "ml-auto flex w-[210px] shrink-0 flex-col items-center justify-center rounded-2xl p-3 text-white bg-[#ef4444]";
+            return (
+          <div className={timerBlockClass}>
+            {isDone ? (() => {
+              const ratingValue = Number(
+                ((task as OddsTask & { reviews?: Array<{ review_type: string; rating?: number | null }> }).reviews ?? []).find(
+                  (review) => review.review_type === "client" && review.rating
+                )?.rating ?? 5
+              );
+              return (
+                <>
+                  <p className="text-xs font-semibold drop-shadow-sm">Selesai</p>
+                  <div className="my-1.5 flex h-9 items-center justify-center gap-1">
+                    {Array.from({ length: 5 }).map((_, index) => {
+                      const filled = index < (ratingValue || 5);
+                      return (
+                        <MaterialIcon
+                          key={index}
+                          name="star"
+                          size="auto"
+                          className={`text-[22px] ${filled ? "text-[#ffd166]" : "text-white/35"}`}
+                        />
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] font-bold text-white/90">
+                    {ratingValue}/5
+                  </p>
+                </>
+              );
+            })() : (
+              <>
+                <p className="text-xs font-semibold drop-shadow-sm">{displayStatus}</p>
+                {(task.status === "spv_review" || task.status === "client_review") && canCheckRole ? (
+                  <button
+                    type="button"
+                    onClick={() => toggleTab("check")}
+                    className="my-1.5 flex h-9 items-center justify-center gap-1.5 rounded-lg bg-white px-6 text-sm font-bold text-[#ef4444] shadow-sm transition hover:bg-white/90 active:scale-95"
+                  >
+                    Check
+                    <MaterialIcon name="arrow_forward" size="sm" />
+                  </button>
+                ) : (
+                  <div className="my-1.5 flex items-center justify-center gap-1.5">
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-white font-mono text-base font-black text-[#ef4444] shadow-sm">
+                      {task.status === "spv_review" || task.status === "client_review" ? "-" : timerParts.hours}
+                    </div>
+                    <span className="font-bold text-white">:</span>
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-white font-mono text-base font-black text-[#ef4444] shadow-sm">
+                      {task.status === "spv_review" || task.status === "client_review" ? "-" : timerParts.minutes}
+                    </div>
+                    <span className="font-bold text-white">:</span>
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-white font-mono text-base font-black text-[#ef4444] shadow-sm">
+                      {task.status === "spv_review" || task.status === "client_review" ? "-" : timerParts.seconds}
+                    </div>
+                  </div>
+                )}
+                <p className="text-[10px] font-bold text-white/90">
+                  {(task.status === "spv_review" || task.status === "client_review") && canCheckRole
+                    ? "Tinjau Output"
+                    : (task.status === "spv_review" || task.status === "client_review")
+                    ? "Menunggu Review"
+                    : isOverdue
+                    ? "Melewati deadline"
+                    : "Sisa waktu"}
+                </p>
+              </>
+            )}
+          </div>
+            );
+          })()}
+        </div>
+      </div>
+
+      {isExpanded && (
+        <div className="border-t border-slate-100 bg-slate-50/50 p-4">
+          {children}
+        </div>
+      )}
+    </article>
+  );
+}
+
 type DesignerTaskQueueCardProps = {
   task: OddsTask;
   theme: "light" | "dark" | "retro";
@@ -2611,6 +3457,8 @@ type DesignerTaskQueueCardProps = {
   selected?: boolean;
   startDisabled?: boolean;
   timerText?: string;
+  externalAction?: { type: "brief" | "file" | "check" | "delete" | "detail"; nonce: number };
+  detailOnly?: boolean;
   onChat: () => void;
   onStart: () => void;
   onPause?: () => void;
@@ -2619,7 +3467,7 @@ type DesignerTaskQueueCardProps = {
   onReturnBrief: (note: string) => Promise<void>;
 };
 
-function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, selected = false, startDisabled = false, timerText, onChat, onStart, onPause, onDone, onAcceptBrief, onReturnBrief }: DesignerTaskQueueCardProps) {
+function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, selected = false, startDisabled = false, timerText, externalAction, detailOnly = false, onChat, onStart, onPause, onDone, onAcceptBrief, onReturnBrief }: DesignerTaskQueueCardProps) {
   const [briefOpen, setBriefOpen] = useState(false);
   const [fileOpen, setFileOpen] = useState(false);
   const [outputCheckOpen, setOutputCheckOpen] = useState(false);
@@ -2630,6 +3478,36 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
   const [declineOpen, setDeclineOpen] = useState(false);
   const [decisionNote, setDecisionNote] = useState("");
   const [decisionBusy, setDecisionBusy] = useState<"accept" | "return" | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelBusy, setCancelBusy] = useState(false);
+  const lastActionNonce = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (externalAction && externalAction.nonce !== lastActionNonce.current) {
+      lastActionNonce.current = externalAction.nonce;
+      
+      setBriefOpen(externalAction.type === "brief");
+      setFileOpen(externalAction.type === "file");
+      setOutputCheckOpen(externalAction.type === "check");
+      setCancelOpen(externalAction.type === "delete");
+    }
+  }, [externalAction]);
+
+  const handleCancelTask = async () => {
+    if (!cancelReason.trim()) return;
+    setCancelBusy(true);
+    try {
+      await requestOddsCancel(task.id, cancelReason.trim());
+      setCancelOpen(false);
+      setCancelReason("");
+      window.location.reload();
+    } catch (err) {
+      alert(oddsError(err));
+    } finally {
+      setCancelBusy(false);
+    }
+  };
   const requesterRole = task.requester?.roles?.[0] ?? "Client";
   const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
   const priority = (task.important_matrix || task.category?.important_matrix || "Q4").toUpperCase();
@@ -2873,14 +3751,16 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
 
   return (
     <>
-      <article className={`${shellClass} ${theme === "retro" ? "font-mono shadow-[3px_3px_0_#777a72]" : "shadow-[0_5px_14px_rgba(44,42,39,0.06)]"}`}>
-        <div className={`flex items-center justify-between gap-4 px-4 py-2 ${headerClass}`}>
-          <p className={`truncate leading-none ${theme === "retro" ? "text-[11px] font-black uppercase tracking-[0.12em]" : "text-base"}`}>
-            {priority} - {task.design_purpose}
-          </p>
-          {controlView && <p className="shrink-0 text-sm font-semibold leading-none">{displayStatus}</p>}
-        </div>
-        <div className={`flex items-center justify-between px-4 py-2 ${bodyClass}`}>
+      <article className={detailOnly ? "" : `${shellClass} ${theme === "retro" ? "font-mono shadow-[3px_3px_0_#777a72]" : "shadow-[0_5px_14px_rgba(44,42,39,0.06)]"}`}>
+        {!detailOnly && (
+          <>
+            <div className={`flex items-center justify-between gap-4 px-4 py-2 ${headerClass}`}>
+              <p className={`truncate leading-none ${theme === "retro" ? "text-[11px] font-black uppercase tracking-[0.12em]" : "text-base"}`}>
+                {priority} - {task.design_purpose}
+              </p>
+              {controlView && <p className="shrink-0 text-sm font-semibold leading-none">{displayStatus}</p>}
+            </div>
+            <div className={`flex items-center justify-between px-4 py-2 ${bodyClass}`}>
           <div className="flex items-center gap-[22px]">
               <div className={`flex items-center gap-2 ${controlView ? "min-w-[760px]" : "min-w-[600px]"}`}>
               <div className="flex w-24 shrink-0 flex-col items-start gap-0.5 leading-none">
@@ -2972,6 +3852,32 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
                   <MaterialIcon name="task_alt" size="auto" className="text-2xl" />
                 </button>
               )}
+              {controlView && (
+                <Link
+                  href={`/odds/detail?id=${task.id}`}
+                  title="Buka Detail Task"
+                  aria-label="Buka Detail Task"
+                  className="flex size-6 items-center justify-center transition hover:opacity-75"
+                >
+                  <MaterialIcon name="open_in_new" size="auto" className="text-2xl" />
+                </Link>
+              )}
+              {task.status !== "done" && task.status !== "cancelled" && task.status !== "cancelled_by_spv" && (
+                <button
+                  type="button"
+                  title="Hapus / Cancel Task"
+                  aria-label="Hapus / Cancel Task"
+                  onClick={() => {
+                    setCancelOpen((open) => !open);
+                    setBriefOpen(false);
+                    setFileOpen(false);
+                    setOutputCheckOpen(false);
+                  }}
+                  className="flex size-6 items-center justify-center text-red-500 transition hover:opacity-75"
+                >
+                  <MaterialIcon name="delete_forever" size="auto" className="text-2xl" />
+                </button>
+              )}
             </div>
           </div>
           <div className="flex items-center justify-center gap-4 p-2.5">
@@ -3000,6 +3906,8 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
             {!controlView && !isDone && <p className={`whitespace-nowrap text-sm font-medium leading-none ${statusClass} ${retroSmallTextClass}`}>{displayStatus}</p>}
           </div>
         </div>
+      </>
+    )}
         {fileOpen && (
           <div className={`grid gap-2 border-t p-3 ${dividerClass} ${bodyClass}`}>
             {resultAssets.length > 0 ? (
@@ -3116,6 +4024,48 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
             })() : (
                 <p className="px-3 py-2 text-sm text-cu-muted">Detail output belum tersedia.</p>
             )}
+          </div>
+        )}
+        {cancelOpen && (
+          <div className={`border-t px-3 py-3 ${dividerClass} ${bodyClass}`}>
+            <div className="mb-2 flex items-center gap-2">
+              <MaterialIcon name="delete_forever" size="sm" className="text-red-500" />
+              <p className="text-sm font-semibold leading-none text-red-600">Batalkan / Hapus Task ({task.task_number})</p>
+            </div>
+            <p className="mb-2 text-xs text-cu-muted">
+              {controlView || !["in_progress", "spv_review", "client_review", "revision", "leader_revision_requested"].includes(task.status)
+                ? "Task akan langsung dibatalkan/dihapus dari antrean pengerjaan aktif."
+                : "Pengajuan pembatalan task yang sedang berjalan akan dikirim ke SPV/Manajer untuk ditinjau."}
+            </p>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={2}
+              placeholder="Isi alasan pembatalan / hapus task (wajib)..."
+              className="mb-3 w-full resize-y rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-medium outline-none focus:border-red-500"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={cancelBusy}
+                onClick={() => {
+                  setCancelOpen(false);
+                  setCancelReason("");
+                }}
+                className="inline-flex h-8 items-center justify-center rounded-lg border border-cu-border bg-white px-3 text-xs font-semibold text-cu-ink hover:bg-cu-panel-soft disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                disabled={!cancelReason.trim() || cancelBusy}
+                onClick={() => void handleCancelTask()}
+                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-red-600 px-3 text-xs font-bold text-white shadow-sm hover:bg-red-700 disabled:opacity-50"
+              >
+                <MaterialIcon name="delete_forever" size="xs" />
+                {cancelBusy ? "Memproses..." : "Konfirmasi Hapus Task"}
+              </button>
+            </div>
           </div>
         )}
       </article>

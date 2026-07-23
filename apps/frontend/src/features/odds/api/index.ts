@@ -215,6 +215,9 @@ export interface OddsRanking {
   designer_id: number;
   total_output: number;
   total_score: string | number;
+  total_work_duration_seconds?: number;
+  total_revision_count?: number;
+  overdue_count?: number;
   average_rating: string | number | null;
   designer?: OddsUser;
 }

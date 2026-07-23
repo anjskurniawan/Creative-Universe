@@ -18,7 +18,7 @@ class OddsReportingService
         $rating = $task->reviews()->where('review_type', 'client')->whereNotNull('rating')->latest()->value('rating');
         $latestResultNotes = (string) ($task->results()->latest('version_number')->value('result_notes') ?? '');
         preg_match('/Total Output:\s*([0-9]+)/i', $latestResultNotes, $matches);
-        $totalOutput = isset($matches[1]) ? (int) $matches[1] : 0;
+        $totalOutput = isset($matches[1]) ? (int) $matches[1] : 1;
         $categoryWeight = (float) data_get($task->category_snapshot, 'score_weight', $task->category?->score_weight ?? 1);
         $score = $task->status === 'done' ? $totalOutput * $categoryWeight : 0;
 
@@ -30,17 +30,22 @@ class OddsReportingService
                 'task_id' => $task->id,
             ]);
 
+        $activeWorkSeconds = $this->timeLogs->duration($task, 'work');
+        $slaMinutes = (int) data_get($task->category_snapshot, 'sla_minutes', $task->category?->sla_minutes ?? 0);
+        $slaSeconds = $slaMinutes * 60;
+        $isSlaOverdue = $slaSeconds > 0 && $activeWorkSeconds > $slaSeconds;
+
         $report->fill([
             'designer_id' => $task->assigned_designer_id,
             'category_id' => $task->category_id,
             'output_done' => $task->status === 'done',
             'total_output' => $totalOutput,
-            'active_work_duration_seconds' => $this->timeLogs->duration($task, 'work'),
+            'active_work_duration_seconds' => $activeWorkSeconds,
             'revision_duration_seconds' => $this->timeLogs->duration($task, 'revision'),
-            'review_waiting_duration_seconds' => 0,
+            'review_waiting_duration_seconds' => $this->timeLogs->duration($task, 'spv_review') + $this->timeLogs->duration($task, 'client_review'),
             'revision_count' => $task->revisions()->count(),
-            'overdue' => $doneAt->greaterThan($task->deadline),
-            'quality_issue_flag' => $task->quality_issue_flag,
+            'overdue' => $isSlaOverdue,
+            'quality_issue_flag' => (bool) ($task->quality_issue_flag ?? false),
             'rating' => $rating,
             'final_status' => $task->status,
             'done_at' => $doneAt,

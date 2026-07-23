@@ -198,11 +198,17 @@ function DetailContent() {
     ? undefined
     : latestResult;
   const timeLogs = task.time_logs ?? task.timeLogs ?? [];
-  const designerTimeLogs = timeLogs.filter((log) => ["work", "revision"].includes(log.log_type));
+  const designerTimeLogs = timeLogs.filter((log) => ["work", "revision", "spv_review", "client_review"].includes(log.log_type));
   const timerTotals = {
-    work: designerTimeLogs.filter((log) => log.log_type === "work").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
-    revision: designerTimeLogs.filter((log) => log.log_type === "revision").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
+    work: timeLogs.filter((log) => log.log_type === "work").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
+    revision: timeLogs.filter((log) => log.log_type === "revision").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
+    spv_review: timeLogs.filter((log) => log.log_type === "spv_review").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
+    client_review: timeLogs.filter((log) => log.log_type === "client_review").reduce((total, log) => total + durationSeconds(log, timerNow), 0),
   };
+  const slaMinutes = task.category?.sla_minutes ?? 0;
+  const slaSeconds = slaMinutes * 60;
+  const isSlaOverdue = slaSeconds > 0 && timerTotals.work > slaSeconds;
+  const isDeadlineOverdue = Boolean(task.deadline && new Date(task.deadline).getTime() < timerNow && task.status !== "done");
   const outputTitle = isVisibleLeaderRevisionTask ? "Output Revisi Leader Creative" : isClientRevisionTask ? "Output Revisi Client" : "Output";
   const outputNotice = isVisibleLeaderRevisionTask
     ? "Task sedang dalam revisi Leader Creative. Setelah disubmit, hasil revisi kembali masuk review Leader Creative."
@@ -459,21 +465,39 @@ function DetailContent() {
 
           {!isClientSideView && (
             <section className="rounded-lg border border-cu-border bg-white p-5">
-              <h2 className="mb-4 text-lg font-semibold text-cu-ink">Time Logging</h2>
-              <p className="mb-3 text-sm text-cu-muted">
-                Timer hanya mencatat proses pengerjaan desainer: task awal, revisi SPV, dan revisi client.
+              <h2 className="mb-2 text-lg font-semibold text-cu-ink">Audit Durasi & Time Logging</h2>
+              <p className="mb-4 text-xs text-cu-muted">
+                Transparansi pencatatan durasi per fase untuk melacak bottleneck pengerjaan dan SLA desainer.
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                <TimerTile label="Work" value={formatDuration(timerTotals.work)} />
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <TimerTile label={`Work (SLA: ${slaMinutes}m)`} value={formatDuration(timerTotals.work)} />
                 <TimerTile label="Revisi" value={formatDuration(timerTotals.revision)} />
+                <TimerTile label="Review Leader" value={formatDuration(timerTotals.spv_review)} />
+                <TimerTile label="Review Client" value={formatDuration(timerTotals.client_review)} />
               </div>
+
+              {isSlaOverdue && (
+                <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400">
+                  ⚠️ Overdue SLA: Waktu pengerjaan awal desainer ({formatDuration(timerTotals.work)}) melebihi SLA Kategori ({slaMinutes} menit).
+                </p>
+              )}
+
+              {isDeadlineOverdue && (
+                <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-400">
+                  ⏳ Overdue Deadline: Target deadline client terlewati.
+                  {timerTotals.client_review > timerTotals.work && " (Bottleneck terbesar: Menunggu Review Client)"}
+                  {timerTotals.spv_review > timerTotals.work && " (Bottleneck terbesar: Menunggu Review Leader Creative)"}
+                  {timerTotals.work > timerTotals.spv_review && timerTotals.work > timerTotals.client_review && " (Bottleneck terbesar: Pengerjaan Desainer)"}
+                </p>
+              )}
+
               {task.quality_issue_flag && (
                 <p className="mt-3 rounded-lg border border-cu-warning/20 bg-cu-warning/10 px-3 py-2 text-sm text-cu-warning">
                   Quality issue: {task.quality_issue_note ?? "Revisi SPV melewati batas wajar."}
                 </p>
               )}
               <div className="mt-3 space-y-2">
-                {designerTimeLogs.slice(-5).reverse().map((log) => (
+                {designerTimeLogs.slice(-6).reverse().map((log) => (
                   <div key={log.id} className="flex items-center justify-between rounded-lg border border-cu-border px-3 py-2 text-xs">
                     <div>
                       <p className="font-semibold capitalize text-cu-ink">{statusLabel(log.log_type)}</p>

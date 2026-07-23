@@ -74,6 +74,11 @@ class OddsCategorySeeder extends Seeder
             ['name' => 'JETE Pop Style', 'workload_point' => 3, 'sla_minutes' => 180, 'important_matrix' => 'Q4'],
         ];
 
+        // Truncate/clear existing categories before seeding
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Category::truncate();
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         // Ensure all categories exist and update SLA / score / important_matrix
         $categoryIds = [];
         foreach ($categoryData as $data) {

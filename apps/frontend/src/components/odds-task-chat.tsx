@@ -29,6 +29,39 @@ function participantNames(conversation: OddsTaskConversation): string {
   return names.length > 0 ? names.join(", ") : "Belum ada peserta";
 }
 
+function userInitial(name: string | null | undefined): string {
+  return (name ?? "?").trim().charAt(0).toUpperCase() || "?";
+}
+
+function userAvatarUrl(user: ChatMessage["sender"]): string | null {
+  return user?.avatar ?? user?.avatar_path ?? null;
+}
+
+function isClientSender(message: ChatMessage): boolean {
+  return (message.sender?.roles ?? []).some((role) => role.toLowerCase().includes("client"));
+}
+
+function isDesignerSender(message: ChatMessage): boolean {
+  return (message.sender?.roles ?? []).some((role) => role.toLowerCase().includes("designer"));
+}
+
+function ChatAvatar({ sender, align }: { sender: ChatMessage["sender"]; align: "left" | "right" }) {
+  const avatarUrl = userAvatarUrl(sender);
+
+  return (
+    <span
+      className={`flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border text-[11px] font-bold leading-none ${
+        align === "right"
+          ? "border-[#bdeaff] bg-[#e5f6fd] text-[#00a4ff]"
+          : "border-white bg-white text-[#806272] shadow-[0_1px_2px_rgba(44,42,39,0.08)]"
+      }`}
+      aria-hidden="true"
+    >
+      {avatarUrl ? <img src={avatarUrl} alt="" className="size-full object-cover" /> : userInitial(sender?.name)}
+    </span>
+  );
+}
+
 export function OddsTaskChat({
   taskId,
   userId,
@@ -190,23 +223,30 @@ export function OddsTaskChat({
             </p>
           )}
 
-          <div ref={messagesPanelRef} className={`${compact ? "max-h-56 min-h-28 bg-white px-3 py-2" : "max-h-80 min-h-48 rounded-lg border border-cu-border bg-cu-panel-soft p-3"} overflow-y-auto`}>
-            <div className="space-y-3">
+          <div ref={messagesPanelRef} className={`${compact ? "max-h-72 min-h-40 bg-transparent px-4 py-4" : "max-h-80 min-h-48 rounded-lg border border-cu-border bg-cu-panel-soft p-3"} overflow-y-auto`}>
+            <div className="space-y-4">
               {messages.map((message) => {
-                const isMine = Number(message.sender_id) === Number(userId);
+                const roleSide = isDesignerSender(message) ? "right" : isClientSender(message) ? "left" : Number(message.sender_id) === Number(userId) ? "right" : "left";
+                const isRight = roleSide === "right";
                 return (
-                  <div key={message.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                      isMine ? "bg-cu-info text-white" : "bg-white text-cu-ink"
-                    }`}>
-                      {!isMine && message.sender?.name && (
-                        <p className="mb-1 text-[11px] font-semibold text-cu-muted">{message.sender.name}</p>
-                      )}
-                      <p className="whitespace-pre-wrap leading-5">{message.body}</p>
-                      <p className={`mt-1 text-right text-[10px] ${isMine ? "text-white/70" : "text-cu-muted"}`}>
-                        {formatChatTime(message.created_at)}
-                      </p>
+                  <div key={message.id} className={`flex items-end gap-2 ${isRight ? "justify-end" : "justify-start"}`}>
+                    {!isRight && <ChatAvatar sender={message.sender} align="left" />}
+                    <div className={`flex max-w-[72%] flex-col ${isRight ? "items-end" : "items-start"}`}>
+                      <div className={`mb-1 flex items-center gap-2 text-[11px] ${isRight ? "justify-end text-[#00a4ff]" : "justify-start text-[#806272]"}`}>
+                        <span className="font-semibold">{message.sender?.name ?? (isRight ? "Designer" : "Client")}</span>
+                        <span className="text-[#9aa3ad]">{formatChatTime(message.created_at)}</span>
+                      </div>
+                      <div
+                        className={`rounded-2xl px-3.5 py-2.5 text-sm shadow-[0_2px_6px_rgba(44,42,39,0.06)] ${
+                          isRight
+                            ? "rounded-br-md bg-[#00a4ff] text-white"
+                            : "rounded-bl-md border border-white/80 bg-white text-[#303431]"
+                        }`}
+                      >
+                        <p className="whitespace-pre-wrap leading-5">{message.body}</p>
+                      </div>
                     </div>
+                    {isRight && <ChatAvatar sender={message.sender} align="right" />}
                   </div>
                 );
               })}
