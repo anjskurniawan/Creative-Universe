@@ -10810,3 +10810,5 @@ Synchronized 28 documentation pages.
  GET /odds/?section=client_in_progress 200 in 185ms (next.js: 138ms, application-code: 46ms)
  GET /odds/?section=client_in_progress 200 in 42ms (next.js: 4ms, application-code: 38ms)
  GET /odds/?section=client_in_progress 200 in 37ms (next.js: 6ms, application-code: 31ms)
+ GET /odds/?section=client_in_progress 200 in 215ms (next.js: 45ms, application-code: 170ms)
+ GET /odds/?section=client_in_progress 200 in 59ms (next.js: 8ms, application-code: 50ms)

@@ -34,7 +34,7 @@ class FonnteService
         }
 
         try {
-            $response = Http::withHeaders([
+            $response = Http::timeout(5)->withHeaders([
                 'Authorization' => $this->token,
             ])->post("{$this->baseUrl}/send", [
                 'target' => $target,
