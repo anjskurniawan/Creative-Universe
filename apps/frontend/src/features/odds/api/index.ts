@@ -342,12 +342,17 @@ export async function getOddsSystemRules(): Promise<OddsSystemRule[]> {
 }
 
 export async function getOddsAssignableUsers(): Promise<OddsAssignableUser[]> {
-  const [designers, videographers] = await Promise.all([
+  const [designers, videographers, spvs] = await Promise.all([
     apiFetch<OddsPagination<OddsAssignableUser>>("/users?role=Designer&per_page=50"),
     apiFetch<OddsPagination<OddsAssignableUser>>("/users?role=Videographer&per_page=50"),
+    apiFetch<OddsPagination<OddsAssignableUser>>("/users?role=SPV&per_page=50"),
   ]);
 
-  const users = [...normalizePage(designers).data, ...normalizePage(videographers).data];
+  const users = [
+    ...normalizePage(designers).data,
+    ...normalizePage(videographers).data,
+    ...normalizePage(spvs).data,
+  ];
   return Array.from(new Map(users.map((user) => [user.id, user])).values());
 }
 
