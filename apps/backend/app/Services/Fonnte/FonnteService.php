@@ -42,7 +42,7 @@ class FonnteService
                 'sender' => $this->sender,
             ]);
 
-            if (! $response->successful()) {
+            if (! $response->successful() || ! $response->json('status', true)) {
                 Log::error('[CORE] Fonnte API error', [
                     'target' => $target,
                     'status' => $response->status(),

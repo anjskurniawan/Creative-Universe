@@ -17377,3 +17377,117 @@ Caused by:
 ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
 ⚠ Fast Refresh had to perform a full reload due to a runtime error.
 ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] GSAP target .launch-bit not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:120:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target .launch-success-mark not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:122:14)
+[browser] GSAP target .launch-success-copy not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com (src\app\odds\new\page.tsx:123:14)
+[browser] GSAP target  not found. https://gsap.com
+[browser] GSAP target  not found. https://gsap.com
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:459:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)

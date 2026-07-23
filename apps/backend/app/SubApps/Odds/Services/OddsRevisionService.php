@@ -45,9 +45,11 @@ class OddsRevisionService
             if ($type === RevisionTypeEnum::NORMAL->value) {
                 $task->increment('normal_revision_count');
                 $this->queue->enqueue($task, TaskTypeEnum::CLIENT_REVISION->value, $task->assigned_designer_id);
+                $this->notifications->send($task->assignedDesigner, 'client_revision_requested', 'Revisi dari Client', $data['notes'], $task);
             } elseif ($type === RevisionTypeEnum::LEADER->value) {
                 $task->increment('leader_revision_count');
                 $this->queue->enqueue($task, TaskTypeEnum::LEADER_REVISION->value, $task->assigned_designer_id);
+                $this->notifications->send($task->assignedDesigner, 'leader_revision_requested', 'Revisi dari Leader Creative', $data['notes'], $task);
             } else {
                 $this->notifications->sendToRoles(['Manajer', 'SPV'], $type.'_requested', 'Revision ODDS butuh review SPV', $data['notes'], $task);
             }

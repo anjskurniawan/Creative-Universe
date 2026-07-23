@@ -372,23 +372,20 @@ function AssessmentTable({
 
                             <button
                               type="button"
-                              onClick={() => {
-                                const el = document.getElementById(
-                                  `add-${item.id}-${hrdKey}`
-                                ) as HTMLInputElement | null;
+                              onClick={(e) => {
+                                const el = e.currentTarget.querySelector('input[type="date"]') as HTMLInputElement | null;
                                 el?.showPicker();
                               }}
-                              className="size-5 rounded-full border border-dashed border-[#9ed5a7] text-[#248235] hover:bg-[#e8f7ea] transition flex items-center justify-center"
+                              className="relative size-5 rounded-full border border-dashed border-[#9ed5a7] text-[#248235] hover:bg-[#e8f7ea] transition flex items-center justify-center cursor-pointer"
                             >
                               <MaterialIcon name="add" size="auto" className="text-xs font-bold" />
+                              <input
+                                type="date"
+                                onChange={(e) => addDate(item.id, hrdKey, e.target.value)}
+                                className="absolute inset-0 z-10 w-full h-full opacity-0 pointer-events-none"
+                                tabIndex={-1}
+                              />
                             </button>
-
-                            <input
-                              type="date"
-                              id={`add-${item.id}-${hrdKey}`}
-                              onChange={(e) => addDate(item.id, hrdKey, e.target.value)}
-                              className="sr-only"
-                            />
                           </div>
                         );
                       })() : (
@@ -603,7 +600,14 @@ export default function CreativeReportPage() {
             </h1>
           </div>
           <div className="flex gap-2">
-            <label className={`relative flex items-center gap-2 rounded-lg border p-2 text-sm font-medium leading-4 cursor-pointer ${theme === "dark" ? "border border-[#b0ff5e]/30 bg-[#121916] text-[#f1f1f1]" : theme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6] text-[#24252b] shadow-[0_2px_0_#24252b]" : "border border-[#bdeaff] bg-[#f3fbff] text-[#04044A]"}`}>
+            <button
+              type="button"
+              onClick={(e) => {
+                const el = e.currentTarget.querySelector('input[type="month"]') as HTMLInputElement | null;
+                el?.showPicker();
+              }}
+              className={`relative flex items-center gap-2 rounded-lg border p-2 text-sm font-medium leading-4 cursor-pointer ${theme === "dark" ? "border border-[#b0ff5e]/30 bg-[#121916] text-[#f1f1f1]" : theme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6] text-[#24252b] shadow-[0_2px_0_#24252b]" : "border border-[#bdeaff] bg-[#f3fbff] text-[#04044A]"}`}
+            >
               <MaterialIcon name="calendar_month" size="auto" className="text-xl" />
               <span className="capitalize">{monthLabel}</span>
               <MaterialIcon name="keyboard_arrow_down" size="auto" className="text-xl" />
@@ -612,9 +616,10 @@ export default function CreativeReportPage() {
                 type="month"
                 value={month}
                 onChange={(event) => setMonth(event.target.value)}
-                className="absolute inset-0 cursor-pointer opacity-0"
+                className="absolute inset-0 z-10 w-full h-full opacity-0 pointer-events-none"
+                tabIndex={-1}
               />
-            </label>
+            </button>
             <button
               type="button"
               onClick={() => window.print()}

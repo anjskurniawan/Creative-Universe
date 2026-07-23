@@ -22,6 +22,12 @@ class FonnteChannel
             return; // User tidak punya nomor WA — skip tanpa error
         }
 
+        // SRD v6.3 Seksi 11.3: Normalisasi Format Nomor WA (mengubah awalan 0 menjadi 62)
+        $target = preg_replace('/[^0-9]/', '', $target);
+        if (str_starts_with($target, '0')) {
+            $target = '62' . substr($target, 1);
+        }
+
         $this->fonnte->send($target, $notification->toFonnte($notifiable));
     }
 }
