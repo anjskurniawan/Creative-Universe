@@ -16248,3 +16248,441 @@ Caused by:
   237 | }
   238 |
   239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Terjadi kesalahan internal pada server.
+    at handleResponse (src\core\api\client.ts:236:9)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  234 |     throw new ApiError(message, 503, payload);
+  235 |   }
+> 236 |   throw new ApiError(message, response.status, payload);
+      |         ^
+  237 | }
+  238 |
+  239 | async function parseResponse(response: Response, responseType: ResponseType): Promise<unk... (src\app\odds\layout.tsx:82:15)
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx 
+⨯ ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/odds/page.tsx
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+Caused by:
+    Syntax Error 
+[browser] Uncaught ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+
+Caused by:
+    Syntax Error
+[browser] ./src/app/odds/page.tsx
+Error:   x Expected '</', got ')'
+      ,-[C:\laragon\www\creativeuniverse\apps\frontend\src\app\odds\page.tsx:2434:1]
+ 2431 |                           </div>
+ 2432 |                         )}
+ 2433 |                       </div>
+ 2434 |                     ))}
+      :                      ^
+ 2435 |                   </div>
+ 2436 |                   )}
+ 2437 |               </section>
+      `----
+
+Caused by:
+    Syntax Error 
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+[browser] Error loading counts for sidebar: ApiError: Sesi Anda telah berakhir. Silakan login kembali.
+    at handleResponse (src\core\api\client.ts:223:11)
+    at async apiFetch (src\core\api\client.ts:166:14)
+    at async getOddsTasks (src\features\odds\api\index.ts:449:24)
+    at async OddsLayout.useCallback[loadCounts] (src\app\odds\layout.tsx:59:24)
+  221 |       || (!options.skipAuthRedirect && await isSessionExpired());
+  222 |     if (sessionExpired) redirectToLogin(options.skipAuthRedirect);
+> 223 |     throw new ApiError("Sesi Anda telah berakhir. Silakan login kembali.", 401, payload);
+      |           ^
+  224 |   }
+  225 |   if (response.status === 403) throw new ForbiddenError(message, 403, payload);
+  226 |   if (response.status === 422) { (src\app\odds\layout.tsx:82:15)
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/odds/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught Error: Hydration failed because the server rendered HTML didn't match the client. As a result this tree will be regenerated on the client. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/odds/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head headCacheNode={{rsc:{...}, ...}}>
+                    <__next_viewport_boundary__>
+                    <MetadataWrapper>
++                     <div hidden={true}>
+-                     {"\n        "}
+                  ...
+
+    at <unknown> (https://react.dev/link/hydration-mismatch)
+    at div (<anonymous>)
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+[browser] Uncaught NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.

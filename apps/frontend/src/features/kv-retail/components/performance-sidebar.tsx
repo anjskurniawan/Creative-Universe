@@ -14,9 +14,9 @@ export type PerformanceSidebarItem = {
 };
 
 const PRIMARY_ITEMS: readonly PerformanceSidebarItem[] = [
-  { href: "/kv-retail", icon: "calendar_today", label: "Hari ini" },
-  { href: "/kv-retail/unfinished", icon: "priority_high", label: "Belum selesai" },
-  { href: "/kv-retail/month", icon: "calendar_month", label: "Bulan ini" },
+  { href: "/kv-retail", icon: "list_alt_check", label: "Daftar Tugas" },
+  { href: "/kv-retail/unfinished", icon: "alarm", label: "Segera Selesaikan" },
+  { href: "/kv-retail/month", icon: "calendar_month", label: "Tugas Bulan Ini" },
   { href: "/kv-retail/performance", icon: "analytics", label: KV_RETAIL_PERFORMANCE_PAGE.navLabel },
 ] as const;
 
@@ -82,7 +82,7 @@ export function PerformanceSidebar({ theme, onToggleTheme, onToggleRetro, expand
           );
         })}
       </div>
-      {settingsHref && <div className={`border-t pt-2 ${divider}`}><SidebarLink href={settingsHref} icon="settings" label="Pengaturan" active={activeHref === settingsHref} theme={theme} expanded={expanded} /></div>}
+      {settingsHref && <div className={`border-t pt-2 ${divider}`}><SidebarLink href={settingsHref} icon="settings" label="Setting" active={activeHref === settingsHref} theme={theme} expanded={expanded} /></div>}
     </div>
     <div className={`flex flex-col gap-1 border-t pt-2 ${expanded ? "w-full" : "w-8"} ${divider}`}>
       <button type="button" aria-label={light ? "Gunakan tema gelap" : "Gunakan tema terang"} onClick={onToggleTheme} className={`flex h-8 items-center rounded-lg transition focus-visible:outline-none focus-visible:ring-2 ${expanded ? "w-full gap-3 px-2" : "w-8 justify-center"} ${light ? "text-[#3b4446] hover:bg-black/5 focus-visible:ring-black/30" : "text-[#e3e3e3] hover:bg-white/10 focus-visible:ring-white/70"}`}><MaterialIcon name={light ? "dark_mode" : "light_mode"} size="auto" className="shrink-0 text-xl" />{expanded && <span className="text-sm font-medium">{light ? "Tema gelap" : "Tema terang"}</span>}</button>

@@ -153,16 +153,16 @@ const TASK_CARD_STATES: TaskCardState[] = [
 
 const PRIMARY_MENU: SideMenuItem[] = [
   {
-    label: "Hari ini",
-    icon: "today",
+    label: "Daftar Tugas",
+    icon: "list_alt_check",
     href: "/kv-retail",
     status: "Active",
   },
-  { label: "Belum selesai", icon: "assignment_late", href: "/kv-retail/unfinished" },
-  { label: "Bulan ini", icon: "calendar_month", href: "/kv-retail/month" },
-  { label: "Report", icon: "analytics", href: "/kv-retail/performance" },
+  { label: "Segera Selesaikan", icon: "alarm", href: "/kv-retail/unfinished" },
+  { label: "Tugas Bulan Ini", icon: "calendar_month", href: "/kv-retail/month" },
+  { label: "Performa", icon: "analytics", href: "/kv-retail/performance" },
   {
-    label: "Pengaturan",
+    label: "Setting",
     icon: "settings",
     href: "/kv-retail/option",
   },
@@ -345,9 +345,9 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
   const [sortOption, setSortOption] = useState("Tenggat Waktu Terdekat");
 
 
-  const [todayTitle, setTodayTitle] = useState("Hari ini");
-  const [unfinishedTitle, setUnfinishedTitle] = useState("Belum selesai");
-  const [monthTitle, setMonthTitle] = useState("Bulan ini");
+  const [todayTitle, setTodayTitle] = useState("Daftar Tugas");
+  const [unfinishedTitle, setUnfinishedTitle] = useState("Segera Selesaikan");
+  const [monthTitle, setMonthTitle] = useState("Tugas Bulan Ini");
   const [taskConfig, setTaskConfig] = useState<TaskCardConfig>({});
   const [currentTime, setCurrentTime] = useState(() => Date.now());
   const summaryScrollDrag = useRef({ pointerId: -1, startX: 0, scrollLeft: 0 });
@@ -370,7 +370,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
   const isMentionOnlyUser = Boolean(user && !isTaskAdministrator);
   const compactMobileMenuItems = useMemo(
     () => PRIMARY_MENU
-      .filter((item) => !isMentionOnlyUser || item.label === "Hari ini")
+      .filter((item) => !isMentionOnlyUser || item.label === "Daftar Tugas")
       .map(({ label, href }) => ({ label, href })),
     [isMentionOnlyUser],
   );

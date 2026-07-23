@@ -12,15 +12,15 @@ import { useKvRetailDesktopSidebar } from "@/features/kv-retail/hooks";
 
 const PRIMARY_MENU: SideMenuItem[] = [
   {
-    label: "Hari ini",
-    icon: "today",
+    label: "Daftar Tugas",
+    icon: "list_alt_check",
     href: "/kv-retail",
   },
-  { label: "Belum selesai", icon: "assignment_late", href: "/kv-retail/unfinished" },
-  { label: "Bulan ini", icon: "calendar_month", href: "/kv-retail/month" },
-  { label: "Report", icon: "analytics", href: "/kv-retail/performance" },
+  { label: "Segera Selesaikan", icon: "alarm", href: "/kv-retail/unfinished" },
+  { label: "Tugas Bulan Ini", icon: "calendar_month", href: "/kv-retail/month" },
+  { label: "Performa", icon: "analytics", href: "/kv-retail/performance" },
   {
-    label: "Pengaturan",
+    label: "Setting",
     icon: "settings",
     href: "/kv-retail/option",
     status: "Active",
@@ -48,9 +48,9 @@ export default function OptionPage() {
   const { hasPermission, user, isLoading: isAuthLoading } = useAuth();
 
   // States
-  const [task_page_title_today, setTaskPageTitleToday] = useState("Hari ini");
-  const [task_page_title_unfinished, setTaskPageTitleUnfinished] = useState("Belum selesai");
-  const [task_page_title_month, setTaskPageTitleMonth] = useState("Bulan ini");
+  const [task_page_title_today, setTaskPageTitleToday] = useState("Daftar Tugas");
+  const [task_page_title_unfinished, setTaskPageTitleUnfinished] = useState("Segera Selesaikan");
+  const [task_page_title_month, setTaskPageTitleMonth] = useState("Tugas Bulan Ini");
   
   const [config, setConfig] = useState<TaskCardConfig>({});
 
@@ -70,9 +70,9 @@ export default function OptionPage() {
       
       try {
         const data = await coreApi.settings.get<Record<string, string>>([...KV_RETAIL_SETTING_KEYS]);
-        setTaskPageTitleToday(data?.task_page_title_today || "Hari ini");
-        setTaskPageTitleUnfinished(data?.task_page_title_unfinished || "Belum selesai");
-        setTaskPageTitleMonth(data?.task_page_title_month || "Bulan ini");
+        setTaskPageTitleToday(data?.task_page_title_today || "Daftar Tugas");
+        setTaskPageTitleUnfinished(data?.task_page_title_unfinished || "Segera Selesaikan");
+        setTaskPageTitleMonth(data?.task_page_title_month || "Tugas Bulan Ini");
         
         const loadedConfig: TaskCardConfig = {};
         for (const key of KV_RETAIL_SETTING_KEYS) {
@@ -198,33 +198,33 @@ export default function OptionPage() {
                     </div>
                     <div className="grid gap-4 md:grid-cols-3">
                       <div className="flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700">Hari ini</label>
+                        <label className="text-sm font-semibold text-gray-700">Daftar Tugas</label>
                         <input
                           type="text"
                           value={task_page_title_today}
                           onChange={(e) => setTaskPageTitleToday(e.target.value)}
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8474f9]"
-                          placeholder="Hari ini"
+                          placeholder="Daftar Tugas"
                         />
                       </div>
                       <div className="flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700">Belum selesai</label>
+                        <label className="text-sm font-semibold text-gray-700">Segera Selesaikan</label>
                         <input
                           type="text"
                           value={task_page_title_unfinished}
                           onChange={(e) => setTaskPageTitleUnfinished(e.target.value)}
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8474f9]"
-                          placeholder="Belum selesai"
+                          placeholder="Segera Selesaikan"
                         />
                       </div>
                       <div className="flex flex-col gap-2">
-                        <label className="text-sm font-semibold text-gray-700">Bulan ini</label>
+                        <label className="text-sm font-semibold text-gray-700">Tugas Bulan Ini</label>
                         <input
                           type="text"
                           value={task_page_title_month}
                           onChange={(e) => setTaskPageTitleMonth(e.target.value)}
                           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8474f9]"
-                          placeholder="Bulan ini"
+                          placeholder="Tugas Bulan Ini"
                         />
                       </div>
                       

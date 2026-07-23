@@ -18,11 +18,11 @@ import { PerformanceChartIndicators } from "@/features/kv-retail/components/perf
 import { useKvRetailDesktopSidebar } from "@/features/kv-retail/hooks";
 
 const TASK_NAVIGATION_ITEMS = [
-  { label: "Hari ini", icon: "today", href: "/kv-retail" },
-  { label: "Belum selesai", icon: "assignment_late", href: "/kv-retail/unfinished" },
-  { label: "Bulan ini", icon: "calendar_month", href: "/kv-retail/month" },
+  { label: "Daftar Tugas", icon: "list_alt_check", href: "/kv-retail" },
+  { label: "Segera Selesaikan", icon: "alarm", href: "/kv-retail/unfinished" },
+  { label: "Tugas Bulan Ini", icon: "calendar_month", href: "/kv-retail/month" },
   { label: KV_RETAIL_PERFORMANCE_PAGE.navLabel, icon: "analytics", href: "/kv-retail/performance" },
-  { label: "Pengaturan", icon: "settings", href: "/kv-retail/option" },
+  { label: "Setting", icon: "settings", href: "/kv-retail/option" },
 ];
 
 

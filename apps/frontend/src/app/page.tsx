@@ -46,7 +46,21 @@ export default function GuestLandingPage() {
     return (
       <div className="flex min-h-screen flex-col bg-white font-sans text-cu-ink antialiased">
         <Navbar />
-        <main aria-label="Universe landing" className="flex-1" />
+        <main aria-label="Universe landing" className="flex flex-1 flex-col justify-center px-4 md:px-16 lg:px-24">
+          <div className="w-full max-w-4xl text-left">
+            <h2 className="animate-slide-up text-3xl font-medium leading-[0.95] tracking-[-0.04em] text-cu-ink opacity-0 md:text-5xl lg:text-6xl" style={{ animationDelay: "100ms", animationFillMode: "forwards" }}>
+              Selamat datang di
+            </h2>
+            <HeroHeading typing typingDelay={700} onTypingComplete={completeTyping} className="w-full !text-left mt-2" align="left">
+              Creative Universe
+            </HeroHeading>
+            {isPrimaryActionVisible && (
+              <p className="animate-fade-in mt-6 max-w-3xl text-lg text-cu-muted opacity-0 md:text-xl" style={{ animationDelay: "0ms", animationFillMode: "forwards" }}>
+                Satu ekosistem untuk semua kebutuhan kreatif. Kelola tugas, pantau performance tim, serta terintegrasi dengan Creative AI untuk decision making.
+              </p>
+            )}
+          </div>
+        </main>
       </div>
     );
   }

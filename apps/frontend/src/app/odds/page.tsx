@@ -454,7 +454,7 @@ function OddsPageContent() {
   const [outputTotal, setOutputTotal] = useState("");
   const [outputDragActive, setOutputDragActive] = useState(false);
   const [outputBusy, setOutputBusy] = useState(false);
-  const [adminTaskAction, setAdminTaskAction] = useState<{ taskId: number; type: "brief" | "file" | "check" | "delete" | "detail"; nonce: number } | null>(null);
+  const [adminTaskAction, setAdminTaskAction] = useState<{ taskId: number; type: string; nonce: number } | null>(null);
   const [timerNow, setTimerNow] = useState(() => Date.now());
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
 
@@ -2147,86 +2147,26 @@ function OddsPageContent() {
                   ) : (
                     <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-5 overflow-auto pb-1 pr-1">
                       {/* Mobile: use mobileFilteredTasks */}
-                      {mobileFilteredTasks.map((task) => (
+                      {mobileFilteredTasks.map((task) => {
+                        const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));
+                        const canCheckThisTask = Boolean((task.status === "spv_review" && canReviewSpv) || (task.status === "client_review" && isClientForTask));
+                        
+                        return (
                         <div key={task.id} className="flex flex-col gap-3">
                           {/* ── Mobile Card ── */}
-                          {isControlTaskSection ? (() => {
-                            const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));
-                            const canCheckThisTask = Boolean((task.status === "spv_review" && canReviewSpv) || (task.status === "client_review" && isClientForTask));
-                            return (
-                            <div className="lg:hidden">
-                              <OddsMobileTaskCard
-                                task={task}
-                                theme={theme}
-                                nowMs={timerNow}
-                                timerSeconds={task.status === "in_progress" ? getTaskDuration(task) : undefined}
-                                canCheckRole={canCheckThisTask}
-                                chatOpen={selectedChatTaskId === task.id}
-                                onAction={(action) => {
-                                  if (action === "chat") {
-                                    setActiveChatTaskId((current) => current === task.id ? null : task.id);
-                                    return;
-                                  }
-                                  if (action === "pause") {
-                                    void handlePauseTask(task.id);
-                                    return;
-                                  }
-                                }}
-                              >
-                                {(activeTab) => (
-                                  <>
-                                    <DesignerTaskQueueCard
-                                      task={task}
-                                      theme={theme}
-                                      nowMs={timerNow}
-                                      controlView
-                                      selected={selectedChatTaskId === task.id}
-                                      startDisabled
-                                      timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
-                                      onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
-                                      onStart={() => undefined}
-                                      onPause={() => void handlePauseTask(task.id)}
-                                      onDone={() => undefined}
-                                      onAcceptBrief={() => runOperationalAction(
-                                        `brief-accept-${task.id}`,
-                                        () => acceptOddsBrief(task.id),
-                                        "Brief diterima dan masuk antrean."
-                                      )}
-                                      onReturnBrief={(note) => runOperationalAction(
-                                        `brief-return-${task.id}`,
-                                        () => returnOddsBrief(task.id, note),
-                                        "Brief dikembalikan."
-                                      )}
-                                      externalAction={activeTab ? { type: activeTab as any, nonce: Date.now() } : undefined}
-                                      detailOnly
-                                    />
-                                    {selectedChatTaskId === task.id && (
-                                      <div className={`overflow-hidden border-t ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"}`}>
-                                        <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} compact />
-                                      </div>
-                                    )}
-                                  </>
-                                )}
-                              </OddsMobileTaskCard>
-                            </div>
-                            );
-                          })() : null}
-
-                          {/* ── Desktop Card ── */}
-                          <div className="hidden min-w-[900px] flex-col gap-3 lg:flex">
-                          {isControlTaskSection ? (() => {
-                            const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));
-                            const canCheckThisTask = Boolean((task.status === "spv_review" && canReviewSpv) || (task.status === "client_review" && isClientForTask));
-                            
-                            return (
-                            <AdminKvRetailTaskCard
+                          <div className="lg:hidden">
+                            <OddsMobileTaskCard
                               task={task}
                               theme={theme}
                               nowMs={timerNow}
-                              timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
                               timerSeconds={task.status === "in_progress" ? getTaskDuration(task) : undefined}
-                              chatOpen={selectedChatTaskId === task.id}
                               canCheckRole={canCheckThisTask}
+                              chatOpen={selectedChatTaskId === task.id}
+                              hideDelete={!isControlTaskSection}
+                              showStart={!isControlTaskSection && (task.status === "queued" || task.status === "revision")}
+                              showPause={isControlTaskSection ? ["in_progress", "leader_revision_requested", "revision"].includes(task.status) : task.status === "in_progress"}
+                              showDone={!isControlTaskSection && task.status === "in_progress"}
+                              startDisabled={Boolean(activeInProgressTask)}
                               onAction={(action) => {
                                 if (action === "chat") {
                                   setActiveChatTaskId((current) => current === task.id ? null : task.id);
@@ -2236,6 +2176,111 @@ function OddsPageContent() {
                                   void handlePauseTask(task.id);
                                   return;
                                 }
+                                if (action === "start") {
+                                  void handleStartTask(task.id);
+                                  return;
+                                }
+                                if (action === "done") {
+                                  if (activeOutputTaskId === task.id) {
+                                    closeOutputPanel();
+                                    return;
+                                  }
+                                  setOutputFiles([]);
+                                  setOutputShareLink("");
+                                  setOutputTotal("");
+                                  setOutputDragActive(false);
+                                  setActiveOutputTaskId(task.id);
+                                  return;
+                                }
+                              }}
+                            >
+                              {(activeTab) => (
+                                <>
+                                  <DesignerTaskQueueCard
+                                    task={task}
+                                    theme={theme}
+                                    nowMs={timerNow}
+                                    controlView={isControlTaskSection}
+                                    selected={selectedChatTaskId === task.id}
+                                    startDisabled={Boolean(activeInProgressTask)}
+                                    timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
+                                    onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
+                                    onStart={() => void handleStartTask(task.id)}
+                                    onPause={() => void handlePauseTask(task.id)}
+                                    onDone={() => {
+                                      if (activeOutputTaskId === task.id) {
+                                        closeOutputPanel();
+                                        return;
+                                      }
+                                      setOutputFiles([]);
+                                      setOutputShareLink("");
+                                      setOutputTotal("");
+                                      setOutputDragActive(false);
+                                      setActiveOutputTaskId(task.id);
+                                    }}
+                                    onAcceptBrief={() => runOperationalAction(
+                                      `brief-accept-${task.id}`,
+                                      () => acceptOddsBrief(task.id),
+                                      "Brief diterima dan masuk antrean."
+                                    )}
+                                    onReturnBrief={(note) => runOperationalAction(
+                                      `brief-return-${task.id}`,
+                                      () => returnOddsBrief(task.id, note),
+                                      "Brief dikembalikan."
+                                    )}
+                                    externalAction={activeTab ? { type: activeTab as any, nonce: Date.now() } : undefined}
+                                    detailOnly
+                                  />
+                                  {selectedChatTaskId === task.id && (
+                                    <div className={`overflow-hidden border-t ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"}`}>
+                                      <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} compact />
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </OddsMobileTaskCard>
+                          </div>
+
+                          {/* ── Desktop Card ── */}
+                          <div className="hidden min-w-[900px] flex-col gap-3 lg:flex">
+                            <AdminKvRetailTaskCard
+                              task={task}
+                              theme={theme}
+                              nowMs={timerNow}
+                              timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
+                              timerSeconds={task.status === "in_progress" ? getTaskDuration(task) : undefined}
+                              chatOpen={selectedChatTaskId === task.id}
+                              canCheckRole={canCheckThisTask}
+                              hideDelete={!isControlTaskSection}
+                              showStart={!isControlTaskSection && (task.status === "queued" || task.status === "revision")}
+                              showPause={isControlTaskSection ? ["in_progress", "leader_revision_requested", "revision"].includes(task.status) : task.status === "in_progress"}
+                              showDone={!isControlTaskSection && task.status === "in_progress"}
+                              startDisabled={Boolean(activeInProgressTask)}
+                              onAction={(action) => {
+                                if (action === "chat") {
+                                  setActiveChatTaskId((current) => current === task.id ? null : task.id);
+                                  return;
+                                }
+                                if (action === "pause") {
+                                  void handlePauseTask(task.id);
+                                  return;
+                                }
+                                if (action === "start") {
+                                  void handleStartTask(task.id);
+                                  return;
+                                }
+                                if (action === "done") {
+                                  if (activeOutputTaskId === task.id) {
+                                    closeOutputPanel();
+                                    return;
+                                  }
+                                  setOutputFiles([]);
+                                  setOutputShareLink("");
+                                  setOutputTotal("");
+                                  setOutputDragActive(false);
+                                  setActiveOutputTaskId(task.id);
+                                  return;
+                                }
                                 setAdminTaskAction({ taskId: task.id, type: action, nonce: Date.now() });
                               }}
                             >
@@ -2243,14 +2288,24 @@ function OddsPageContent() {
                                 task={task}
                                 theme={theme}
                                 nowMs={timerNow}
-                                controlView
+                                controlView={isControlTaskSection}
                                 selected={selectedChatTaskId === task.id}
-                                startDisabled
+                                startDisabled={Boolean(activeInProgressTask)}
                                 timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
                                 onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
-                                onStart={() => undefined}
+                                onStart={() => void handleStartTask(task.id)}
                                 onPause={() => void handlePauseTask(task.id)}
-                                onDone={() => undefined}
+                                onDone={() => {
+                                  if (activeOutputTaskId === task.id) {
+                                    closeOutputPanel();
+                                    return;
+                                  }
+                                  setOutputFiles([]);
+                                  setOutputShareLink("");
+                                  setOutputTotal("");
+                                  setOutputDragActive(false);
+                                  setActiveOutputTaskId(task.id);
+                                }}
                                 onAcceptBrief={() => runOperationalAction(
                                   `brief-accept-${task.id}`,
                                   () => acceptOddsBrief(task.id),
@@ -2286,41 +2341,6 @@ function OddsPageContent() {
                                 </div>
                               )}
                             </AdminKvRetailTaskCard>
-                            );
-                          })() : (
-                            <DesignerTaskQueueCard
-                              task={task}
-                              theme={theme}
-                              nowMs={timerNow}
-                              controlView={false}
-                              selected={selectedChatTaskId === task.id}
-                              startDisabled={Boolean(activeInProgressTask)}
-                              timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
-                              onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
-                              onStart={() => void handleStartTask(task.id)}
-                              onDone={() => {
-                                if (activeOutputTaskId === task.id) {
-                                  closeOutputPanel();
-                                  return;
-                                }
-                                setOutputFiles([]);
-                                setOutputShareLink("");
-                                setOutputTotal("");
-                                setOutputDragActive(false);
-                                setActiveOutputTaskId(task.id);
-                              }}
-                              onAcceptBrief={() => runOperationalAction(
-                                `brief-accept-${task.id}`,
-                                () => acceptOddsBrief(task.id),
-                                "Brief diterima dan masuk antrean."
-                              )}
-                              onReturnBrief={(note) => runOperationalAction(
-                                `brief-return-${task.id}`,
-                                () => returnOddsBrief(task.id, note),
-                                "Brief dikembalikan."
-                              )}
-                            />
-                          )}
                           </div>
                           {activeOutputTaskId === task.id && (
                           <div className={`overflow-hidden rounded-lg border ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"} shadow-[0_5px_14px_rgba(44,42,39,0.05)]`}>
@@ -2411,7 +2431,7 @@ function OddsPageContent() {
                           </div>
                         )}
                       </div>
-                    ))}
+                    ); })}
                   </div>
                   )}
               </section>
@@ -2548,6 +2568,9 @@ function OddsPageContent() {
           : effectiveActiveSection === "client_archive"
           ? "Belum ada tugas di arsip."
           : "Belum ada riwayat request.";
+          
+        const accentColor = theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : "#00a4ff";
+        const selectedChatTaskId = activeChatTaskId;
 
         return (
           <section className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -2557,9 +2580,99 @@ function OddsPageContent() {
               <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-8 text-center text-sm text-cu-muted">{emptyText}</div>
             ) : (
               <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-5 overflow-auto pb-1 pr-1">
-                {clientTasks.map((task) => (
-                  <ClientOddsTaskCard key={task.id} task={task} theme={theme} userId={user?.id} nowMs={timerNow} onReviewed={loadConfig} />
-                ))}
+                {clientTasks.map((task) => {
+                  const canCheckThisTask = task.status === "client_review";
+                  return (
+                    <div key={task.id} className="flex flex-col gap-3">
+                      {/* ── Mobile Card ── */}
+                      <div className="lg:hidden">
+                        <OddsMobileTaskCard
+                          task={task}
+                          theme={theme}
+                          nowMs={timerNow}
+                          canCheckRole={canCheckThisTask}
+                          chatOpen={selectedChatTaskId === task.id}
+                          hideDelete={true}
+                          onAction={(action) => {
+                            if (action === "chat") {
+                              setActiveChatTaskId((current) => current === task.id ? null : task.id);
+                              return;
+                            }
+                          }}
+                        >
+                          {(activeTab) => (
+                            <>
+                              <ClientOddsTaskCard
+                                task={task}
+                                theme={theme}
+                                userId={user?.id}
+                                nowMs={timerNow}
+                                onReviewed={loadConfig}
+                                detailOnly
+                                externalAction={activeTab ? { type: activeTab as any, nonce: Date.now() } : undefined}
+                              />
+                              {selectedChatTaskId === task.id && (
+                                <div className={`overflow-hidden border-t ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"}`}>
+                                  <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} compact />
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </OddsMobileTaskCard>
+                      </div>
+
+                      {/* ── Desktop Card ── */}
+                      <div className="hidden min-w-[900px] flex-col gap-3 lg:flex">
+                        <AdminKvRetailTaskCard
+                          task={task}
+                          theme={theme}
+                          nowMs={timerNow}
+                          canCheckRole={canCheckThisTask}
+                          hideDelete={true}
+                          chatOpen={selectedChatTaskId === task.id}
+                          onAction={(action) => {
+                            if (action === "chat") {
+                              setActiveChatTaskId((current) => current === task.id ? null : task.id);
+                              return;
+                            }
+                            setAdminTaskAction({ taskId: task.id, type: action, nonce: Date.now() });
+                          }}
+                        >
+                          <ClientOddsTaskCard
+                            task={task}
+                            theme={theme}
+                            userId={user?.id}
+                            nowMs={timerNow}
+                            onReviewed={loadConfig}
+                            detailOnly
+                            externalAction={adminTaskAction?.taskId === task.id ? adminTaskAction : undefined}
+                          />
+                          {selectedChatTaskId === task.id && (
+                            <div className={`overflow-hidden rounded-lg border mt-3 ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"} shadow-[0_5px_14px_rgba(44,42,39,0.05)]`}>
+                              <div className="flex items-center justify-between border-b border-cu-border bg-cu-panel-soft px-3 py-2">
+                                <div className="flex min-w-0 items-center gap-2">
+                                  <MaterialIcon name="forum" size="auto" className="text-lg" style={{ color: accentColor }} />
+                                  <div className="min-w-0">
+                                    <p className="max-w-[560px] truncate text-xs font-semibold leading-none text-cu-ink">{task.design_purpose}</p>
+                                  </div>
+                                </div>
+                                <button type="button" onClick={() => setActiveChatTaskId(null)} aria-label="Tutup diskusi" className="flex size-7 items-center justify-center rounded-lg border border-cu-border bg-white text-cu-ink transition hover:bg-cu-panel-soft">
+                                  <MaterialIcon name="close" size="xs" />
+                                </button>
+                              </div>
+                              <OddsTaskChat
+                                taskId={task.id}
+                                userId={user?.id}
+                                taskStatus={task.status}
+                                compact
+                              />
+                            </div>
+                          )}
+                        </AdminKvRetailTaskCard>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>
@@ -2786,7 +2899,12 @@ type OddsMobileTaskCardProps = {
   timerSeconds?: number;
   canCheckRole?: boolean;
   chatOpen?: boolean;
-  onAction: (action: "chat" | "pause") => void;
+  onAction: (action: "pause" | "chat" | "brief" | "file" | "check" | "delete" | "start" | "done") => void;
+  hideDelete?: boolean;
+  showStart?: boolean;
+  showDone?: boolean;
+  showPause?: boolean;
+  startDisabled?: boolean;
   children: (activeTab: string | null) => ReactNode;
 };
 
@@ -2798,6 +2916,11 @@ function OddsMobileTaskCard({
   canCheckRole = false,
   chatOpen = false,
   onAction,
+  hideDelete = false,
+  showStart = false,
+  showDone = false,
+  showPause = false,
+  startDisabled = false,
   children,
 }: OddsMobileTaskCardProps) {
   const [activeTab, setActiveTab] = useState<string | null>(null);
@@ -3006,6 +3129,43 @@ function OddsMobileTaskCard({
                 Check
               </button>
             )}
+            {showStart && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction("start");
+                }}
+                disabled={startDisabled}
+                className={`flex h-8 w-9 shrink-0 items-center justify-center rounded-lg transition ${getBtnClass("green")} disabled:opacity-50`}
+              >
+                <MaterialIcon name="play_arrow" size="auto" className="text-sm" />
+              </button>
+            )}
+            {showPause && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction("pause");
+                }}
+                className={`flex h-8 w-9 shrink-0 items-center justify-center rounded-lg transition ${getBtnClass("amber")}`}
+              >
+                <MaterialIcon name="pause" size="auto" className="text-sm" />
+              </button>
+            )}
+            {showDone && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction("done");
+                }}
+                className={`flex h-8 w-9 shrink-0 items-center justify-center rounded-lg transition ${getBtnClass("green")}`}
+              >
+                <MaterialIcon name="task_alt" size="auto" className="text-sm" />
+              </button>
+            )}
             {/* Chat Direct Toggle Button */}
             <button
               type="button"
@@ -3026,7 +3186,7 @@ function OddsMobileTaskCard({
               <MaterialIcon name="open_in_new" size="auto" className="text-sm" />
             </Link>
             {/* Delete/Cancel Button */}
-            {!isDone && (
+            {!isDone && !hideDelete && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -3118,7 +3278,12 @@ type AdminKvRetailTaskCardProps = {
   timerSeconds?: number;
   chatOpen?: boolean;
   canCheckRole?: boolean;
-  onAction: (action: "brief" | "chat" | "file" | "check" | "pause" | "detail" | "delete") => void;
+  onAction: (action: "pause" | "chat" | "brief" | "file" | "check" | "delete" | "start" | "done") => void;
+  hideDelete?: boolean;
+  showStart?: boolean;
+  showDone?: boolean;
+  showPause?: boolean;
+  startDisabled?: boolean;
   children?: ReactNode;
 };
 
@@ -3131,6 +3296,11 @@ function AdminKvRetailTaskCard({
   chatOpen = false,
   canCheckRole = false,
   onAction,
+  hideDelete = false,
+  showStart = false,
+  showDone = false,
+  showPause = false,
+  startDisabled = false,
   children,
 }: AdminKvRetailTaskCardProps) {
   const [expanded, setExpanded] = useState(false);
@@ -3317,7 +3487,18 @@ function AdminKvRetailTaskCard({
             >
               <MaterialIcon name="chat" size="sm" />
             </button>
-            {isPausable && (
+            {showStart && (
+              <button
+                type="button"
+                title="Start Task"
+                onClick={() => onAction("start")}
+                disabled={startDisabled}
+                className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("blue")} disabled:opacity-50`}
+              >
+                <MaterialIcon name="play_arrow" size="sm" />
+              </button>
+            )}
+            {showPause && (
               <button
                 type="button"
                 title="Pause Task"
@@ -3325,6 +3506,16 @@ function AdminKvRetailTaskCard({
                 className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("amber")}`}
               >
                 <MaterialIcon name="pause" size="sm" />
+              </button>
+            )}
+            {showDone && (
+              <button
+                type="button"
+                title="Done / Submit Output"
+                onClick={() => onAction("done")}
+                className={`flex size-9 items-center justify-center rounded-xl transition active:scale-95 ${getBtnClass("emerald")}`}
+              >
+                <MaterialIcon name="task_alt" size="sm" />
               </button>
             )}
             {fileEnabled && (
@@ -3344,7 +3535,7 @@ function AdminKvRetailTaskCard({
             >
               <MaterialIcon name="open_in_new" size="sm" />
             </Link>
-            {!isDone && (
+            {!isDone && !hideDelete && (
               <button
                 type="button"
                 title="Hapus / Cancel Task"
@@ -3457,7 +3648,7 @@ type DesignerTaskQueueCardProps = {
   selected?: boolean;
   startDisabled?: boolean;
   timerText?: string;
-  externalAction?: { type: "brief" | "file" | "check" | "delete" | "detail"; nonce: number };
+  externalAction?: { type: string; nonce: number };
   detailOnly?: boolean;
   onChat: () => void;
   onStart: () => void;
@@ -4107,7 +4298,7 @@ function taskTypeLabel(taskType: string): string {
   return labels[taskType] ?? statusLabel(taskType);
 }
 
-function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed }: { task: OddsTask; theme: "light" | "dark" | "retro"; userId?: number; nowMs: number; onReviewed?: () => Promise<void> }) {
+function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly, externalAction }: { task: OddsTask; theme: "light" | "dark" | "retro"; userId?: number; nowMs: number; onReviewed?: () => Promise<void>; detailOnly?: boolean; externalAction?: { type: string; nonce: number } }) {
   const [briefOpen, setBriefOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [fileOpen, setFileOpen] = useState(false);
@@ -4119,6 +4310,18 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed }: { task: 
   const [clientRating, setClientRating] = useState(5);
   const [clientReviewBusy, setClientReviewBusy] = useState<"approved" | "revision" | null>(null);
   const [copiedAssetId, setCopiedAssetId] = useState<number | null>(null);
+  const lastActionNonce = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (externalAction && externalAction.nonce !== lastActionNonce.current) {
+      lastActionNonce.current = externalAction.nonce;
+      
+      setBriefOpen(externalAction.type === "brief");
+      setFileOpen(externalAction.type === "file" || externalAction.type === "check");
+      setMessageOpen(externalAction.type === "chat");
+    }
+  }, [externalAction]);
+
   const created = task.created_at ? new Date(task.created_at) : null;
   const validCreated = created && !Number.isNaN(created.getTime());
   const submitDay = validCreated ? new Intl.DateTimeFormat("id-ID", { weekday: "long" }).format(created) : "-";
@@ -4314,7 +4517,9 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed }: { task: 
 
   return (
     <>
-      <article className={shellClass}>
+      <article className={detailOnly ? "" : shellClass}>
+        {!detailOnly && (
+          <>
         <div className={`flex items-center justify-between gap-4 px-4 py-2 ${headerClass}`}>
           <p className={`truncate leading-none ${theme === "retro" ? "text-[11px] font-black uppercase tracking-[0.12em]" : "text-base"}`}>
             {priority} - {task.design_purpose}
@@ -4387,7 +4592,9 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed }: { task: 
             )}
           </div>
         </div>
-        {messageOpen && (
+          </>
+        )}
+        {messageOpen && !detailOnly && (
           <div className="border-t border-cu-border bg-white">
             <OddsTaskChat taskId={task.id} userId={userId} taskStatus={task.status} compact />
           </div>

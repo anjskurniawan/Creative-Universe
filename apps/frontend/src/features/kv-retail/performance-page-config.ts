@@ -4,7 +4,7 @@
  * used in menus where space is limited.
  */
 export const KV_RETAIL_PERFORMANCE_PAGE = {
-  title: "Report",
-  navLabel: "Report",
+  title: "Performa",
+  navLabel: "Performa",
   parentTitle: "KV Retail Task",
 } as const;
