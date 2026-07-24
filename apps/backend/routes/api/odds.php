@@ -27,6 +27,7 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::get('/uploads/{storedFile}/content', [TaskController::class, 'attachmentContent']);
     Route::post('/tasks', [TaskController::class, 'store'])->middleware('can:create-odds-tasks');
     Route::get('/tasks/{task}', [TaskController::class, 'show']);
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->middleware('can:cancel-odds-tasks');
     Route::get('/tasks/{task}/conversation', [TaskController::class, 'conversation']);
     Route::patch('/tasks/{task}/brief', [TaskController::class, 'updateBrief'])->middleware('can:create-odds-tasks');
     Route::post('/tasks/{task}/brief/return', [TaskController::class, 'returnBrief'])->middleware('can:review-odds-briefs');

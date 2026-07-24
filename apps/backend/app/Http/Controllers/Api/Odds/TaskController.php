@@ -16,6 +16,7 @@ use App\Http\Requests\Odds\SubmitResultRequest;
 use App\Http\Requests\Odds\UpdateBriefRequest;
 use App\Http\Resources\Odds\TaskResource;
 use App\Models\Core\StoredFile;
+use App\SubApps\Odds\Models\TaskResult;
 use App\SubApps\Odds\Models\Task;
 use App\SubApps\Odds\Services\OddsBriefReviewService;
 use App\SubApps\Odds\Services\OddsEscalationService;
@@ -26,6 +27,7 @@ use App\SubApps\Odds\Services\OddsWorkReviewService;
 use App\Services\Core\FileStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -136,6 +138,56 @@ class TaskController extends BaseApiController
             ]))->resolve($request),
             'Detail task ODDS berhasil diambil.'
         );
+    }
+
+    public function destroy(Request $request, Task $task): JsonResponse
+    {
+        $this->authorizeTaskView($request, $task);
+        abort_unless(
+            $task->requester_id === $request->user()->id || $request->user()->can('view-all-odds-tasks'),
+            403
+        );
+
+        DB::transaction(function () use ($task) {
+            $resultIds = $task->results()->withTrashed()->pluck('id');
+
+            if ($resultIds->isNotEmpty()) {
+                DB::table('asset_links')
+                    ->where('linkable_type', TaskResult::class)
+                    ->whereIn('linkable_id', $resultIds)
+                    ->delete();
+            }
+
+            $task->assetLinks()->withTrashed()->forceDelete();
+            StoredFile::query()
+                ->withTrashed()
+                ->where('application_key', 'odds')
+                ->where('context_type', 'task')
+                ->where('context_id', (string) $task->id)
+                ->forceDelete();
+
+            DB::table('conversations')
+                ->where('context_type', 'odds_task')
+                ->where('context_id', $task->id)
+                ->delete();
+
+            DB::table('odds_designer_daily_reports')
+                ->where('task_id', $task->id)
+                ->delete();
+
+            $task->update(['current_queue_id' => null]);
+            $task->brief()->delete();
+            $task->queueEntries()->delete();
+            $task->timeLogs()->delete();
+            $task->reviews()->delete();
+            $task->revisions()->withTrashed()->forceDelete();
+            $task->skipRequests()->delete();
+            $task->cancelRequests()->delete();
+            $task->results()->withTrashed()->forceDelete();
+            $task->forceDelete();
+        });
+
+        return $this->sendResponse(null, 'Task ODDS berhasil dihapus dari database.');
     }
 
     public function conversation(Request $request, Task $task): JsonResponse

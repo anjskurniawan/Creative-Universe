@@ -40,9 +40,20 @@ function badgeClass(status: string) {
   return "bg-cu-panel-soft text-cu-muted border-cu-border";
 }
 
+function parseDateMs(dateStr?: string | number | null): number {
+  if (!dateStr) return NaN;
+  if (typeof dateStr === "number") return dateStr;
+  let str = String(dateStr).trim();
+  if (!str) return NaN;
+  if (/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/.test(str)) {
+    str = str.replace(" ", "T");
+  }
+  return new Date(str).getTime();
+}
+
 function durationSeconds(log: { started_at: string; stopped_at: string | null; duration_seconds: number }, nowMs = Date.now()) {
   if (log.stopped_at) return log.duration_seconds;
-  const started = new Date(log.started_at).getTime();
+  const started = parseDateMs(log.started_at);
   if (Number.isNaN(started)) return log.duration_seconds;
   return Math.max(0, Math.floor((nowMs - started) / 1000));
 }

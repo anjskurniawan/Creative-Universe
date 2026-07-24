@@ -149,6 +149,50 @@ class OddsWorkflowApiTest extends TestCase
             ->assertJsonPath('data.data.0.user.id', $this->designer->id);
     }
 
+    public function test_client_can_delete_own_task_from_database(): void
+    {
+        $taskId = $this->createTask();
+
+        $this->assertDatabaseHas('odds_tasks', ['id' => $taskId]);
+        $this->assertDatabaseHas('odds_task_briefs', ['task_id' => $taskId]);
+
+        $this->actingAs($this->client)
+            ->deleteJson("/api/v1/odds/tasks/{$taskId}")
+            ->assertOk()
+            ->assertJsonPath('message', 'Task ODDS berhasil dihapus dari database.');
+
+        $this->assertDatabaseMissing('odds_tasks', ['id' => $taskId]);
+        $this->assertDatabaseMissing('odds_task_briefs', ['task_id' => $taskId]);
+    }
+
+    public function test_spv_can_delete_started_task_from_database(): void
+    {
+        $taskId = $this->createTask();
+
+        $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/brief/accept")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'queued');
+
+        $this->actingAs($this->designer)
+            ->postJson("/api/v1/odds/tasks/{$taskId}/start")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'in_progress');
+
+        $this->assertDatabaseHas('odds_tasks', ['id' => $taskId, 'status' => 'in_progress']);
+        $this->assertDatabaseHas('odds_task_queue', ['task_id' => $taskId]);
+        $this->assertDatabaseHas('odds_task_time_logs', ['task_id' => $taskId, 'log_type' => 'work']);
+
+        $this->actingAs($this->spv)
+            ->deleteJson("/api/v1/odds/tasks/{$taskId}")
+            ->assertOk()
+            ->assertJsonPath('message', 'Task ODDS berhasil dihapus dari database.');
+
+        $this->assertDatabaseMissing('odds_tasks', ['id' => $taskId]);
+        $this->assertDatabaseMissing('odds_task_queue', ['task_id' => $taskId]);
+        $this->assertDatabaseMissing('odds_task_time_logs', ['task_id' => $taskId]);
+    }
+
     public function test_queue_skip_request_and_review_permissions_are_separated(): void
     {
         $taskId = $this->createTask();

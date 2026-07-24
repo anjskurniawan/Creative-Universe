@@ -35,6 +35,7 @@ import {
   deleteOddsCategory,
   deleteOddsDesignerProfile,
   deleteOddsSystemRule,
+  deleteOddsTask,
   getOddsAssignableUsers,
   getOddsConfigCategories,
   getOddsConfigDesignerProfiles,
@@ -464,6 +465,48 @@ function OddsPageContent() {
     }, 1000);
     return () => window.clearInterval(interval);
   }, []);
+
+  const parseDateMs = (dateStr?: string | number | null): number => {
+    if (!dateStr) return NaN;
+    if (typeof dateStr === "number") return dateStr;
+    let str = String(dateStr).trim();
+    if (!str) return NaN;
+    if (/^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/.test(str)) {
+      str = str.replace(" ", "T");
+    }
+    return new Date(str).getTime();
+  };
+
+  const getTaskDuration = (task?: OddsTask) => {
+    if (!task) return 0;
+    const timeLogs = task.time_logs ?? task.timeLogs ?? [];
+    const designerTimeLogs = timeLogs.filter((log) => ["work", "revision"].includes(log.log_type));
+    const isRunning = task.status === "in_progress";
+    
+    const durationSeconds = (log: typeof designerTimeLogs[0], nowMs = Date.now()) => {
+      if (log.stopped_at || !isRunning) return log.duration_seconds ?? 0;
+      const started = parseDateMs(log.started_at);
+      if (Number.isNaN(started)) return log.duration_seconds ?? 0;
+      return Math.max(0, Math.floor((nowMs - started) / 1000));
+    };
+
+    const totalSeconds = designerTimeLogs.reduce((total, log) => total + durationSeconds(log, timerNow), 0);
+    if (totalSeconds > 0 || designerTimeLogs.length > 0) return totalSeconds;
+    if (!isRunning) return 0;
+    const fallbackStart = parseDateMs(task.updated_at ?? task.created_at);
+    return Number.isNaN(fallbackStart) ? 0 : Math.max(0, Math.floor((timerNow - fallbackStart) / 1000));
+  };
+
+  const formatTimer = (totalSeconds: number) => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [
+      String(hours).padStart(2, "0"),
+      String(minutes).padStart(2, "0"),
+      String(seconds).padStart(2, "0"),
+    ].join(":");
+  };
 
   useEffect(() => {
     if (!notice) return;
@@ -2009,35 +2052,6 @@ function OddsPageContent() {
         
         // Find if there is an in-progress task for the active designer
         const activeInProgressTask = assignedDesignerTasks.find(t => t.status === "in_progress");
-        
-        // Calculate timer values
-        const getTaskDuration = (task?: OddsTask) => {
-          if (!task) return 0;
-          const timeLogs = task.time_logs ?? task.timeLogs ?? [];
-          const designerTimeLogs = timeLogs.filter((log) => ["work", "revision"].includes(log.log_type));
-          
-          const durationSeconds = (log: typeof designerTimeLogs[0], nowMs = Date.now()) => {
-            if (log.stopped_at) return log.duration_seconds;
-            const started = new Date(log.started_at).getTime();
-            if (Number.isNaN(started)) return log.duration_seconds;
-            return Math.max(0, Math.floor((nowMs - started) / 1000));
-          };
-
-          const totalSeconds = designerTimeLogs.reduce((total, log) => total + durationSeconds(log, timerNow), 0);
-          if (totalSeconds > 0 || designerTimeLogs.length > 0) return totalSeconds;
-          const fallbackStart = new Date(task.updated_at ?? task.created_at).getTime();
-          return Number.isNaN(fallbackStart) ? 0 : Math.max(0, Math.floor((timerNow - fallbackStart) / 1000));
-        };
-        const formatTimer = (totalSeconds: number) => {
-          const hours = Math.floor(totalSeconds / 3600);
-          const minutes = Math.floor((totalSeconds % 3600) / 60);
-          const seconds = totalSeconds % 60;
-          return [
-            String(hours).padStart(2, "0"),
-            String(minutes).padStart(2, "0"),
-            String(seconds).padStart(2, "0"),
-          ].join(":");
-        };
 
         const handleStartTask = async (taskId: number) => {
           setError(null);
@@ -2150,6 +2164,17 @@ function OddsPageContent() {
                       {mobileFilteredTasks.map((task) => {
                         const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));
                         const canCheckThisTask = Boolean((task.status === "spv_review" && canReviewSpv) || (task.status === "client_review" && isClientForTask));
+                        const handleControlDelete = async () => {
+                          const confirmed = window.confirm(`Hapus task ${task.task_number} dari database?`);
+                          if (!confirmed) return;
+
+                          try {
+                            await deleteOddsTask(task.id);
+                            await loadConfig();
+                          } catch (err) {
+                            alert(oddsError(err));
+                          }
+                        };
                         
                         return (
                         <div key={task.id} className="flex flex-col gap-3">
@@ -2191,6 +2216,9 @@ function OddsPageContent() {
                                   setOutputDragActive(false);
                                   setActiveOutputTaskId(task.id);
                                   return;
+                                }
+                                if (action === "delete") {
+                                  void handleControlDelete();
                                 }
                               }}
                             >
@@ -2279,6 +2307,10 @@ function OddsPageContent() {
                                   setOutputTotal("");
                                   setOutputDragActive(false);
                                   setActiveOutputTaskId(task.id);
+                                  return;
+                                }
+                                if (action === "delete") {
+                                  void handleControlDelete();
                                   return;
                                 }
                                 setAdminTaskAction({ taskId: task.id, type: action, nonce: Date.now() });
@@ -2582,6 +2614,18 @@ function OddsPageContent() {
               <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-5 overflow-auto pb-1 pr-1">
                 {clientTasks.map((task) => {
                   const canCheckThisTask = task.status === "client_review";
+                  const hideClientDelete = task.status === "done";
+                  const handleClientDelete = async () => {
+                    const confirmed = window.confirm(`Hapus / cancel task ${task.task_number}?`);
+                    if (!confirmed) return;
+
+                    try {
+                      await deleteOddsTask(task.id);
+                      await loadConfig();
+                    } catch (err) {
+                      alert(oddsError(err));
+                    }
+                  };
                   return (
                     <div key={task.id} className="flex flex-col gap-3">
                       {/* ── Mobile Card ── */}
@@ -2590,13 +2634,17 @@ function OddsPageContent() {
                           task={task}
                           theme={theme}
                           nowMs={timerNow}
+                          timerSeconds={task.status === "in_progress" || getTaskDuration(task) > 0 ? getTaskDuration(task) : undefined}
                           canCheckRole={canCheckThisTask}
                           chatOpen={selectedChatTaskId === task.id}
-                          hideDelete={true}
+                          hideDelete={hideClientDelete}
                           onAction={(action) => {
                             if (action === "chat") {
                               setActiveChatTaskId((current) => current === task.id ? null : task.id);
                               return;
+                            }
+                            if (action === "delete") {
+                              void handleClientDelete();
                             }
                           }}
                         >
@@ -2627,12 +2675,18 @@ function OddsPageContent() {
                           task={task}
                           theme={theme}
                           nowMs={timerNow}
+                          timerText={task.status === "in_progress" || getTaskDuration(task) > 0 ? formatTimer(getTaskDuration(task)) : undefined}
+                          timerSeconds={task.status === "in_progress" || getTaskDuration(task) > 0 ? getTaskDuration(task) : undefined}
                           canCheckRole={canCheckThisTask}
-                          hideDelete={true}
+                          hideDelete={hideClientDelete}
                           chatOpen={selectedChatTaskId === task.id}
                           onAction={(action) => {
                             if (action === "chat") {
                               setActiveChatTaskId((current) => current === task.id ? null : task.id);
+                              return;
+                            }
+                            if (action === "delete") {
+                              void handleClientDelete();
                               return;
                             }
                             setAdminTaskAction({ taskId: task.id, type: action, nonce: Date.now() });
@@ -3025,7 +3079,7 @@ function OddsMobileTaskCard({
         onClick={toggleExpandOnly}
         className={`flex flex-col gap-2.5 p-4 cursor-pointer select-none ${innerBgClass}`}
       >
-        {/* Row 1: Judul Tugas + Label Quartal Singkat */}
+        {/* Row 1: Judul Tugas + Label Quadran Singkat */}
         <div className="flex items-start justify-between gap-3">
           <p className={`line-clamp-2 text-[15px] font-bold leading-snug ${primaryText}`} title={task.design_purpose}>
             {task.design_purpose}
@@ -3191,7 +3245,7 @@ function OddsMobileTaskCard({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleTab("delete");
+                  onAction("delete");
                 }}
                 className={`flex h-8 w-9 shrink-0 items-center justify-center rounded-lg transition ${getBtnClass("rose", activeTab === "delete")}`}
               >
@@ -3322,7 +3376,7 @@ function AdminKvRetailTaskCard({
   const requesterRole = task.requester?.roles?.[0] ?? "Client";
   const assignedDesigner = task.assigned_designer ?? task.assignedDesigner;
   const priorityRaw = (task.important_matrix || task.category?.important_matrix || "Q4").toUpperCase();
-  const priority = priorityRaw.replace(/^Q\s*(\d)$/, "QUARTAL $1");
+  const priority = priorityRaw.replace(/^Q\s*(\d)$/, "QUADRAN $1");
   const results = task.results ?? [];
   const resultAssets = results.flatMap((result) => result.asset_links ?? ((result as OddsTaskResult & { assetLinks?: OddsTaskResult["asset_links"] }).assetLinks ?? []));
   const isDone = task.status === "done";
@@ -3805,6 +3859,9 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
       setSpvRevisionOpen(false);
       setSpvReviewNote("");
       setOutputCheckOpen(false);
+      window.location.reload();
+    } catch (err) {
+      alert(oddsError(err));
     } finally {
       setSpvReviewBusy(null);
     }

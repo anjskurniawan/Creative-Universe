@@ -220,7 +220,7 @@ export default function NewOddsTaskPage() {
     }));
   };
 
-  const addAttachmentFiles = async (files: FileList | null) => {
+  const addAttachmentFiles = async (files: FileList | File[] | null) => {
     const nextFiles = Array.from(files ?? []);
     if (nextFiles.length === 0) return [];
     setUploadingAttachments(true);
@@ -1185,7 +1185,7 @@ function MissionBriefStage({
   attachments: OddsTaskAttachment[];
   uploading: boolean;
   onUpdate: (field: keyof TaskForm, value: string) => void;
-  onUpload: (files: FileList | null) => Promise<OddsTaskAttachment[]>;
+  onUpload: (files: FileList | File[] | null) => Promise<OddsTaskAttachment[]>;
   onRemoveAttachment: (id: number) => void;
   onBack: () => void;
   onContinue: () => void;
@@ -1381,7 +1381,7 @@ function MissionBriefStage({
   );
 }
 
-function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; onChange: (value: string) => void; onUploadImage: (files: FileList | null) => Promise<OddsTaskAttachment[]> }) {
+function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; onChange: (value: string) => void; onUploadImage: (files: FileList | File[] | null) => Promise<OddsTaskAttachment[]> }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const savedRangeRef = useRef<Range | null>(null);
@@ -1482,7 +1482,7 @@ function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; o
     setLinkPanelOpen(false);
   };
 
-  const insertImages = async (files: FileList | null) => {
+  const insertImages = async (files: FileList | File[] | null) => {
     const editor = editorRef.current;
     if (!editor || !files?.length) return;
     setImageUploading(true);
@@ -1578,6 +1578,26 @@ function RetroBriefEditor({ value, onChange, onUploadImage }: { value: string; o
           onKeyDown={rememberSelection}
           onFocus={syncActiveTools}
           onPaste={(event) => {
+            const items = Array.from(event.clipboardData.items || []);
+            const pastedImages: File[] = [];
+            for (const item of items) {
+              if (item.type.startsWith("image/")) {
+                const file = item.getAsFile();
+                if (file) pastedImages.push(file);
+              }
+            }
+            if (pastedImages.length === 0 && event.clipboardData.files?.length) {
+              for (const file of Array.from(event.clipboardData.files)) {
+                if (file.type.startsWith("image/")) pastedImages.push(file);
+              }
+            }
+
+            if (pastedImages.length > 0) {
+              event.preventDefault();
+              void insertImages(pastedImages);
+              return;
+            }
+
             event.preventDefault();
             pastePlainTextAsParagraphs(event.clipboardData.getData("text/plain"));
           }}

@@ -40,6 +40,17 @@ class UpdateUserRequest extends FormRequest
         ];
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('whatsapp_number') && $this->whatsapp_number) {
+            $wa = preg_replace('/[^0-9]/', '', $this->whatsapp_number);
+            if (str_starts_with($wa, '0')) {
+                $wa = '62' . substr($wa, 1);
+            }
+            $this->merge(['whatsapp_number' => $wa]);
+        }
+    }
+
     public function messages(): array
     {
         return [

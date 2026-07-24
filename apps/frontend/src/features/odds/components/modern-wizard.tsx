@@ -32,7 +32,7 @@ export type ModernWizardProps = {
   recommendedDesignerId?: string | null;
   uploadedAttachments: OddsTaskAttachment[];
   uploadingAttachments: boolean;
-  addAttachmentFiles: (files: FileList | null) => Promise<any[]>;
+  addAttachmentFiles: (files: FileList | File[] | null) => Promise<any[]>;
   onRemoveAttachment: (id: number) => void;
   loading: boolean;
   initializing: boolean;
@@ -993,7 +993,7 @@ function ModernBriefEditor({
 }: {
   value: string;
   onChange: (value: string) => void;
-  onUploadImage: (files: FileList | null) => Promise<OddsTaskAttachment[]>;
+  onUploadImage: (files: FileList | File[] | null) => Promise<OddsTaskAttachment[]>;
   dark: boolean;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -1079,7 +1079,7 @@ function ModernBriefEditor({
     setLinkPanelOpen(false);
   };
 
-  const insertImages = async (files: FileList | null) => {
+  const insertImages = async (files: FileList | File[] | null) => {
     const editor = editorRef.current;
     if (!editor || !files?.length) return;
     setImageUploading(true);
@@ -1250,6 +1250,26 @@ function ModernBriefEditor({
           onKeyDown={rememberSelection}
           onFocus={syncActiveTools}
           onPaste={(event) => {
+            const items = Array.from(event.clipboardData.items || []);
+            const pastedImages: File[] = [];
+            for (const item of items) {
+              if (item.type.startsWith("image/")) {
+                const file = item.getAsFile();
+                if (file) pastedImages.push(file);
+              }
+            }
+            if (pastedImages.length === 0 && event.clipboardData.files?.length) {
+              for (const file of Array.from(event.clipboardData.files)) {
+                if (file.type.startsWith("image/")) pastedImages.push(file);
+              }
+            }
+
+            if (pastedImages.length > 0) {
+              event.preventDefault();
+              void insertImages(pastedImages);
+              return;
+            }
+
             event.preventDefault();
             pastePlainTextAsParagraphs(event.clipboardData.getData("text/plain"));
           }}

@@ -474,10 +474,16 @@ export async function createOddsTask(input: CreateOddsTaskInput): Promise<OddsTa
   });
 }
 
-export async function uploadOddsTaskAttachment(file: File, taskId?: string | number): Promise<OddsTaskAttachment> {
+export async function deleteOddsTask(id: string | number): Promise<void> {
+  await apiFetch<null>(`/odds/tasks/${id}`, { method: "DELETE" });
+}
+
+export async function uploadOddsTaskAttachment(file: File, taskId?: string | number | null): Promise<OddsTaskAttachment> {
   const body = new FormData();
   body.append("file", file);
-  if (taskId !== undefined) body.append("task_id", String(taskId));
+  if (taskId !== undefined && taskId !== null && taskId !== "" && taskId !== 0 && taskId !== "0" && taskId !== "null") {
+    body.append("task_id", String(taskId));
+  }
   return apiFetch<OddsTaskAttachment>("/odds/uploads", { method: "POST", body });
 }
 

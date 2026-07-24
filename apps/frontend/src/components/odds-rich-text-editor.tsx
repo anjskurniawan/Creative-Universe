@@ -195,7 +195,20 @@ export function OddsRichTextEditor({
           onKeyDown={rememberSelection}
           onFocus={syncActiveTools}
           onPaste={(event) => {
-            const pastedImages = Array.from(event.clipboardData.files).filter((file) => file.type.startsWith("image/"));
+            const items = Array.from(event.clipboardData.items || []);
+            const pastedImages: File[] = [];
+            for (const item of items) {
+              if (item.type.startsWith("image/")) {
+                const file = item.getAsFile();
+                if (file) pastedImages.push(file);
+              }
+            }
+            if (pastedImages.length === 0 && event.clipboardData.files?.length) {
+              for (const file of Array.from(event.clipboardData.files)) {
+                if (file.type.startsWith("image/")) pastedImages.push(file);
+              }
+            }
+
             if (pastedImages.length > 0 && onUploadImage) {
               event.preventDefault();
               void insertImages(pastedImages);

@@ -70,12 +70,20 @@ class OnboardingController extends BaseApiController
      */
     public function submit(Request $request, CreativeMembershipService $memberships): JsonResponse
     {
+        if ($request->has('whatsapp_number') && $request->input('whatsapp_number')) {
+            $wa = preg_replace('/[^0-9]/', '', $request->input('whatsapp_number'));
+            if (str_starts_with($wa, '0')) {
+                $wa = '62' . substr($wa, 1);
+            }
+            $request->merge(['whatsapp_number' => $wa]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'division_id' => 'required|exists:divisions,id',
             'position_id' => 'nullable|integer|exists:positions,id',
             'position_name' => 'nullable|string|max:100',
-            'whatsapp_number' => 'required|string|max:20',
+            'whatsapp_number' => ['required', 'string', 'regex:/^62[0-9]{8,13}$/'],
         ]);
 
         /** @var User $user */
