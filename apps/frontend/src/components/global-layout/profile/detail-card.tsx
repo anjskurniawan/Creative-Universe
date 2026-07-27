@@ -126,6 +126,8 @@ export default function DetailCard({
   autoPlayMedia = false,
   ratingAnimationKey = 0,
 }: DetailCardProps) {
+  const visibleSpecialties = specialties.slice(0, 4);
+  const remainingSpecialties = specialties.length - visibleSpecialties.length;
   return (
     <article
       className={`flex w-full max-w-none flex-col gap-4 rounded-lg bg-white p-3 shadow-[0_5px_14px_rgba(44,42,39,0.06)] sm:grid sm:grid-cols-[194px_minmax(0,1fr)_200px] sm:items-stretch sm:gap-6 sm:p-4 ${className ?? ""}`}
@@ -157,7 +159,7 @@ export default function DetailCard({
           <div className="flex flex-col gap-4">
             <p className="text-sm font-medium tracking-[0.28px] text-[#7d7c7c]">Specialties</p>
             <div className="flex flex-wrap gap-2">
-              {specialties.map((specialty) => (
+              {visibleSpecialties.map((specialty) => (
                 <span
                   key={specialty}
                   className="rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs text-[#7d7c7c] sm:px-4 sm:py-2 sm:text-sm"
@@ -165,6 +167,7 @@ export default function DetailCard({
                   {specialty}
                 </span>
               ))}
+              {remainingSpecialties > 0 && <span className="rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs font-semibold text-[#0077bf] sm:px-4 sm:py-2 sm:text-sm">+{remainingSpecialties}</span>}
             </div>
             <RatingBars ratings={ratings} animationKey={ratingAnimationKey} />
           </div>
