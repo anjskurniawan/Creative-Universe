@@ -174,7 +174,7 @@ export default function Card({
         className={`flex w-full min-w-0 items-center gap-2 ${compact ? "" : "lg:gap-4"}`}
       >
         <div
-          className={`shrink-0 overflow-hidden rounded-lg border-0 bg-[#3b4446] outline-none ring-0 ${compact ? "size-14" : "size-[74px] lg:h-[154px] lg:w-[145px]"}`}
+          className={`shrink-0 overflow-hidden rounded-lg border-0 ${profileImage ? "bg-white" : "bg-[#3b4446]"} outline-none ring-0 ${compact ? "size-14" : "size-[74px] lg:h-[154px] lg:w-[145px]"}`}
         >
           {videoMedia && profileImage ? (
             <video ref={mediaRef} src={profileImage} muted loop playsInline preload="metadata" className="block size-full object-contain" />
