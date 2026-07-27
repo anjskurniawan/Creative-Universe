@@ -70,6 +70,15 @@ export interface CreativeMember {
   status: "pending" | "active" | "resigned";
 }
 
+export interface CreativeMemberProfile extends CreativeMember {
+  joined_at: string | null;
+  resigned_at: string | null;
+  card_image_path: string | null;
+  profile_metrics: Record<string, number>;
+  odds_profile: { id: number; status: "available" | "off"; specializations: Array<number | string> } | null;
+  odds_metrics?: { avg_response_minutes: number | null; on_time_rate: number | null; user_rating: number | null; rating_count: number; capacity_percent: number | null; average_score: number | null };
+}
+
 export interface HistoricalCreativeMemberInput {
   name: string;
   position_name: "SPV" | "Designer" | "Videographer";

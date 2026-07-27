@@ -7,6 +7,7 @@ import type {
   CreativeReportUserDetail,
   CreativeMember,
   HistoricalCreativeMemberInput,
+  CreativeMemberProfile,
 } from "@/features/creative-report/types";
 
 const PREFIX = "/creative-reports";
@@ -34,10 +35,13 @@ export const creativeReportApi = {
     return apiFetch<CreativeReportUserDetail>(`${PREFIX}/users/${userId}${query}`, options);
   },
   members: {
+    list: () => apiFetch<CreativeMemberProfile[]>(`${PREFIX}/members`),
     pending: () => apiFetch<CreativeMember[]>(`${PREFIX}/members/pending`),
     approve: (memberId: number) => apiFetch<CreativeMember>(`${PREFIX}/members/${memberId}/approve`, { method: "POST" }),
     reject: (memberId: number) => apiFetch<null>(`${PREFIX}/members/${memberId}/reject`, { method: "POST" }),
     createHistorical: (body: HistoricalCreativeMemberInput) =>
       apiFetch<CreativeMember>(`${PREFIX}/members/historical`, { method: "POST", body: JSON.stringify(body) }),
+    detail: (memberId: number | string) => apiFetch<CreativeMemberProfile>(`${PREFIX}/members/${memberId}`),
+    update: (memberId: number | string, body: FormData) => apiFetch<CreativeMemberProfile>(`${PREFIX}/members/${memberId}`, { method: "POST", body }),
   },
 } as const;

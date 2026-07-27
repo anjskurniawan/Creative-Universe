@@ -10,6 +10,9 @@ use App\SubApps\CreativeReport\Models\Assessment;
 use App\SubApps\CreativeReport\Models\CreativeMember;
 use App\SubApps\CreativeReport\Services\AssessmentService;
 use App\SubApps\CreativeReport\Services\CreativeMembershipService;
+use App\SubApps\Odds\Models\DesignerProfile;
+use App\SubApps\Odds\Models\DesignerDailyReport;
+use App\Services\Core\FileStorageService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -95,6 +98,12 @@ class AssessmentController extends BaseApiController
             ->orderBy('created_at')->get()->map(fn (CreativeMember $member) => $this->memberPayload($member)), 'Menunggu validasi anggota Creative.');
     }
 
+    public function members(Request $request): JsonResponse
+    {
+        Gate::authorize('viewAny', Assessment::class);
+        return $this->sendResponse(CreativeMember::query()->with('user')->whereIn('status', [CreativeMember::STATUS_ACTIVE, CreativeMember::STATUS_RESIGNED])->orderBy('name')->get()->map(fn (CreativeMember $member) => $this->memberPayload($member)), 'Anggota Creative berhasil diambil.');
+    }
+
     public function approveMember(Request $request, CreativeMember $member): JsonResponse
     {
         $this->authorizeMembershipReview($request);
@@ -132,6 +141,63 @@ class AssessmentController extends BaseApiController
         return $this->sendResponse($this->memberPayload($member), 'Personel historis berhasil ditambahkan.');
     }
 
+    public function member(Request $request, CreativeMember $member): JsonResponse
+    {
+        $this->authorizeMembershipReview($request);
+        $member->load('user');
+        $profile = $member->user_id ? DesignerProfile::query()->where('user_id', $member->user_id)->first() : null;
+
+        return $this->sendResponse(array_merge($this->memberPayload($member), [
+            'joined_at' => $member->joined_at?->toDateString(),
+            'resigned_at' => $member->resigned_at?->toDateString(),
+            'card_image_path' => $member->card_image_path,
+            'profile_metrics' => $member->profile_metrics ?? [],
+            'odds_profile' => $profile ? ['id' => $profile->id, 'status' => $profile->status, 'specializations' => $profile->specializations ?? []] : null,
+        ]), 'Profil anggota Creative berhasil diambil.');
+    }
+
+    public function updateMember(Request $request, CreativeMember $member, FileStorageService $files): JsonResponse
+    {
+        $this->authorizeMembershipReview($request);
+        foreach (['profile_metrics', 'specializations'] as $jsonField) {
+            if (is_string($request->input($jsonField))) {
+                $decoded = json_decode($request->input($jsonField), true);
+                if (json_last_error() === JSON_ERROR_NONE) $request->merge([$jsonField => $decoded]);
+            }
+        }
+        $data = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'position_name' => 'sometimes|in:Manajer,SPV,Designer,Videographer',
+            'joined_at' => 'nullable|date',
+            'resigned_at' => 'nullable|date|after_or_equal:joined_at',
+            'profile_metrics' => 'sometimes|array',
+            'profile_metrics.*' => 'numeric|min:0|max:10',
+            'specializations' => 'sometimes|array',
+            'specializations.*' => 'integer|exists:odds_categories,id',
+            'odds_status' => 'sometimes|in:available,off',
+            'card_image' => 'nullable|image|max:2048|mimes:jpeg,jpg,png,webp',
+            'remove_card_image' => 'nullable|boolean',
+        ]);
+        DB::transaction(function () use ($request, $member, $data, $files) {
+            if ($request->boolean('remove_card_image') && $member->card_image_path) {
+                $files->deleteByPath($member->card_image_path, 'public');
+                $data['card_image_path'] = null;
+            }
+            if ($request->hasFile('card_image')) {
+                $stored = $files->store($request->file('card_image'), 'creative-report', 'members', $member->id, 'profile-cards', $request->user()->id, 'public');
+                if ($member->card_image_path) $files->deleteByPath($member->card_image_path, 'public');
+                $data['card_image_path'] = $stored->path;
+            }
+            unset($data['card_image'], $data['remove_card_image'], $data['specializations'], $data['odds_status']);
+            $member->update($data);
+            if ($member->user_id && (array_key_exists('specializations', $request->all()) || array_key_exists('odds_status', $request->all()))) {
+                $profile = DesignerProfile::firstOrCreate(['user_id' => $member->user_id], ['status' => 'available', 'specializations' => [], 'is_active' => true, 'created_by' => $request->user()->id]);
+                $profile->update(array_filter(['specializations' => $request->input('specializations'), 'status' => $request->input('odds_status')], fn ($value) => $value !== null));
+            }
+        });
+        return $this->member($request, $member->fresh());
+    }
+
     private function authorizeMembershipReview(Request $request): void
     {
         abort_unless($request->user()->hasAnyRole(['Root', 'Manajer']), 403);
@@ -139,6 +205,37 @@ class AssessmentController extends BaseApiController
 
     private function memberPayload(CreativeMember $member): array
     {
-        return ['id' => $member->id, 'name' => $member->name, 'position_name' => $member->position_name, 'status' => $member->status];
+        return ['id' => $member->id, 'name' => $member->name, 'position_name' => $member->position_name, 'status' => $member->status, 'card_image_path' => $member->card_image_path, 'profile_metrics' => $member->profile_metrics ?? [], 'joined_at' => $member->joined_at?->toDateString(), 'resigned_at' => $member->resigned_at?->toDateString(), 'odds_metrics' => $this->oddsMetrics($member->user_id)];
+    }
+
+    private function oddsMetrics(?int $userId): array
+    {
+        if (! $userId) return ['avg_response_minutes' => null, 'on_time_rate' => null, 'user_rating' => null, 'rating_count' => 0, 'capacity_percent' => null, 'average_score' => null];
+        $daily = DesignerDailyReport::query()->where('designer_id', $userId);
+        $done = (clone $daily)->where('output_done', true);
+        $doneCount = (clone $done)->count();
+        $profile = DesignerProfile::query()->where('user_id', $userId)->first();
+        $responseDurations = DB::table('odds_task_briefs as brief')
+            ->join('odds_tasks as task', 'task.id', '=', 'brief.task_id')
+            ->join('activity_log as activity', function ($join) {
+                $join->on('activity.subject_id', '=', 'task.id')
+                    ->where('activity.subject_type', 'App\\SubApps\\Odds\\Models\\Task')
+                    ->whereIn('activity.event', ['brief_accepted', 'brief_returned']);
+            })
+            ->where('task.assigned_designer_id', $userId)
+            ->where('activity.created_at', '>=', DB::raw('brief.created_at'))
+            ->groupBy('brief.id', 'brief.created_at')
+            ->selectRaw('TIMESTAMPDIFF(MINUTE, brief.created_at, MIN(activity.created_at)) as response_minutes')
+            ->pluck('response_minutes');
+        $avgResponse = $responseDurations->isNotEmpty() ? $responseDurations->avg() : null;
+        $rating = (clone $daily)->whereNotNull('rating')->selectRaw('AVG(rating) as average, COUNT(rating) as count')->first();
+        return [
+            'avg_response_minutes' => $avgResponse !== null ? (int) round($avgResponse) : null,
+            'on_time_rate' => $doneCount ? (int) round(((clone $done)->where('overdue', false)->count() / $doneCount) * 100) : null,
+            'user_rating' => $rating?->average !== null ? round((float) $rating->average, 1) : null,
+            'rating_count' => (int) ($rating?->count ?? 0),
+            'capacity_percent' => $profile ? min(100, (int) round(($profile->current_load_minutes / 480) * 100)) : null,
+            'average_score' => (clone $daily)->count() ? round((float) (clone $daily)->avg('score'), 1) : null,
+        ];
     }
 }

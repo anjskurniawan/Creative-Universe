@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/material-icon";
+import PopupPerson from "@/components/global-layout/profile/popup-person";
+import { resolveStorageUrl } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type {
   CreativeReportGroup,
@@ -11,6 +13,8 @@ import type {
 import { useAuth } from "@/providers/auth-provider";
 import { useCreativeReportTheme } from "./theme-context";
 import { getCollabAspects, getPerfAspects } from "./settings";
+import { CreativeReportHeader } from "@/components/creative-report/report-header";
+import { CreativeReportToolbar, type ReportMetric } from "@/components/creative-report/report-toolbar";
 
 const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer"];
 
@@ -27,7 +31,8 @@ type Draft = {
   };
 };
 
-function Avatar({ name }: { name: string }) {
+function Avatar({ name, imagePath }: { name: string; imagePath?: string | null }) {
+  const imageUrl = resolveStorageUrl(imagePath);
   const initials = name
     .split(" ")
     .map((part) => part[0])
@@ -35,8 +40,8 @@ function Avatar({ name }: { name: string }) {
     .join("")
     .toUpperCase();
   return (
-    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#ede9fe] text-[10px] font-bold text-[#6d46eb]">
-      {initials}
+    <span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#ede9fe] text-[10px] font-bold text-[#6d46eb]">
+      {imageUrl ? <img src={imageUrl} alt="" className="size-full object-cover" /> : initials}
     </span>
   );
 }
@@ -62,14 +67,16 @@ function AssessmentTable({
     index: number;
     dateStr: string;
   } | null>(null);
+  const [expandedMobileAssessments, setExpandedMobileAssessments] = useState<number[]>([]);
+  const [hoveredAssessmentId, setHoveredAssessmentId] = useState<number | null>(null);
   
   const collabAspects = useMemo(() => getCollabAspects(), []);
   const perfAspects = useMemo(() => getPerfAspects(), []);
+  const scoreAspects = useMemo(() => [...collabAspects, ...perfAspects], [collabAspects, perfAspects]);
   
   const scoreMaxima = useMemo(() => [
-    ...collabAspects.map((a) => a.maxPoints),
-    ...perfAspects.map((a) => a.maxPoints),
-  ], [collabAspects, perfAspects]);
+    ...scoreAspects.map((a) => a.maxPoints),
+  ], [scoreAspects]);
 
   const headers = useMemo(() => [
     ...collabAspects.map((a) => `${a.name} (${a.maxPoints})`),
@@ -198,7 +205,7 @@ function AssessmentTable({
 
   return (
     <>
-      <div className="overflow-hidden rounded-b-xl border border-t-0 border-[#c9bbfc] bg-white">
+      <div className="hidden overflow-visible rounded-b-xl border border-t-0 border-[#c9bbfc] bg-white lg:block">
         <table className="w-full table-fixed border-collapse text-left">
         <thead>
           <tr className="bg-[#f7f5ff] text-xs font-semibold text-[#3b4446]">
@@ -210,7 +217,7 @@ function AssessmentTable({
             </th>
             <th
               rowSpan={2}
-              className="w-72 border-b border-r border-[#ded7fb] px-3 py-3 text-center"
+              className="w-52 border-b border-r border-[#ded7fb] px-3 py-3 text-center"
             >
               Nama
             </th>
@@ -298,15 +305,25 @@ function AssessmentTable({
                   {rowIndex + 1}
                 </td>
                     <td className="border-r border-[#e5edf0] px-3 py-3">
+                      <div className="relative" onMouseEnter={() => setHoveredAssessmentId(item.id)} onMouseLeave={() => setHoveredAssessmentId(null)}>
                       <Link
                         href={`/creative-report/detail?user=${item.user.id}&month=${month}`}
                         className="flex min-w-0 items-center gap-2 rounded-md outline-none hover:text-[#6d46eb] focus-visible:ring-2 focus-visible:ring-[#6d46eb]"
                       >
-                        <Avatar name={item.user.name} />
+                        <Avatar name={item.user.name} imagePath={item.user.avatar_path} />
                         <span className="truncate font-semibold">
                           {item.user.name}
                         </span>
                       </Link>
+                      {hoveredAssessmentId === item.id && <div className="absolute bottom-full left-0 z-50 mb-2 hidden w-[300px] lg:block">
+                        <PopupPerson
+                          name={item.user.name}
+                          role={item.user.position ?? "Creative"}
+                          division={item.user.division}
+                          avatarPath={item.user.avatar_path}
+                        />
+                      </div>}
+                      </div>
                     </td>
                 {cells.map((value, index) => {
                   const editableScore = index < 5 || (index >= 6 && index < 11);
@@ -325,6 +342,8 @@ function AssessmentTable({
                           type="number"
                           min={0}
                           max={scoreMaxima[scoreIndex]}
+                          title={`Maksimal nilai: ${scoreMaxima[scoreIndex]}`}
+                          aria-label={`Nilai ${headers[index]}, maksimal ${scoreMaxima[scoreIndex]}`}
                           value={value}
                           onChange={(event) =>
                             updateDraft(
@@ -450,7 +469,61 @@ function AssessmentTable({
         </tfoot>}
       </table>
     </div>
-    
+      <div className="space-y-3 rounded-b-xl border border-t-0 border-[#c9bbfc] bg-[#f7f5ff] p-3 lg:hidden">
+        {group.assessments.map((item, rowIndex) => {
+          const draft = drafts[item.id] ?? {
+            creative_scores: item.creative_scores,
+            leave: item.hrd_review.leave,
+            absence: item.hrd_review.absence,
+            late: item.hrd_review.late,
+          };
+          const score30 = draft.creative_scores.slice(0, 5).reduce((total, value) => total + value, 0);
+          const score50 = draft.creative_scores.slice(5, 10).reduce((total, value) => total + value, 0);
+          const hrd = Math.max(0, 20 - (draft.late >= 2 ? 2 : draft.late ? 1 : 0) - (draft.absence >= 2 ? 5 : draft.absence ? 3 : 0));
+          const mobileExpanded = expandedMobileAssessments.includes(item.id);
+          return (
+            <article key={item.id} className="overflow-hidden rounded-xl border border-[#ded7fb] bg-white shadow-[0_2px_8px_rgba(73,55,145,0.06)]">
+              <button type="button" aria-expanded={mobileExpanded} onClick={() => setExpandedMobileAssessments((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} className="flex w-full items-center gap-3 border-b border-[#eeeafd] px-3 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#6d46eb]">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-[#f0edff] text-xs font-bold text-[#6d46eb]">{rowIndex + 1}</span>
+                <Avatar name={item.user.name} imagePath={item.user.avatar_path} />
+                <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[#3b4446]">{item.user.name}</span>
+                <MaterialIcon name={mobileExpanded ? "keyboard_arrow_up" : "keyboard_arrow_down"} size="sm" className="text-[#6d46eb]" />
+              </button>
+              <div className="grid grid-cols-3 divide-x divide-[#eeeafd] border-b border-[#eeeafd]">
+                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Aspek 30%</p><b className="text-sm text-[#6d46eb]">{score30}</b></div>
+                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Aspek 50%</p><b className="text-sm text-[#b65d08]">{score50}</b></div>
+                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Nilai akhir</p><b className="text-sm text-[#5d35d9]">{score30 + score50 + hrd}</b></div>
+              </div>
+              {mobileExpanded && <div className="space-y-3 border-t border-[#eeeafd] p-3">
+                <section>
+                  <p className="mb-2 text-[11px] font-semibold text-[#6d46eb]">Aspek penilaian</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {scoreAspects.map((aspect, scoreIndex) => {
+                      const value = draft.creative_scores[scoreIndex] ?? 0;
+                      return <label key={aspect.name} className="flex min-w-0 items-center justify-between gap-2 rounded-lg bg-[#faf9ff] px-2 py-1.5 text-[10px] text-[#525e61]"><span className="min-w-0 truncate">{aspect.name}</span>{inputMode ? <span className="flex shrink-0 flex-col items-center"><input type="number" min={0} max={aspect.maxPoints} title={`Maksimal nilai: ${aspect.maxPoints}`} aria-label={`Nilai ${aspect.name}, maksimal ${aspect.maxPoints}`} value={value} onChange={(event) => updateDraft(item.id, "score", event.target.value, scoreIndex)} className="h-7 w-9 rounded border border-[#bdb0f5] bg-white text-center text-xs font-semibold outline-none" /><small className="mt-0.5 whitespace-nowrap text-[8px] leading-none text-[#6d46eb]">maks. {aspect.maxPoints}</small></span> : <b className="shrink-0 text-xs text-[#3b4446]">{value}/{aspect.maxPoints}</b>}</label>;
+                    })}
+                  </div>
+                </section>
+                <section>
+                  <p className="mb-2 text-[11px] font-semibold text-[#248235]">HRD Review</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(["leave", "absence", "late"] as const).map((key) => {
+                      const label = key === "leave" ? "Cuti" : key === "absence" ? "Bolos" : "Telat";
+                      const value = draft[key];
+                      return <label key={key} className="rounded-lg bg-[#f4fbf5] px-2 py-2 text-center text-[10px] text-[#52755a]"><span className="block">{label}</span>{inputMode ? <input type="number" min={0} value={value} onChange={(event) => updateDraft(item.id, key, event.target.value)} className="mx-auto mt-1 h-7 w-10 rounded border border-[#a9dcb0] bg-white text-center text-xs font-semibold text-[#248235] outline-none" /> : <b className="mt-1 block text-sm text-[#248235]">{value}</b>}</label>;
+                    })}
+                  </div>
+                </section>
+              </div>}
+            </article>
+          );
+        })}
+        {canEdit && <div className="flex flex-wrap justify-end gap-2 border-t border-[#ded7fb] pt-3">
+          {inputMode ? <><button type="button" disabled={saving} onClick={() => save(false)} className="h-9 rounded-lg border border-[#dbe4e8] bg-white px-3 text-xs font-semibold text-[#525e61] disabled:opacity-50">Simpan draft</button><button type="button" disabled={saving} onClick={() => save(true)} className="h-9 rounded-lg bg-[#6d46eb] px-3 text-xs font-semibold text-white disabled:opacity-50">Selesaikan</button></> : <button type="button" onClick={beginInput} className="h-9 rounded-lg bg-[#6d46eb] px-3 text-xs font-semibold text-white">{group.assessments.every((item) => item.status === "completed") ? "Edit penilaian" : "Input nilai"}</button>}
+        </div>}
+        {saveError && <p className="rounded-lg bg-[#ffedf1] px-3 py-2 text-xs text-[#b4234d]">{saveError}</p>}
+      </div>
+
       {/* Date action modal */}
       {activeDateAction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -504,7 +577,7 @@ function AssessmentTable({
 
 export default function CreativeReportPage() {
   const { theme } = useCreativeReportTheme();
-  const { hasPermission, hasRole } = useAuth();
+  const { hasPermission } = useAuth();
   const canEdit = hasPermission("creative-report.assessments.update");
 
 
@@ -515,14 +588,20 @@ export default function CreativeReportPage() {
   const [openGroups, setOpenGroups] = useState<number[]>([]);
   const [report, setReport] = useState<CreativeReportIndex | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const hasInitializedGroups = useRef(false);
   const load = useCallback(async (signal?: AbortSignal) => {
     try {
       setError(null);
-      setReport(await creativeReportApi.assessments.list({
+      const nextReport = await creativeReportApi.assessments.list({
         month,
         jobdesk: jobdesk !== JOBDESKS[0] ? jobdesk : undefined,
         search: appliedSearch || undefined,
-      }, { signal }));
+      }, { signal });
+      setReport(nextReport);
+      if (!hasInitializedGroups.current && window.innerWidth >= 1024) {
+        setOpenGroups(nextReport.groups.map((group) => group.id));
+        hasInitializedGroups.current = true;
+      }
     } catch (cause) {
       if (signal?.aborted) return;
       setError(
@@ -546,7 +625,7 @@ export default function CreativeReportPage() {
     () => report?.groups.flatMap((group) => group.assessments) ?? [],
     [report],
   );
-  const metrics = useMemo(() => {
+  const metrics = useMemo<ReportMetric[]>(() => {
     const values = assessments
       .map((item) => item.totals.final)
       .sort((a, b) => b - a);
@@ -591,9 +670,10 @@ export default function CreativeReportPage() {
         : [...current, id],
     );
   const content = (
-    <main className="min-w-0 flex-1">
+    <main className="w-full min-w-0 flex-1">
       <div className="w-full">
-        <header className="flex min-h-[45px] items-center justify-between gap-6 pb-4">
+        <CreativeReportHeader month={month} monthLabel={monthLabel} theme={theme} onMonthChange={setMonth} />
+        <header className="hidden">
           <div>
             <h1 className={`text-4xl font-medium leading-none tracking-[-0.72px] ${theme === "dark" ? "text-white" : theme === "retro" ? "text-[#24252b]" : "text-[#24252b]"}`}>
               Creative Report
@@ -631,7 +711,8 @@ export default function CreativeReportPage() {
           </div>
         </header>
 
-        <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1.2fr)_180px_repeat(3,minmax(170px,1fr))]">
+        <CreativeReportToolbar search={search} onSearchChange={setSearch} jobdesk={jobdesk} onJobdeskChange={setJobdesk} jobdesks={JOBDESKS} metrics={metrics} />
+        <section className="hidden">
           <label className="flex h-12 min-w-0 items-center gap-3 rounded-xl border border-[#e2e6e9] bg-white px-4">
             <MaterialIcon name="search" size="sm" className="text-[#7b868a]" />
             <input

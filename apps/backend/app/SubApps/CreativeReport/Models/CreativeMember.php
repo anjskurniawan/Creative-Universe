@@ -20,12 +20,12 @@ class CreativeMember extends Model
 
     protected $fillable = [
         'user_id', 'name', 'position_id', 'position_name', 'status', 'joined_at',
-        'resigned_at', 'reviewed_by', 'reviewed_at',
+        'resigned_at', 'reviewed_by', 'reviewed_at', 'card_image_path', 'profile_metrics',
     ];
 
     protected function casts(): array
     {
-        return ['joined_at' => 'datetime', 'resigned_at' => 'datetime', 'reviewed_at' => 'datetime'];
+        return ['joined_at' => 'datetime', 'resigned_at' => 'datetime', 'reviewed_at' => 'datetime', 'profile_metrics' => 'array'];
     }
 
     public function user(): BelongsTo

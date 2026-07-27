@@ -2188,7 +2188,7 @@ function OddsPageContent() {
                               canCheckRole={canCheckThisTask}
                               chatOpen={selectedChatTaskId === task.id}
                               hideDelete={!isControlTaskSection}
-                              showStart={!isControlTaskSection && (task.status === "queued" || task.status === "revision")}
+                              showStart={!isControlTaskSection && ["queued", "ready_to_start", "revision"].includes(task.status)}
                               showPause={isControlTaskSection ? ["in_progress", "leader_revision_requested", "revision"].includes(task.status) : task.status === "in_progress"}
                               showDone={!isControlTaskSection && task.status === "in_progress"}
                               startDisabled={Boolean(activeInProgressTask)}
@@ -2280,7 +2280,7 @@ function OddsPageContent() {
                               chatOpen={selectedChatTaskId === task.id}
                               canCheckRole={canCheckThisTask}
                               hideDelete={!isControlTaskSection}
-                              showStart={!isControlTaskSection && (task.status === "queued" || task.status === "revision")}
+                              showStart={!isControlTaskSection && ["queued", "ready_to_start", "revision"].includes(task.status)}
                               showPause={isControlTaskSection ? ["in_progress", "leader_revision_requested", "revision"].includes(task.status) : task.status === "in_progress"}
                               showDone={!isControlTaskSection && task.status === "in_progress"}
                               startDisabled={Boolean(activeInProgressTask)}

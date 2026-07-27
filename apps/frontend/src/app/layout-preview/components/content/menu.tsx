@@ -6,9 +6,12 @@ import { createPortal } from "react-dom";
 export type MenuItem = {
   label: string;
   href?: string;
+  icon?: string;
+  badge?: number | string;
+  group?: string;
 };
 
-export type SubAppMenuProps = {
+export type MenuProps = {
   isOpen: boolean;
   onClose: () => void;
   menuItems: MenuItem[];
@@ -19,14 +22,14 @@ export type SubAppMenuProps = {
 
 const COMPACT_MENU_ITEM_HEIGHT = 64;
 
-export default function SubAppMenu({
+export default function Menu({
   isOpen,
   onClose,
   menuItems,
   onItemClick,
   title = "KV RETAIL",
   activeHref,
-}: SubAppMenuProps) {
+}: MenuProps) {
   const [menuPivot, setMenuPivot] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const autoSelectTimerRef = useRef<number | null>(null);

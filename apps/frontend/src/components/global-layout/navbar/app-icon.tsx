@@ -1,0 +1,1 @@
+export default function AppIcon() { return <div className="relative flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#00a4ff] p-1"><div className="relative h-5 w-[18px]"><img src="/images/icon-app/Logo_White.png" alt="Creative Universe" className="absolute inset-0 size-full object-contain" /></div></div>; }

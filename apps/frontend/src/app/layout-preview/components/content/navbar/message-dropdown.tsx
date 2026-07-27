@@ -29,6 +29,7 @@ export default function MessageDropdown({
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
+      if ((event.target as Element).closest("[data-dropdown-trigger]")) return;
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         onClose();
       }
@@ -43,7 +44,7 @@ export default function MessageDropdown({
   return (
     <div
       ref={containerRef}
-      className="absolute left-2 right-2 top-[calc(100%+8px)] z-50 flex w-auto flex-col overflow-hidden rounded-2xl p-1.5 border border-[#bdeaff] bg-[#f3fbff]/95 shadow-[0_10px_24px_rgba(0,4,117,0.18)] backdrop-blur-md"
+      className="layout-preview-navbar-dropdown absolute right-0 top-[calc(100%+8px)] z-50 flex w-[280px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[#bdeaff] bg-[#f3fbff]/95 p-1.5 shadow-[0_10px_24px_rgba(0,4,117,0.18)] backdrop-blur-md"
     >
       <div className="flex items-center justify-between px-3 py-2 border-b border-[#bdeaff]/30">
         <h3 className="text-xs font-bold uppercase tracking-wider text-[#04044A]">Pesan</h3>
@@ -52,7 +53,7 @@ export default function MessageDropdown({
         )}
       </div>
 
-      <ul className="m-0 flex max-h-[240px] list-none flex-col gap-1 overflow-y-auto p-1">
+      <ul className="layout-preview-dropdown-scroll m-0 flex max-h-[240px] list-none flex-col gap-1 overflow-y-auto p-1">
         {messages.length > 0 ? (
           messages.map((msg) => (
             <li key={msg.id}>

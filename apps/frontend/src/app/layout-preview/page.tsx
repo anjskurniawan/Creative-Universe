@@ -9,7 +9,6 @@ export default function LayoutPreviewIndexPage() {
       <div className="max-w-md w-full text-center space-y-6">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">Layout Preview</h1>
-          
         </div>
 
         <div className="pt-4">
@@ -20,7 +19,6 @@ export default function LayoutPreviewIndexPage() {
             Global Layout
           </Link>
         </div>
-       
       </div>
     </div>
   );
