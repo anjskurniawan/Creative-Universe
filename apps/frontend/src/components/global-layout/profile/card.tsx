@@ -47,7 +47,7 @@ function MarqueeTrack({ text }: { text: string }) {
 
     const updateDuration = () => {
       const distance = track.scrollWidth / 4;
-      const duration = distance > 0 ? distance : 12;
+      const duration = distance > 0 ? distance / 3 : 12;
       track.style.setProperty("--cu-profile-marquee-duration", `${duration}s`);
     };
 
