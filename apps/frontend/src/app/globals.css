@@ -771,7 +771,7 @@
 }
 
 .cu-profile-marquee-track {
-  animation: cu-profile-marquee 12s linear infinite;
+  animation: cu-profile-marquee var(--cu-profile-marquee-duration, 12s) linear infinite;
   will-change: transform;
 }
 

@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 
 export type DetailCardRating = {
   label: string;
   value: number;
+  max?: number;
 };
 
 export type DetailCardMetric = {
@@ -24,6 +25,25 @@ export interface DetailCardProps {
   profileImage?: string;
   profileAlt?: string;
   onEdit?: () => void;
+  autoPlayMedia?: boolean;
+}
+
+function isVideoSource(source?: string) {
+  return Boolean(source && /\.(mp4|webm|ogg)(?:\?.*)?$/i.test(source));
+}
+
+function DetailMedia({ source, alt, autoPlay }: { source?: string; alt: string; autoPlay: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const video = isVideoSource(source);
+  useEffect(() => {
+    if (!video || !videoRef.current) return;
+    if (autoPlay) void videoRef.current.play();
+    else videoRef.current.pause();
+  }, [autoPlay, source, video]);
+
+  if (!source) return null;
+  if (video) return <video ref={videoRef} src={source} muted loop playsInline preload="metadata" className="size-full object-cover object-center" />;
+  return <img src={source} alt={alt} className="size-full object-cover object-center" />;
 }
 
 function initials(name: string) {
@@ -53,15 +73,6 @@ const defaultMetrics: DetailCardMetric[] = [
   { label: "Capacity", value: "90%", icon: "speed" },
 ];
 
-function ratingWidth(value: number) {
-  if (value >= 10) return "w-full";
-  if (value >= 8) return "w-4/5";
-  if (value >= 7.5) return "w-3/4";
-  if (value >= 6) return "w-3/5";
-  if (value >= 5) return "w-1/2";
-  return "w-1/3";
-}
-
 export default function DetailCard({
   className,
   name = "Anjas Kurniawan",
@@ -72,6 +83,7 @@ export default function DetailCard({
   profileImage,
   profileAlt,
   onEdit,
+  autoPlayMedia = false,
 }: DetailCardProps) {
   return (
     <article
@@ -81,11 +93,7 @@ export default function DetailCard({
     >
       <div className={`flex h-36 w-full shrink-0 items-center justify-center self-center overflow-hidden rounded-lg sm:h-full sm:min-h-[275px] sm:w-[194px] sm:justify-self-center ${profileImage ? "bg-transparent" : "bg-[#3b4446]"}`}>
           {profileImage ? (
-            <img
-              src={profileImage}
-              alt={profileAlt ?? name}
-              className="size-full object-cover object-center"
-            />
+            <DetailMedia source={profileImage} alt={profileAlt ?? name} autoPlay={autoPlayMedia} />
           ) : (
             <span className="text-3xl font-semibold text-white">{initials(name)}</span>
           )}
@@ -119,13 +127,15 @@ export default function DetailCard({
             </div>
             <div className="flex flex-col gap-3">
               {ratings.map((rating) => {
+                const maximum = rating.max ?? 10;
+                const percentage = maximum > 0 ? Math.max(0, Math.min(100, (rating.value / maximum) * 100)) : 0;
                 return (
                   <div key={rating.label} className="flex items-center gap-2 text-xs text-[#7d7c7c] sm:gap-4 sm:text-sm">
-                    <span className="w-[92px] shrink-0 font-medium sm:w-[150px]">{rating.label}</span>
+                    <span className="w-[140px] shrink-0 whitespace-nowrap font-medium sm:w-[220px]">{rating.label}</span>
                     <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-[5px] bg-[#e5ebf2]">
-                      <div className={`h-full rounded-[5px] bg-[#00a4ff] ${ratingWidth(rating.value)}`} />
+                      {percentage > 0 && <div className="h-full rounded-[5px] bg-[#00a4ff]" style={{ width: `${percentage}%` }} />}
                     </div>
-                    <span className="w-8 shrink-0 font-medium sm:w-12">{rating.value.toFixed(1)}</span>
+                    <span className="w-12 shrink-0 font-medium sm:w-16">{rating.value}/{maximum}</span>
                   </div>
                 );
               })}

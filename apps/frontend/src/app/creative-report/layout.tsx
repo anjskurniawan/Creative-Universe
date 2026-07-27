@@ -13,9 +13,9 @@ const creativeReportMenu = [
     group: "Creative Report",
   },
   {
-    label: "Staff",
+    label: "Creative Agent",
     icon: "group",
-    href: "/creative-report/staff",
+    href: "/creative-report/creative-agent",
     group: "Creative Report",
   },
   {
@@ -53,7 +53,7 @@ export default function CreativeReportLayout({ children }: { children: React.Rea
             onToggleSidebarRetro: () => setTheme((current) => current === "retro" ? "light" : "retro"),
           }}
           menuItems={creativeReportMenu}
-          activeMenuHref={pathname === "/creative-report/option" ? "/creative-report/option" : pathname === "/creative-report/staff" ? "/creative-report/staff" : "/creative-report"}
+          activeMenuHref={pathname === "/creative-report/option" ? "/creative-report/option" : pathname.startsWith("/creative-report/creative-agent") ? "/creative-report/creative-agent" : "/creative-report"}
           menuTitle="Creative Report"
         >
           {children}

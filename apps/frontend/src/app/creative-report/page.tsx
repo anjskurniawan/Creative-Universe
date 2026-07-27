@@ -205,7 +205,7 @@ function AssessmentTable({
 
   return (
     <>
-      <div className="hidden overflow-visible rounded-b-xl border border-t-0 border-[#c9bbfc] bg-white lg:block">
+      <div className="hidden overflow-hidden rounded-b-xl border border-t-0 border-[#c9bbfc] bg-white lg:block">
         <table className="w-full table-fixed border-collapse text-left">
         <thead>
           <tr className="bg-[#f7f5ff] text-xs font-semibold text-[#3b4446]">

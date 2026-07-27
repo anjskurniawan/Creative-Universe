@@ -27,6 +27,7 @@ export type NavbarProps = {
   onChatClick?: () => void;
   onAppsClick?: () => void;
   onAvatarClick?: () => void;
+  hideBrand?: boolean;
   // Dropdown props
   applications?: ApplicationItem[];
   userProfile?: UserProfile;
@@ -47,6 +48,7 @@ export default function Navbar({
   onChatClick,
   onAppsClick,
   onAvatarClick,
+  hideBrand = false,
   applications,
   userProfile,
   profileMenuItems,
@@ -138,7 +140,7 @@ export default function Navbar({
     <div
       className={
         className ||
-        `bg-[rgba(255,255,255,0.55)] content-stretch flex items-center justify-between backdrop-blur-md border-b border-slate-100 relative z-20 ${
+        `bg-[rgba(255,255,255,0.55)] content-stretch flex items-center ${hideBrand ? "justify-end" : "justify-between"} backdrop-blur-md border-b border-slate-100 relative z-20 ${
           isDesktop ? "h-[64px] px-[16px] w-full" : "h-[56px] pl-[8px] pr-[16px] w-full"
         }`
       }
@@ -147,12 +149,12 @@ export default function Navbar({
       data-name="Navbar"
     >
       {/* Leading Actions */}
-      {isDesktop ? (
+      {isDesktop && !hideBrand ? (
         <div className="content-stretch flex gap-[16px] items-center relative shrink-0" data-node-id="119:478">
           <AppIcon />
           <Breadcrumb />
         </div>
-      ) : (
+      ) : !isDesktop && !hideBrand ? (
         <div className="flex h-full items-center justify-center w-10 shrink-0" data-node-id="112:621" data-name="Leading Actions">
           <button
             type="button"
@@ -163,7 +165,7 @@ export default function Navbar({
             <ButtonMenu icon="menu" />
           </button>
         </div>
-      )}
+      ) : null}
 
       {/* Trailing Actions */}
       <div className="flex h-full items-center gap-1" data-node-id="112:502" data-name="Trailing Actions">

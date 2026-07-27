@@ -13,6 +13,7 @@ export type NavbarProps = {
   session?: NavbarSession;
   previewUser?: PreviewNavbarProps["userProfile"];
   interactive?: boolean;
+  hideBrand?: boolean;
 };
 
 export function Navbar({
@@ -20,6 +21,7 @@ export function Navbar({
   sticky = true,
   session = "connected",
   previewUser,
+  hideBrand = false,
 }: NavbarProps) {
   void session;
   return (
@@ -27,6 +29,7 @@ export function Navbar({
       <PreviewNavbar
         viewport="Desktop"
         userProfile={previewUser}
+        hideBrand={hideBrand}
         className={variant === "transparent-dark" ? "bg-transparent text-white" : undefined}
       />
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { MaterialIcon } from "@/components/material-icon";
 
 export type CardStatus = "FullBook" | "Available" | "Busy";
@@ -16,7 +16,7 @@ export interface CardProps {
   viewport?: CardViewport;
   name?: string;
   role?: string;
-  departments?: [string, string];
+  departments?: string[];
   responseTime?: string;
   rating?: string;
   score?: string;
@@ -36,6 +36,38 @@ function getInitials(name: string): string {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("") || "?";
+}
+
+function MarqueeTrack({ text }: { text: string }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const updateDuration = () => {
+      const distance = track.scrollWidth / 4;
+      const duration = distance > 0 ? distance : 12;
+      track.style.setProperty("--cu-profile-marquee-duration", `${duration}s`);
+    };
+
+    updateDuration();
+    const observer = new ResizeObserver(updateDuration);
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, [text]);
+
+  return <div ref={trackRef} className="cu-profile-marquee-track flex w-max">
+    {[0, 1, 2, 3].map((copy) => (
+      <span key={copy} aria-hidden={copy > 0} className="block shrink-0 pr-8">
+        {text}
+      </span>
+    ))}
+  </div>;
+}
+
+function isVideoSource(source?: string) {
+  return Boolean(source && /\.(mp4|webm|ogg)(?:\?.*)?$/i.test(source));
 }
 
 const STATUS_STYLES: Record<
@@ -106,7 +138,7 @@ export default function Card({
   state,
   name = "Anjas Kurniawan",
   role = "Graphic Designer",
-  departments = ["Retail Marketing", "Retail Marketing"],
+  departments = ["Retail Marketing"],
   responseTime = "10 min",
   rating = "4.5/5",
   score = "12345",
@@ -117,15 +149,23 @@ export default function Card({
   showAvailability = true,
   compact = false,
 }: CardProps) {
-  const resolvedStatus: CardStatus =
-    state === "Fullbook" ? "FullBook" : (state ?? status);
+  const mediaRef = useRef<HTMLVideoElement>(null);
+  const configuredStatus: CardStatus = state === "Fullbook" ? "FullBook" : (state ?? status);
+  const configuredStyle = STATUS_STYLES[configuredStatus];
+  const capacityValue = Math.max(0, Math.min(100, capacity ?? configuredStyle.capacity));
+  const resolvedStatus: CardStatus = capacity !== undefined
+    ? capacityValue >= 100 ? "FullBook" : capacityValue >= 70 ? "Busy" : "Available"
+    : configuredStatus;
   const statusStyle = STATUS_STYLES[resolvedStatus];
-  const capacityValue = capacity ?? statusStyle.capacity;
+  const departmentsText = departments.filter(Boolean).join(" • ");
+  const videoMedia = isVideoSource(profileImage);
 
   return (
     <article
       className={`flex w-full min-w-0 flex-col items-start gap-2 overflow-hidden rounded-lg bg-white p-2 text-[#3b4446] shadow-[0_5px_14px_rgba(44,42,39,0.06)] ${compact ? "" : "lg:min-w-[360px] lg:p-4"} ${onClick ? "cursor-pointer transition-[box-shadow,outline-color,transform] duration-300 ease-out will-change-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,164,255,0.28),0_0_18px_rgba(0,164,255,0.28)]" : ""} ${active ? "outline outline-2 outline-[#00a4ff] shadow-[0_0_18px_rgba(0,164,255,0.42)]" : ""} ${className}`}
       onClick={onClick}
+      onMouseEnter={videoMedia ? () => void mediaRef.current?.play() : undefined}
+      onMouseLeave={videoMedia ? () => { mediaRef.current?.pause(); if (mediaRef.current) mediaRef.current.currentTime = 0; } : undefined}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (event) => { if (event.key === "Enter" || event.key === " ") onClick(); } : undefined}
@@ -136,11 +176,13 @@ export default function Card({
         <div
           className={`shrink-0 overflow-hidden rounded-lg border-0 bg-[#3b4446] outline-none ring-0 ${compact ? "size-14" : "size-[74px] lg:h-[154px] lg:w-[145px]"}`}
         >
-          {profileImage ? (
+          {videoMedia && profileImage ? (
+            <video ref={mediaRef} src={profileImage} muted loop playsInline preload="metadata" className="block size-full object-contain" />
+          ) : profileImage ? (
             <img
               src={profileImage}
               alt={profileAlt}
-              className="block size-full object-cover"
+              className="block size-full object-contain"
             />
           ) : (
             <span className="flex size-full items-center justify-center text-xl font-semibold text-white">
@@ -180,19 +222,9 @@ export default function Card({
           </div>}
           <div
             className={`w-full min-w-0 overflow-hidden whitespace-nowrap text-[#7d7c7c] ${compact ? "text-[9px] leading-3 tracking-[0.14px]" : "text-[10px] leading-3 tracking-[0.2px] lg:text-xs lg:leading-[14px] lg:tracking-[0.24px]"}`}
-            aria-label={`${departments[0]} • ${departments[1]}`}
+            aria-label={departmentsText}
           >
-            <div className="cu-profile-marquee-track flex w-max">
-              {[0, 1, 2, 3].map((copy) => (
-                <span
-                  key={copy}
-                  aria-hidden={copy > 0}
-                  className="block shrink-0 pr-8"
-                >
-                  {departments[0]} • {departments[1]}
-                </span>
-              ))}
-            </div>
+            <MarqueeTrack text={departmentsText} />
           </div>
         </div>
       </div>

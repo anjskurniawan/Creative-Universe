@@ -12,6 +12,8 @@ use App\SubApps\CreativeReport\Services\AssessmentService;
 use App\SubApps\CreativeReport\Services\CreativeMembershipService;
 use App\SubApps\Odds\Models\DesignerProfile;
 use App\SubApps\Odds\Models\DesignerDailyReport;
+use App\SubApps\Odds\Models\Category;
+use App\SubApps\Odds\Services\OddsScheduleService;
 use App\Services\Core\FileStorageService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +26,7 @@ class AssessmentController extends BaseApiController
     public function __construct(
         private readonly AssessmentService $service,
         private readonly CreativeMembershipService $memberships,
+        private readonly OddsScheduleService $oddsSchedule,
     ) {}
 
     public function index(IndexAssessmentRequest $request): JsonResponse
@@ -175,7 +178,7 @@ class AssessmentController extends BaseApiController
             'specializations' => 'sometimes|array',
             'specializations.*' => 'integer|exists:odds_categories,id',
             'odds_status' => 'sometimes|in:available,off',
-            'card_image' => 'nullable|image|max:2048|mimes:jpeg,jpg,png,webp',
+            'card_image' => 'nullable|file|max:10240|mimetypes:image/jpeg,image/png,image/webp,video/mp4,video/webm,video/ogg',
             'remove_card_image' => 'nullable|boolean',
         ]);
         DB::transaction(function () use ($request, $member, $data, $files) {
@@ -205,7 +208,13 @@ class AssessmentController extends BaseApiController
 
     private function memberPayload(CreativeMember $member): array
     {
-        return ['id' => $member->id, 'name' => $member->name, 'position_name' => $member->position_name, 'status' => $member->status, 'card_image_path' => $member->card_image_path, 'profile_metrics' => $member->profile_metrics ?? [], 'joined_at' => $member->joined_at?->toDateString(), 'resigned_at' => $member->resigned_at?->toDateString(), 'odds_metrics' => $this->oddsMetrics($member->user_id)];
+        $profile = $member->user_id ? DesignerProfile::query()->where('user_id', $member->user_id)->first() : null;
+        $specializations = $profile?->specializations ?? [];
+        $categoryIds = collect($specializations)->filter(fn ($value) => is_numeric($value))->map(fn ($value) => (int) $value);
+        $categoryNames = Category::query()->whereIn('id', $categoryIds)->pluck('name')->all();
+        $legacyNames = collect($specializations)->filter(fn ($value) => is_string($value) && !is_numeric($value))->values()->all();
+
+        return ['id' => $member->id, 'name' => $member->name, 'position_name' => $member->position_name, 'status' => $member->status, 'card_image_path' => $member->card_image_path, 'profile_metrics' => $member->profile_metrics ?? [], 'joined_at' => $member->joined_at?->toDateString(), 'resigned_at' => $member->resigned_at?->toDateString(), 'specialties' => array_values(array_unique([...$categoryNames, ...$legacyNames])), 'odds_metrics' => $this->oddsMetrics($member->user_id)];
     }
 
     private function oddsMetrics(?int $userId): array
@@ -234,8 +243,16 @@ class AssessmentController extends BaseApiController
             'on_time_rate' => $doneCount ? (int) round(((clone $done)->where('overdue', false)->count() / $doneCount) * 100) : null,
             'user_rating' => $rating?->average !== null ? round((float) $rating->average, 1) : null,
             'rating_count' => (int) ($rating?->count ?? 0),
-            'capacity_percent' => $profile ? min(100, (int) round(($profile->current_load_minutes / 480) * 100)) : null,
+            'capacity_percent' => $profile ? $this->capacityToday($profile) : null,
             'average_score' => (clone $daily)->count() ? round((float) (clone $daily)->avg('score'), 1) : null,
         ];
+    }
+
+    private function capacityToday(DesignerProfile $profile): int
+    {
+        $dailyCapacity = $this->oddsSchedule->getCapacityForDate(now()->toImmutable(), $profile);
+        if ($dailyCapacity <= 0) return 0;
+
+        return min(100, (int) round(($profile->current_load_minutes / $dailyCapacity) * 100));
     }
 }
