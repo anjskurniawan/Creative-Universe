@@ -12,11 +12,16 @@ import { getCollabAspects, getDetailCardAspectIndexes, getPerfAspects } from "..
 
 const labels = [["creativity", "Creativity"], ["speed", "Speed"], ["communication", "Communication"], ["quality", "Quality"], ["teamwork", "Teamwork"]] as const;
 
+function displayCreativeRole(role: CreativeMemberProfile["position_name"]) {
+  return role === "SPV" ? "SPV Creative" : role;
+}
+
 export default function CreativeReportCreativeAgentPage() {
   const [members, setMembers] = useState<CreativeMemberProfile[]>([]);
   const [assessments, setAssessments] = useState<CreativeReportAssessment[]>([]);
   const [selected, setSelected] = useState(0);
   const [shouldAutoPlayDetailMedia, setShouldAutoPlayDetailMedia] = useState(false);
+  const [ratingAnimationKey, setRatingAnimationKey] = useState(0);
   const router = useRouter();
   const detailCardRef = useRef<HTMLElement>(null);
   const { hasRole } = useAuth();
@@ -54,6 +59,7 @@ export default function CreativeReportCreativeAgentPage() {
   const selectMember = (index: number) => {
     setSelected(index);
     setShouldAutoPlayDetailMedia(true);
+    setRatingAnimationKey((current) => current + 1);
     window.requestAnimationFrame(() => detailCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   };
 
@@ -61,11 +67,13 @@ export default function CreativeReportCreativeAgentPage() {
     <section ref={detailCardRef} className="flex w-full scroll-mt-4 flex-col gap-4">
       <DetailCard
         name={member.name}
-        role={member.position_name}
+        role={displayCreativeRole(member.position_name)}
+        specialties={member.specialties?.length ? member.specialties : ["Belum ada spesialisasi ODDS"]}
         ratings={ratings}
         metrics={metrics}
         onEdit={canEdit ? () => router.push(`/creative-report/creative-agent/edit?memberId=${member.id}`) : undefined}
         autoPlayMedia={shouldAutoPlayDetailMedia}
+        ratingAnimationKey={ratingAnimationKey}
         profileImage={resolveStorageUrl(member.card_image_path) ?? undefined}
       />
       <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(360px,1fr))]">
@@ -73,7 +81,7 @@ export default function CreativeReportCreativeAgentPage() {
           <ProfileCard
             key={item.id}
             name={item.name}
-            role={item.position_name}
+            role={displayCreativeRole(item.position_name)}
             departments={item.specialties?.length ? item.specialties : ["Belum ada spesialisasi ODDS"]}
             capacity={item.odds_metrics?.capacity_percent ?? 0}
             profileImage={resolveStorageUrl(item.card_image_path) ?? undefined}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import { MaterialIcon } from "@/components/material-icon";
 
 export type DetailCardRating = {
@@ -26,6 +27,7 @@ export interface DetailCardProps {
   profileAlt?: string;
   onEdit?: () => void;
   autoPlayMedia?: boolean;
+  ratingAnimationKey?: number;
 }
 
 function isVideoSource(source?: string) {
@@ -73,6 +75,44 @@ const defaultMetrics: DetailCardMetric[] = [
   { label: "Capacity", value: "90%", icon: "speed" },
 ];
 
+function RatingBars({ ratings, animationKey }: { ratings: DetailCardRating[]; animationKey: number }) {
+  const barsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!animationKey || !barsRef.current) return;
+    const context = gsap.context(() => {
+      const fills = gsap.utils.toArray<HTMLElement>("[data-detail-rating-fill]");
+      gsap.fromTo(
+        fills,
+        { width: "0%" },
+        {
+          width: (_, element) => element.dataset.fill ?? "0%",
+          duration: 0.7,
+          ease: "power2.out",
+          stagger: 0.08,
+        },
+      );
+    }, barsRef);
+    return () => context.revert();
+  }, [animationKey]);
+
+  return <div ref={barsRef} className="flex flex-col gap-3">
+    {ratings.map((rating) => {
+      const maximum = rating.max ?? 10;
+      const percentage = maximum > 0 ? Math.max(0, Math.min(100, (rating.value / maximum) * 100)) : 0;
+      return (
+        <div key={rating.label} className="flex items-center gap-2 text-xs text-[#7d7c7c] sm:gap-4 sm:text-sm">
+          <span className="w-[140px] shrink-0 whitespace-nowrap font-medium sm:w-[220px]">{rating.label}</span>
+          <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-[5px] bg-[#e5ebf2]">
+            {percentage > 0 && <div data-detail-rating-fill data-fill={`${percentage}%`} className="h-full rounded-[5px] bg-[#00a4ff]" style={{ width: `${percentage}%` }} />}
+          </div>
+          <span className="w-12 shrink-0 font-medium sm:w-16">{rating.value}/{maximum}</span>
+        </div>
+      );
+    })}
+  </div>;
+}
+
 export default function DetailCard({
   className,
   name = "Anjas Kurniawan",
@@ -84,6 +124,7 @@ export default function DetailCard({
   profileAlt,
   onEdit,
   autoPlayMedia = false,
+  ratingAnimationKey = 0,
 }: DetailCardProps) {
   return (
     <article
@@ -125,21 +166,7 @@ export default function DetailCard({
                 </span>
               ))}
             </div>
-            <div className="flex flex-col gap-3">
-              {ratings.map((rating) => {
-                const maximum = rating.max ?? 10;
-                const percentage = maximum > 0 ? Math.max(0, Math.min(100, (rating.value / maximum) * 100)) : 0;
-                return (
-                  <div key={rating.label} className="flex items-center gap-2 text-xs text-[#7d7c7c] sm:gap-4 sm:text-sm">
-                    <span className="w-[140px] shrink-0 whitespace-nowrap font-medium sm:w-[220px]">{rating.label}</span>
-                    <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-[5px] bg-[#e5ebf2]">
-                      {percentage > 0 && <div className="h-full rounded-[5px] bg-[#00a4ff]" style={{ width: `${percentage}%` }} />}
-                    </div>
-                    <span className="w-12 shrink-0 font-medium sm:w-16">{rating.value}/{maximum}</span>
-                  </div>
-                );
-              })}
-            </div>
+            <RatingBars ratings={ratings} animationKey={ratingAnimationKey} />
           </div>
       </div>
       <div className="grid grid-cols-2 divide-x divide-y divide-[#e6edf2] overflow-hidden rounded-lg border border-[#e6edf2] sm:flex sm:min-h-[275px] sm:flex-col sm:divide-x-0 sm:divide-y sm:px-3">
