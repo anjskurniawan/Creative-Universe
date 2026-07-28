@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/material-icon";
 import PopupPerson from "@/components/global-layout/profile/popup-person";
@@ -41,6 +41,19 @@ function calculateHrdScore(absence: number, late: number) {
   const latePenalty = Math.min(late, 2) + Math.max(late - 2, 0) * 2;
 
   return 20 - absencePenalty - latePenalty;
+}
+
+function MobileSummaryLabel({ label }: { label: string }) {
+  return (
+    <p className="line-clamp-2 h-6 overflow-hidden text-[10px] leading-3 text-[#7b868a]">
+      {label.split(/\s+/).map((word, index) => (
+        <Fragment key={`${word}-${index}`}>
+          {index > 0 && <br />}
+          {word}
+        </Fragment>
+      ))}
+    </p>
+  );
 }
 
 function Avatar({ name, imagePath }: { name: string; imagePath?: string | null }) {
@@ -508,10 +521,10 @@ function AssessmentTable({
                 <MaterialIcon name={mobileExpanded ? "keyboard_arrow_up" : "keyboard_arrow_down"} size="sm" className={lowScore ? "text-[#b4234d]" : "text-[#6d46eb]"} />
               </button>
               <div className={`grid grid-cols-4 divide-x border-b ${lowScore ? "divide-[#f2cbd3] border-[#f2cbd3]" : "divide-[#eeeafd] border-[#eeeafd]"}`}>
-                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Aspek 30%</p><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#6d46eb]"}`}>{score30}</b></div>
-                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Aspek 50%</p><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#b65d08]"}`}>{score50}</b></div>
-                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Nilai HRD</p><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#248235]"}`}>{hrd}</b></div>
-                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Nilai akhir</p><b className="text-sm text-[#5d35d9]">{finalScore}</b></div>
+                <div className="px-2 py-2 text-center"><MobileSummaryLabel label={groupTitles.collab} /><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#6d46eb]"}`}>{score30}</b></div>
+                <div className="px-2 py-2 text-center"><MobileSummaryLabel label={groupTitles.perf} /><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#b65d08]"}`}>{score50}</b></div>
+                <div className="px-2 py-2 text-center"><MobileSummaryLabel label="HRD Review" /><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#248235]"}`}>{hrd}</b></div>
+                <div className="px-2 py-2 text-center"><MobileSummaryLabel label="Nilai Akhir" /><b className="text-sm text-[#5d35d9]">{finalScore}</b></div>
               </div>
               {mobileExpanded && <div className={`space-y-3 border-t p-3 ${lowScore ? "border-[#f2cbd3]" : "border-[#eeeafd]"}`}>
                 <section>
