@@ -12,9 +12,10 @@ import type {
 } from "@/features/creative-report/types";
 import { useAuth } from "@/providers/auth-provider";
 import { useCreativeReportTheme } from "./theme-context";
-import { getCollabAspects, getPerfAspects } from "./settings";
+import { getAspectGroupTitles, getCollabAspects, getPerfAspects } from "./settings";
 import { CreativeReportHeader } from "@/components/creative-report/report-header";
 import { CreativeReportToolbar, type ReportMetric } from "@/components/creative-report/report-toolbar";
+import { HrdRulesFooter } from "./components/hrd-rules-footer";
 
 const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer"];
 
@@ -22,14 +23,25 @@ const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer"];
 type Draft = {
   creative_scores: number[];
   leave: number;
+  appPermission: number;
   absence: number;
   late: number;
   hrd_review_history?: {
     leave_dates?: string[];
+    app_permission_dates?: string[];
     absence_dates?: string[];
     late_dates?: string[];
   };
 };
+
+type HrdDateKey = "leave" | "appPermission" | "absence" | "late";
+
+function calculateHrdScore(absence: number, late: number) {
+  const absencePenalty = Math.min(absence, 2) * 3 + Math.max(absence - 2, 0) * 5;
+  const latePenalty = Math.min(late, 2) + Math.max(late - 2, 0) * 2;
+
+  return 20 - absencePenalty - latePenalty;
+}
 
 function Avatar({ name, imagePath }: { name: string; imagePath?: string | null }) {
   const imageUrl = resolveStorageUrl(imagePath);
@@ -63,7 +75,7 @@ function AssessmentTable({
   const [drafts, setDrafts] = useState<Record<number, Draft>>({});
   const [activeDateAction, setActiveDateAction] = useState<{
     assessmentId: number;
-    key: "leave" | "absence" | "late";
+    key: HrdDateKey;
     index: number;
     dateStr: string;
   } | null>(null);
@@ -72,6 +84,7 @@ function AssessmentTable({
   
   const collabAspects = useMemo(() => getCollabAspects(), []);
   const perfAspects = useMemo(() => getPerfAspects(), []);
+  const groupTitles = useMemo(() => getAspectGroupTitles(), []);
   const scoreAspects = useMemo(() => [...collabAspects, ...perfAspects], [collabAspects, perfAspects]);
   
   const scoreMaxima = useMemo(() => [
@@ -84,6 +97,7 @@ function AssessmentTable({
     ...perfAspects.map((a) => `${a.name} (${a.maxPoints})`),
     "Total nilai",
     "Cuti",
+    "Izin App",
     "Bolos",
     "Telat",
     "Total nilai",
@@ -96,10 +110,12 @@ function AssessmentTable({
           {
             creative_scores: [...item.creative_scores],
             leave: item.hrd_review.leave,
+            appPermission: item.hrd_review.app_permission,
             absence: item.hrd_review.absence,
             late: item.hrd_review.late,
             hrd_review_history: {
               leave_dates: item.hrd_review.history?.leave_dates ?? [],
+              app_permission_dates: item.hrd_review.history?.app_permission_dates ?? [],
               absence_dates: item.hrd_review.history?.absence_dates ?? [],
               late_dates: item.hrd_review.history?.late_dates ?? [],
             },
@@ -111,7 +127,7 @@ function AssessmentTable({
   };
   const updateDraft = (
     id: number,
-    field: keyof Omit<Draft, "creative_scores"> | "score",
+    field: keyof Omit<Draft, "creative_scores" | "hrd_review_history"> | "score",
     value: string,
     scoreIndex?: number,
   ) => {
@@ -122,17 +138,17 @@ function AssessmentTable({
         next.creative_scores = next.creative_scores.map((score, index) =>
           index === scoreIndex ? Math.min(scoreMaxima[index], parsed) : score,
         );
-      else if (field === "leave" || field === "absence" || field === "late")
+      else if (field === "leave" || field === "appPermission" || field === "absence" || field === "late")
         next[field] = parsed;
       return { ...current, [id]: next };
     });
   };
-  const addDate = (id: number, key: "leave" | "absence" | "late", dateStr: string) => {
+  const addDate = (id: number, key: HrdDateKey, dateStr: string) => {
     if (!dateStr) return;
     setDrafts((current) => {
       const next = { ...current[id] };
       const history = { ...next.hrd_review_history };
-      const dateKey = `${key}_dates` as const;
+      const dateKey = key === "appPermission" ? "app_permission_dates" : `${key}_dates` as const;
       const list = [...(history[dateKey] ?? [])];
       list.push(dateStr);
       list.sort();
@@ -143,12 +159,12 @@ function AssessmentTable({
     });
   };
 
-  const updateDate = (id: number, key: "leave" | "absence" | "late", index: number, newDateStr: string) => {
+  const updateDate = (id: number, key: HrdDateKey, index: number, newDateStr: string) => {
     if (!newDateStr) return;
     setDrafts((current) => {
       const next = { ...current[id] };
       const history = { ...next.hrd_review_history };
-      const dateKey = `${key}_dates` as const;
+      const dateKey = key === "appPermission" ? "app_permission_dates" : `${key}_dates` as const;
       const list = [...(history[dateKey] ?? [])];
       list[index] = newDateStr;
       list.sort();
@@ -159,11 +175,11 @@ function AssessmentTable({
     });
   };
 
-  const deleteDate = (id: number, key: "leave" | "absence" | "late", index: number) => {
+  const deleteDate = (id: number, key: HrdDateKey, index: number) => {
     setDrafts((current) => {
       const next = { ...current[id] };
       const history = { ...next.hrd_review_history };
-      const dateKey = `${key}_dates` as const;
+      const dateKey = key === "appPermission" ? "app_permission_dates" : `${key}_dates` as const;
       const list = [...(history[dateKey] ?? [])];
       list.splice(index, 1);
       history[dateKey] = list;
@@ -188,6 +204,7 @@ function AssessmentTable({
         await creativeReportApi.assessments.update(item.id, {
           creative_scores: draft.creative_scores,
           leave_count: draft.leave,
+          app_permission_count: draft.appPermission,
           absence_count: draft.absence,
           late_count: draft.late,
           hrd_review_history: draft.hrd_review_history,
@@ -225,16 +242,16 @@ function AssessmentTable({
               colSpan={6}
               className="border-b border-r border-[#ded7fb] px-2 py-3 text-center"
             >
-              Aspek penilaian 30%
+              {groupTitles.collab}
             </th>
             <th
               colSpan={6}
               className="border-b border-r border-[#f6c88d] bg-[#fff1df] px-2 py-3 text-center text-[#b65d08]"
             >
-              Aspek penilaian 50%
+              {groupTitles.perf}
             </th>
             <th
-              colSpan={4}
+              colSpan={5}
               className="border-b border-r border-[#a9dcb0] bg-[#e8f7ea] px-2 py-3 text-center text-[#248235]"
             >
               HRD Review (20%)
@@ -274,6 +291,7 @@ function AssessmentTable({
             const draft = drafts[item.id] ?? {
               creative_scores: item.creative_scores,
               leave: item.hrd_review.leave,
+              appPermission: item.hrd_review.app_permission,
               absence: item.hrd_review.absence,
               late: item.hrd_review.late,
             };
@@ -283,24 +301,21 @@ function AssessmentTable({
             const score50 = draft.creative_scores
               .slice(5, 10)
               .reduce((a, b) => a + b, 0);
-            const hrd = Math.max(
-              0,
-              20 -
-                (draft.late >= 2 ? 2 : draft.late ? 1 : 0) -
-                (draft.absence >= 2 ? 5 : draft.absence ? 3 : 0),
-            );
+            const hrd = calculateHrdScore(draft.absence, draft.late);
+            const finalScore = score30 + score50 + hrd;
             const cells = [
               ...draft.creative_scores.slice(0, 5),
               score30,
               ...draft.creative_scores.slice(5),
               score50,
               draft.leave,
+              draft.appPermission,
               draft.absence,
               draft.late,
               hrd,
             ];
             return (
-              <tr key={item.id} className="bg-white hover:bg-[#fbfcfd]">
+              <tr key={item.id} className={finalScore < 75 ? "bg-[#ffedf1] hover:bg-[#fff0f3]" : "bg-white hover:bg-[#fbfcfd]"}>
                 <td className="border-r border-[#e5edf0] px-1 py-3 text-center text-[#7b868a]">
                   {rowIndex + 1}
                 </td>
@@ -327,15 +342,15 @@ function AssessmentTable({
                     </td>
                 {cells.map((value, index) => {
                   const editableScore = index < 5 || (index >= 6 && index < 11);
-                  const editableHrd = index >= 12 && index < 15;
+                  const editableHrd = index >= 12 && index < 16;
                   const scoreIndex = index < 5 ? index : index - 1;
-                  const hrdKey = (["leave", "absence", "late"] as const)[
+                  const hrdKey = (["leave", "appPermission", "absence", "late"] as const)[
                     index - 12
                   ];
                   return (
                     <td
                       key={index}
-                      className={`border-b border-[#edf1f3] px-1 py-3 text-center ${index >= 6 && index < 12 ? "bg-[#fffaf4]" : index >= 12 ? "bg-[#f6fcf7]" : ""} ${index === 5 || index === 11 || index === 15 ? "border-r border-[#d8e1e5] font-semibold" : ""}`}
+                      className={`border-b px-1 py-3 text-center ${finalScore < 75 ? "border-[#f2cbd3] bg-[#ffedf1]" : `border-[#edf1f3] ${index >= 6 && index < 12 ? "bg-[#fffaf4]" : index >= 12 ? "bg-[#f6fcf7]" : ""}`} ${index === 5 || index === 11 || index === 16 ? "border-r border-[#d8e1e5] font-semibold" : ""}`}
                     >
                       {inputMode && editableScore ? (
                         <input
@@ -357,7 +372,7 @@ function AssessmentTable({
                         />
                       ) : inputMode && editableHrd ? (() => {
                         const history = draft.hrd_review_history ?? {};
-                        const dateKey = `${hrdKey}_dates` as const;
+                        const dateKey = hrdKey === "appPermission" ? "app_permission_dates" : `${hrdKey}_dates` as const;
                         const dates = history[dateKey] ?? [];
 
                         return (
@@ -413,8 +428,8 @@ function AssessmentTable({
                     </td>
                   );
                 })}
-                <td className="border-b border-[#edf1f3] bg-[#f4f1ff] px-1 py-3 text-center font-bold text-[#5d35d9]">
-                  {score30 + score50 + hrd}
+                <td className={`border-b px-1 py-3 text-center font-bold ${finalScore < 75 ? "border-[#f2cbd3] bg-[#fbd5dc] text-[#b4234d]" : "border-[#edf1f3] bg-[#f4f1ff] text-[#5d35d9]"}`}>
+                  {finalScore}
                 </td>
               </tr>
             );
@@ -422,7 +437,7 @@ function AssessmentTable({
         </tbody>
         {canEdit && <tfoot>
           <tr className="bg-[#fbfcfd]">
-            <td colSpan={19} className="border-t border-[#dbe4e8] px-4 py-3">
+            <td colSpan={20} className="border-t border-[#dbe4e8] px-4 py-3">
               <div className="flex items-center justify-end gap-2">
                 {inputMode ? (
                   <>
@@ -461,7 +476,7 @@ function AssessmentTable({
           </tr>
               {saveError && (
                 <tr>
-                  <td colSpan={19} className="bg-[#ffedf1] px-4 py-3 text-right text-xs text-[#b4234d]">
+                  <td colSpan={20} className="bg-[#ffedf1] px-4 py-3 text-right text-xs text-[#b4234d]">
                     {saveError}
                   </td>
                 </tr>
@@ -474,43 +489,92 @@ function AssessmentTable({
           const draft = drafts[item.id] ?? {
             creative_scores: item.creative_scores,
             leave: item.hrd_review.leave,
+            appPermission: item.hrd_review.app_permission,
             absence: item.hrd_review.absence,
             late: item.hrd_review.late,
           };
           const score30 = draft.creative_scores.slice(0, 5).reduce((total, value) => total + value, 0);
           const score50 = draft.creative_scores.slice(5, 10).reduce((total, value) => total + value, 0);
-          const hrd = Math.max(0, 20 - (draft.late >= 2 ? 2 : draft.late ? 1 : 0) - (draft.absence >= 2 ? 5 : draft.absence ? 3 : 0));
+          const hrd = calculateHrdScore(draft.absence, draft.late);
+          const finalScore = score30 + score50 + hrd;
+          const lowScore = finalScore < 75;
           const mobileExpanded = expandedMobileAssessments.includes(item.id);
           return (
-            <article key={item.id} className="overflow-hidden rounded-xl border border-[#ded7fb] bg-white shadow-[0_2px_8px_rgba(73,55,145,0.06)]">
-              <button type="button" aria-expanded={mobileExpanded} onClick={() => setExpandedMobileAssessments((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} className="flex w-full items-center gap-3 border-b border-[#eeeafd] px-3 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#6d46eb]">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-[#f0edff] text-xs font-bold text-[#6d46eb]">{rowIndex + 1}</span>
+            <article key={item.id} className={`overflow-hidden rounded-xl border shadow-[0_2px_8px_rgba(73,55,145,0.06)] ${finalScore < 75 ? "border-[#f2b8c7] bg-[#ffedf1]" : "border-[#ded7fb] bg-white"}`}>
+              <button type="button" aria-expanded={mobileExpanded} onClick={() => setExpandedMobileAssessments((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])} className={`flex w-full items-center gap-3 border-b px-3 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset ${lowScore ? "border-[#f2cbd3] focus-visible:ring-[#b4234d]" : "border-[#eeeafd] focus-visible:ring-[#6d46eb]"}`}>
+                <span className={`flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${lowScore ? "bg-[#fbd5dc] text-[#b4234d]" : "bg-[#f0edff] text-[#6d46eb]"}`}>{rowIndex + 1}</span>
                 <Avatar name={item.user.name} imagePath={item.user.avatar_path} />
                 <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[#3b4446]">{item.user.name}</span>
-                <MaterialIcon name={mobileExpanded ? "keyboard_arrow_up" : "keyboard_arrow_down"} size="sm" className="text-[#6d46eb]" />
+                <MaterialIcon name={mobileExpanded ? "keyboard_arrow_up" : "keyboard_arrow_down"} size="sm" className={lowScore ? "text-[#b4234d]" : "text-[#6d46eb]"} />
               </button>
-              <div className="grid grid-cols-3 divide-x divide-[#eeeafd] border-b border-[#eeeafd]">
-                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Aspek 30%</p><b className="text-sm text-[#6d46eb]">{score30}</b></div>
-                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Aspek 50%</p><b className="text-sm text-[#b65d08]">{score50}</b></div>
-                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Nilai akhir</p><b className="text-sm text-[#5d35d9]">{score30 + score50 + hrd}</b></div>
+              <div className={`grid grid-cols-4 divide-x border-b ${lowScore ? "divide-[#f2cbd3] border-[#f2cbd3]" : "divide-[#eeeafd] border-[#eeeafd]"}`}>
+                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Aspek 30%</p><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#6d46eb]"}`}>{score30}</b></div>
+                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Aspek 50%</p><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#b65d08]"}`}>{score50}</b></div>
+                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Nilai HRD</p><b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#248235]"}`}>{hrd}</b></div>
+                <div className="px-2 py-2 text-center"><p className="text-[10px] text-[#7b868a]">Nilai akhir</p><b className="text-sm text-[#5d35d9]">{finalScore}</b></div>
               </div>
-              {mobileExpanded && <div className="space-y-3 border-t border-[#eeeafd] p-3">
+              {mobileExpanded && <div className={`space-y-3 border-t p-3 ${lowScore ? "border-[#f2cbd3]" : "border-[#eeeafd]"}`}>
                 <section>
-                  <p className="mb-2 text-[11px] font-semibold text-[#6d46eb]">Aspek penilaian</p>
+                  <p className={`mb-2 text-[11px] font-semibold ${lowScore ? "text-[#b4234d]" : "text-[#6d46eb]"}`}>Aspek penilaian</p>
                   <div className="grid grid-cols-2 gap-2">
                     {scoreAspects.map((aspect, scoreIndex) => {
                       const value = draft.creative_scores[scoreIndex] ?? 0;
-                      return <label key={aspect.name} className="flex min-w-0 items-center justify-between gap-2 rounded-lg bg-[#faf9ff] px-2 py-1.5 text-[10px] text-[#525e61]"><span className="min-w-0 truncate">{aspect.name}</span>{inputMode ? <span className="flex shrink-0 flex-col items-center"><input type="number" min={0} max={aspect.maxPoints} title={`Maksimal nilai: ${aspect.maxPoints}`} aria-label={`Nilai ${aspect.name}, maksimal ${aspect.maxPoints}`} value={value} onChange={(event) => updateDraft(item.id, "score", event.target.value, scoreIndex)} className="h-7 w-9 rounded border border-[#bdb0f5] bg-white text-center text-xs font-semibold outline-none" /><small className="mt-0.5 whitespace-nowrap text-[8px] leading-none text-[#6d46eb]">maks. {aspect.maxPoints}</small></span> : <b className="shrink-0 text-xs text-[#3b4446]">{value}/{aspect.maxPoints}</b>}</label>;
+                      return <label key={aspect.name} className={`flex min-w-0 items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-[10px] text-[#525e61] ${lowScore ? "bg-[#fff7f8]" : "bg-[#faf9ff]"}`}><span className="min-w-0 truncate">{aspect.name}</span>{inputMode ? <span className="flex shrink-0 flex-col items-center"><input type="number" min={0} max={aspect.maxPoints} title={`Maksimal nilai: ${aspect.maxPoints}`} aria-label={`Nilai ${aspect.name}, maksimal ${aspect.maxPoints}`} value={value} onChange={(event) => updateDraft(item.id, "score", event.target.value, scoreIndex)} className="h-7 w-9 rounded border border-[#bdb0f5] bg-white text-center text-xs font-semibold outline-none" /><small className={`mt-0.5 whitespace-nowrap text-[8px] leading-none ${lowScore ? "text-[#b4234d]" : "text-[#6d46eb]"}`}>maks. {aspect.maxPoints}</small></span> : <b className="shrink-0 text-xs text-[#3b4446]">{value}/{aspect.maxPoints}</b>}</label>;
                     })}
                   </div>
                 </section>
                 <section>
-                  <p className="mb-2 text-[11px] font-semibold text-[#248235]">HRD Review</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(["leave", "absence", "late"] as const).map((key) => {
-                      const label = key === "leave" ? "Cuti" : key === "absence" ? "Bolos" : "Telat";
+                  <p className={`mb-2 text-[11px] font-semibold ${lowScore ? "text-[#b4234d]" : "text-[#248235]"}`}>HRD Review</p>
+                  <div className={`mb-2 flex items-center justify-between rounded-lg px-3 py-2 text-xs ${lowScore ? "bg-[#fbd5dc] text-[#b4234d]" : "bg-[#e8f7ea] text-[#248235]"}`}>
+                    <span className="font-medium">Total HRD Review</span>
+                    <b>{hrd}/20</b>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {(["leave", "appPermission", "absence", "late"] as const).map((key) => {
+                      const label = key === "leave" ? "Cuti" : key === "appPermission" ? "Izin App" : key === "absence" ? "Bolos" : "Telat";
                       const value = draft[key];
-                      return <label key={key} className="rounded-lg bg-[#f4fbf5] px-2 py-2 text-center text-[10px] text-[#52755a]"><span className="block">{label}</span>{inputMode ? <input type="number" min={0} value={value} onChange={(event) => updateDraft(item.id, key, event.target.value)} className="mx-auto mt-1 h-7 w-10 rounded border border-[#a9dcb0] bg-white text-center text-xs font-semibold text-[#248235] outline-none" /> : <b className="mt-1 block text-sm text-[#248235]">{value}</b>}</label>;
+                      const history = draft.hrd_review_history ?? {};
+                      const dateKey = key === "appPermission" ? "app_permission_dates" : `${key}_dates` as const;
+                      const dates = history[dateKey] ?? [];
+                      return (
+                        <div key={key} className={`rounded-lg px-2 py-2 text-[10px] ${lowScore ? "bg-[#fff7f8] text-[#8f4b59]" : "bg-[#f4fbf5] text-[#52755a]"}`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium">{label}</span>
+                            <b className={`text-sm ${lowScore ? "text-[#b4234d]" : "text-[#248235]"}`}>{value}</b>
+                          </div>
+                          {inputMode ? (
+                            <div className="mt-2 flex min-h-7 flex-wrap items-center gap-1">
+                              {dates.map((dateStr, index) => (
+                                <button
+                                  key={`${dateStr}-${index}`}
+                                  type="button"
+                                  onClick={() => setActiveDateAction({ assessmentId: item.id, key, index, dateStr })}
+                                  className={`rounded border px-1.5 py-1 text-[10px] font-medium ${lowScore ? "border-[#f2cbd3] bg-[#fbd5dc] text-[#b4234d]" : "border-[#c9bbfc] bg-[#ede9fe] text-[#6d46eb]"}`}
+                                >
+                                  {formatDateShort(dateStr)}
+                                </button>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={(event) => (event.currentTarget.querySelector('input[type="date"]') as HTMLInputElement | null)?.showPicker()}
+                                className={`relative flex h-6 min-w-6 items-center justify-center rounded border border-dashed ${lowScore ? "border-[#e6a5b2] text-[#b4234d]" : "border-[#9ed5a7] text-[#248235]"}`}
+                                aria-label={`Tambah tanggal ${label}`}
+                              >
+                                <MaterialIcon name="add" size="auto" className="text-sm" />
+                                <input
+                                  type="date"
+                                  onChange={(event) => addDate(item.id, key, event.target.value)}
+                                  className="pointer-events-none absolute inset-0 size-full opacity-0"
+                                  tabIndex={-1}
+                                />
+                              </button>
+                              {dates.length === 0 && <span className="text-[10px] text-[#7b868a]">Pilih tanggal</span>}
+                            </div>
+                          ) : (
+                            <p className="mt-1 text-[10px] text-[#7b868a]">{value === 0 ? "Tidak ada catatan" : `${value} tanggal tercatat`}</p>
+                          )}
+                        </div>
+                      );
                     })}
                   </div>
                 </section>
@@ -671,7 +735,7 @@ export default function CreativeReportPage() {
     );
   const content = (
     <main className="w-full min-w-0 flex-1">
-      <div className="w-full">
+      <div className="flex min-h-full w-full flex-col">
         <CreativeReportHeader month={month} monthLabel={monthLabel} theme={theme} onMonthChange={setMonth} />
         <header className="hidden">
           <div>
@@ -711,7 +775,7 @@ export default function CreativeReportPage() {
           </div>
         </header>
 
-        <CreativeReportToolbar search={search} onSearchChange={setSearch} jobdesk={jobdesk} onJobdeskChange={setJobdesk} jobdesks={JOBDESKS} metrics={metrics} />
+        <CreativeReportToolbar search={search} onSearchChange={setSearch} jobdesk={jobdesk} onJobdeskChange={setJobdesk} jobdesks={JOBDESKS} metrics={metrics} showMetrics={false} />
         <section className="hidden">
           <label className="flex h-12 min-w-0 items-center gap-3 rounded-xl border border-[#e2e6e9] bg-white px-4">
             <MaterialIcon name="search" size="sm" className="text-[#7b868a]" />
@@ -770,7 +834,7 @@ export default function CreativeReportPage() {
         <p className="mt-3 text-xs text-[#7b868a]">
           Menampilkan ringkasan {monthLabel} · {assessments.length} staff
         </p>
-        <section className="mt-6 space-y-3">
+        <section className="mt-6 mb-4 space-y-3">
           {report?.groups.map((group, index) => (
             <div key={group.id}>
               <button
@@ -806,6 +870,7 @@ export default function CreativeReportPage() {
             </div>
           ))}
         </section>
+        <HrdRulesFooter theme={theme} />
       </div>
     </main>
   );

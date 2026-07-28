@@ -16,7 +16,7 @@ class Assessment extends Model
 
     protected $fillable = [
         'creative_report_group_id', 'user_id', 'period', 'creative_scores',
-        'creative_report_member_id', 'leave_count', 'absence_count', 'late_count', 'hrd_review_history', 'status', 'completed_at', 'completed_by',
+        'creative_report_member_id', 'leave_count', 'app_permission_count', 'absence_count', 'late_count', 'hrd_review_history', 'status', 'completed_at', 'completed_by',
     ];
 
     protected function casts(): array
@@ -51,10 +51,10 @@ class Assessment extends Model
 
     public function hrdScore(): int
     {
-        $late = $this->late_count >= 2 ? 2 : ($this->late_count === 1 ? 1 : 0);
-        $absence = $this->absence_count >= 2 ? 5 : ($this->absence_count === 1 ? 3 : 0);
+        $late = min($this->late_count, 2) + (max(0, $this->late_count - 2) * 2);
+        $absence = (min($this->absence_count, 2) * 3) + (max(0, $this->absence_count - 2) * 5);
 
-        return max(0, 20 - $late - $absence);
+        return 20 - $late - $absence;
     }
 
     public function finalScore(): int

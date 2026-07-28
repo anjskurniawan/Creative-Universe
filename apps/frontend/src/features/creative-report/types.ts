@@ -17,11 +17,13 @@ export interface CreativeReportAssessment {
   creative_scores: number[];
   hrd_review: {
     leave: number;
+    app_permission: number;
     absence: number;
     late: number;
     score: number;
     history?: {
       leave_dates?: string[];
+      app_permission_dates?: string[];
       absence_dates?: string[];
       late_dates?: string[];
     };
@@ -54,10 +56,12 @@ export interface CreativeReportFilters {
 export interface CreativeReportUpdateInput {
   creative_scores: number[];
   leave_count?: number;
+  app_permission_count?: number;
   absence_count?: number;
   late_count?: number;
   hrd_review_history?: {
     leave_dates?: string[];
+    app_permission_dates?: string[];
     absence_dates?: string[];
     late_dates?: string[];
   };

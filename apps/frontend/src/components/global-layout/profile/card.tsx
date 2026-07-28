@@ -72,25 +72,28 @@ function isVideoSource(source?: string) {
 
 const STATUS_STYLES: Record<
   CardStatus,
-  { label: string; capacity: number; text: string; bg: string }
+  { label: string; capacity: number; text: string; bg: string; dot: string }
 > = {
   FullBook: {
     label: "Full Book",
     capacity: 100,
     text: "text-[#ff5e5e]",
     bg: "bg-[#ffe5e5]",
+    dot: "bg-[#ff5e5e]",
   },
   Available: {
     label: "Available",
     capacity: 20,
     text: "text-[#04b904]",
     bg: "bg-[#f1ffe3]",
+    dot: "bg-[#04b904]",
   },
   Busy: {
     label: "Busy",
     capacity: 60,
     text: "text-[#ffae00]",
     bg: "bg-[#fff5e0]",
+    dot: "bg-[#ffae00]",
   },
 };
 
@@ -157,7 +160,10 @@ export default function Card({
     ? capacityValue >= 100 ? "FullBook" : capacityValue >= 70 ? "Busy" : "Available"
     : configuredStatus;
   const statusStyle = STATUS_STYLES[resolvedStatus];
-  const departmentsText = departments.filter(Boolean).join(" • ");
+  const departmentList = departments.filter(Boolean);
+  const primaryDepartment = departmentList[0] ?? "";
+  const remainingDepartments = departmentList.length - 1;
+  const departmentsText = departmentList.join(" • ");
   const videoMedia = isVideoSource(profileImage);
 
   return (
@@ -212,7 +218,7 @@ export default function Card({
               className="flex max-w-full items-center gap-[5px] overflow-hidden whitespace-nowrap text-[10px] font-medium leading-3 tracking-[0.2px] lg:max-w-none lg:text-xs lg:leading-[14px] lg:tracking-[0.24px]"
             >
               <span
-                className={`size-[9px] shrink-0 rounded-full ${statusStyle.bg}`}
+                className={`size-[9px] shrink-0 rounded-full ${statusStyle.dot}`}
               />
               <span className={statusStyle.text}>{statusStyle.label}</span>
               <span className="text-[#7d7c7c] lg:hidden">|</span>
@@ -220,8 +226,14 @@ export default function Card({
             </div>
             <div className={`hidden rounded-lg border border-current px-3 py-1.5 text-xs leading-[14px] tracking-[0.24px] lg:block ${statusStyle.text} ${statusStyle.bg}`}>{capacityValue}% Capacity</div>
           </div>}
+          <div className="w-full min-w-0 lg:hidden" aria-label={departmentsText}>
+            <div className={`flex min-w-0 items-center gap-1 overflow-hidden text-[#7d7c7c] ${compact ? "text-[9px] leading-3 tracking-[0.14px]" : "text-[10px] leading-3 tracking-[0.2px]"}`}>
+              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{primaryDepartment}</span>
+              {remainingDepartments > 0 && <span className="shrink-0">+{remainingDepartments}</span>}
+            </div>
+          </div>
           <div
-            className={`w-full min-w-0 overflow-hidden whitespace-nowrap text-[#7d7c7c] ${compact ? "text-[9px] leading-3 tracking-[0.14px]" : "text-[10px] leading-3 tracking-[0.2px] lg:text-xs lg:leading-[14px] lg:tracking-[0.24px]"}`}
+            className={`hidden w-full min-w-0 overflow-hidden whitespace-nowrap text-[#7d7c7c] lg:block ${compact ? "text-[9px] leading-3 tracking-[0.14px]" : "text-[10px] leading-3 tracking-[0.2px] lg:text-xs lg:leading-[14px] lg:tracking-[0.24px]"}`}
             aria-label={departmentsText}
           >
             <MarqueeTrack text={departmentsText} />

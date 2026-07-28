@@ -9,7 +9,6 @@ import { useAuth } from "@/providers/auth-provider";
 import { APP_ROUTES } from "@/core/navigation/routes";
 import { resolveAuthenticatedRoute } from "@/core/auth";
 import { ValidationError } from "@/core/api/client";
-import { CreativeUniverseLogo, Navbar } from "@/components/navbar";
 
 // Small stacked "CR EA" logo
 const LogoSmall = () => (
@@ -594,10 +593,6 @@ export default function LoginPage() {
       className="relative min-h-screen overflow-hidden bg-cu-surface font-sans text-[#232925]"
     >
       <LoginParticleBackground />
-
-      <div className="absolute inset-x-0 top-0 z-20 hidden md:block">
-        <Navbar variant="transparent-dark" session="guest" />
-      </div>
 
       <div
         className="relative z-10 flex min-h-screen w-full items-end justify-center px-0 pt-10 md:items-center md:px-5 md:pt-0"

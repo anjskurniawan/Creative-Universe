@@ -44,8 +44,8 @@ function DetailMedia({ source, alt, autoPlay }: { source?: string; alt: string; 
   }, [autoPlay, source, video]);
 
   if (!source) return null;
-  if (video) return <video ref={videoRef} src={source} muted loop playsInline preload="metadata" className="size-full object-cover object-center" />;
-  return <img src={source} alt={alt} className="size-full object-cover object-center" />;
+  if (video) return <video ref={videoRef} src={source} muted loop playsInline preload="metadata" className="size-full object-cover object-[center_top] sm:object-center" />;
+  return <img src={source} alt={alt} className="size-full object-cover object-[center_top] sm:object-center" />;
 }
 
 function initials(name: string) {
@@ -101,12 +101,12 @@ function RatingBars({ ratings, animationKey }: { ratings: DetailCardRating[]; an
       const maximum = rating.max ?? 10;
       const percentage = maximum > 0 ? Math.max(0, Math.min(100, (rating.value / maximum) * 100)) : 0;
       return (
-        <div key={rating.label} className="flex items-center gap-2 text-xs text-[#7d7c7c] sm:gap-4 sm:text-sm">
-          <span className="w-[140px] shrink-0 whitespace-nowrap font-medium sm:w-[220px]">{rating.label}</span>
-          <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-[5px] bg-[#e5ebf2]">
+        <div key={rating.label} className="grid w-full grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)_auto] items-center gap-2 text-xs text-[#7d7c7c] sm:flex sm:gap-4 sm:text-sm">
+          <span className="min-w-0 whitespace-normal font-medium sm:w-[220px] sm:shrink-0 sm:whitespace-nowrap">{rating.label}</span>
+          <div className="h-2.5 min-w-0 w-full overflow-hidden rounded-[5px] bg-[#e5ebf2] sm:flex-1">
             {percentage > 0 && <div data-detail-rating-fill data-fill={`${percentage}%`} className="h-full rounded-[5px] bg-[#00a4ff]" style={{ width: `${percentage}%` }} />}
           </div>
-          <span className="w-12 shrink-0 font-medium sm:w-16">{rating.value}/{maximum}</span>
+          <span className="shrink-0 whitespace-nowrap font-medium sm:w-16">{rating.value}/{maximum}</span>
         </div>
       );
     })}
@@ -126,8 +126,10 @@ export default function DetailCard({
   autoPlayMedia = false,
   ratingAnimationKey = 0,
 }: DetailCardProps) {
-  const visibleSpecialties = specialties.slice(0, 4);
-  const remainingSpecialties = specialties.length - visibleSpecialties.length;
+  const primarySpecialty = specialties[0];
+  const desktopSpecialties = specialties.slice(1, 4);
+  const mobileHiddenSpecialties = specialties.slice(1);
+  const desktopHiddenSpecialties = specialties.slice(4);
   return (
     <article
       className={`flex w-full max-w-none flex-col gap-4 rounded-lg bg-white p-3 shadow-[0_5px_14px_rgba(44,42,39,0.06)] sm:grid sm:grid-cols-[194px_minmax(0,1fr)_200px] sm:items-stretch sm:gap-6 sm:p-4 ${className ?? ""}`}
@@ -159,15 +161,34 @@ export default function DetailCard({
           <div className="flex flex-col gap-4">
             <p className="text-sm font-medium tracking-[0.28px] text-[#7d7c7c]">Specialties</p>
             <div className="flex flex-wrap gap-2">
-              {visibleSpecialties.map((specialty) => (
+              {primarySpecialty && (
                 <span
-                  key={specialty}
                   className="rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs text-[#7d7c7c] sm:px-4 sm:py-2 sm:text-sm"
                 >
+                  {primarySpecialty}
+                </span>
+              )}
+              {desktopSpecialties.map((specialty) => (
+                <span key={specialty} className="hidden rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs text-[#7d7c7c] sm:inline-flex sm:px-4 sm:py-2 sm:text-sm">
                   {specialty}
                 </span>
               ))}
-              {remainingSpecialties > 0 && <span className="rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs font-semibold text-[#0077bf] sm:px-4 sm:py-2 sm:text-sm">+{remainingSpecialties}</span>}
+              {mobileHiddenSpecialties.length > 0 && (
+                <span className="group relative inline-flex rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs font-semibold text-[#0077bf] sm:hidden" tabIndex={0} aria-label={`Specialty lainnya: ${mobileHiddenSpecialties.join(", ")}`}>
+                  +{mobileHiddenSpecialties.length}
+                  <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-max max-w-64 -translate-x-1/2 rounded-lg bg-[#3b4446] px-3 py-2 text-left text-xs font-normal text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus:opacity-100">
+                    {mobileHiddenSpecialties.join(" • ")}
+                  </span>
+                </span>
+              )}
+              {desktopHiddenSpecialties.length > 0 && (
+                <span className="group relative hidden rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs font-semibold text-[#0077bf] sm:inline-flex sm:px-4 sm:py-2 sm:text-sm" tabIndex={0} aria-label={`Specialty lainnya: ${desktopHiddenSpecialties.join(", ")}`}>
+                  +{desktopHiddenSpecialties.length}
+                  <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-max max-w-64 -translate-x-1/2 rounded-lg bg-[#3b4446] px-3 py-2 text-left text-xs font-normal text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus:opacity-100">
+                    {desktopHiddenSpecialties.join(" • ")}
+                  </span>
+                </span>
+              )}
             </div>
             <RatingBars ratings={ratings} animationKey={ratingAnimationKey} />
           </div>

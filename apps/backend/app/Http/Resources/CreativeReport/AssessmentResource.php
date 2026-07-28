@@ -24,11 +24,13 @@ class AssessmentResource extends JsonResource
             'creative_scores' => $this->creative_scores,
             'hrd_review' => [
                 'leave' => $this->leave_count,
+                'app_permission' => $this->app_permission_count,
                 'absence' => $this->absence_count,
                 'late' => $this->late_count,
                 'score' => $this->hrdScore(),
                 'history' => $this->hrd_review_history ?? [
                     'leave_dates' => [],
+                    'app_permission_dates' => [],
                     'absence_dates' => [],
                     'late_dates' => [],
                 ]

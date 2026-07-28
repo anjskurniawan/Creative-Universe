@@ -77,18 +77,15 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
 
   const dark = theme === "dark";
   const retro = theme === "retro";
-  const cardBg = dark ? "bg-white/5 border-white/10" : retro ? "bg-[#eceee6] border-[#24252b]" : "bg-white border-[#e8edf0] shadow-sm";
   const inputClass = `h-9 px-3 text-xs rounded-lg border outline-none transition w-full ${dark ? "bg-[#181818] border-white/10 text-white focus:border-[#b0ff5e]" : "bg-white border-slate-200 text-slate-800 focus:border-[#00a4ff]"}`;
-  const headingClass = dark ? "text-[#b0ff5e]" : retro ? "text-[#24252b]" : "text-[#6d46eb]";
   const sectionTitleClass = dark ? "text-slate-200" : "text-slate-700";
 
   return (
-    <div className={`w-full p-6 rounded-2xl border ${cardBg}`}>
-      <h2 className={`mb-4 flex items-center gap-2 text-lg font-bold ${headingClass}`}>
-        <MaterialIcon name="tune" />
+    <div className="w-full">
+      <h2 className="text-base font-semibold text-[#3b4446]">
         Konfigurasi Aspek Penilaian
       </h2>
-      <p className={`mb-6 text-xs ${dark ? "text-slate-400" : "text-slate-500"}`}>
+      <p className={`mt-1 mb-4 text-xs ${dark ? "text-slate-400" : "text-slate-500"}`}>
         Atur nama aspek beserta nilai maksimalnya untuk porsi penilaian 30% dan 50%.
       </p>
 
@@ -211,7 +208,7 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
           type="button"
           disabled={!isValid}
           onClick={handleSave}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition ${
+          className={`flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition sm:w-auto ${
             isValid
               ? dark
                 ? "bg-[#b0ff5e] text-[#181818] hover:bg-[#c4ff80]"
@@ -234,9 +231,9 @@ export default function CreativeReportOptionPage() {
   const [activeTab, setActiveTab] = useState<"validation" | "historical" | "aspects">("validation");
 
   const tabs = [
-    { id: "validation" as const, label: "Validasi Anggota", icon: "how_to_reg" },
-    { id: "historical" as const, label: "Personel Historis", icon: "history" },
-    { id: "aspects" as const, label: "Aspek Penilaian", icon: "tune" },
+    { id: "validation" as const, label: "Agent", icon: "how_to_reg" },
+    { id: "historical" as const, label: "Add Agent", icon: "history" },
+    { id: "aspects" as const, label: "Performa", icon: "tune" },
   ];
 
   return (
@@ -254,7 +251,7 @@ export default function CreativeReportOptionPage() {
           {canManageMembers ? (
             <>
               <section className={`flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border ${theme === "dark" ? "border-white/10 bg-white/5" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#e1e8eb] bg-white shadow-sm"}`}>
-                <div className={`flex flex-wrap gap-1 border-b p-2 ${theme === "dark" ? "border-white/10" : theme === "retro" ? "border-[#24252b]" : "border-[#e1e8eb]"}`}>
+                <div className={`flex flex-nowrap gap-1 overflow-x-auto border-b p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${theme === "dark" ? "border-white/10" : theme === "retro" ? "border-[#24252b]" : "border-[#e1e8eb]"}`}>
                   {tabs.map((tab) => {
                     const active = activeTab === tab.id;
                     return (
@@ -262,7 +259,7 @@ export default function CreativeReportOptionPage() {
                         key={tab.id}
                         type="button"
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${active ? theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#6d46eb] text-white" : theme === "dark" ? "text-slate-300 hover:bg-white/10" : "text-slate-600 hover:bg-slate-100"}`}
+                        className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${active ? theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#6d46eb] text-white" : theme === "dark" ? "text-slate-300 hover:bg-white/10" : "text-slate-600 hover:bg-slate-100"}`}
                       >
                         <MaterialIcon name={tab.icon} className="text-base" />
                         {tab.label}

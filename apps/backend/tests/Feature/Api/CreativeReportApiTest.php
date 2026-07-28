@@ -37,8 +37,8 @@ class CreativeReportApiTest extends TestCase
         $assessment = Assessment::create(['creative_report_group_id' => $group->id, 'user_id' => $staff->id, 'period' => now()->startOfMonth(), 'creative_scores' => [6, 6, 6, 6, 6, 10, 10, 10, 10, 10], 'late_count' => 2, 'absence_count' => 2]);
 
         $this->actingAs($actor)->getJson('/api/v1/creative-reports?month='.now()->format('Y-m'))
-            ->assertOk()->assertJsonPath('data.groups.0.assessments.0.hrd_review.score', 13)
-            ->assertJsonPath('data.groups.0.assessments.0.totals.final', 93);
+            ->assertOk()->assertJsonPath('data.groups.0.assessments.0.hrd_review.score', 12)
+            ->assertJsonPath('data.groups.0.assessments.0.totals.final', 92);
 
         $this->actingAs($actor)->getJson("/api/v1/creative-reports/{$assessment->id}")
             ->assertOk()->assertJsonPath('data.id', $assessment->id)
@@ -86,6 +86,22 @@ class CreativeReportApiTest extends TestCase
         $this->actingAs($editor)
             ->patchJson("/api/v1/creative-reports/{$assessment->id}", $this->validUpdatePayload())
             ->assertOk();
+    }
+
+    public function test_hrd_score_uses_progressive_penalties_and_can_be_negative(): void
+    {
+        $group = ReportGroup::create(['name' => 'Creative Design Production', 'sort_order' => 1]);
+        $assessment = Assessment::create([
+            'creative_report_group_id' => $group->id,
+            'user_id' => User::factory()->create()->id,
+            'period' => now()->startOfMonth(),
+            'creative_scores' => array_fill(0, 10, 0),
+            'absence_count' => 4,
+            'late_count' => 4,
+        ]);
+
+        $this->assertSame(-2, $assessment->hrdScore());
+        $this->assertSame(-2, $assessment->finalScore());
     }
 
     public function test_demo_seeder_creates_named_accounts_in_their_report_groups(): void
@@ -159,6 +175,7 @@ class CreativeReportApiTest extends TestCase
         return [
             'creative_scores' => [6, 6, 6, 6, 6, 10, 10, 10, 10, 10],
             'leave_count' => 0,
+            'app_permission_count' => 0,
             'absence_count' => 0,
             'late_count' => 0,
         ];

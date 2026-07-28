@@ -262,9 +262,10 @@ function CreativeReportDetailContent() {
             <h2 className="font-semibold text-[#248235]">
               C. HRD Review (20%)
             </h2>
-            <div className="mt-5 grid grid-cols-3 gap-3">
+            <div className="mt-5 grid grid-cols-2 gap-3">
               {[
                 ["Cuti", detail.hrd_review.leave],
+                ["Izin App", detail.hrd_review.app_permission],
                 ["Bolos", detail.hrd_review.absence],
                 ["Telat", detail.hrd_review.late],
               ].map(([label, value]) => (
@@ -288,31 +289,36 @@ function CreativeReportDetailContent() {
             <h2 className="font-semibold text-[#6d46eb]">
               Aturan Pengurangan HRD Review
             </h2>
-            <div className="mt-4 grid grid-cols-5 gap-2 text-center text-xs">
+            <div className="mt-4 grid grid-cols-2 gap-3 text-center text-xs sm:grid-cols-3">
               <span>
                 Cuti
                 <br />
                 <b>0</b>
               </span>
               <span>
-                Bolos 1×
+                Izin App
                 <br />
-                <b>-3</b>
+                <b>0</b>
               </span>
               <span>
-                Bolos ≥2×
+                Bolos 1-2×
                 <br />
-                <b>-5</b>
+                <b>-3 / kejadian</b>
               </span>
               <span>
-                Telat 1×
+                Bolos &gt;2×
                 <br />
-                <b>-1</b>
+                <b>-5 / kejadian</b>
               </span>
               <span>
-                Telat ≥2×
+                Telat 1-2×
                 <br />
-                <b>-2</b>
+                <b>-1 / kejadian</b>
+              </span>
+              <span>
+                Telat &gt;2×
+                <br />
+                <b>-2 / kejadian</b>
               </span>
             </div>
           </article>

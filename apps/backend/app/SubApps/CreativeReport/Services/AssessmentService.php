@@ -12,6 +12,7 @@ class AssessmentService
         if (isset($data['hrd_review_history'])) {
             $history = $data['hrd_review_history'];
             $data['leave_count'] = count($history['leave_dates'] ?? []);
+            $data['app_permission_count'] = count($history['app_permission_dates'] ?? []);
             $data['absence_count'] = count($history['absence_dates'] ?? []);
             $data['late_count'] = count($history['late_dates'] ?? []);
         }
