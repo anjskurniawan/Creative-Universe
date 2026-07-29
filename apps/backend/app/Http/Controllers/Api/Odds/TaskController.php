@@ -23,6 +23,7 @@ use App\SubApps\Odds\Services\OddsEscalationService;
 use App\SubApps\Odds\Services\OddsQueueService;
 use App\SubApps\Odds\Services\OddsTaskConversationService;
 use App\SubApps\Odds\Services\OddsTaskIntakeService;
+use App\SubApps\Odds\Services\OddsTaskRealtimeService;
 use App\SubApps\Odds\Services\OddsWorkReviewService;
 use App\Services\Core\FileStorageService;
 use Illuminate\Http\JsonResponse;
@@ -40,13 +41,14 @@ class TaskController extends BaseApiController
         private OddsWorkReviewService $workReviews,
         private OddsEscalationService $escalations,
         private OddsQueueService $queue,
-        private OddsTaskConversationService $conversations
+        private OddsTaskConversationService $conversations,
+        private OddsTaskRealtimeService $realtime,
     ) {}
 
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'results.assetLinks', 'revisions', 'skipRequests', 'cancelRequests', 'reviews']);
+        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'results.assetLinks', 'revisions', 'skipRequests', 'cancelRequests', 'reviews', 'timeLogs']);
 
         if (! $user->can('view-all-odds-tasks')) {
             $query->where(function ($inner) use ($user) {
@@ -66,6 +68,7 @@ class TaskController extends BaseApiController
     public function store(StoreTaskRequest $request): JsonResponse
     {
         $task = $this->intake->create($request->validated(), $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Task ODDS berhasil dibuat.', 201);
     }
@@ -148,6 +151,9 @@ class TaskController extends BaseApiController
             403
         );
 
+        $taskId = (int) $task->id;
+        $audience = $this->realtime->audience($task);
+
         DB::transaction(function () use ($task) {
             $resultIds = $task->results()->withTrashed()->pluck('id');
 
@@ -187,6 +193,8 @@ class TaskController extends BaseApiController
             $task->forceDelete();
         });
 
+        $this->realtime->publishDeleted($taskId, $audience);
+
         return $this->sendResponse(null, 'Task ODDS berhasil dihapus dari database.');
     }
 
@@ -207,6 +215,7 @@ class TaskController extends BaseApiController
         abort_unless($task->status === TaskStatusEnum::BRIEF_REVISION_REQUESTED->value, 422, 'Brief hanya bisa diperbarui setelah desainer meminta update.');
 
         $task = $this->intake->updateBrief($task, $request->validated(), $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Brief ODDS berhasil diperbarui.');
     }
@@ -214,6 +223,7 @@ class TaskController extends BaseApiController
     public function returnBrief(NoteRequest $request, Task $task): JsonResponse
     {
         $task = $this->briefs->returnBrief($task, $request->string('note')->toString(), $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Brief ODDS dikembalikan ke client.');
     }
@@ -221,35 +231,47 @@ class TaskController extends BaseApiController
     public function acceptBrief(Request $request, Task $task): JsonResponse
     {
         $task = $this->briefs->acceptBrief($task, $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Brief ODDS diterima dan masuk antrean.');
     }
 
     public function forceContinue(Request $request, Task $task): JsonResponse
     {
-        return $this->sendResponse($this->briefs->forceContinue($task, $request->user()->id), 'Brief ODDS dipaksa lanjut ke antrean.');
+        $task = $this->briefs->forceContinue($task, $request->user()->id);
+        $this->realtime->publishUpdated($task);
+
+        return $this->sendResponse($task, 'Brief ODDS dipaksa lanjut ke antrean.');
     }
 
     public function cancelBrief(ReasonRequest $request, Task $task): JsonResponse
     {
         $task = $this->briefs->cancelBySpv($task, $request->string('reason')->toString(), $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Task ODDS dibatalkan SPV.');
     }
 
     public function start(Request $request, Task $task): JsonResponse
     {
-        return $this->sendResponse($this->workReviews->start($task, $request->user()->id), 'Task ODDS dimulai.');
+        $task = $this->workReviews->start($task, $request->user()->id);
+        $this->realtime->publishUpdated($task);
+
+        return $this->sendResponse($task, 'Task ODDS dimulai.');
     }
 
     public function pause(Request $request, Task $task): JsonResponse
     {
-        return $this->sendResponse($this->workReviews->pause($task, $request->user()->id), 'Pengerjaan task ODDS dipause.');
+        $task = $this->workReviews->pause($task, $request->user()->id);
+        $this->realtime->publishUpdated($task);
+
+        return $this->sendResponse($task, 'Pengerjaan task ODDS dipause.');
     }
 
     public function submitResult(SubmitResultRequest $request, Task $task): JsonResponse
     {
         $result = $this->workReviews->submitResult($task, $request->validated(), $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($result, 'Hasil ODDS berhasil dikirim ke SPV.', 201);
     }
@@ -257,6 +279,7 @@ class TaskController extends BaseApiController
     public function spvReview(SpvReviewRequest $request, Task $task): JsonResponse
     {
         $task = $this->workReviews->spvReview($task, $request->validated(), $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Review SPV ODDS berhasil disimpan.');
     }
@@ -265,6 +288,7 @@ class TaskController extends BaseApiController
     {
         $this->authorizeTaskView($request, $task);
         $task = $this->workReviews->clientReview($task, $request->validated(), $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Review client ODDS berhasil disimpan.');
     }
@@ -273,6 +297,7 @@ class TaskController extends BaseApiController
     {
         $this->authorizeTaskView($request, $task);
         $task = $this->workReviews->rate($task, $request->validated(), $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Rating ODDS berhasil disimpan.');
     }
@@ -281,13 +306,16 @@ class TaskController extends BaseApiController
     {
         $this->authorizeTaskView($request, $task);
         $result = $this->escalations->requestCancel($task, $request->user()->id, $request->string('reason')->toString());
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($result, 'Permintaan cancel ODDS berhasil diproses.');
     }
 
     public function reassign(ReassignTaskRequest $request, Task $task): JsonResponse
     {
+        $previousAudience = $this->realtime->audience($task);
         $task = $this->escalations->reassign($task, $request->integer('designer_id'), $request->user()->id);
+        $this->realtime->publishUpdated($task, $previousAudience);
 
         return $this->sendResponse($task, 'Task ODDS berhasil direassign.');
     }
@@ -296,6 +324,7 @@ class TaskController extends BaseApiController
     {
         $data = $request->validated();
         $task = $this->escalations->extendDeadline($task, $data['deadline'], $data['note'] ?? null, $request->user()->id);
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($task, 'Deadline ODDS berhasil diperpanjang.');
     }

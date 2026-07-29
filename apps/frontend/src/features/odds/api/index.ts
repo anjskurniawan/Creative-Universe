@@ -1,4 +1,4 @@
-import { ApiError, ValidationError, apiFetch } from "@/core/api/client";
+import { ApiError, ValidationError, apiFetch, type ApiRequestOptions } from "@/core/api/client";
 
 export interface OddsPagination<T> {
   data: T[];
@@ -25,6 +25,7 @@ export interface OddsCategory {
   normal_revision_limit: number;
   sla_minutes: number;
   important_matrix?: string;
+  brief_format?: "default" | "table";
   is_active: boolean;
 }
 
@@ -81,6 +82,19 @@ export interface OddsTaskResult {
   status: string;
   submitted_at: string;
   asset_links?: Array<{ id: number; label: string; url: string; provider: string }>;
+}
+
+export interface OddsTaskReview {
+  id: number;
+  task_id: number;
+  result_id?: number | null;
+  reviewer_id?: number | null;
+  review_type: string;
+  decision: string;
+  notes?: string | null;
+  rating?: number | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface OddsTaskRevision {
@@ -169,6 +183,7 @@ export interface OddsTask {
   currentQueue?: OddsQueueEntry;
   brief?: OddsTaskBrief;
   results?: OddsTaskResult[];
+  reviews?: OddsTaskReview[];
   revisions?: OddsTaskRevision[];
   cancel_requests?: OddsTaskCancelRequest[];
   cancelRequests?: OddsTaskCancelRequest[];
@@ -362,6 +377,7 @@ export async function createOddsCategory(input: {
   normal_revision_limit: number;
   sla_minutes: number;
   important_matrix?: string;
+  brief_format?: "default" | "table";
   is_active?: boolean;
 }): Promise<OddsCategory> {
   return apiFetch<OddsCategory>("/odds/categories", {
@@ -378,6 +394,7 @@ export async function updateOddsCategory(
     normal_revision_limit: number;
     sla_minutes: number;
     important_matrix: string;
+    brief_format: "default" | "table";
     is_active: boolean;
   }>
 ): Promise<OddsCategory> {
@@ -455,8 +472,8 @@ export async function deleteOddsSystemRule(id: string | number): Promise<void> {
   await apiFetch<null>(`/odds/system-rules/${id}`, { method: "DELETE" });
 }
 
-export async function getOddsTasks(): Promise<OddsPagination<OddsTask>> {
-  return normalizePage(await apiFetch<OddsPagination<OddsTask>>("/odds/tasks?per_page=50"));
+export async function getOddsTasks(options?: ApiRequestOptions): Promise<OddsPagination<OddsTask>> {
+  return normalizePage(await apiFetch<OddsPagination<OddsTask>>("/odds/tasks?per_page=50", options));
 }
 
 export async function getOddsTask(id: string | number): Promise<OddsTask> {

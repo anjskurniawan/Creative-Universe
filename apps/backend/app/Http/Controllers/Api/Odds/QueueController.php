@@ -9,12 +9,16 @@ use App\SubApps\Odds\Models\Task;
 use App\SubApps\Odds\Models\TaskQueue;
 use App\SubApps\Odds\Models\TaskSkipRequest;
 use App\SubApps\Odds\Services\OddsQueueService;
+use App\SubApps\Odds\Services\OddsTaskRealtimeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class QueueController extends BaseApiController
 {
-    public function __construct(private OddsQueueService $queue) {}
+    public function __construct(
+        private OddsQueueService $queue,
+        private OddsTaskRealtimeService $realtime,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -37,6 +41,7 @@ class QueueController extends BaseApiController
     public function requestSkip(ReasonRequest $request, Task $task): JsonResponse
     {
         $skip = $this->queue->requestSkip($task, $request->user()->id, $request->string('reason')->toString());
+        $this->realtime->publishUpdated($task);
 
         return $this->sendResponse($skip, 'Permintaan skip ODDS berhasil dikirim.', 201);
     }
@@ -45,6 +50,9 @@ class QueueController extends BaseApiController
     {
         $data = $request->validated();
 
-        return $this->sendResponse($this->queue->reviewSkip($skipRequest, $request->user()->id, $data['decision'], $data['note'] ?? null), 'Review skip ODDS berhasil disimpan.');
+        $skip = $this->queue->reviewSkip($skipRequest, $request->user()->id, $data['decision'], $data['note'] ?? null);
+        $this->realtime->publishUpdated(Task::findOrFail($skipRequest->task_id));
+
+        return $this->sendResponse($skip, 'Review skip ODDS berhasil disimpan.');
     }
 }

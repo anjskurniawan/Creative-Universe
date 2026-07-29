@@ -46,17 +46,22 @@ export function OddsRichTextEditor({
   minHeight = 220,
   placeholder = "Tulis kebutuhan desain, ukuran, copy, channel, dan output final.",
   onUploadImage,
+  toolbarMode = "always",
+  fillHeight = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   minHeight?: number;
   placeholder?: string;
   onUploadImage?: (files: FileList | File[]) => Promise<RichTextUpload[]>;
+  toolbarMode?: "always" | "focus";
+  fillHeight?: boolean;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const savedRangeRef = useRef<Range | null>(null);
   const [imageUploading, setImageUploading] = useState(false);
   const [activeTools, setActiveTools] = useState<string[]>([]);
+  const [isFocused, setIsFocused] = useState(false);
   const isEmpty = !stripRichText(value);
 
   useEffect(() => {
@@ -151,8 +156,8 @@ export function OddsRichTextEditor({
   ];
 
   return (
-    <div className="overflow-hidden rounded-lg border border-cu-border bg-white">
-      <div className="odds-scroll-hidden flex items-center gap-1 overflow-x-auto border-b border-cu-border bg-cu-panel-soft p-1.5">
+    <div className={`relative min-w-0 rounded-lg border border-cu-border bg-white ${fillHeight ? "flex h-full flex-col" : ""} ${toolbarMode === "focus" ? "overflow-visible" : "overflow-hidden"}`}>
+      {(toolbarMode === "always" || isFocused) && <div className={`odds-scroll-hidden flex items-center gap-1 overflow-x-auto border-b border-cu-border bg-cu-panel-soft p-1.5 ${toolbarMode === "focus" ? "absolute bottom-full left-0 right-0 z-30 mb-1 rounded-lg border shadow-lg" : ""}`}>
         {tools.map((tool) => (
           <button
             key={tool.command}
@@ -177,8 +182,8 @@ export function OddsRichTextEditor({
             <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple disabled={imageUploading} onChange={(event) => event.target.files && void insertImages(event.target.files)} className="sr-only" />
           </label>
         )}
-      </div>
-      <div className="relative">
+      </div>}
+      <div className={`relative ${fillHeight ? "flex min-h-0 flex-1 flex-col" : ""}`}>
         {isEmpty && <span className="pointer-events-none absolute left-3 top-3 text-sm text-cu-muted">{placeholder}</span>}
         <div
           ref={editorRef}
@@ -193,7 +198,11 @@ export function OddsRichTextEditor({
           onKeyUp={() => { syncActiveTools(); rememberSelection(); }}
           onMouseUp={() => { syncActiveTools(); rememberSelection(); }}
           onKeyDown={rememberSelection}
-          onFocus={syncActiveTools}
+          onFocus={() => {
+            setIsFocused(true);
+            syncActiveTools();
+          }}
+          onBlur={() => setIsFocused(false)}
           onPaste={(event) => {
             const items = Array.from(event.clipboardData.items || []);
             const pastedImages: File[] = [];
@@ -218,8 +227,8 @@ export function OddsRichTextEditor({
             event.preventDefault();
             pastePlainTextAsParagraphs(event.clipboardData.getData("text/plain"));
           }}
-          className="odds-scroll-hidden overflow-y-auto bg-white px-3 py-2 text-sm leading-6 text-cu-ink outline-none [&_a]:font-semibold [&_a]:text-cu-info [&_a]:underline [&_figcaption]:mt-1 [&_figcaption]:text-xs [&_figcaption]:text-cu-muted [&_figure]:my-3 [&_figure]:inline-block [&_figure]:max-w-md [&_img]:max-h-56 [&_img]:max-w-full [&_img]:rounded-lg [&_img]:border [&_img]:border-cu-border [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_ul]:list-disc"
-          style={{ minHeight }}
+          className={`odds-scroll-hidden min-w-0 break-all overflow-y-auto bg-white px-3 py-2 text-sm leading-6 text-cu-ink outline-none [overflow-wrap:anywhere] [&_a]:font-semibold [&_a]:text-cu-info [&_a]:underline [&_figcaption]:mt-1 [&_figcaption]:text-xs [&_figcaption]:text-cu-muted [&_figure]:my-3 [&_figure]:inline-block [&_figure]:max-w-md [&_img]:max-h-56 [&_img]:max-w-full [&_img]:rounded-lg [&_img]:border [&_img]:border-cu-border [&_li]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_ul]:list-disc ${fillHeight ? "min-h-0 flex-1" : ""}`}
+          style={fillHeight ? undefined : { minHeight }}
         />
       </div>
     </div>

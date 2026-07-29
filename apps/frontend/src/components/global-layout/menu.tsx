@@ -9,6 +9,7 @@ export type MenuItem = {
   icon?: string;
   badge?: number | string;
   group?: string;
+  isActive?: boolean;
 };
 
 export type MenuProps = {

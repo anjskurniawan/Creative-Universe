@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { MaterialIcon } from "@/components/material-icon";
+import { TaskFeedbackToast } from "@/components/odds/TaskCard/task-feedback-toast";
 import {
   chatApi,
   subscribeToConversationMessages,
@@ -30,36 +31,55 @@ function participantNames(conversation: OddsTaskConversation): string {
 }
 
 function userInitial(name: string | null | undefined): string {
-  return (name ?? "?").trim().charAt(0).toUpperCase() || "?";
+  const initials = (name ?? "?").trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join("");
+  return initials || "?";
 }
 
 function userAvatarUrl(user: ChatMessage["sender"]): string | null {
   return user?.avatar ?? user?.avatar_path ?? null;
 }
 
-function isClientSender(message: ChatMessage): boolean {
-  return (message.sender?.roles ?? []).some((role) => role.toLowerCase().includes("client"));
-}
-
 function isDesignerSender(message: ChatMessage): boolean {
-  return (message.sender?.roles ?? []).some((role) => role.toLowerCase().includes("designer"));
+  const roles = (message.sender?.roles ?? []).map((role) => String(role).toLowerCase());
+  const identity = `${message.sender?.name ?? ""} ${message.sender?.username ?? ""}`.toLowerCase();
+  return roles.some((role) => role.includes("designer") || role.includes("videographer")) || identity.includes("designer");
 }
 
-function ChatAvatar({ sender, align }: { sender: ChatMessage["sender"]; align: "left" | "right" }) {
+function ChatAvatar({ sender, align, compact = false }: { sender: ChatMessage["sender"]; align: "left" | "right"; compact?: boolean }) {
   const avatarUrl = userAvatarUrl(sender);
+  const avatarClass = compact
+    ? "bg-slate-200 text-[#3b4446]"
+    : align === "right"
+      ? "border border-[#bdeaff] bg-[#e5f6fd] text-[#00a4ff]"
+      : "border border-white bg-white text-[#806272] shadow-[0_1px_2px_rgba(44,42,39,0.08)]";
 
   return (
     <span
-      className={`flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border text-[11px] font-bold leading-none ${
-        align === "right"
-          ? "border-[#bdeaff] bg-[#e5f6fd] text-[#00a4ff]"
-          : "border-white bg-white text-[#806272] shadow-[0_1px_2px_rgba(44,42,39,0.08)]"
-      }`}
+      className={`flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full ${compact ? "text-[10px]" : "text-[11px]"} font-bold leading-none ${avatarClass}`}
       aria-hidden="true"
     >
       {avatarUrl ? <img src={avatarUrl} alt="" className="size-full object-cover" /> : userInitial(sender?.name)}
     </span>
   );
+}
+
+function MessageActionSkeleton() {
+  return <div className="animate-pulse space-y-4" aria-label="Memuat diskusi task" aria-busy="true">
+    {["first", "second"].map((key, index) => <div key={key} className="flex items-start gap-2">
+      <span className="size-8 shrink-0 rounded-full bg-slate-200" />
+      <div className={`min-w-0 flex-1 rounded-lg p-2 ${index === 0 ? "bg-[#f3fbff]" : "bg-[#f3fff3]"}`}>
+        <span className="block h-3 w-20 rounded bg-slate-200/80" />
+        <span className="mt-2 block h-3 w-3/4 rounded bg-slate-200/70" />
+        <span className="mt-2 ml-auto block h-2 w-8 rounded bg-slate-200/60" />
+      </div>
+    </div>)}
+    <div className="flex items-center gap-2 rounded-lg bg-white p-2 shadow-[0_5px_14px_rgba(44,42,39,0.06)]">
+      <span className="size-9 shrink-0 rounded-full bg-slate-100" />
+      <span className="size-9 shrink-0 rounded-full bg-slate-100" />
+      <span className="h-4 flex-1 rounded bg-slate-100" />
+      <span className="size-9 shrink-0 rounded-full bg-sky-100" />
+    </div>
+  </div>;
 }
 
 export function OddsTaskChat({
@@ -132,14 +152,29 @@ export function OddsTaskChat({
     if (!conversation?.can_send || !draft.trim() || sending) return;
 
     const body = draft.trim();
+    const optimisticId = `optimistic-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const optimisticMessage: ChatMessage = {
+      id: optimisticId,
+      conversation_id: Number(conversation.id),
+      sender_id: userId ?? undefined,
+      body,
+      created_at: new Date().toISOString(),
+      read_state: "sending",
+      sender: conversation.participants?.find((participant) => Number(participant.id) === Number(userId)) ?? {
+        id: Number(userId ?? 0),
+        name: "Anda",
+      },
+    };
     setDraft("");
     setSending(true);
     setError(null);
+    setMessages((prev) => [...prev, optimisticMessage]);
     try {
       const message = await chatApi.send({ conversation_id: conversation.id, body });
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => prev.map((item) => item.id === optimisticId ? message : item));
     } catch (err) {
       setDraft(body);
+      setMessages((prev) => prev.map((item) => item.id === optimisticId ? { ...item, read_state: "failed" } : item));
       setError(err instanceof Error ? err.message : "Gagal mengirim pesan.");
     } finally {
       setSending(false);
@@ -148,7 +183,8 @@ export function OddsTaskChat({
   };
 
   return (
-    <section className={compact ? "bg-transparent" : "rounded-lg border border-cu-border bg-white p-5"}>
+    <section className={compact ? "bg-transparent px-2 pb-1" : "rounded-lg border border-cu-border bg-white p-5"}>
+      <TaskFeedbackToast toast={error ? { status: "error", message: error } : null} onClose={() => setError(null)} />
       {!compact && (
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
@@ -194,7 +230,7 @@ export function OddsTaskChat({
       )}
 
       {loading ? (
-        <p className={`${compact ? "px-3 py-4" : "rounded-lg border border-dashed border-cu-border px-3 py-4"} text-sm text-cu-muted`}>Memuat chat task...</p>
+        compact ? <MessageActionSkeleton /> : <p className="rounded-lg border border-dashed border-cu-border px-3 py-4 text-sm text-cu-muted">Memuat chat task...</p>
       ) : !conversation ? (
         <div className={`${compact ? "px-3 py-4" : "rounded-lg border border-dashed border-cu-border px-3 py-4"}`}>
           {error ? (
@@ -223,30 +259,39 @@ export function OddsTaskChat({
             </p>
           )}
 
-          <div ref={messagesPanelRef} className={`${compact ? "max-h-72 min-h-40 bg-transparent px-4 py-4" : "max-h-80 min-h-48 rounded-lg border border-cu-border bg-cu-panel-soft p-3"} overflow-y-auto`}>
+          <div ref={messagesPanelRef} className={`${compact ? "max-h-72 min-h-40 bg-transparent" : "max-h-80 min-h-48 rounded-lg border border-cu-border bg-cu-panel-soft p-3"} overflow-y-auto`}>
             <div className="space-y-4">
               {messages.map((message) => {
-                const roleSide = isDesignerSender(message) ? "right" : isClientSender(message) ? "left" : Number(message.sender_id) === Number(userId) ? "right" : "left";
-                const isRight = roleSide === "right";
+                const isLeaderView = Boolean(
+                  conversation.task
+                  && Number(userId) !== Number(conversation.task.requester_id)
+                  && Number(userId) !== Number(conversation.task.assigned_designer_id),
+                );
+                const isCurrentUser = Number(message.sender_id) === Number(userId);
+                const designerMessage = isDesignerSender(message);
+                const greenBubble = isLeaderView ? designerMessage : isCurrentUser;
+                const isRight = !isLeaderView && isCurrentUser;
                 return (
-                  <div key={message.id} className={`flex items-end gap-2 ${isRight ? "justify-end" : "justify-start"}`}>
-                    {!isRight && <ChatAvatar sender={message.sender} align="left" />}
-                    <div className={`flex max-w-[72%] flex-col ${isRight ? "items-end" : "items-start"}`}>
-                      <div className={`mb-1 flex items-center gap-2 text-[11px] ${isRight ? "justify-end text-[#00a4ff]" : "justify-start text-[#806272]"}`}>
-                        <span className="font-semibold">{message.sender?.name ?? (isRight ? "Designer" : "Client")}</span>
-                        <span className="text-[#9aa3ad]">{formatChatTime(message.created_at)}</span>
+                  <div key={message.id} className={`flex items-start gap-2 ${isRight ? "justify-end" : "justify-start"}`}>
+                    {!isRight && <ChatAvatar sender={message.sender} align="left" compact={compact} />}
+                    {compact ? (
+                      <div className={`min-w-0 w-fit max-w-[calc(100%-2.5rem)] rounded-lg p-2 ${greenBubble ? "bg-[#f3fff3]" : "bg-[#f3fbff]"}`}>
+                        <p className={`text-xs font-medium ${greenBubble ? "text-[#1caa00]" : "text-[#0077bf]"}`}>{message.sender?.name ?? (designerMessage ? "Designer" : "Client")}</p>
+                        <p className="mt-1 whitespace-pre-wrap text-sm leading-5 text-black">{message.body}</p>
+                        <p className={`mt-1 text-right text-xs ${message.read_state === "failed" ? "text-rose-500" : message.read_state === "sending" ? "text-[#7d7c7c]" : "text-[#7d7c7c]"}`}>{message.read_state === "failed" ? "Gagal dikirim" : message.read_state === "sending" ? "Mengirim..." : formatChatTime(message.created_at)}</p>
                       </div>
-                      <div
-                        className={`rounded-2xl px-3.5 py-2.5 text-sm shadow-[0_2px_6px_rgba(44,42,39,0.06)] ${
-                          isRight
-                            ? "rounded-br-md bg-[#00a4ff] text-white"
-                            : "rounded-bl-md border border-white/80 bg-white text-[#303431]"
-                        }`}
-                      >
-                        <p className="whitespace-pre-wrap leading-5">{message.body}</p>
+                    ) : (
+                      <div className="flex max-w-[72%] flex-col items-start">
+                        <div className="flex items-center gap-2 text-[11px] text-[#806272]">
+                          <span className="font-semibold">{message.sender?.name ?? (designerMessage ? "Designer" : "Client")}</span>
+                          <span className={message.read_state === "failed" ? "text-rose-500" : "text-[#9aa3ad]"}>{message.read_state === "failed" ? "Gagal dikirim" : message.read_state === "sending" ? "Mengirim..." : formatChatTime(message.created_at)}</span>
+                        </div>
+                        <div className={`rounded-2xl rounded-bl-md px-3.5 py-2.5 text-sm shadow-[0_2px_6px_rgba(44,42,39,0.06)] ${greenBubble ? "bg-[#f3fff3] text-[#303431]" : "border border-white/80 bg-[#f3fbff] text-[#303431]"}`}>
+                          <p className="whitespace-pre-wrap leading-5">{message.body}</p>
+                        </div>
                       </div>
-                    </div>
-                    {isRight && <ChatAvatar sender={message.sender} align="right" />}
+                    )}
+                    {isRight && <ChatAvatar sender={message.sender} align="right" compact={compact} />}
                   </div>
                 );
               })}
@@ -256,26 +301,32 @@ export function OddsTaskChat({
             </div>
           </div>
 
-          {error && <p className="mt-3 text-sm text-cu-danger">{error}</p>}
-
           {conversation.can_send ? (
-            <form onSubmit={submitMessage} className={`${compact ? "border-t border-cu-border bg-white px-3 py-2" : "mt-3"} flex items-center gap-2`}>
+            <form onSubmit={submitMessage} className={`${compact ? "mt-4 rounded-lg bg-white p-2 shadow-[0_5px_14px_rgba(44,42,39,0.06)]" : "mt-3"} flex items-center gap-2`}>
+              {compact && <><button type="button" className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[#7d7c7c] transition hover:bg-[#f3fbff] hover:text-[#0077bf]" aria-label="Tambah lampiran"><MaterialIcon name="add" size="sm" /></button><button type="button" className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[#7d7c7c] transition hover:bg-[#f3fbff] hover:text-[#0077bf]" aria-label="Pilih stiker"><MaterialIcon name="mood" size="sm" /></button></>}
               <input
                 ref={inputRef}
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
-                placeholder="Tulis pesan task..."
-                className={`${compact ? "h-9" : "h-10"} min-w-0 flex-1 rounded-lg border border-cu-border px-3 text-sm outline-none focus:border-cu-info`}
+                placeholder={compact ? "Type a message" : "Tulis pesan task..."}
+                className={`${compact ? "h-9 border-0 px-1" : "h-10 rounded-lg border border-cu-border px-3"} min-w-0 flex-1 text-sm outline-none focus:border-cu-info`}
               />
               <button
                 type="submit"
                 disabled={!draft.trim() || sending}
-                className={`${compact ? "size-9" : "size-10"} inline-flex shrink-0 items-center justify-center rounded-lg bg-cu-info text-white transition hover:bg-cu-info/90 disabled:opacity-50`}
+                className={`${compact ? "size-9 rounded-full" : "size-10 rounded-lg"} inline-flex shrink-0 items-center justify-center bg-[#00a4ff] text-white transition hover:bg-[#0077bf] disabled:opacity-50`}
                 aria-label="Kirim pesan"
               >
                 <MaterialIcon name="send" size="sm" />
               </button>
             </form>
+          ) : compact ? (
+            <div className="mt-4 flex items-center gap-2 rounded-lg bg-white p-2 shadow-[0_5px_14px_rgba(44,42,39,0.06)]" aria-label="Composer chat tidak aktif">
+              <button type="button" disabled className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[#7d7c7c] opacity-40" aria-label="Tambah lampiran"><MaterialIcon name="add" size="sm" /></button>
+              <button type="button" disabled className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-[#7d7c7c] opacity-40" aria-label="Pilih stiker"><MaterialIcon name="mood" size="sm" /></button>
+              <input disabled value="" placeholder="Anda hanya dapat melihat percakapan ini." className="h-9 min-w-0 flex-1 border-0 bg-transparent px-1 text-sm text-[#7d7c7c] outline-none placeholder:text-[#7d7c7c]" />
+              <button type="button" disabled className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#00a4ff] text-white opacity-40" aria-label="Kirim pesan"><MaterialIcon name="send" size="sm" /></button>
+            </div>
           ) : (
             <p className="mt-3 rounded-lg border border-dashed border-cu-border px-3 py-3 text-sm text-cu-muted">
               Anda hanya bisa melihat riwayat chat task ini.

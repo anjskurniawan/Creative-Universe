@@ -1,10 +1,10 @@
-import type { MenuItem } from "../components/content/menu";
+import type { MenuItem } from "@/components/global-layout/menu";
 
 const profileCardMenu: MenuItem = {
-  label: "ProfileCard",
+  label: "Profile Card",
   href: "#profile-card",
   icon: "badge",
-  group: "ProfileCard",
+  group: "Profile Card",
 };
 
 export default profileCardMenu;

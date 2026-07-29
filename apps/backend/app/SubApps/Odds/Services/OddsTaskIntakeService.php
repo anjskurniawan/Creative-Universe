@@ -87,6 +87,7 @@ class OddsTaskIntakeService
                     'normal_revision_limit' => $category->normal_revision_limit,
                     'sla_minutes' => $category->sla_minutes,
                     'important_matrix' => $category->important_matrix ?? 'Q4',
+                    'brief_format' => $category->brief_format ?? 'default',
                 ],
                 'requester_id' => $userId,
                 'preferred_designer_id' => $preferredDesignerId,

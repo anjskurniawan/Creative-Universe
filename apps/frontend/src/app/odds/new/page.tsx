@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { MaterialIcon } from "@/components/material-icon";
 import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
+import { TaskFeedbackToast } from "@/components/odds/TaskCard";
 import { useOddsTheme } from "../odds-theme-context";
 import { ModernWizard } from "@/features/odds/components/modern-wizard";
 import { stripRichText } from "@/components/odds-rich-text-editor";
@@ -315,7 +316,6 @@ export default function NewOddsTaskPage() {
           onRemoveAttachment={(id) => setUploadedAttachments((items) => items.filter((item) => item.id !== id))}
           loading={loading}
           initializing={initializing}
-          error={error}
           submit={submit}
         />
       </div>
@@ -324,6 +324,7 @@ export default function NewOddsTaskPage() {
 
   return (
     <div ref={pageRef} className="relative h-full min-h-0 w-full font-mono text-[#24252b] p-4">
+      <TaskFeedbackToast toast={error ? { status: "error", message: error } : null} onClose={() => setError(null)} />
       {launchSequence !== "idle" && (
         <div ref={launchSplashRef} className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden rounded-[30px] border-[3px] border-[#24252b] bg-[#24252b] p-6 text-center text-[#eceee6]">
           <span className="absolute inset-x-0 top-0 h-2 bg-[#ba0dcb]" />
@@ -353,8 +354,6 @@ export default function NewOddsTaskPage() {
         action={<Link href="/odds" className="rounded-md border-2 border-[#24252b] bg-[#eceee6] px-3 py-1.5 shadow-[0_2px_0_#24252b] transition active:translate-y-0.5 active:shadow-none">Exit</Link>}
         className="h-full"
       >
-
-        {error && <div className="mb-3 border-2 border-[#24252b] bg-[#f2b8f6] px-3 py-2 text-xs font-black uppercase">Error: {error}</div>}
 
         {!gameStarted ? (
           <WelcomeScreen

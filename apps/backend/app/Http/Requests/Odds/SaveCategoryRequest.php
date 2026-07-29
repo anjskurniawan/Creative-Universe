@@ -14,6 +14,7 @@ class SaveCategoryRequest extends OddsFormRequest
             'normal_revision_limit' => [$presence, 'integer', 'min:0'],
             'sla_minutes' => [$presence, 'integer', 'min:1'],
             'important_matrix' => ['sometimes', 'string', 'in:Q1,Q2,Q3,Q4'],
+            'brief_format' => ['sometimes', 'string', 'in:default,table'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

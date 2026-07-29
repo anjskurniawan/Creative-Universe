@@ -40,4 +40,19 @@ class MessageSent implements ShouldBroadcastNow
     {
         return 'message.sent';
     }
+
+    public function broadcastWith(): array
+    {
+        $message = $this->message->loadMissing(['sender.roles:id,name', 'replyTo.sender.roles:id,name']);
+        $payload = $message->toArray();
+
+        if ($message->sender) {
+            $payload['sender']['roles'] = $message->sender->roles->pluck('name')->values()->all();
+        }
+        if ($message->replyTo?->sender) {
+            $payload['reply_to']['sender']['roles'] = $message->replyTo->sender->roles->pluck('name')->values()->all();
+        }
+
+        return ['message' => $payload];
+    }
 }

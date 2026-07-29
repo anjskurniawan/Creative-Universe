@@ -50,7 +50,7 @@ class ChatController extends BaseApiController
 
         $perPage = min(max($request->integer('per_page', 40), 1), 80);
         $page = $conversation->messages()
-            ->with(['sender:id,name,avatar_path', 'replyTo.sender:id,name,avatar_path'])
+            ->with(['sender:id,name,avatar_path', 'sender.roles:id,name', 'replyTo.sender:id,name,avatar_path', 'replyTo.sender.roles:id,name'])
             ->latest('id')
             ->paginate($perPage);
         $messages = $page->getCollection()->reverse()->values();
@@ -198,7 +198,7 @@ class ChatController extends BaseApiController
             return $message;
         });
 
-        $message->load(['sender:id,name,avatar_path', 'replyTo.sender:id,name,avatar_path']);
+        $message->load(['sender:id,name,avatar_path', 'sender.roles:id,name', 'replyTo.sender:id,name,avatar_path', 'replyTo.sender.roles:id,name']);
         $this->notifyMentions($message, $mentionedUserIds);
 
         broadcast(new MessageSent($message))->toOthers();
@@ -243,7 +243,14 @@ class ChatController extends BaseApiController
 
     private function messagePayload(Message $message, int $viewerId): array
     {
+        $message->loadMissing(['sender.roles:id,name', 'replyTo.sender.roles:id,name']);
         $payload = $message->toArray();
+        if ($message->sender) {
+            $payload['sender']['roles'] = $message->sender->roles->pluck('name')->values()->all();
+        }
+        if ($message->replyTo?->sender) {
+            $payload['reply_to']['sender']['roles'] = $message->replyTo->sender->roles->pluck('name')->values()->all();
+        }
         $payload['read_at'] = $message->sender_id === $viewerId ? null : MessageRead::query()
             ->where('message_id', $message->id)->where('user_id', $viewerId)->value('read_at');
         $payload['read_state'] = $message->sender_id === $viewerId

@@ -19,6 +19,7 @@ class Category extends OddsModel
         'normal_revision_limit',
         'sla_minutes',
         'important_matrix',
+        'brief_format',
         'is_active',
         'created_by',
         'updated_by',

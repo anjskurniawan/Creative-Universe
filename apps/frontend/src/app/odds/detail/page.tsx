@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/material-icon";
 import { OddsRichTextEditor, RichTextViewer, stripRichText } from "@/components/odds-rich-text-editor";
 import { OddsTaskChat } from "@/components/odds-task-chat";
+import { TaskFeedbackToast } from "@/components/odds/TaskCard";
 import { useAuth } from "@/providers/auth-provider";
 import {
   OddsDesignerProfile,
@@ -284,6 +285,10 @@ function DetailContent() {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4">
+      <TaskFeedbackToast
+        toast={error ? { status: "error", message: error } : notice ? { status: "success", message: notice } : null}
+        onClose={() => { setError(null); setNotice(null); }}
+      />
       <header className="flex flex-col gap-4 border-b border-cu-border pb-5 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-3">
           <Link
@@ -309,16 +314,6 @@ function DetailContent() {
           {statusLabel(task.status)}
         </span>
       </header>
-
-      {(error || notice) && (
-        <div
-          className={`rounded-lg border px-4 py-3 text-sm ${
-            error ? "border-cu-danger/20 bg-cu-danger/10 text-cu-danger" : "border-cu-success/20 bg-cu-success/10 text-cu-success"
-          }`}
-        >
-          {error || notice}
-        </div>
-      )}
 
       <section className="grid gap-6 xl:grid-cols-[1fr_24rem]">
         <div className="space-y-6">

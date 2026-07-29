@@ -1,10 +1,10 @@
 "use client";
 
 import { type FormEvent, useMemo, useState, useRef, useEffect } from "react";
-import Link from "next/link";
 import { MaterialIcon } from "@/components/material-icon";
 import { type OddsCategory, type OddsDesignerProfile, type OddsTaskAttachment } from "@/features/odds/api";
 import { stripRichText } from "@/components/odds-rich-text-editor";
+import { StandardBriefDetails, TableBriefDetails, TableBriefPreview, type TableBriefRow } from "./brief-details";
 
 type TaskForm = {
   request_type: "design";
@@ -36,23 +36,22 @@ export type ModernWizardProps = {
   onRemoveAttachment: (id: number) => void;
   loading: boolean;
   initializing: boolean;
-  error: string | null;
   submit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 };
-
-const steps = [
-  { step: 1, label: "Format", desc: "Medium" },
-  { step: 2, label: "Kategori", desc: "Kebutuhan" },
-  { step: 3, label: "Talent", desc: "Desainer" },
-  { step: 4, label: "Brief", desc: "Detail Ide" },
-  { step: 5, label: "Review", desc: "Kirim" }
-];
 
 const dateFromNow = (days: number) => {
   const date = new Date();
   date.setDate(date.getDate() + days);
   return date.toLocaleDateString("en-CA");
 };
+
+const escapeBriefTableCell = (value: string) => value.replace(/[&<>'"]/g, (character) => ({
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  "'": "&#39;",
+  '"': "&quot;",
+})[character] ?? character);
 
 export function ModernWizard({
   theme,
@@ -72,7 +71,6 @@ export function ModernWizard({
   onRemoveAttachment,
   loading,
   initializing,
-  error,
   submit,
 }: ModernWizardProps) {
   const dark = theme === "dark";
@@ -87,16 +85,22 @@ export function ModernWizard({
 
   // Mini-step tracking for Step 4
   const [miniStep, setMiniStep] = useState(1);
+  const [tableBriefCategory, setTableBriefCategory] = useState("");
+  const [tableBriefProduct, setTableBriefProduct] = useState("");
+  const [tableBriefPackagingImageName, setTableBriefPackagingImageName] = useState("");
+  const [tableBriefPackagingImageId, setTableBriefPackagingImageId] = useState<number | null>(null);
+  const [tableBriefRows, setTableBriefRows] = useState<TableBriefRow[]>([
+    { id: "image-1", image_order: "1", image_description: "", image_illustration: "", image_illustration_id: null, additional_notes: "" },
+  ]);
+  const tableBriefRowCounter = useRef(2);
+  const [uploadingIllustrationId, setUploadingIllustrationId] = useState<string | null>(null);
+  const usesTableBrief = selectedCategory?.brief_format === "table";
 
 
   // Design Tokens matching Pattern_KV_Retail_Performance_Themes.md
   const containerClass = dark
     ? "bg-[#111413]/90 border border-white/10 shadow-2xl backdrop-blur-md rounded-3xl"
     : "bg-white/90 border border-[#BDEAFF] shadow-[0_16px_48px_rgba(4,4,74,0.08)] backdrop-blur-md rounded-3xl";
-
-  const panelClass = dark
-    ? "bg-[#171717] border border-white/5 rounded-2xl p-6"
-    : "bg-[#F3FAFF] border border-[#BDEAFF] rounded-2xl p-6";
 
   const innerSurfaceClass = dark
     ? "bg-[#0E0E0E] rounded-2xl p-4 border border-white/5"
@@ -138,10 +142,92 @@ export function ModernWizard({
       if (miniStep === 1) return !!form.design_purpose.trim();
       if (miniStep === 2) return true;
       if (miniStep === 3) return true;
-      if (miniStep === 4) return !!stripRichText(form.brief_text).trim();
+      if (miniStep === 4) return usesTableBrief
+        ? Boolean(tableBriefProduct.trim()) || tableBriefRows.some((row) => [row.image_description, row.image_illustration, row.additional_notes].some((value) => value.trim()))
+        : !!stripRichText(form.brief_text).trim();
     }
     return true;
-  }, [currentStep, miniStep, form]);
+  }, [currentStep, miniStep, form, tableBriefRows, usesTableBrief]);
+
+  const buildTableBriefMarkup = (category: string, product: string, packagingImageName: string, rows: TableBriefRow[]) => `<h3>Detail Packaging</h3><table><tbody><tr><th>Kategori</th><td>${escapeBriefTableCell(category)}</td></tr><tr><th>Product</th><td>${escapeBriefTableCell(product)}</td></tr><tr><th>Gambar Packaging</th><td>${escapeBriefTableCell(packagingImageName)}</td></tr></tbody></table><table><thead><tr><th>Urutan gambar</th><th>Deskripsi Gambar</th><th>Ilustrasi Gambar</th><th>Keterangan Tambahan</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td>${row.image_description}</td><td>${escapeBriefTableCell(row.image_illustration)}</td><td>${row.additional_notes}</td></tr>`).join("")}</tbody></table>`;
+
+  const syncTableBrief = (category: string, product: string, packagingImageName: string, rows: TableBriefRow[]) => {
+    update("brief_text", buildTableBriefMarkup(category, product, packagingImageName, rows));
+  };
+
+  const updateTableBriefRow = (id: string, field: keyof Omit<TableBriefRow, "id">, value: string) => {
+    setTableBriefRows((currentRows) => {
+      const nextRows = currentRows.map((row) => row.id === id ? { ...row, [field]: value } : row);
+      syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
+      return nextRows;
+    });
+  };
+
+  const updateTableBriefCategory = (value: string) => {
+    setTableBriefCategory(value);
+    syncTableBrief(value, tableBriefProduct, tableBriefPackagingImageName, tableBriefRows);
+  };
+
+  const updateTableBriefProduct = (value: string) => {
+    setTableBriefProduct(value);
+    syncTableBrief(tableBriefCategory, value, tableBriefPackagingImageName, tableBriefRows);
+  };
+
+  const uploadTableBriefPackagingImage = async (files: FileList | null) => {
+    const [uploaded] = await addAttachmentFiles(files);
+    if (!uploaded) return;
+    setTableBriefPackagingImageName(uploaded.name);
+    setTableBriefPackagingImageId(uploaded.id);
+    syncTableBrief(tableBriefCategory, tableBriefProduct, uploaded.name, tableBriefRows);
+  };
+
+  const uploadTableBriefIllustration = async (id: string, files: FileList | null) => {
+    setUploadingIllustrationId(id);
+    try {
+      const [uploaded] = await addAttachmentFiles(files);
+      if (uploaded) {
+        setTableBriefRows((currentRows) => {
+          const nextRows = currentRows.map((row) => row.id === id ? { ...row, image_illustration: uploaded.name, image_illustration_id: uploaded.id } : row);
+          syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
+          return nextRows;
+        });
+      }
+    } finally {
+      setUploadingIllustrationId(null);
+    }
+  };
+
+  const addTableBriefRow = () => {
+    setTableBriefRows((currentRows) => {
+      const nextRows = [...currentRows, { id: `image-${tableBriefRowCounter.current++}`, image_order: "", image_description: "", image_illustration: "", image_illustration_id: null, additional_notes: "" }];
+      syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
+      return nextRows;
+    });
+  };
+
+  const removeTableBriefRow = (id: string) => {
+    setTableBriefRows((currentRows) => {
+      if (currentRows.length === 1) return currentRows;
+      const nextRows = currentRows.filter((row) => row.id !== id);
+      syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
+      return nextRows;
+    });
+  };
+
+  const reorderTableBriefRows = (sourceId: string, targetId: string) => {
+    setTableBriefRows((currentRows) => {
+      const sourceIndex = currentRows.findIndex((row) => row.id === sourceId);
+      const targetIndex = currentRows.findIndex((row) => row.id === targetId);
+      if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return currentRows;
+
+      const nextRows = [...currentRows];
+      const [movedRow] = nextRows.splice(sourceIndex, 1);
+      const insertionIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
+      nextRows.splice(insertionIndex, 0, movedRow);
+      syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
+      return nextRows;
+    });
+  };
 
   const handleNextStep = () => {
     if (!canGoNext) return;
@@ -206,86 +292,6 @@ export function ModernWizard({
 
   return (
     <div className={`flex w-full flex-col flex-1 min-h-0 ${dark ? "text-[#F1F1F1]" : "text-[#04044A]"}`}>
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className={`text-3xl font-semibold tracking-tight ${textTitle}`}>Buat Request Baru</h1>
-          <p className={`text-xs mt-1 ${textMuted}`}>Penuhi kebutuhan desain visual Anda melalui ODDS</p>
-        </div>
-        <Link href="/odds" className={secondaryBtnClass}>
-          <MaterialIcon name="arrow_back" size="auto" className="text-lg" />
-          <span>Kembali</span>
-        </Link>
-      </div>
-
-      {/* Stepper Progress */}
-      <div className={`mb-6 p-5 ${containerClass} overflow-x-auto`}>
-        <div className="flex min-w-[600px] items-center justify-between">
-          {steps.map((s, idx) => {
-            const isCompleted = currentStep > s.step;
-            const isActive = currentStep === s.step;
-            return (
-              <div key={s.step} className="flex flex-1 items-center last:flex-none">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (s.step === 4) setMiniStep(1);
-                    if (s.step < currentStep) setCurrentStep(s.step);
-                  }}
-                  disabled={s.step > currentStep}
-                  className="flex items-center gap-3 text-left focus:outline-none disabled:cursor-not-allowed group"
-                >
-                  <div
-                    className={`flex size-9 items-center justify-center rounded-2xl text-xs font-bold transition-all duration-300 ${
-                      isCompleted
-                        ? dark
-                          ? "bg-[#B0FF5E] text-[#181818] shadow-[0_0_12px_rgba(176,255,94,0.3)]"
-                          : "bg-[#00A4FF] text-white shadow-[0_0_12px_rgba(0,164,255,0.3)]"
-                        : isActive
-                          ? dark
-                            ? "bg-[#B0FF5E]/20 text-[#B0FF5E] border-2 border-[#B0FF5E]"
-                            : "bg-[#00A4FF]/10 text-[#00A4FF] border-2 border-[#00A4FF]"
-                          : dark
-                            ? "bg-[#0E0E0E] border border-white/10 text-slate-500"
-                            : "bg-white border border-[#BDEAFF] text-[#04044A]/40"
-                    }`}
-                  >
-                    {isCompleted ? <MaterialIcon name="check" size="auto" className="text-sm font-bold" /> : s.step}
-                  </div>
-                  <div>
-                    <p className={`text-xs font-bold tracking-tight transition-colors ${isActive ? textTitle : textMuted}`}>
-                      {s.label}
-                    </p>
-                    <p className="text-[10px] opacity-60 leading-none mt-0.5">{s.desc}</p>
-                  </div>
-                </button>
-                {idx < steps.length - 1 && (
-                  <div
-                    className={`mx-4 h-0.5 flex-1 rounded-full transition-all duration-300 ${
-                      isCompleted
-                        ? dark
-                          ? "bg-[#B0FF5E]"
-                          : "bg-[#00A4FF]"
-                        : dark
-                          ? "bg-white/10"
-                          : "bg-[#BDEAFF]/50"
-                    }`}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {error && (
-        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-500/25 bg-red-500/5 p-4 text-sm text-red-500">
-          <MaterialIcon name="error_outline" size="auto" className="mt-0.5 text-lg shrink-0" />
-          <span>Error: {error}</span>
-        </div>
-      )}
-
-      {/* Split Grid */}
       <form
         onSubmit={submit}
         onKeyDown={(e) => {
@@ -297,10 +303,10 @@ export function ModernWizard({
             }
           }
         }}
-        className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] flex-1 min-h-0"
+        className="flex min-h-0 flex-1"
       >
         {/* Form Body */}
-        <div className={`p-6 sm:p-8 ${containerClass} flex flex-col min-h-[480px]`}>
+        <div className={`flex min-h-[560px] flex-1 flex-col p-6 sm:p-8 ${containerClass}`}>
           
           {/* STEP 1: Format Medium */}
           {currentStep === 1 && (
@@ -506,21 +512,7 @@ export function ModernWizard({
 
           {/* STEP 4: Brief Details (Split into 4 sub-steps) */}
           {currentStep === 4 && (
-            <div className="space-y-5 flex-1 flex flex-col min-h-0">
-              {/* Mini step Header */}
-              <div className="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-3">
-                <div>
-                  <h2 className={`text-xl font-bold tracking-tight ${textTitle}`}>Detail Request Brief</h2>
-                  <p className={`text-xs ${textMuted} mt-0.5`}>Lengkapi rincian kebutuhan desain secara bertahap</p>
-                </div>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                  dark ? "bg-white/5 text-[#B0FF5E]" : "bg-[#F3FAFF] text-[#00A4FF] border border-[#BDEAFF]"
-                }`}>
-                  Langkah Brief {miniStep} / 4
-                </span>
-              </div>
-
-              <div className="flex-1 flex flex-col min-h-0">
+            <StandardBriefDetails>
                 {/* Mini Step 1: Purpose (Tujuan) */}
                 {miniStep === 1 && (
                   <div className="space-y-5 flex-1 flex flex-col justify-center max-w-2xl mx-auto w-full">
@@ -695,20 +687,42 @@ export function ModernWizard({
                 {/* Mini Step 4: WYSIWYG Brief Editor */}
                 {miniStep === 4 && (
                   <div className="space-y-3 flex-1 flex flex-col min-h-0">
-                    <label className="block text-xs font-bold mb-1">Deskripsi Ide / Brief Detail</label>
-                    <ModernBriefEditor
-                      value={form.brief_text}
-                      onChange={(value) => update("brief_text", value)}
-                      onUploadImage={async (files) => {
-                        const uploaded = await addAttachmentFiles(files);
-                        return uploaded || [];
-                      }}
-                      dark={dark}
-                    />
+                    <label className="block text-xs font-bold mb-1">
+                      {usesTableBrief ? "Detail Brief" : "Deskripsi Ide / Brief Detail"}
+                    </label>
+                    {usesTableBrief ? (
+                      <TableBriefDetails
+                        category={tableBriefCategory}
+                        product={tableBriefProduct}
+                        packagingImageName={tableBriefPackagingImageName}
+                        packagingImageId={tableBriefPackagingImageId}
+                        rows={tableBriefRows}
+                        uploadingPackagingImage={uploadingAttachments}
+                        onCategoryChange={updateTableBriefCategory}
+                        onProductChange={updateTableBriefProduct}
+                        onPackagingImageUpload={(files) => void uploadTableBriefPackagingImage(files)}
+                        onRowChange={updateTableBriefRow}
+                        onIllustrationUpload={(id, files) => void uploadTableBriefIllustration(id, files)}
+                        uploadingIllustrationId={uploadingIllustrationId}
+                        onAddRow={addTableBriefRow}
+                        onRemoveRow={removeTableBriefRow}
+                        onReorderRows={reorderTableBriefRows}
+                        dark={dark}
+                      />
+                    ) : (
+                      <ModernBriefEditor
+                        value={form.brief_text}
+                        onChange={(value) => update("brief_text", value)}
+                        onUploadImage={async (files) => {
+                          const uploaded = await addAttachmentFiles(files);
+                          return uploaded || [];
+                        }}
+                        dark={dark}
+                      />
+                    )}
                   </div>
                 )}
-              </div>
-            </div>
+            </StandardBriefDetails>
           )}
 
           {/* STEP 5: Review & Kirim */}
@@ -721,7 +735,7 @@ export function ModernWizard({
 
               {/* Obsidian-style Preview Panel */}
               <div className="p-8 bg-white border border-slate-200 shadow-md rounded-2xl flex-1 flex flex-col min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div className="max-w-2xl mx-auto w-full space-y-6 font-mono text-xs">
+                <div className="w-full max-w-none space-y-6 font-mono text-xs">
                   
                   {/* Obsidian Document Header / File Name */}
                   <div className="flex items-center gap-2 pb-3 border-b border-slate-100 text-slate-400">
@@ -795,12 +809,22 @@ export function ModernWizard({
                       </button>
                     </div>
 
-                    <div className="prose max-w-none text-sm leading-relaxed text-slate-800">
-                      <div
-                        className="min-h-[160px] overflow-y-visible pr-1 [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_a]:font-bold [&_a]:text-[#00A4FF] [&_a]:underline [&_figure]:my-6 [&_img]:max-h-72 [&_img]:w-auto [&_img]:rounded-xl [&_img]:border [&_img]:border-slate-100 [&_img]:shadow-md [&_figcaption]:text-center [&_figcaption]:text-xs [&_figcaption]:text-slate-400 [&_figcaption]:mt-2"
-                        dangerouslySetInnerHTML={{ __html: form.brief_text || "Tidak ada rincian brief." }}
+                    {usesTableBrief ? (
+                      <TableBriefPreview
+                        category={tableBriefCategory}
+                        product={tableBriefProduct}
+                        packagingImageId={tableBriefPackagingImageId}
+                        packagingImageName={tableBriefPackagingImageName}
+                        rows={tableBriefRows}
                       />
-                    </div>
+                    ) : (
+                      <div className="prose max-w-none text-sm leading-relaxed text-slate-800">
+                        <div
+                          className="min-h-[160px] overflow-y-visible pr-1 [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_a]:font-bold [&_a]:text-[#00A4FF] [&_a]:underline [&_figure]:my-6 [&_img]:max-h-72 [&_img]:w-auto [&_img]:rounded-xl [&_img]:border [&_img]:border-slate-100 [&_img]:shadow-md [&_figcaption]:text-center [&_figcaption]:text-xs [&_figcaption]:text-slate-400 [&_figcaption]:mt-2"
+                          dangerouslySetInnerHTML={{ __html: form.brief_text || "Tidak ada rincian brief." }}
+                        />
+                      </div>
+                    )}
                   </div>
 
                 </div>
@@ -845,7 +869,7 @@ export function ModernWizard({
         </div>
 
         {/* Premium Preview Summary Panel (Visual Request Ticket) */}
-        <div className={`p-6 ${containerClass} flex flex-col relative overflow-hidden`}>
+        <div className="hidden" aria-hidden="true">
           {/* Decorative Top Accent Bar */}
           <span className={`absolute top-0 inset-x-0 h-1.5 ${
             dark ? "bg-[#B0FF5E]" : "bg-gradient-to-r from-[#00A4FF] to-[#00E7EF]"

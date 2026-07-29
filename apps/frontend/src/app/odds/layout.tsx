@@ -3,15 +3,14 @@
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
-import { type SideMenuItem } from "@/components/side-menu";
-import { PerformanceNavbar } from "@/features/kv-retail/components/performance-navbar";
-import { PerformanceSidebar, type PerformanceSidebarItem } from "@/features/kv-retail/components/performance-sidebar";
-import { useKvRetailDesktopSidebar } from "@/features/kv-retail/hooks/use-kv-retail-desktop-sidebar";
+import Container from "@/components/global-layout/container";
 import {
   getOddsTasks,
   OddsTask,
 } from "@/features/odds/api";
+import { TaskFeedbackToast, TaskFeedbackToastHost } from "@/components/odds/TaskCard";
 import { OddsThemeContext } from "./odds-theme-context";
+import { getEchoClient } from "@/core/realtime/client";
 
 type OddsMenuItem = {
   id: string;
@@ -30,7 +29,7 @@ const ODDS_GROUP_LABELS: Record<OddsMenuItem["group"], string> = {
 const ODDS_GROUP_ORDER: OddsMenuItem["group"][] = ["tasks", "manage", "reports"];
 
 export default function OddsLayout({ children }: { children: ReactNode }) {
-  const { hasPermission } = useAuth();
+  const { hasPermission, user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -50,21 +49,32 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
 
   // State to hold counts
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [countsError, setCountsError] = useState<string | null>(null);
   const [desktopTheme, setDesktopTheme] = useState<"light" | "dark" | "retro">("light");
-  const { expanded: desktopShellExpanded, toggleExpanded: toggleDesktopShellExpanded } = useKvRetailDesktopSidebar();
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [viewport, setViewport] = useState<"Mobile" | "Desktop">("Mobile");
+
+  useEffect(() => {
+    const updateViewport = () => setViewport(window.innerWidth >= 1024 ? "Desktop" : "Mobile");
+    updateViewport();
+    window.addEventListener("resize", updateViewport);
+    return () => window.removeEventListener("resize", updateViewport);
+  }, []);
 
   // Load counts for menu badges
   const loadCounts = useCallback(async () => {
     try {
-      const taskPage = await getOddsTasks();
+      const taskPage = await getOddsTasks({ skipAuthRedirect: true });
       const newCounts: Record<string, number> = {
         workspace: taskPage.data.length,
         all_tasks: taskPage.data.length,
         spv_review: taskPage.data.filter((t: OddsTask) => t.status === "spv_review").length,
         client_review: taskPage.data.filter((t: OddsTask) => t.status === "client_review").length,
         client_all_requests: taskPage.data.length,
+        client_queue: taskPage.data.filter((t: OddsTask) => t.status === "queued").length,
+        client_working: taskPage.data.filter((t: OddsTask) => t.status === "in_progress").length,
         client_action_required: taskPage.data.filter((t: OddsTask) => t.status === "client_review").length,
-        client_in_progress: taskPage.data.filter((t: OddsTask) => ["queued", "in_progress", "spv_review", "revision"].includes(t.status)).length,
+        client_revisions: taskPage.data.filter((t: OddsTask) => t.task_type === "client_revision" && !["done", "cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(t.status)).length,
         client_archive: taskPage.data.filter((t: OddsTask) => ["done", "cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(t.status)).length,
         special_revisions: taskPage.data
           .flatMap((t: OddsTask) => t.revisions ?? [])
@@ -79,7 +89,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
 
       setCounts(newCounts);
     } catch (err) {
-      console.error("Error loading counts for sidebar:", err);
+      setCountsError(err instanceof Error ? err.message : "Gagal memuat informasi ODDS.");
     }
   }, []);
 
@@ -87,19 +97,36 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     queueMicrotask(() => {
       void loadCounts();
     });
-    const interval = setInterval(loadCounts, 15000);
-    return () => clearInterval(interval);
-  }, [loadCounts]);
+
+    if (!user?.id) return;
+
+    const echo = getEchoClient();
+    if (!echo) return;
+
+    const channelName = `App.Models.Core.User.${user.id}`;
+    const channel = echo.private(channelName);
+    const handleTaskUpdated = (event: { task?: OddsTask }) => {
+      void loadCounts();
+      if (event.task) window.dispatchEvent(new CustomEvent("odds:task-updated", { detail: event.task }));
+    };
+    const handleTaskDeleted = (event: { task_id?: number | string }) => {
+      void loadCounts();
+      if (event.task_id !== undefined) window.dispatchEvent(new CustomEvent("odds:task-deleted", { detail: event.task_id }));
+    };
+    channel.listen(".odds.task.updated", handleTaskUpdated);
+    channel.listen(".odds.task.deleted", handleTaskDeleted);
+
+    return () => {
+      channel.stopListening(".odds.task.updated");
+      channel.stopListening(".odds.task.deleted");
+      echo.leave(channelName);
+    };
+  }, [loadCounts, user?.id]);
 
   const activeSection = searchParams.get("section");
   // Next can preserve a trailing slash in the local URL. Normalize it so the
   // request page consistently receives its contained-scroll shell.
   const normalizedPathname = pathname.replace(/\/$/, "") || "/";
-  const usesContainedScroll = normalizedPathname === "/odds";
-  const sidebarClassName = usesContainedScroll
-    ? "!static !m-0 !h-full !min-h-0 !p-4"
-    : "!m-0 !h-screen !p-4";
-
   const menuItems = useMemo<OddsMenuItem[]>(() => {
     const items: OddsMenuItem[] = [];
 
@@ -108,20 +135,23 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
         items.push(
           { id: "workspace", label: "Dashboard", icon: "dashboard", href: "/odds", group: "tasks" },
           { id: "designer_today_tasks", label: "Tugas Hari Ini", icon: "today", href: "/odds?section=designer_today_tasks", group: "tasks" },
+          { id: "designer_queue", label: "Dalam Antrean", icon: "hourglass_top", href: "/odds?section=designer_queue", group: "tasks" },
           { id: "designer_all_tasks", label: "Semua Tugas", icon: "assignment", href: "/odds?section=designer_all_tasks", group: "tasks" },
-          { id: "designer_review", label: "Menunggu Review", icon: "pending_actions", href: "/odds?section=designer_review", group: "tasks" },
+          { id: "designer_spv_review", label: "Review Leader", icon: "rate_review", href: "/odds?section=designer_spv_review", group: "tasks" },
+          { id: "designer_client_review", label: "Review Client", icon: "reviews", href: "/odds?section=designer_client_review", group: "tasks" },
           { id: "designer_revisions", label: "Revisi", icon: "error", href: "/odds?section=designer_revisions", group: "tasks" },
           { id: "designer_done", label: "Selesai", icon: "task_alt", href: "/odds?section=designer_done", group: "tasks" },
-          { id: "designer_report", label: "Laporan Kinerja", icon: "monitoring", href: "/odds?section=designer_report", group: "reports" },
-          { id: "designer_settings", label: "Pengaturan & Jadwal", icon: "manage_accounts", href: "/odds?section=designer_settings", group: "manage" }
+          { id: "designer_report", label: "Report", icon: "monitoring", href: "/odds?section=designer_report", group: "reports" },
         );
       } else {
         items.push(
           { id: "workspace", label: "Dashboard", icon: "dashboard", href: "/odds", group: "tasks" },
           { id: "client_all_requests", label: "Semua Request", icon: "assignment", href: "/odds?section=client_all_requests", group: "tasks" },
+          { id: "client_queue", label: "Dalam Antrean", icon: "hourglass_top", href: "/odds?section=client_queue", group: "tasks" },
+          { id: "client_working", label: "Sedang Dikerjakan", icon: "autorenew", href: "/odds?section=client_working", group: "tasks" },
           { id: "client_action_required", label: "Perlu Review", icon: "pending_actions", href: "/odds?section=client_action_required", group: "tasks" },
-          { id: "client_in_progress", label: "Sedang Diproses", icon: "autorenew", href: "/odds?section=client_in_progress", group: "tasks" },
-          { id: "client_archive", label: "Arsip", icon: "archive", href: "/odds?section=client_archive", group: "reports" }
+          { id: "client_revisions", label: "Revisi", icon: "error", href: "/odds?section=client_revisions", group: "tasks" },
+          { id: "client_archive", label: "Selesai", icon: "task_alt", href: "/odds?section=client_archive", group: "tasks" }
         );
       }
     } else {
@@ -184,7 +214,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     return item.id === defaultItem?.id;
   }, [activeSection, menuItems, normalizedPathname]);
 
-  const sidebarItems = useMemo<PerformanceSidebarItem[]>(() => [
+  const sidebarItems = useMemo(() => [
     ...(canCreateTask ? [{
       label: "Request Baru",
       icon: "add",
@@ -206,60 +236,35 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
       }))),
   ], [canCreateTask, counts, isSectionActive, menuItems, normalizedPathname]);
 
-  const activeMobileLabel = sidebarItems.find((item) => item.isActive)?.label;
-
-  const navigationTitle = sidebarItems.find((item) => item.isActive)?.label ?? "Dashboard";
   const activeHref = sidebarItems.find((item) => item.isActive)?.href ?? pathname;
-  const compactMobileMenuItems = useMemo(
-    () => sidebarItems.map(({ label, href }) => ({ label, href })),
-    [sidebarItems]
-  );
 
   return (
     <OddsThemeContext.Provider value={{ theme: desktopTheme, setTheme: setDesktopTheme }}>
-      {/* Mobile view */}
-      <div
-        className={`h-dvh overflow-hidden p-3 lg:hidden ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)]" : desktopTheme === "retro" ? "bg-[#dfe2d3] font-mono" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}
-        data-kv-retail-mobile-theme={desktopTheme}
-      >
-        <div className={`flex h-[calc(100dvh-24px)] flex-col overflow-hidden rounded-[22px] ${desktopTheme === "dark" ? "border border-white/10 bg-[#111413]/90 shadow-[0_12px_32px_rgba(0,0,0,0.34)]" : desktopTheme === "retro" ? "border-[3px] border-[#24252b] bg-[#c9ccc0] shadow-[0_6px_0_#24252b]" : "border border-white/80 bg-white/80 shadow-[0_12px_32px_rgba(0,4,117,0.2)] backdrop-blur-md"}`}>
-          <PerformanceNavbar
-            theme={desktopTheme}
-            title={navigationTitle}
-            parentTitle="ODDS"
-            compact
-            compactMenuItems={compactMobileMenuItems}
-          />
-          <main aria-label="ODDS mobile" className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6 pt-6">
-            <div className={`flex-1 min-h-0 ${usesContainedScroll ? "h-full overflow-hidden flex flex-col w-full" : "odds-scroll-hidden overflow-y-auto"} text-slate-800`}>
+      <TaskFeedbackToast
+        toast={countsError ? { status: "error", message: countsError } : null}
+        onClose={() => setCountsError(null)}
+      />
+      <TaskFeedbackToastHost />
+      <div className={`h-screen w-screen overflow-hidden ${desktopTheme === "dark" ? "bg-[#111413]" : desktopTheme === "retro" ? "bg-[#dfe2d3]" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}>
+        <div id="odds-shell-modal-root" className="h-full">
+          <Container
+            viewport={viewport}
+            contentProps={{
+              className: `flex h-full w-full flex-col overflow-hidden rounded-[16px] shadow-[0px_14px_42px_0px_rgba(44,42,39,0.16)] ${desktopTheme === "dark" ? "bg-[#111413] text-white" : desktopTheme === "retro" ? "bg-[#c9ccc0] font-mono" : "bg-[#f3fbff]"}`,
+              sidebarTheme: desktopTheme,
+              sidebarExpanded,
+              onToggleSidebarExpanded: () => setSidebarExpanded((current) => !current),
+              onToggleSidebarTheme: () => setDesktopTheme((current) => current === "dark" ? "light" : "dark"),
+              onToggleSidebarRetro: () => setDesktopTheme((current) => current === "retro" ? "light" : "retro"),
+            }}
+            menuItems={sidebarItems}
+            activeMenuHref={activeHref}
+            menuTitle="ODDS"
+          >
+            <main aria-label="ODDS" className="flex h-full min-h-0 w-full flex-1 flex-col text-slate-800">
               {children}
-            </div>
-          </main>
-        </div>
-      </div>
-
-      {/* Desktop view */}
-      <div className={`hidden h-screen min-h-0 flex-col text-[#222] lg:flex ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)] p-6" : desktopTheme === "retro" ? "bg-[#dfe2d3] p-6" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)] p-6"}`}>
-        <div id="odds-shell-modal-root" className={`relative flex min-h-0 flex-1 flex-col overflow-hidden ${desktopTheme === "light" ? "rounded-[26px] border border-white/80 bg-white/80 shadow-[0_14px_42px_rgba(44,42,39,0.16)] backdrop-blur-md" : desktopTheme === "dark" ? "rounded-[26px] border border-white/10 bg-[#111413]/90 shadow-[0_14px_42px_rgba(0,0,0,0.45)] backdrop-blur-md" : "rounded-[30px] border-[3px] border-[#24252b] bg-[#c9ccc0] font-mono shadow-[0_8px_0_#24252b]"}`}>
-          <PerformanceNavbar theme={desktopTheme} title={navigationTitle} parentTitle="ODDS" />
-          <div className="flex min-h-0 flex-1">
-            <PerformanceSidebar
-              theme={desktopTheme}
-              primaryItems={sidebarItems}
-              activeHref={activeHref}
-              settingsHref=""
-              ariaLabel="Navigasi ODDS"
-              onToggleTheme={() => setDesktopTheme((t) => t === "dark" ? "light" : "dark")}
-              onToggleRetro={() => setDesktopTheme((t) => t === "retro" ? "light" : "retro")}
-              expanded={desktopShellExpanded}
-              onToggleExpanded={toggleDesktopShellExpanded}
-            />
-            <main className={`relative min-w-0 flex min-h-0 flex-1 flex-col ${usesContainedScroll ? "h-full" : "odds-scroll-hidden overflow-y-auto"}`}>
-              <div className={`${usesContainedScroll ? "h-full min-h-0 flex flex-col flex-1 w-full" : "min-h-full flex flex-col flex-1 w-full"} text-slate-800`}>
-                {children}
-              </div>
             </main>
-          </div>
+          </Container>
         </div>
       </div>
     </OddsThemeContext.Provider>

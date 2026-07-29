@@ -10,7 +10,7 @@ import { ScheduleConfig } from "@/features/odds/components/schedule-config";
 import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
 import { OddsRichTextEditor, stripRichText } from "@/components/odds-rich-text-editor";
 import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-card";
-import { OddsTaskChat } from "@/components/odds-task-chat";
+import { OddsTaskCard, OutputFilesPanel, OutputReviewPanel, TaskDiscussionPanel, TaskSubmissionPanel, publishTaskFeedbackToast } from "@/components/odds/TaskCard";
 import { useAuth } from "@/providers/auth-provider";
 import { useOddsTheme } from "./odds-theme-context";
 import TaskCardDate from "@/components/taskcard/date";
@@ -72,6 +72,7 @@ type CategoryForm = {
   normal_revision_limit: string;
   sla_minutes: string;
   important_matrix: string;
+  brief_format: "default" | "table";
   is_active: boolean;
 };
 
@@ -99,6 +100,7 @@ const emptyCategoryForm: CategoryForm = {
   normal_revision_limit: "2",
   sla_minutes: "1440",
   important_matrix: "Q4",
+  brief_format: "default",
   is_active: true,
 };
 
@@ -117,6 +119,14 @@ const emptyRuleForm: RuleForm = {
   value: "{\n  \"count\": 2\n}",
   description: "",
   is_active: true,
+};
+
+const recommendationLabel = (task: OddsTask, viewerRole: "leader" | "client" | "designer") => {
+  if (viewerRole === "leader" && task.status === "spv_review") return "Review";
+  if (viewerRole === "client" && task.status === "client_review") return "Review";
+  if (viewerRole === "designer" && task.status === "submitted") return "Check";
+  if (viewerRole === "designer" && task.status === "queued") return "Proses";
+  return undefined;
 };
 
 const statusOptions = [
@@ -138,15 +148,20 @@ type ConfigSection =
   | "rankings"
   | "all_tasks"
   | "designer_today_tasks"
+  | "designer_queue"
   | "designer_all_tasks"
   | "designer_review"
+  | "designer_spv_review"
+  | "designer_client_review"
   | "designer_revisions"
   | "designer_done"
   | "designer_report"
   | "designer_settings"
   | "client_all_requests"
+  | "client_queue"
+  | "client_working"
   | "client_action_required"
-  | "client_in_progress"
+  | "client_revisions"
   | "client_archive"
   | "workspace";
 
@@ -187,6 +202,12 @@ const configSections: Array<{
     description: "Tugas yang masuk kapasitas hari ini.",
   },
   {
+    id: "designer_queue",
+    label: "Dalam Antrean",
+    icon: "hourglass_top",
+    description: "Tugas yang sedang menunggu untuk dikerjakan.",
+  },
+  {
     id: "designer_all_tasks",
     label: "Semua Tugas",
     icon: "assignment",
@@ -197,6 +218,18 @@ const configSections: Array<{
     label: "Menunggu Review",
     icon: "pending_actions",
     description: "Tugas dalam review.",
+  },
+  {
+    id: "designer_spv_review",
+    label: "Review Leader",
+    icon: "rate_review",
+    description: "Output yang sedang diperiksa Leader Creative.",
+  },
+  {
+    id: "designer_client_review",
+    label: "Review Client",
+    icon: "reviews",
+    description: "Output yang sedang menunggu persetujuan client.",
   },
   {
     id: "designer_revisions",
@@ -229,22 +262,34 @@ const configSections: Array<{
     description: "Seluruh permintaan Anda.",
   },
   {
+    id: "client_queue",
+    label: "Dalam Antrean",
+    icon: "hourglass_top",
+    description: "Request yang sedang menunggu dikerjakan.",
+  },
+  {
+    id: "client_working",
+    label: "Sedang Dikerjakan",
+    icon: "autorenew",
+    description: "Request yang sedang dikerjakan oleh designer.",
+  },
+  {
     id: "client_action_required",
     label: "Perlu Review",
     icon: "pending_actions",
     description: "Tugas menunggu ACC.",
   },
   {
-    id: "client_in_progress",
-    label: "Sedang Diproses",
-    icon: "autorenew",
-    description: "Memantau progres desain.",
+    id: "client_revisions",
+    label: "Revisi",
+    icon: "error",
+    description: "Request revisi yang sedang diproses.",
   },
   {
     id: "client_archive",
-    label: "Arsip",
-    icon: "archive",
-    description: "Riwayat tugas selesai.",
+    label: "Selesai",
+    icon: "task_alt",
+    description: "Request yang telah selesai.",
   },
   {
     id: "schedules",
@@ -456,8 +501,19 @@ function OddsPageContent() {
   const [outputDragActive, setOutputDragActive] = useState(false);
   const [outputBusy, setOutputBusy] = useState(false);
   const [adminTaskAction, setAdminTaskAction] = useState<{ taskId: number; type: string; nonce: number } | null>(null);
+  const [deleteConfirmTaskId, setDeleteConfirmTaskId] = useState<number | null>(null);
+  const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
+  const [pauseConfirmTaskId, setPauseConfirmTaskId] = useState<number | null>(null);
+  const [pauseReason, setPauseReason] = useState("");
+  const [pausingTaskId, setPausingTaskId] = useState<number | null>(null);
+  const [startingTaskId, setStartingTaskId] = useState<number | null>(null);
   const [timerNow, setTimerNow] = useState(() => Date.now());
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  const tasksRef = useRef<OddsTask[]>([]);
+
+  useEffect(() => {
+    tasksRef.current = tasks;
+  }, [tasks]);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -514,6 +570,18 @@ function OddsPageContent() {
     return () => window.clearTimeout(timeout);
   }, [notice]);
 
+  useEffect(() => {
+    if (saving) {
+      publishTaskFeedbackToast({ status: "loading", message: "Memproses aksi ODDS..." });
+      return;
+    }
+    if (error) {
+      publishTaskFeedbackToast({ status: "error", message: error });
+      return;
+    }
+    if (notice) publishTaskFeedbackToast({ status: "success", message: notice });
+  }, [error, notice, saving]);
+
   const visibleConfigSections = useMemo(() => {
     return configSections.filter((section) => {
       if (["categories", "designers", "rules", "schedules"].includes(section.id)) return canShowConfigSections;
@@ -524,8 +592,8 @@ function OddsPageContent() {
       if (section.id === "skip_requests") return canReviewQueueSkip;
       if (section.id === "reports") return canViewReports;
       if (section.id === "rankings") return canViewRankings;
-      if (["designer_today_tasks", "designer_all_tasks", "designer_review", "designer_revisions", "designer_done", "designer_report", "designer_settings"].includes(section.id)) return canViewAssignedTasks && !canUseControl;
-      if (["client_all_requests", "client_action_required", "client_in_progress", "client_archive"].includes(section.id)) return !canViewAssignedTasks && !canUseControl;
+      if (["designer_today_tasks", "designer_queue", "designer_all_tasks", "designer_review", "designer_spv_review", "designer_client_review", "designer_revisions", "designer_done", "designer_report", "designer_settings"].includes(section.id)) return canViewAssignedTasks && !canUseControl;
+      if (["client_all_requests", "client_queue", "client_working", "client_action_required", "client_revisions", "client_archive"].includes(section.id)) return !canViewAssignedTasks && !canUseControl;
       return canViewAllTasks || canReviewSpv;
     });
   }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewQueueSkip, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports, canViewAssignedTasks, canUseControl]);
@@ -658,19 +726,96 @@ function OddsPageContent() {
     }
   }, [canShowConfigSections, canUseControl, canViewRankings, canViewReports, rankingPeriod]);
 
+  const mergeRealtimeTask = useCallback((incomingTask: OddsTask) => {
+    const isParticipant = incomingTask.requester?.id === user?.id
+      || incomingTask.assigned_designer?.id === user?.id
+      || incomingTask.assignedDesigner?.id === user?.id;
+
+    setTasks((currentTasks) => {
+      if (!canViewAllTasks && !isParticipant) {
+        return currentTasks.filter((task) => task.id !== incomingTask.id);
+      }
+
+      const exists = currentTasks.some((task) => task.id === incomingTask.id);
+      if (!exists) return [incomingTask, ...currentTasks];
+
+      return currentTasks.map((task) => task.id === incomingTask.id
+        ? { ...task, ...incomingTask }
+        : task);
+    });
+  }, [canViewAllTasks, user?.id]);
+
+  const removeRealtimeTask = useCallback((taskId: number) => {
+    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+  }, []);
+
+  const optimisticallyPatchTask = useCallback((taskId: number, patch: (task: OddsTask) => OddsTask) => {
+    const previous = tasksRef.current.find((task) => task.id === taskId) ?? null;
+    setTasks((currentTasks) => {
+      const nextTasks = currentTasks.map((task) => task.id === taskId ? patch(task) : task);
+      tasksRef.current = nextTasks;
+      return nextTasks;
+    });
+    return previous;
+  }, []);
+
+  const confirmOptimisticTask = useCallback((taskId: number, task: OddsTask) => {
+    setTasks((currentTasks) => {
+      const nextTasks = currentTasks.map((currentTask) => currentTask.id === taskId ? { ...currentTask, ...task } : currentTask);
+      tasksRef.current = nextTasks;
+      return nextTasks;
+    });
+  }, []);
+
+  const rollbackOptimisticTask = useCallback((previous: OddsTask | null) => {
+    if (!previous) return;
+    setTasks((currentTasks) => {
+      const hasTask = currentTasks.some((task) => task.id === previous.id);
+      const nextTasks = hasTask
+        ? currentTasks.map((task) => task.id === previous.id ? previous : task)
+        : [previous, ...currentTasks];
+      tasksRef.current = nextTasks;
+      return nextTasks;
+    });
+  }, []);
+
+  const optimisticallyRemoveTask = useCallback((taskId: number) => {
+    const previous = tasksRef.current.find((task) => task.id === taskId) ?? null;
+    setTasks((currentTasks) => {
+      const nextTasks = currentTasks.filter((task) => task.id !== taskId);
+      tasksRef.current = nextTasks;
+      return nextTasks;
+    });
+    return previous;
+  }, []);
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void loadConfig();
     }, 0);
-    const interval = window.setInterval(() => {
-      void loadConfig(true);
-    }, 10000);
 
     return () => {
       window.clearTimeout(timer);
-      window.clearInterval(interval);
     };
   }, [loadConfig]);
+
+  useEffect(() => {
+    const handleTaskUpdated = (event: Event) => {
+      const task = (event as CustomEvent<OddsTask>).detail;
+      if (task) mergeRealtimeTask(task);
+    };
+    const handleTaskDeleted = (event: Event) => {
+      const taskId = Number((event as CustomEvent<number | string>).detail);
+      if (Number.isFinite(taskId)) removeRealtimeTask(taskId);
+    };
+
+    window.addEventListener("odds:task-updated", handleTaskUpdated);
+    window.addEventListener("odds:task-deleted", handleTaskDeleted);
+    return () => {
+      window.removeEventListener("odds:task-updated", handleTaskUpdated);
+      window.removeEventListener("odds:task-deleted", handleTaskDeleted);
+    };
+  }, [mergeRealtimeTask, removeRealtimeTask]);
 
   const resetMessages = () => {
     setError(null);
@@ -688,6 +833,7 @@ function OddsPageContent() {
       normal_revision_limit: Number(categoryForm.normal_revision_limit),
       sla_minutes: Number(categoryForm.sla_minutes),
       important_matrix: categoryForm.important_matrix || "Q4",
+      brief_format: categoryForm.brief_format,
       is_active: categoryForm.is_active,
     };
 
@@ -820,6 +966,7 @@ function OddsPageContent() {
       normal_revision_limit: String(category.normal_revision_limit),
       sla_minutes: String(category.sla_minutes),
       important_matrix: category.important_matrix ?? "Q4",
+      brief_format: category.brief_format ?? "default",
       is_active: category.is_active,
     });
   };
@@ -860,15 +1007,24 @@ function OddsPageContent() {
     }));
   };
 
-  const runOperationalAction = async (label: string, action: () => Promise<unknown>, message: string) => {
+  const runOperationalAction = async <T,>(
+    label: string,
+    action: () => Promise<T>,
+    message: string,
+    onSuccess?: (result: T) => void,
+    onOptimistic?: () => void,
+    onRollback?: () => void,
+  ) => {
     resetMessages();
     setSaving(label);
+    onOptimistic?.();
     try {
-      await action();
+      const result = await action();
+      onSuccess?.(result);
       setNotice(message);
       setReviewNote("");
-      await loadConfig();
     } catch (err) {
+      onRollback?.();
       setError(oddsError(err));
     } finally {
       setSaving(null);
@@ -993,19 +1149,12 @@ function OddsPageContent() {
     const queuedTasksCount = tasks.filter(t => t.status === "queued").length;
     const doneTasksCount = tasks.filter(t => t.status === "done").length;
     const revisionTasksCount = tasks.filter(t => t.status === "revision").length;
-
     return (
       <div className="flex flex-col gap-5 p-4">
         {/* Header */}
         <HeaderTitle>
           {!canViewAssignedTasks ? "Dashboard" : getGreeting(user?.name ?? "Designer")}
         </HeaderTitle>
-
-        {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-medium text-red-700">
-            {error}
-          </div>
-        )}
 
         {/* Main layout */}
         {!canViewAssignedTasks ? (
@@ -1398,16 +1547,21 @@ function OddsPageContent() {
     rankings: "Ranking",
     all_tasks: "Semua Tugas",
     designer_today_tasks: "Tugas Hari Ini",
+    designer_queue: "Dalam Antrean",
     designer_all_tasks: "Semua Tugas",
     designer_review: "Menunggu Review",
+    designer_spv_review: "Review Leader",
+    designer_client_review: "Review Client",
     designer_revisions: "Revisi",
     designer_done: "Selesai",
     designer_report: "Laporan Kinerja",
     designer_settings: "Pengaturan & Jadwal",
     client_all_requests: "Semua Request",
+    client_queue: "Dalam Antrean",
+    client_working: "Sedang Dikerjakan",
     client_action_required: "Perlu Review",
-    client_in_progress: "Sedang Diproses",
-    client_archive: "Arsip",
+    client_revisions: "Revisi",
+    client_archive: "Selesai",
     workspace: "Dashboard"
   };
 
@@ -1420,8 +1574,11 @@ function OddsPageContent() {
     "cancel_requests",
     "skip_requests",
     "designer_today_tasks",
+    "designer_queue",
     "designer_all_tasks",
     "designer_review",
+    "designer_spv_review",
+    "designer_client_review",
     "designer_revisions",
     "designer_done",
   ].includes(effectiveActiveSection);
@@ -1471,16 +1628,6 @@ function OddsPageContent() {
         )}
       </div>
 
-      {(error || notice) && (
-        <div
-          className={`rounded-xl border px-4 py-3 text-xs font-medium ${
-            error ? "border-red-200 bg-red-50 text-red-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"
-          }`}
-        >
-          {error || notice}
-        </div>
-      )}
-
       <div className={`flex min-h-0 min-w-0 flex-1 flex-col ${isDesignerTaskSection ? "overflow-hidden" : "odds-scroll-hidden overflow-y-auto"}`}>
       {effectiveActiveSection === "categories" && (
       <section className="grid min-h-[calc(100vh-10rem)] gap-6 xl:h-[calc(100vh-10rem)] xl:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
@@ -1504,6 +1651,16 @@ function OddsPageContent() {
                 { value: "Q4", label: "Q4 - Quadran IV (Normal / Standar)" },
               ]}
               onChange={(value) => setCategoryForm((prev) => ({ ...prev, important_matrix: value }))}
+            />
+            <SelectField
+              label="Format Brief"
+              value={categoryForm.brief_format}
+              help="Menentukan format detail brief yang otomatis dipakai saat client memilih kategori ini."
+              options={[
+                { value: "default", label: "Default Brief" },
+                { value: "table", label: "Table Brief" },
+              ]}
+              onChange={(value) => setCategoryForm((prev) => ({ ...prev, brief_format: value as CategoryForm["brief_format"] }))}
             />
             <div className="grid grid-cols-2 gap-2">
               <NumberField
@@ -1545,7 +1702,7 @@ function OddsPageContent() {
           <DataTable
             loading={loading}
             empty="Belum ada kategori."
-            headers={["Nama", "Matrix", "Bobot", "Revisi", "SLA", "Status", ""]}
+            headers={["Nama", "Matrix", "Format Brief", "Bobot", "Revisi", "SLA", "Status", ""]}
             className="flex h-full min-h-0 flex-col"
             scrollClassName="odds-scroll-hidden min-h-0 flex-1 overflow-auto"
             rows={categories.map((category) => {
@@ -1561,6 +1718,7 @@ function OddsPageContent() {
                 <span key={`cat-matrix-${category.id}`} className={`px-2 py-0.5 rounded text-[10px] font-extrabold border shrink-0 ${matrixBadgeColor}`}>
                   {matrix}
                 </span>,
+                category.brief_format === "table" ? "Table Brief" : "Default Brief",
                 String(category.score_weight),
                 String(category.normal_revision_limit),
                 `${category.sla_minutes} menit`,
@@ -2000,7 +2158,10 @@ function OddsPageContent() {
             if (effectiveActiveSection === "cancel_requests") return cancelRequestTaskIds.has(task.id);
             if (effectiveActiveSection === "skip_requests") return skipRequestTaskIds.has(task.id);
             if (effectiveActiveSection === "designer_done") return task.status === "done";
+            if (effectiveActiveSection === "designer_queue") return task.status === "queued";
             if (effectiveActiveSection === "designer_review") return ["spv_review", "client_review"].includes(task.status);
+            if (effectiveActiveSection === "designer_spv_review") return task.status === "spv_review";
+            if (effectiveActiveSection === "designer_client_review") return task.status === "client_review";
             if (effectiveActiveSection === "designer_revisions") {
               return revisionTaskTypes.includes(task.task_type)
                 && !["done", "cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(task.status);
@@ -2050,32 +2211,44 @@ function OddsPageContent() {
         
         const myTasks = sortedTasks;
         
-        // Find if there is an in-progress task for the active designer
-        const activeInProgressTask = assignedDesignerTasks.find(t => t.status === "in_progress");
-
         const handleStartTask = async (taskId: number) => {
+          if (startingTaskId !== null) return;
           setError(null);
           setNotice(null);
+          setStartingTaskId(taskId);
+          const previousTask = optimisticallyPatchTask(taskId, (task) => ({
+            ...task,
+            status: "in_progress",
+            updated_at: new Date().toISOString(),
+          }));
           try {
             const startedTask = await startOddsTask(taskId);
-            setTasks((current) => current.map((task) => task.id === taskId ? { ...task, ...startedTask, status: "in_progress" } : task));
+            confirmOptimisticTask(taskId, startedTask);
             setNotice("Tugas berhasil dimulai.");
-            await loadConfig();
           } catch (err) {
+            rollbackOptimisticTask(previousTask);
             setError(oddsError(err));
+          } finally {
+            setStartingTaskId(null);
           }
         };
 
         const handlePauseTask = async (taskId: number) => {
           setError(null);
           setNotice(null);
+          setPausingTaskId(taskId);
+          const previousTask = optimisticallyPatchTask(taskId, (task) => ({ ...task, status: "ready_to_start" }));
           try {
             const pausedTask = await pauseOddsTask(taskId);
-            setTasks((current) => current.map((task) => task.id === taskId ? { ...task, ...pausedTask } : task));
+            confirmOptimisticTask(taskId, pausedTask);
+            setPauseConfirmTaskId(null);
+            setPauseReason("");
             setNotice("Pengerjaan task dipause.");
-            await loadConfig();
           } catch (err) {
+            rollbackOptimisticTask(previousTask);
             setError(oddsError(err));
+          } finally {
+            setPausingTaskId(null);
           }
         };
 
@@ -2089,6 +2262,11 @@ function OddsPageContent() {
           setError(null);
           setNotice(null);
           setOutputBusy(true);
+          const previousTask = optimisticallyPatchTask(taskId, (task) => ({
+            ...task,
+            status: ["new_task", "leader_revision"].includes(task.task_type) ? "spv_review" : "client_review",
+            finished_at: new Date().toISOString(),
+          }));
           try {
             const uploadedFiles = await Promise.all(outputFiles.map((file) => uploadOddsTaskAttachment(file, taskId)));
             const assets = [
@@ -2101,17 +2279,20 @@ function OddsPageContent() {
                 url: `${window.location.origin}/api/v1/odds/uploads/${file.id}/content`,
               })),
             ];
-            await submitOddsResult(taskId, {
+            const result = await submitOddsResult(taskId, {
               result_notes: `Total Output: ${total}`,
               assets,
             });
+            setTasks((current) => current.map((task) => task.id === taskId
+              ? { ...task, results: [...(task.results ?? []), result] }
+              : task));
             setNotice("Output dikirim ke SPV.");
             setOutputShareLink("");
             setOutputFiles([]);
             setOutputTotal("");
             setActiveOutputTaskId(null);
-            await loadConfig();
           } catch (err) {
+            rollbackOptimisticTask(previousTask);
             setError(oddsError(err));
           } finally {
             setOutputBusy(false);
@@ -2165,40 +2346,73 @@ function OddsPageContent() {
                         const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));
                         const canCheckThisTask = Boolean((task.status === "spv_review" && canReviewSpv) || (task.status === "client_review" && isClientForTask));
                         const handleControlDelete = async () => {
-                          const confirmed = window.confirm(`Hapus task ${task.task_number} dari database?`);
-                          if (!confirmed) return;
-
+                          setDeletingTaskId(task.id);
+                          const previousTask = optimisticallyRemoveTask(task.id);
                           try {
                             await deleteOddsTask(task.id);
-                            await loadConfig();
+                            setDeleteConfirmTaskId(null);
+                            setActiveChatTaskId((current) => current === task.id ? null : current);
+                            setActiveOutputTaskId((current) => current === task.id ? null : current);
+                            setNotice(`Task ${task.task_number} berhasil dihapus.`);
                           } catch (err) {
-                            alert(oddsError(err));
+                            rollbackOptimisticTask(previousTask);
+                            setError(oddsError(err));
+                          } finally {
+                            setDeletingTaskId(null);
                           }
+                        };
+                        const acceptBriefOptimistically = () => {
+                          let previousTask: OddsTask | null = null;
+                          return runOperationalAction(
+                            `brief-accept-${task.id}`,
+                            () => acceptOddsBrief(task.id),
+                            "Brief diterima dan masuk antrean.",
+                            (updatedTask) => confirmOptimisticTask(task.id, updatedTask),
+                            () => { previousTask = optimisticallyPatchTask(task.id, (currentTask) => ({ ...currentTask, status: "queued" })); },
+                            () => rollbackOptimisticTask(previousTask),
+                          );
+                        };
+                        const returnBriefOptimistically = (note: string) => {
+                          let previousTask: OddsTask | null = null;
+                          return runOperationalAction(
+                            `brief-return-${task.id}`,
+                            () => returnOddsBrief(task.id, note),
+                            "Brief dikembalikan.",
+                            (updatedTask) => confirmOptimisticTask(task.id, updatedTask),
+                            () => { previousTask = optimisticallyPatchTask(task.id, (currentTask) => ({ ...currentTask, status: "brief_revision_requested" })); },
+                            () => rollbackOptimisticTask(previousTask),
+                          );
                         };
                         
                         return (
                         <div key={task.id} className="flex flex-col gap-3">
                           {/* ── Mobile Card ── */}
                           <div className="lg:hidden">
-                            <OddsMobileTaskCard
+                            <OddsTaskCard
                               task={task}
                               theme={theme}
+                              viewerRole={isControlTaskSection ? "leader" : "designer"}
                               nowMs={timerNow}
                               timerSeconds={task.status === "in_progress" ? getTaskDuration(task) : undefined}
                               canCheckRole={canCheckThisTask}
                               chatOpen={selectedChatTaskId === task.id}
+                              outputOpen={activeOutputTaskId === task.id}
                               hideDelete={!isControlTaskSection}
+                              actionOverlayOpen={deleteConfirmTaskId === task.id || pauseConfirmTaskId === task.id}
+                              actionOverlay={deleteConfirmTaskId === task.id ? <TaskDeleteOverlay busy={deletingTaskId === task.id} onCancel={() => setDeleteConfirmTaskId(null)} onConfirm={() => void handleControlDelete()} /> : pauseConfirmTaskId === task.id ? <TaskPauseOverlay reason={pauseReason} busy={pausingTaskId === task.id} onChange={setPauseReason} onCancel={() => { setPauseConfirmTaskId(null); setPauseReason(""); }} onConfirm={() => void handlePauseTask(task.id)} /> : undefined}
                               showStart={!isControlTaskSection && ["queued", "ready_to_start", "revision"].includes(task.status)}
-                              showPause={isControlTaskSection ? ["in_progress", "leader_revision_requested", "revision"].includes(task.status) : task.status === "in_progress"}
+                              showPause={isControlTaskSection && ["in_progress", "leader_revision_requested", "revision"].includes(task.status)}
                               showDone={!isControlTaskSection && task.status === "in_progress"}
-                              startDisabled={Boolean(activeInProgressTask)}
+                              startDisabled={startingTaskId === task.id}
                               onAction={(action) => {
                                 if (action === "chat") {
+                                  setAdminTaskAction(null);
                                   setActiveChatTaskId((current) => current === task.id ? null : task.id);
                                   return;
                                 }
                                 if (action === "pause") {
-                                  void handlePauseTask(task.id);
+                                  setPauseReason("");
+                                  setPauseConfirmTaskId(task.id);
                                   return;
                                 }
                                 if (action === "start") {
@@ -2218,11 +2432,11 @@ function OddsPageContent() {
                                   return;
                                 }
                                 if (action === "delete") {
-                                  void handleControlDelete();
+                                  setDeleteConfirmTaskId(task.id);
                                 }
                               }}
                             >
-                              {(activeTab) => (
+                              {(activeTab, closePanel) => (
                                 <>
                                   <DesignerTaskQueueCard
                                     task={task}
@@ -2230,7 +2444,7 @@ function OddsPageContent() {
                                     nowMs={timerNow}
                                     controlView={isControlTaskSection}
                                     selected={selectedChatTaskId === task.id}
-                                    startDisabled={Boolean(activeInProgressTask)}
+                                    startDisabled={startingTaskId === task.id}
                                     timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
                                     onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
                                     onStart={() => void handleStartTask(task.id)}
@@ -2246,51 +2460,70 @@ function OddsPageContent() {
                                       setOutputDragActive(false);
                                       setActiveOutputTaskId(task.id);
                                     }}
-                                    onAcceptBrief={() => runOperationalAction(
-                                      `brief-accept-${task.id}`,
-                                      () => acceptOddsBrief(task.id),
-                                      "Brief diterima dan masuk antrean."
-                                    )}
-                                    onReturnBrief={(note) => runOperationalAction(
-                                      `brief-return-${task.id}`,
-                                      () => returnOddsBrief(task.id, note),
-                                      "Brief dikembalikan."
-                                    )}
-                                    externalAction={activeTab ? { type: activeTab as any, nonce: Date.now() } : undefined}
+                                    onAcceptBrief={acceptBriefOptimistically}
+                                    onReturnBrief={returnBriefOptimistically}
+                                    onTaskUpdated={(updatedTask) => setTasks((current) => current.map((currentTask) => currentTask.id === task.id ? { ...currentTask, ...updatedTask } : currentTask))}
+                                    externalAction={activeTab ? { type: activeTab as any, nonce: task.id } : undefined}
+                                    onBriefModalClose={closePanel}
+                                    onPanelClose={closePanel}
                                     detailOnly
                                   />
                                   {selectedChatTaskId === task.id && (
-                                    <div className={`overflow-hidden border-t ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"}`}>
-                                      <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} compact />
-                                    </div>
+                                    <TaskDiscussionPanel taskId={task.id} userId={user?.id} taskStatus={task.status} title={task.design_purpose} onClose={() => setActiveChatTaskId(null)} />
+                                  )}
+                                  {activeOutputTaskId === task.id && (
+                                    <TaskSubmissionPanel
+                                      theme={theme}
+                                      accentColor={accentColor}
+                                      outputBusy={outputBusy}
+                                      outputShareLink={outputShareLink}
+                                      outputFiles={outputFiles}
+                                      outputTotal={outputTotal}
+                                      outputDragActive={outputDragActive}
+                                      onShareLinkChange={setOutputShareLink}
+                                      onFilesChange={appendOutputFiles}
+                                      onTotalChange={setOutputTotal}
+                                      onDragActiveChange={setOutputDragActive}
+                                      onClose={closeOutputPanel}
+                                      onSubmit={(event) => {
+                                        event.preventDefault();
+                                        void handleSubmitOutput(task.id);
+                                      }}
+                                    />
                                   )}
                                 </>
                               )}
-                            </OddsMobileTaskCard>
+                            </OddsTaskCard>
                           </div>
 
                           {/* ── Desktop Card ── */}
                           <div className="hidden min-w-[900px] flex-col gap-3 lg:flex">
-                            <AdminKvRetailTaskCard
+                            <OddsTaskCard
                               task={task}
                               theme={theme}
+                              viewerRole={isControlTaskSection ? "leader" : "designer"}
+                              wideHighlightLabel={recommendationLabel(task, isControlTaskSection ? "leader" : "designer")}
                               nowMs={timerNow}
-                              timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
                               timerSeconds={task.status === "in_progress" ? getTaskDuration(task) : undefined}
                               chatOpen={selectedChatTaskId === task.id}
+                              outputOpen={activeOutputTaskId === task.id}
                               canCheckRole={canCheckThisTask}
                               hideDelete={!isControlTaskSection}
+                              actionOverlayOpen={deleteConfirmTaskId === task.id || pauseConfirmTaskId === task.id}
+                              actionOverlay={deleteConfirmTaskId === task.id ? <TaskDeleteOverlay busy={deletingTaskId === task.id} onCancel={() => setDeleteConfirmTaskId(null)} onConfirm={() => void handleControlDelete()} /> : pauseConfirmTaskId === task.id ? <TaskPauseOverlay reason={pauseReason} busy={pausingTaskId === task.id} onChange={setPauseReason} onCancel={() => { setPauseConfirmTaskId(null); setPauseReason(""); }} onConfirm={() => void handlePauseTask(task.id)} /> : undefined}
                               showStart={!isControlTaskSection && ["queued", "ready_to_start", "revision"].includes(task.status)}
-                              showPause={isControlTaskSection ? ["in_progress", "leader_revision_requested", "revision"].includes(task.status) : task.status === "in_progress"}
+                              showPause={isControlTaskSection && ["in_progress", "leader_revision_requested", "revision"].includes(task.status)}
                               showDone={!isControlTaskSection && task.status === "in_progress"}
-                              startDisabled={Boolean(activeInProgressTask)}
+                              startDisabled={startingTaskId === task.id}
                               onAction={(action) => {
                                 if (action === "chat") {
+                                  setAdminTaskAction(null);
                                   setActiveChatTaskId((current) => current === task.id ? null : task.id);
                                   return;
                                 }
                                 if (action === "pause") {
-                                  void handlePauseTask(task.id);
+                                  setPauseReason("");
+                                  setPauseConfirmTaskId(task.id);
                                   return;
                                 }
                                 if (action === "start") {
@@ -2310,19 +2543,21 @@ function OddsPageContent() {
                                   return;
                                 }
                                 if (action === "delete") {
-                                  void handleControlDelete();
+                                  setDeleteConfirmTaskId(task.id);
                                   return;
                                 }
                                 setAdminTaskAction({ taskId: task.id, type: action, nonce: Date.now() });
                               }}
                             >
+                              {(_activeTab, closePanel) => (
+                                <>
                               <DesignerTaskQueueCard
                                 task={task}
                                 theme={theme}
                                 nowMs={timerNow}
                                 controlView={isControlTaskSection}
                                 selected={selectedChatTaskId === task.id}
-                                startDisabled={Boolean(activeInProgressTask)}
+                                startDisabled={startingTaskId === task.id}
                                 timerText={task.status === "in_progress" ? formatTimer(getTaskDuration(task)) : undefined}
                                 onChat={() => setActiveChatTaskId((current) => current === task.id ? null : task.id)}
                                 onStart={() => void handleStartTask(task.id)}
@@ -2338,43 +2573,42 @@ function OddsPageContent() {
                                   setOutputDragActive(false);
                                   setActiveOutputTaskId(task.id);
                                 }}
-                                onAcceptBrief={() => runOperationalAction(
-                                  `brief-accept-${task.id}`,
-                                  () => acceptOddsBrief(task.id),
-                                  "Brief diterima dan masuk antrean."
-                                )}
-                                onReturnBrief={(note) => runOperationalAction(
-                                  `brief-return-${task.id}`,
-                                  () => returnOddsBrief(task.id, note),
-                                  "Brief dikembalikan."
-                                )}
+                                onAcceptBrief={acceptBriefOptimistically}
+                                onReturnBrief={returnBriefOptimistically}
+                                onTaskUpdated={(updatedTask) => setTasks((current) => current.map((currentTask) => currentTask.id === task.id ? { ...currentTask, ...updatedTask } : currentTask))}
                                 externalAction={adminTaskAction?.taskId === task.id ? adminTaskAction : undefined}
+                                onBriefModalClose={() => { setAdminTaskAction(null); closePanel(); }}
+                                onPanelClose={() => { setAdminTaskAction(null); closePanel(); }}
                                 detailOnly
                               />
                               {selectedChatTaskId === task.id && (
-                                <div className={`overflow-hidden rounded-lg border mt-3 ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"} shadow-[0_5px_14px_rgba(44,42,39,0.05)]`}>
-                                  <div className="flex items-center justify-between border-b border-cu-border bg-cu-panel-soft px-3 py-2">
-                                    <div className="flex min-w-0 items-center gap-2">
-                                      <MaterialIcon name="forum" size="auto" className="text-lg" style={{ color: accentColor }} />
-                                      <div className="min-w-0">
-                                        <p className="max-w-[560px] truncate text-xs font-semibold leading-none text-cu-ink">{task.design_purpose}</p>
-                                      </div>
-                                    </div>
-                                    <button type="button" onClick={() => setActiveChatTaskId(null)} aria-label="Tutup diskusi" className="flex size-7 items-center justify-center rounded-lg border border-cu-border bg-white text-cu-ink transition hover:bg-cu-panel-soft">
-                                      <MaterialIcon name="close" size="xs" />
-                                    </button>
-                                  </div>
-                                  <OddsTaskChat
-                                    taskId={task.id}
-                                    userId={user?.id}
-                                    taskStatus={task.status}
-                                    compact
-                                  />
-                                </div>
+                                <TaskDiscussionPanel taskId={task.id} userId={user?.id} taskStatus={task.status} title={task.design_purpose} onClose={() => setActiveChatTaskId(null)} />
                               )}
-                            </AdminKvRetailTaskCard>
+                              {activeOutputTaskId === task.id && (
+                                <TaskSubmissionPanel
+                                  theme={theme}
+                                  accentColor={accentColor}
+                                  outputBusy={outputBusy}
+                                  outputShareLink={outputShareLink}
+                                  outputFiles={outputFiles}
+                                  outputTotal={outputTotal}
+                                  outputDragActive={outputDragActive}
+                                  onShareLinkChange={setOutputShareLink}
+                                  onFilesChange={appendOutputFiles}
+                                  onTotalChange={setOutputTotal}
+                                  onDragActiveChange={setOutputDragActive}
+                                  onClose={closeOutputPanel}
+                                  onSubmit={(event) => {
+                                    event.preventDefault();
+                                    void handleSubmitOutput(task.id);
+                                  }}
+                                />
+                              )}
+                                </>
+                              )}
+                            </OddsTaskCard>
                           </div>
-                          {activeOutputTaskId === task.id && (
+                          {false && activeOutputTaskId === task.id && (
                           <div className={`overflow-hidden rounded-lg border ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"} shadow-[0_5px_14px_rgba(44,42,39,0.05)]`}>
                             <div className="flex h-10 items-center justify-between border-b border-cu-border bg-cu-panel-soft px-3">
                               <div className="flex min-w-0 items-center gap-2">
@@ -2522,36 +2756,39 @@ function OddsPageContent() {
       })()}
 
       {effectiveActiveSection === "designer_report" && (() => {
-        const reportRows = dailyReports.length > 0
-          ? dailyReports.map((report) => [
-              formatOddsDate(report.report_date),
-              String(report.total_output ?? (report.output_done ? 1 : 0)),
-              String(report.revision_count),
-              report.overdue ? "Ya" : "Tidak",
-              report.quality_issue_flag ? "Ya" : "Tidak",
-              String(report.score),
-            ])
-          : tasks
-              .filter((task) => task.status === "done" && String(task.assigned_designer?.id ?? task.assignedDesigner?.id) === String(user?.id))
-              .map((task) => [
-                formatOddsDate(task.done_at ?? task.updated_at ?? task.created_at),
-                String((task.results ?? []).reduce((total, result) => {
-                  const match = (result.result_notes ?? "").match(/Total Output:\s*([0-9]+)/i);
-                  return total + (match?.[1] ? Number(match[1]) : 0);
-                }, 0)),
-                String((task.normal_revision_count ?? 0) + (task.leader_revision_count ?? 0)),
-                task.overdue ? "Ya" : "Tidak",
-                task.quality_issue_flag ? "Ya" : "Tidak",
-                String(task.category_snapshot?.score_weight ?? task.category?.score_weight ?? 0),
-              ]);
+        const reportRows = tasks
+          .filter((task) => task.status === "done" && String(task.assigned_designer?.id ?? task.assignedDesigner?.id) === String(user?.id))
+          .map((task) => {
+            const workLogs = (task.time_logs ?? task.timeLogs ?? [])
+              .filter((log) => ["work", "revision"].includes(log.log_type))
+              .sort((left, right) => new Date(left.started_at).getTime() - new Date(right.started_at).getTime());
+            const startedAt = workLogs[0]?.started_at ?? task.created_at;
+            const totalOutput = (task.results ?? []).reduce((total, result) => {
+              const match = (result.result_notes ?? "").match(/Total Output:\s*([0-9]+)/i);
+              return total + (match?.[1] ? Number(match[1]) : 0);
+            }, 0);
+            const localFile = [...(task.results ?? [])]
+              .sort((left, right) => Number(right.version_number) - Number(left.version_number))
+              .flatMap((result) => result.asset_links ?? [])
+              .find((asset) => asset.label.toLowerCase().includes("local file sharing"));
+
+            return [
+              formatOddsDate(startedAt, true),
+              formatOddsDate(task.done_at ?? task.updated_at ?? task.created_at, true),
+              task.design_purpose,
+              task.requester?.name ?? "-",
+              String(totalOutput),
+              localFile ? <span key={`local-file-${task.id}`} title={localFile.url} className="block max-w-64 truncate text-xs text-cu-info">{localFile.url}</span> : "-",
+            ];
+          });
 
         return (
         <div className="space-y-6">
-          <ConfigPanel title="Laporan Kinerja Pribadi" icon="monitoring">
+          <ConfigPanel title="Report" icon="monitoring">
             <DataTable
               loading={loading}
               empty="Belum ada data kinerja."
-              headers={["Tanggal", "Output", "Revisi", "Overdue", "Quality", "Score"]}
+              headers={["Tanggal Pengerjaan", "Selesai Pengerjaan", "Judul Tugas", "Tugas Dari", "Total Output", "Link File Sharing"]}
               rows={reportRows}
             />
           </ConfigPanel>
@@ -2586,19 +2823,25 @@ function OddsPageContent() {
         </ConfigPanel>
       )}
 
-      {["client_all_requests", "client_action_required", "client_in_progress", "client_archive"].includes(effectiveActiveSection) && (() => {
+      {["client_all_requests", "client_queue", "client_working", "client_action_required", "client_revisions", "client_archive"].includes(effectiveActiveSection) && (() => {
         const clientTasks = tasks.filter((task) => {
+          if (effectiveActiveSection === "client_queue") return task.status === "queued";
+          if (effectiveActiveSection === "client_working") return task.status === "in_progress";
           if (effectiveActiveSection === "client_action_required") return task.status === "client_review";
-          if (effectiveActiveSection === "client_in_progress") return ["queued", "in_progress", "spv_review"].includes(task.status);
+          if (effectiveActiveSection === "client_revisions") return task.task_type === "client_revision" && !["done", "cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(task.status);
           if (effectiveActiveSection === "client_archive") return ["done", "cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(task.status);
           return true;
         });
-        const emptyText = effectiveActiveSection === "client_action_required"
+        const emptyText = effectiveActiveSection === "client_queue"
+          ? "Tidak ada request dalam antrean."
+          : effectiveActiveSection === "client_working"
+          ? "Tidak ada request yang sedang dikerjakan."
+          : effectiveActiveSection === "client_action_required"
           ? "Tidak ada tugas yang menunggu ACC/Feedback Anda saat ini."
-          : effectiveActiveSection === "client_in_progress"
-          ? "Tidak ada tugas yang sedang diproses."
+          : effectiveActiveSection === "client_revisions"
+          ? "Tidak ada request revisi yang sedang diproses."
           : effectiveActiveSection === "client_archive"
-          ? "Belum ada tugas di arsip."
+          ? "Belum ada request yang selesai."
           : "Belum ada riwayat request.";
           
         const accentColor = theme === "dark" ? "#b0ff5e" : theme === "retro" ? "#ba0dcb" : "#00a4ff";
@@ -2616,113 +2859,114 @@ function OddsPageContent() {
                   const canCheckThisTask = task.status === "client_review";
                   const hideClientDelete = task.status === "done";
                   const handleClientDelete = async () => {
-                    const confirmed = window.confirm(`Hapus / cancel task ${task.task_number}?`);
-                    if (!confirmed) return;
-
+                    setDeletingTaskId(task.id);
+                    const previousTask = optimisticallyRemoveTask(task.id);
                     try {
                       await deleteOddsTask(task.id);
-                      await loadConfig();
+                      setDeleteConfirmTaskId(null);
+                      setActiveChatTaskId((current) => current === task.id ? null : current);
+                      setActiveOutputTaskId((current) => current === task.id ? null : current);
+                      setNotice(`Task ${task.task_number} berhasil dihapus.`);
                     } catch (err) {
-                      alert(oddsError(err));
+                      rollbackOptimisticTask(previousTask);
+                      setError(oddsError(err));
+                    } finally {
+                      setDeletingTaskId(null);
                     }
                   };
                   return (
                     <div key={task.id} className="flex flex-col gap-3">
                       {/* ── Mobile Card ── */}
                       <div className="lg:hidden">
-                        <OddsMobileTaskCard
+                        <OddsTaskCard
                           task={task}
                           theme={theme}
+                          viewerRole="client"
                           nowMs={timerNow}
                           timerSeconds={task.status === "in_progress" || getTaskDuration(task) > 0 ? getTaskDuration(task) : undefined}
                           canCheckRole={canCheckThisTask}
                           chatOpen={selectedChatTaskId === task.id}
                           hideDelete={hideClientDelete}
+                          actionOverlayOpen={deleteConfirmTaskId === task.id}
+                          actionOverlay={deleteConfirmTaskId === task.id ? <TaskDeleteOverlay busy={deletingTaskId === task.id} onCancel={() => setDeleteConfirmTaskId(null)} onConfirm={() => void handleClientDelete()} /> : undefined}
                           onAction={(action) => {
                             if (action === "chat") {
+                              setAdminTaskAction(null);
                               setActiveChatTaskId((current) => current === task.id ? null : task.id);
                               return;
                             }
                             if (action === "delete") {
-                              void handleClientDelete();
+                              setDeleteConfirmTaskId(task.id);
                             }
                           }}
                         >
-                          {(activeTab) => (
+                          {(activeTab, closePanel) => (
                             <>
                               <ClientOddsTaskCard
                                 task={task}
                                 theme={theme}
                                 userId={user?.id}
                                 nowMs={timerNow}
-                                onReviewed={loadConfig}
+                                onReviewed={(updatedTask) => setTasks((current) => current.map((currentTask) => currentTask.id === task.id ? { ...currentTask, ...updatedTask } : currentTask))}
                                 detailOnly
-                                externalAction={activeTab ? { type: activeTab as any, nonce: Date.now() } : undefined}
+                                externalAction={activeTab ? { type: activeTab as any, nonce: task.id } : undefined}
+                                onBriefModalClose={closePanel}
+                                onPanelClose={closePanel}
                               />
                               {selectedChatTaskId === task.id && (
-                                <div className={`overflow-hidden border-t ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"}`}>
-                                  <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} compact />
-                                </div>
+                                <TaskDiscussionPanel taskId={task.id} userId={user?.id} taskStatus={task.status} title={task.design_purpose} onClose={() => setActiveChatTaskId(null)} />
                               )}
                             </>
                           )}
-                        </OddsMobileTaskCard>
+                        </OddsTaskCard>
                       </div>
 
                       {/* ── Desktop Card ── */}
                       <div className="hidden min-w-[900px] flex-col gap-3 lg:flex">
-                        <AdminKvRetailTaskCard
+                        <OddsTaskCard
                           task={task}
                           theme={theme}
+                          viewerRole="client"
+                          wideHighlightLabel={recommendationLabel(task, "client")}
                           nowMs={timerNow}
-                          timerText={task.status === "in_progress" || getTaskDuration(task) > 0 ? formatTimer(getTaskDuration(task)) : undefined}
                           timerSeconds={task.status === "in_progress" || getTaskDuration(task) > 0 ? getTaskDuration(task) : undefined}
                           canCheckRole={canCheckThisTask}
                           hideDelete={hideClientDelete}
                           chatOpen={selectedChatTaskId === task.id}
+                          actionOverlayOpen={deleteConfirmTaskId === task.id}
+                          actionOverlay={deleteConfirmTaskId === task.id ? <TaskDeleteOverlay busy={deletingTaskId === task.id} onCancel={() => setDeleteConfirmTaskId(null)} onConfirm={() => void handleClientDelete()} /> : undefined}
                           onAction={(action) => {
                             if (action === "chat") {
+                              setAdminTaskAction(null);
                               setActiveChatTaskId((current) => current === task.id ? null : task.id);
                               return;
                             }
                             if (action === "delete") {
-                              void handleClientDelete();
+                              setDeleteConfirmTaskId(task.id);
                               return;
                             }
                             setAdminTaskAction({ taskId: task.id, type: action, nonce: Date.now() });
                           }}
                         >
+                          {(_activeTab, closePanel) => (
+                            <>
                           <ClientOddsTaskCard
                             task={task}
                             theme={theme}
                             userId={user?.id}
                             nowMs={timerNow}
-                            onReviewed={loadConfig}
+                            onReviewed={(updatedTask) => setTasks((current) => current.map((currentTask) => currentTask.id === task.id ? { ...currentTask, ...updatedTask } : currentTask))}
                             detailOnly
                             externalAction={adminTaskAction?.taskId === task.id ? adminTaskAction : undefined}
+                            onBriefModalClose={() => { setAdminTaskAction(null); closePanel(); }}
+                            onPanelClose={() => { setAdminTaskAction(null); closePanel(); }}
                           />
                           {selectedChatTaskId === task.id && (
-                            <div className={`overflow-hidden rounded-lg border mt-3 ${theme === "dark" ? "border-white/10 bg-[#171717]" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#d9e1e6] bg-white"} shadow-[0_5px_14px_rgba(44,42,39,0.05)]`}>
-                              <div className="flex items-center justify-between border-b border-cu-border bg-cu-panel-soft px-3 py-2">
-                                <div className="flex min-w-0 items-center gap-2">
-                                  <MaterialIcon name="forum" size="auto" className="text-lg" style={{ color: accentColor }} />
-                                  <div className="min-w-0">
-                                    <p className="max-w-[560px] truncate text-xs font-semibold leading-none text-cu-ink">{task.design_purpose}</p>
-                                  </div>
-                                </div>
-                                <button type="button" onClick={() => setActiveChatTaskId(null)} aria-label="Tutup diskusi" className="flex size-7 items-center justify-center rounded-lg border border-cu-border bg-white text-cu-ink transition hover:bg-cu-panel-soft">
-                                  <MaterialIcon name="close" size="xs" />
-                                </button>
-                              </div>
-                              <OddsTaskChat
-                                taskId={task.id}
-                                userId={user?.id}
-                                taskStatus={task.status}
-                                compact
-                              />
-                            </div>
+                            <TaskDiscussionPanel taskId={task.id} userId={user?.id} taskStatus={task.status} title={task.design_purpose} onClose={() => setActiveChatTaskId(null)} />
                           )}
-                        </AdminKvRetailTaskCard>
+                            </>
+                          )}
+                        </OddsTaskCard>
                       </div>
                     </div>
                   );
@@ -3383,7 +3627,7 @@ function AdminKvRetailTaskCard({
   const hasBriefContent = Boolean(stripRichText(task.brief_text));
   const canCheckOutput = task.status === "spv_review";
   const chatEnabled = task.status !== "submitted";
-  const fileEnabled = resultAssets.length > 0 || canCheckOutput;
+  const fileEnabled = isDone || resultAssets.length > 0 || canCheckOutput;
   const isPausable = ["in_progress", "leader_revision_requested", "revision"].includes(task.status);
   const isOverdue = task.deadline ? new Date(task.deadline).getTime() < nowMs && !isDone : false;
   const reviewsList = ((task as OddsTask & { reviews?: Array<{ review_type: string; rating?: number | null }> }).reviews ?? []);
@@ -3710,9 +3954,12 @@ type DesignerTaskQueueCardProps = {
   onDone: () => void;
   onAcceptBrief: () => Promise<void>;
   onReturnBrief: (note: string) => Promise<void>;
+  onTaskUpdated?: (task: OddsTask) => void;
+  onBriefModalClose?: () => void;
+  onPanelClose?: () => void;
 };
 
-function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, selected = false, startDisabled = false, timerText, externalAction, detailOnly = false, onChat, onStart, onPause, onDone, onAcceptBrief, onReturnBrief }: DesignerTaskQueueCardProps) {
+function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, selected = false, startDisabled = false, timerText, externalAction, detailOnly = false, onChat, onStart, onPause, onDone, onAcceptBrief, onReturnBrief, onTaskUpdated, onBriefModalClose, onPanelClose }: DesignerTaskQueueCardProps) {
   const [briefOpen, setBriefOpen] = useState(false);
   const [fileOpen, setFileOpen] = useState(false);
   const [outputCheckOpen, setOutputCheckOpen] = useState(false);
@@ -3729,9 +3976,13 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
   const lastActionNonce = useRef<number | null>(null);
 
   useEffect(() => {
-    if (externalAction && externalAction.nonce !== lastActionNonce.current) {
+    if (!externalAction) {
+      lastActionNonce.current = null;
+      return;
+    }
+
+    if (externalAction.nonce !== lastActionNonce.current) {
       lastActionNonce.current = externalAction.nonce;
-      
       setBriefOpen(externalAction.type === "brief");
       setFileOpen(externalAction.type === "file");
       setOutputCheckOpen(externalAction.type === "check");
@@ -3746,9 +3997,9 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
       await requestOddsCancel(task.id, cancelReason.trim());
       setCancelOpen(false);
       setCancelReason("");
-      window.location.reload();
+      publishTaskFeedbackToast({ status: "success", message: "Permintaan cancel ODDS berhasil dikirim." });
     } catch (err) {
-      alert(oddsError(err));
+      publishTaskFeedbackToast({ status: "error", message: oddsError(err) });
     } finally {
       setCancelBusy(false);
     }
@@ -3792,6 +4043,8 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
   const canCheckOutput = controlView && task.status === "spv_review";
   const fileEnabled = resultAssets.length > 0 || canCheckOutput;
   const ratingValue = typeof task.rating === "number" ? task.rating : null;
+  const clientRatingReview = [...(task.reviews ?? [])].reverse().find((review) => review.review_type === "client" && (review.rating != null || Boolean(review.notes?.trim())));
+  const clientFeedback = clientRatingReview?.notes ?? null;
   const getResultAssets = (result: OddsTaskResult) => result.asset_links ?? ((result as OddsTaskResult & { assetLinks?: OddsTaskResult["asset_links"] }).assetLinks ?? []);
   const getTotalOutput = (notes: string | null | undefined) => {
     const match = (notes ?? "").match(/Total Output:\s*([0-9]+)/i);
@@ -3849,19 +4102,26 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
       </a>
     );
   };
-  const handleSpvResultReview = async (decision: "approved" | "revision") => {
-    const note = spvReviewNote.trim();
+  const handleSpvResultReview = async (decision: "approved" | "revision", revisionNote = spvReviewNote) => {
+    const note = revisionNote.trim();
     if (decision === "revision" && !stripRichText(note)) return;
 
     setSpvReviewBusy(decision);
+    onTaskUpdated?.({
+      ...task,
+      status: decision === "approved" ? "client_review" : "leader_revision_requested",
+    });
     try {
-      await spvReviewOddsTask(task.id, decision, note || undefined);
+      const updatedTask = await spvReviewOddsTask(task.id, decision, note || undefined);
       setSpvRevisionOpen(false);
       setSpvReviewNote("");
       setOutputCheckOpen(false);
-      window.location.reload();
+      onPanelClose?.();
+      onTaskUpdated?.(updatedTask);
+      publishTaskFeedbackToast({ status: "success", message: decision === "approved" ? "Output berhasil disetujui." : "Permintaan revisi berhasil dikirim." });
     } catch (err) {
-      alert(oddsError(err));
+      onTaskUpdated?.(task);
+      publishTaskFeedbackToast({ status: "error", message: oddsError(err) });
     } finally {
       setSpvReviewBusy(null);
     }
@@ -3917,6 +4177,18 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
     }
   };
   const actionButtonBase = "inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50";
+  const closeBriefModal = () => {
+    setBriefOpen(false);
+    onBriefModalClose?.();
+  };
+  const closeFilePanel = () => {
+    setFileOpen(false);
+    onPanelClose?.();
+  };
+  const closeOutputCheckPanel = () => {
+    setOutputCheckOpen(false);
+    onPanelClose?.();
+  };
   const briefModal = briefOpen && modalRoot ? createPortal(
     <div
       className="absolute inset-0 z-[80] overflow-hidden bg-white text-cu-ink"
@@ -3929,7 +4201,7 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
           <div className="min-w-0">
             <p id={`task-brief-${task.id}`} className="truncate text-xl font-bold">Detail Task</p>
           </div>
-          <button type="button" onClick={() => setBriefOpen(false)} aria-label="Tutup cek brief" className="flex size-10 items-center justify-center rounded-xl border border-[#c9c9c9] bg-white text-[#303431] shadow-sm transition hover:border-[#00a4ff] hover:bg-[#f3fbff]">
+          <button type="button" onClick={closeBriefModal} aria-label="Tutup cek brief" className="flex size-10 items-center justify-center rounded-xl border border-[#c9c9c9] bg-white text-[#303431] shadow-sm transition hover:border-[#00a4ff] hover:bg-[#f3fbff]">
             <MaterialIcon name="close" size="auto" className="text-xl" />
           </button>
         </div>
@@ -3965,7 +4237,7 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
                 </div>
               )}
             </div>
-            {canCheckBrief && (
+            {canCheckBrief && !controlView && (
               <div className="grid gap-3">
                 {declineOpen ? (
                 <>
@@ -4155,22 +4427,21 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
           </div>
         </div>
       </>
-    )}
+        )}
         {fileOpen && (
-          <div className={`grid gap-2 border-t p-3 ${dividerClass} ${bodyClass}`}>
-            {resultAssets.length > 0 ? (
-              resultAssets.map((asset) => (
-                <a key={asset.id} href={asset.url} target="_blank" rel="noreferrer" className={`flex items-center justify-between gap-3 border px-3 py-2 text-sm font-semibold transition hover:opacity-80 ${theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "rounded-lg border-cu-border bg-white text-cu-ink"}`}>
-                  <span className="min-w-0 truncate">{asset.label}</span>
-                  <MaterialIcon name="open_in_new" size="xs" />
-                </a>
-              ))
-            ) : (
-              <p className="px-3 py-2 text-sm text-cu-muted">Belum ada file output yang tercatat.</p>
-            )}
-          </div>
+          <OutputFilesPanel onClose={closeFilePanel} assets={resultAssets} version={activeResult?.version_number} rating={ratingValue ?? clientRatingReview?.rating ?? null} feedback={clientFeedback} showReview={isDone} />
         )}
         {outputCheckOpen && (
+          <OutputReviewPanel
+            onClose={closeOutputCheckPanel}
+            assets={activeResult ? getResultAssets(activeResult) : []}
+            version={activeResult?.version_number}
+            busy={!!spvReviewBusy}
+            onApprove={() => void handleSpvResultReview("approved")}
+            onRevisionSubmit={(note) => void handleSpvResultReview("revision", note)}
+          />
+        )}
+        {false && outputCheckOpen && (
           <div className={`border-t px-3 py-2 ${dividerClass} ${bodyClass}`}>
             {activeResult ? (() => {
               const assets = getResultAssets(activeResult);
@@ -4323,6 +4594,21 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
   );
 }
 
+function TaskDeleteOverlay({ busy, onCancel, onConfirm }: { busy: boolean; onCancel: () => void; onConfirm: () => void }) {
+  return <div className="grid h-full w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 bg-rose-50 px-4 text-[#3b4446]">
+    <div className="flex min-w-0 items-center gap-2"><MaterialIcon name="warning" size="sm" className="shrink-0 text-rose-500" /><span className="truncate text-sm font-semibold">Yakin ingin menghapus request ini?</span></div>
+    <div className="flex h-full shrink-0 items-center gap-2"><button type="button" disabled={busy} onClick={onCancel} className="h-8 rounded-md border border-[#d9e1e6] bg-white px-3 text-xs font-semibold text-[#3b4446] transition hover:bg-slate-50 disabled:opacity-50">Batal</button><button type="button" disabled={busy} onClick={onConfirm} className="h-8 rounded-md bg-rose-500 px-3 text-xs font-semibold text-white transition hover:bg-rose-600 disabled:opacity-50">{busy ? "Menghapus..." : "Hapus"}</button></div>
+  </div>;
+}
+
+function TaskPauseOverlay({ reason, busy, onChange, onCancel, onConfirm }: { reason: string; busy: boolean; onChange: (value: string) => void; onCancel: () => void; onConfirm: () => void }) {
+  return <div className="grid h-full w-full grid-rows-[auto_1fr_auto] gap-2 bg-amber-50 px-4 py-3 text-[#3b4446]">
+    <p className="text-sm font-semibold">Pause Pengerjaan</p>
+    <input value={reason} onChange={(event) => onChange(event.target.value)} placeholder="Tulis alasan pause..." className="h-8 w-full min-w-0 self-center rounded-md border border-amber-200 bg-white px-3 text-xs text-[#3b4446] outline-none placeholder:text-[#9aa7ac] focus:border-amber-400" />
+    <div className="flex justify-end gap-2"><button type="button" disabled={busy} onClick={onCancel} className="h-8 rounded-md border border-[#d9e1e6] bg-white px-3 text-xs font-semibold text-[#3b4446] transition hover:bg-slate-50 disabled:opacity-50">Batal</button><button type="button" disabled={busy || !reason.trim()} onClick={onConfirm} className="h-8 rounded-md bg-amber-500 px-3 text-xs font-semibold text-white transition hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-40">{busy ? "Memproses..." : "Jeda Task"}</button></div>
+  </div>;
+}
+
 function RetroStatusBadge({ status }: { status: string }) {
   const danger = ["cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(status);
   const success = ["done", "client_review"].includes(status);
@@ -4355,7 +4641,7 @@ function taskTypeLabel(taskType: string): string {
   return labels[taskType] ?? statusLabel(taskType);
 }
 
-function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly, externalAction }: { task: OddsTask; theme: "light" | "dark" | "retro"; userId?: number; nowMs: number; onReviewed?: () => Promise<void>; detailOnly?: boolean; externalAction?: { type: string; nonce: number } }) {
+function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly, externalAction, onBriefModalClose, onPanelClose }: { task: OddsTask; theme: "light" | "dark" | "retro"; userId?: number; nowMs: number; onReviewed?: (task: OddsTask) => void | Promise<void>; detailOnly?: boolean; externalAction?: { type: string; nonce: number }; onBriefModalClose?: () => void; onPanelClose?: () => void }) {
   const [briefOpen, setBriefOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
   const [fileOpen, setFileOpen] = useState(false);
@@ -4370,9 +4656,13 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
   const lastActionNonce = useRef<number | null>(null);
 
   useEffect(() => {
-    if (externalAction && externalAction.nonce !== lastActionNonce.current) {
+    if (!externalAction) {
+      lastActionNonce.current = null;
+      return;
+    }
+
+    if (externalAction.nonce !== lastActionNonce.current) {
       lastActionNonce.current = externalAction.nonce;
-      
       setBriefOpen(externalAction.type === "brief");
       setFileOpen(externalAction.type === "file" || externalAction.type === "check");
       setMessageOpen(externalAction.type === "chat");
@@ -4438,9 +4728,12 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
   const activeResult = sortedResults[0] ?? null;
   const getResultAssets = (result: OddsTaskResult) => result.asset_links ?? ((result as OddsTaskResult & { assetLinks?: OddsTaskResult["asset_links"] }).assetLinks ?? []);
   const resultAssets = sortedResults.flatMap((result) => getResultAssets(result));
+  const doneRatingReview = [...(task.reviews ?? [])].reverse().find((review) => review.review_type === "client" && (review.rating != null || Boolean(review.notes?.trim())));
+  const doneRating = typeof task.rating === "number" ? task.rating : doneRatingReview?.rating ?? null;
+  const doneFeedback = doneRatingReview?.notes ?? null;
   const messageEnabled = !["submitted", "brief_revision_requested"].includes(task.status);
   const canClientCheckOutput = task.status === "client_review";
-  const fileEnabled = resultAssets.length > 0 || canClientCheckOutput;
+  const fileEnabled = task.status === "done" || resultAssets.length > 0 || canClientCheckOutput;
   const actionButtonClass = "flex size-6 items-center justify-center text-cu-ink transition hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-30";
   const getTotalOutput = (notes: string | null | undefined) => {
     const match = (notes ?? "").match(/Total Output:\s*([0-9]+)/i);
@@ -4503,13 +4796,18 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
     if (decision === "revision" && !stripRichText(note)) return;
 
     setClientReviewBusy(decision);
+    onReviewed?.({
+      ...task,
+      status: decision === "approved" ? "done" : "queued",
+    });
     try {
+      let updatedTask: OddsTask;
       if (decision === "approved") {
         const feedback = clientFeedback.trim();
-        await clientReviewOddsTask(task.id, "approved", feedback || undefined);
-        await rateOddsTask(task.id, clientRating, feedback || undefined);
+        updatedTask = await clientReviewOddsTask(task.id, "approved", feedback || undefined);
+        updatedTask = await rateOddsTask(task.id, clientRating, feedback || undefined);
       } else {
-        await clientReviewOddsTask(task.id, "revision", note || undefined, "normal");
+        updatedTask = await clientReviewOddsTask(task.id, "revision", note || undefined, "normal");
       }
       setClientApproveOpen(false);
       setClientApproveStep(1);
@@ -4517,10 +4815,13 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
       setClientReviewNote("");
       setClientFeedback("");
       setFileOpen(false);
-      await onReviewed?.();
+      await onReviewed?.(updatedTask);
+      onPanelClose?.();
+      publishTaskFeedbackToast({ status: "success", message: decision === "approved" ? "Hasil task berhasil disetujui." : "Permintaan revisi berhasil dikirim." });
     } catch (err: any) {
+      onReviewed?.(task);
       console.error(err);
-      alert(oddsError(err));
+      publishTaskFeedbackToast({ status: "error", message: oddsError(err) });
     } finally {
       setClientReviewBusy(null);
     }
@@ -4543,6 +4844,10 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
   const estimatedTime = formatEstimatedTime();
   const hasBriefContent = Boolean(stripRichText(task.brief_text));
   const modalRoot = typeof document !== "undefined" ? document.getElementById("odds-shell-modal-root") : null;
+  const closeBriefModal = () => {
+    setBriefOpen(false);
+    onBriefModalClose?.();
+  };
   const briefModal = briefOpen && modalRoot ? createPortal(
     <div
       className="absolute inset-0 z-[80] overflow-hidden bg-white text-cu-ink"
@@ -4553,7 +4858,7 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
       <div className="flex h-full w-full flex-col overflow-hidden bg-white">
         <div className="flex items-center justify-between gap-4 border-b border-[#e1e8eb] bg-white/80 px-5 py-4">
           <p id={`client-task-brief-${task.id}`} className="truncate text-xl font-bold">Detail Task</p>
-          <button type="button" onClick={() => setBriefOpen(false)} aria-label="Tutup brief" className="flex size-10 items-center justify-center rounded-xl border border-[#c9c9c9] bg-white text-[#303431] shadow-sm transition hover:border-[#00a4ff] hover:bg-[#f3fbff]">
+          <button type="button" onClick={closeBriefModal} aria-label="Tutup brief" className="flex size-10 items-center justify-center rounded-xl border border-[#c9c9c9] bg-white text-[#303431] shadow-sm transition hover:border-[#00a4ff] hover:bg-[#f3fbff]">
             <MaterialIcon name="close" size="auto" className="text-xl" />
           </button>
         </div>
@@ -4655,11 +4960,21 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
           </>
         )}
         {messageOpen && !detailOnly && (
-          <div className="border-t border-cu-border bg-white">
-            <OddsTaskChat taskId={task.id} userId={userId} taskStatus={task.status} compact />
+          <TaskDiscussionPanel taskId={task.id} userId={userId} taskStatus={task.status} title={task.design_purpose} onClose={() => setMessageOpen(false)} />
+        )}
+        {fileOpen && task.status === "done" && (
+          <div className="border-t border-cu-border bg-white px-4 py-3">
+            <OutputFilesPanel
+              onClose={() => { setFileOpen(false); onPanelClose?.(); }}
+              assets={resultAssets}
+              version={activeResult?.version_number}
+              rating={doneRating}
+              feedback={doneFeedback}
+              showReview
+            />
           </div>
         )}
-        {fileOpen && (
+        {fileOpen && task.status !== "done" && (
           <div className="border-t border-cu-border bg-white px-4 py-3">
             {activeResult ? (() => {
               const assets = getResultAssets(activeResult);
