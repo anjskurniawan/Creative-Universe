@@ -11,5 +11,14 @@ export function TaskCardPeople({ requesterName, requesterRole, designerName, com
 }
 
 export function TaskCardWidePeople({ requesterName, requesterRole, designerName, lineClass }: { requesterName: string; requesterRole: string; designerName: string; lineClass: string }) {
-  return <div className={`flex min-w-0 items-center ${lineClass}`}><div className="min-w-0 flex-1 px-4 py-2"><TaskCardPerson name={requesterName} role={requesterRole} accent compact /></div><div className={`min-w-0 flex-1 border-l px-4 py-2 ${lineClass}`}><TaskCardPerson name={designerName} role="Designer" compact /></div></div>;
+  return (
+    <div className="flex flex-col w-full min-w-0 justify-center">
+      <div className="min-w-0 px-4 py-2">
+        <TaskCardPerson name={requesterName} role={requesterRole} accent compact />
+      </div>
+      <div className={`min-w-0 border-t px-4 py-2 ${lineClass}`}>
+        <TaskCardPerson name={designerName} role="Designer" compact />
+      </div>
+    </div>
+  );
 }

@@ -144,16 +144,18 @@ export function TableBriefDetails({
         <table className={`h-full w-full flex-1 table-fixed border-collapse text-sm [&_td]:min-w-0 ${dark ? "border border-white/10" : "border border-[#BDEAFF]"}`}>
           <colgroup>
             <col className="w-20" />
-            <col className="w-[31%]" />
-            <col className="w-[31%]" />
-            <col className="w-[38%]" />
+            <col className="w-[30%]" />
+            <col className="w-[30%]" />
+            <col className="w-[35%]" />
+            <col className="w-20" />
           </colgroup>
           <thead className={dark ? "bg-white/5 text-[#B9B9B9]" : "bg-[#F3FAFF] text-[#04044A]/70"}>
             <tr>
-              <th className={`w-20 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Urutan gambar</th>
-              <th className={`min-w-48 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Deskripsi Gambar</th>
-              <th className={`min-w-48 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Ilustrasi Gambar</th>
-              <th className="min-w-52 px-3 py-3 text-center text-xs font-semibold">Keterangan Tambahan</th>
+              <th className={`w-20 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>No</th>
+              <th className={`min-w-48 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Deskripsi</th>
+              <th className={`min-w-48 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Referensi</th>
+              <th className={`min-w-52 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Keterangan</th>
+              <th className="w-20 px-3 py-3 text-center text-xs font-semibold">Action</th>
             </tr>
           </thead>
           <tbody className="h-full">
@@ -198,29 +200,29 @@ export function TableBriefDetails({
                     ) : (
                       <>
                         <MaterialIcon name={uploadingIllustrationId === row.id ? "progress_activity" : "add_photo_alternate"} size="sm" className={uploadingIllustrationId === row.id ? "animate-spin" : ""} />
-                        <span>{uploadingIllustrationId === row.id ? "Mengunggah..." : "Upload ilustrasi gambar"}</span>
+                        <span>{uploadingIllustrationId === row.id ? "Mengunggah..." : "Klik untuk upload / Seret referensi ke sini"}</span>
                       </>
                     )}
                     <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={uploadingIllustrationId === row.id} onChange={(event) => onIllustrationUpload(row.id, event.target.files)} className="sr-only" />
                   </label>
                 </td>
-                <td className="h-full p-2 align-top">
-                  <div className="flex h-full items-start gap-2">
-                    <div className="min-w-0 flex-1"><OddsRichTextEditor value={row.additional_notes} onChange={(value) => onRowChange(row.id, "additional_notes", value)} minHeight={0} placeholder="Catatan tambahan" toolbarMode="focus" fillHeight /></div>
-                    <button type="button" onClick={() => onRemoveRow(row.id)} disabled={rows.length === 1} title="Hapus baris" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-rose-500 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-30">
-                      <MaterialIcon name="delete" size="sm" />
-                    </button>
-                  </div>
+                <td className={`h-full p-2 align-top ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]/60"}`}>
+                  <OddsRichTextEditor value={row.additional_notes} onChange={(value) => onRowChange(row.id, "additional_notes", value)} minHeight={0} placeholder="Catatan tambahan" toolbarMode="focus" fillHeight />
+                </td>
+                <td className="p-2 text-center align-middle">
+                  <button type="button" onClick={() => onRemoveRow(row.id)} disabled={rows.length === 1} title="Hapus baris" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-rose-500 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-30">
+                    <MaterialIcon name="delete" size="sm" />
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
           <tfoot className={dark ? "border-t border-white/10" : "border-t border-[#BDEAFF]"}>
             <tr>
-              <td colSpan={4} className="p-3">
+              <td colSpan={5} className="p-3">
                 <button type="button" onClick={onAddRow} className={dark ? "inline-flex items-center gap-1.5 rounded-xl border border-[#B0FF5E]/40 px-3 py-2 text-xs font-semibold text-[#B0FF5E]" : "inline-flex items-center gap-1.5 rounded-xl border border-[#BDEAFF] px-3 py-2 text-xs font-semibold text-[#00A4FF]"}>
                   <MaterialIcon name="add" size="sm" />
-                  Tambah gambar
+                  Tambah Baris
                 </button>
               </td>
             </tr>

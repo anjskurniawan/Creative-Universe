@@ -7,13 +7,15 @@ export function capacityLabel(profile: OddsDesignerProfile, todayCapacity: numbe
   return "Available";
 }
 
-export function matchesSpecialization(profile: OddsDesignerProfile, categoryId: string): boolean {
-  if (!categoryId) return true;
+export function matchesSpecialization(profile: OddsDesignerProfile, categoryId: string, categoryName?: string): boolean {
+  if (!categoryId && !categoryName) return true;
 
   const specializations = profile.specializations ?? [];
   return specializations.length === 0
-    || specializations.includes(Number(categoryId))
-    || specializations.includes(categoryId as any);
+    || specializations.some((specialization) =>
+      String(specialization) === categoryId
+      || (categoryName ? String(specialization).toLowerCase() === categoryName.toLowerCase() : false),
+    );
 }
 
 export function designerSort(left: OddsDesignerProfile, right: OddsDesignerProfile, todayCapacity: number): number {
@@ -32,8 +34,8 @@ export function designerSort(left: OddsDesignerProfile, right: OddsDesignerProfi
 export function recommendDesigner(profiles: OddsDesignerProfile[], category: OddsCategory | null | undefined): OddsDesignerProfile | null {
   const todayStr = new Date().toLocaleDateString("en-CA");
   const matching = profiles
-    .filter((profile) => profile.is_active && profile.status === "available" && !profile.leave_dates?.includes(todayStr))
-    .filter((profile) => matchesSpecialization(profile, category ? String(category.id) : ""))
+    .filter((profile) => profile.is_active && String(profile.status).toLowerCase() === "available" && !profile.leave_dates?.includes(todayStr))
+    .filter((profile) => matchesSpecialization(profile, category ? String(category.id) : "", category?.name))
     .sort((left, right) => designerSort(left, right, 420));
 
   return matching[0] ?? null;

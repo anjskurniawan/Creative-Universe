@@ -7,7 +7,6 @@ import { createPortal } from "react-dom";
 import { HeaderTitle } from "@/components/typography/header-title";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { ScheduleConfig } from "@/features/odds/components/schedule-config";
-import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
 import { OddsRichTextEditor, stripRichText } from "@/components/odds-rich-text-editor";
 import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-card";
 import { OddsTaskCard, OutputFilesPanel, OutputReviewPanel, TaskDiscussionPanel, TaskSubmissionPanel, publishTaskFeedbackToast } from "@/components/odds/TaskCard";
@@ -3045,33 +3044,6 @@ function ConfigPanel({
   className?: string;
   bodyClassName?: string;
 }) {
-  if (retroHeader) {
-    return (
-      <OddsGameboyFrame
-        label="ODDS Debug Console"
-        action={<span className="flex items-center gap-2 text-[8px] tracking-[0.14em]"><span className="size-2 animate-pulse bg-[#ba0dcb]" /> System Ready</span>}
-        className="h-full"
-      >
-        <div className="flex min-h-0 flex-1 flex-col rounded-xl border-[3px] border-[#24252b] bg-[#dfe2d3] p-3 shadow-[inset_0_0_0_3px_#b5b9ad] sm:p-4">
-          <div className="mb-4 flex shrink-0 items-center justify-between gap-4 border-b-2 border-[#24252b] pb-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center border-2 border-[#24252b] bg-[#ba0dcb] text-white shadow-[2px_2px_0_#24252b]"><MaterialIcon name={icon} size="sm" /></span>
-              <div className="min-w-0">
-                <p className="text-[8px] font-black uppercase tracking-[0.2em] text-[#666961]">Audit Mode // Live Data</p>
-                <h2 className="mt-1 truncate text-lg font-black uppercase tracking-[0.08em] text-[#24252b]">{title}</h2>
-              </div>
-            </div>
-            <span className="hidden border-2 border-[#24252b] bg-[#eceee6] px-3 py-1 text-[8px] font-black uppercase tracking-[0.14em] shadow-[2px_2px_0_#777a72] sm:block">Task Log</span>
-          </div>
-
-          <div className="min-h-0 flex-1 overflow-hidden">
-            {children}
-          </div>
-        </div>
-      </OddsGameboyFrame>
-    );
-  }
-
   const panelClassName = className
     ? `flex flex-col rounded-lg border border-cu-border bg-white p-4 ${className}`
     : "rounded-lg border border-cu-border bg-white p-4";

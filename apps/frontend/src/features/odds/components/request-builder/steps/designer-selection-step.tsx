@@ -32,7 +32,7 @@ export function DesignerSelectionStep({
           Tidak ada desainer tersedia untuk kategori ini.
         </div>
       ) : (
-        <div className="grid min-h-0 flex-1 content-start grid-cols-1 gap-4 overflow-y-auto p-2 [scrollbar-width:none] sm:grid-cols-[repeat(auto-fit,minmax(360px,1fr))] [&::-webkit-scrollbar]:hidden">
+        <div className="flex min-h-0 flex-1 flex-wrap content-start items-start gap-4 overflow-y-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {designers.map((profile) => {
             const capacityMinutes = todayCapacity || 420;
             const percentage = Math.min(profile.current_load_minutes || 0, capacityMinutes) / capacityMinutes * 100;
@@ -41,7 +41,10 @@ export function DesignerSelectionStep({
             const isActive = selectedDesignerId === String(profile.user_id) || (!selectedDesignerId && isRecommended);
 
             return (
-              <div key={profile.user_id} className={`min-w-0 ${designers.length === 1 ? "flex justify-start" : ""}`}>
+              <div
+                key={profile.user_id}
+                className={`w-full min-w-0 max-w-full ${designers.length < 2 ? "sm:max-w-md" : "sm:w-[32rem] sm:max-w-full"} ${designers.length === 1 ? "flex justify-start" : ""}`}
+              >
                 <ProfileCard
                   name={profile.user?.name ?? "Designer"}
                   role="Designer"
@@ -57,9 +60,10 @@ export function DesignerSelectionStep({
                   score="—"
                   cardImage={resolveStorageUrl(profile.user?.card_image_path) ?? undefined}
                   active={isActive}
+                  isRecommended={isRecommended}
                   autoPlayMedia={isRecommended}
                   onClick={() => onSelect(String(profile.user_id))}
-                  className={designers.length === 1 ? "w-full max-w-lg" : "w-full"}
+                  className={designers.length < 2 ? "w-full max-w-md" : "w-full"}
                 />
               </div>
             );

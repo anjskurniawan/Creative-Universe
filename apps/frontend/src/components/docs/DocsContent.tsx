@@ -13,7 +13,6 @@ import { UniversalErrorViewDocumentation } from "@/components/docs/templates/uni
 import { OddsDesignerDashboardCardsDocumentation } from "@/components/docs/templates/odds-designer-dashboard-cards-documentation";
 import type { OddsDesignerDashboardCardId } from "@/components/docs/templates/odds-designer-dashboard-cards-documentation";
 import { OddsTaskCardDocumentation } from "@/components/docs/templates/odds-task-card-documentation";
-import type { OddsTaskCardView } from "@/components/docs/templates/odds-task-card-documentation";
 import { LayoutContainerDocumentation } from "@/components/docs/templates/layout-container-documentation";
 import { LayoutWorkspaceDocumentation } from "@/components/docs/templates/layout-workspace-documentation";
 import { LayoutSidebarDocumentation } from "@/components/docs/templates/layout-sidebar-documentation";
@@ -69,6 +68,13 @@ import { OddsBriefImportantMatrixDocumentation } from "@/components/docs/templat
 import { OddsBriefDeadlineDocumentation } from "@/components/docs/templates/odds-brief-deadline-documentation";
 import { OddsRequestBuilderShellDocumentation } from "@/components/docs/templates/odds-request-builder-shell-documentation";
 import { OddsTableBriefDetailsDocumentation } from "@/components/docs/templates/odds-table-brief-details-documentation";
+import { OddsTableBriefPreviewDocumentation } from "@/components/docs/templates/odds-table-brief-preview-documentation";
+import { OddsTaskCardDateDocumentation } from "@/components/docs/templates/odds-task-card-date-documentation";
+import { OddsTaskCardPeopleDocumentation } from "@/components/docs/templates/odds-task-card-people-documentation";
+import { OddsTaskCardStatusPanelDocumentation } from "@/components/docs/templates/odds-task-card-status-panel-documentation";
+import { OddsTaskCardLayoutsDocumentation } from "@/components/docs/templates/odds-task-card-layouts-documentation";
+import { OddsTaskCardActionBarDocumentation } from "@/components/docs/templates/odds-task-card-action-bar-documentation";
+import { OddsTaskCardRecommendationButtonDocumentation } from "@/components/docs/templates/odds-task-card-recommendation-button-documentation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -246,9 +252,12 @@ export default function DocsContent({ slug }: DocsContentProps) {
     );
   }
   if (slug === "components/odds-task-card") return <OddsTaskCardDocumentation />;
-  if (slug.startsWith("components/odds-task-card-")) {
-    return <OddsTaskCardDocumentation view={slug.replace("components/odds-task-card-", "") as OddsTaskCardView} />;
-  }
+  if (slug === "components/odds-task-card-date") return <OddsTaskCardDateDocumentation />;
+  if (slug === "components/odds-task-card-people") return <OddsTaskCardPeopleDocumentation />;
+  if (slug === "components/odds-task-card-status-panel") return <OddsTaskCardStatusPanelDocumentation />;
+  if (slug === "components/odds-task-card-layouts") return <OddsTaskCardLayoutsDocumentation />;
+  if (slug === "components/odds-task-card-action-bar") return <OddsTaskCardActionBarDocumentation />;
+  if (slug === "components/odds-task-card-recommendation-button") return <OddsTaskCardRecommendationButtonDocumentation />;
   if (slug === "components/side-menu") return <SideMenuDocumentation />;
   if (slug === "components/layout-container") return <LayoutContainerDocumentation />;
   if (slug === "components/layout-workspace") return <LayoutWorkspaceDocumentation />;
@@ -299,6 +308,7 @@ export default function DocsContent({ slug }: DocsContentProps) {
   if (slug === "components/odds-brief-purpose") return <OddsBriefPurposeDocumentation />;
   if (slug === "components/odds-request-brief-editor") return <OddsRequestBriefEditorDocumentation />;
   if (slug === "components/odds-table-brief-details") return <OddsTableBriefDetailsDocumentation />;
+  if (slug === "components/odds-table-brief-preview") return <OddsTableBriefPreviewDocumentation />;
   if (slug === "components/odds-brief-important-matrix") return <OddsBriefImportantMatrixDocumentation />;
   if (slug === "components/odds-brief-deadline") return <OddsBriefDeadlineDocumentation />;
   if (slug === "components/odds-gameboy-frame") return <OddsGameboyFrameDocumentation />;

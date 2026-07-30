@@ -237,9 +237,20 @@ export default function DocsMenu({ onNavigate }: { onNavigate?: () => void }) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     () => new Set(initialPath ? [initialPath.categoryId] : [])
   );
-  const [expandedSubs, setExpandedSubs] = useState<Set<string>>(
-    () => new Set(initialPath?.subKey ? [initialPath.subKey] : [])
-  );
+  const [expandedSubs, setExpandedSubs] = useState<Set<string>>(() => {
+    const set = new Set<string>();
+    if (initialPath?.subKey) set.add(initialPath.subKey);
+    // Auto-expand all sub categories that have children (e.g., Odds Task Card)
+    MENU_DATA.forEach((cat) => {
+      cat.children.forEach((sub) => {
+        if (Array.isArray(sub.children) && sub.children.length > 0) {
+          const subKey = `${cat.id}::${sub.label}`;
+          set.add(subKey);
+        }
+      });
+    });
+    return set;
+  });
   const [expandedItems, setExpandedItems] = useState<Set<string>>(
     () => new Set()
   );

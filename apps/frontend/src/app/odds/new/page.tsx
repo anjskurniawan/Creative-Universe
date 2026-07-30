@@ -1,28 +1,17 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
-import { WelcomeScreen } from "@/components/odds/retro/welcome-screen";
-import { RequestTypeSelectStage } from "@/components/odds/retro/request-type-select-stage";
-import { CategoryInventoryStage } from "@/components/odds/retro/category-inventory-stage";
-import { DesignerCharacterSelectStage } from "@/components/odds/retro/designer-character-select-stage";
-import { MissionBriefStage } from "@/components/odds/retro/mission-brief-stage";
-import { MissionScrollReview } from "@/components/odds/retro/mission-scroll-review";
-import { RetroHudRoute } from "@/components/odds/retro/retro-hud-route";
-import { LoadoutRow } from "@/components/odds/retro/loadout-row";
-import { Panel, StepActions } from "@/components/odds/retro/panel";
-import { matchesSpecialization, designerSort, recommendDesigner, selectedDesignerName } from "@/components/odds/retro/utils";
-import { TaskFeedbackToast } from "@/components/odds/TaskCard";
 import { RequestLaunchSequence } from "@/features/odds/components/request-builder/components/request-launch-sequence";
 import { useOddsTheme } from "../odds-theme-context";
 import {
   OddsRequestBuilder,
   type OddsRequestBuilderDraft,
 } from "@/features/odds/components/request-builder";
+import { matchesSpecialization, designerSort, recommendDesigner } from "@/features/odds/utils";
 import { stripRichText } from "@/components/odds-rich-text-editor";
 import { useAuth } from "@/providers/auth-provider";
 import { briefWithReferenceAliases, extractOddsBriefReferences } from "@/features/odds/brief-references";
@@ -237,7 +226,7 @@ export default function NewOddsTaskPage() {
 
   const selectableDesigners = useMemo(() => {
     return designerProfiles
-      .filter((profile) => matchesSpecialization(profile, form.category_id))
+      .filter((profile) => matchesSpecialization(profile, form.category_id, selectedCategory?.name))
       .sort((left, right) => designerSort(left, right, todayCapacity));
   }, [designerProfiles, form.category_id, selectedCategory]);
 
@@ -359,183 +348,38 @@ export default function NewOddsTaskPage() {
 
   const { theme } = useOddsTheme();
 
-  if (theme !== "retro") {
-    return (
-      <div ref={pageRef} className="relative min-h-0 w-full flex-1 flex flex-col p-4">
-        {launchSequence !== "idle" && <RequestLaunchSequence launchSequence={launchSequence} theme={theme} />}
-        <OddsRequestBuilder
-          theme={theme}
-          currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
-          form={form}
-          update={update}
-          categories={categories}
-          selectedCategory={selectedCategory ?? undefined}
-          selectableDesigners={selectableDesigners}
-          todayCapacity={todayCapacity}
-          selectedDesigner={selectedDesigner ?? undefined}
-          productCatalog={productCatalog}
-          onProductCategoryCommit={commitProductCategory}
-          onProductCommit={commitProduct}
-          recommendedDesignerId={recommendedDesigner ? String(recommendedDesigner.user_id) : null}
-          uploadedAttachments={uploadedAttachments}
-          uploadingAttachments={uploadingAttachments}
-          addAttachmentFiles={addAttachmentFiles}
-          onRemoveAttachment={(id) => setUploadedAttachments((items) => items.filter((item) => item.id !== id))}
-          loading={loading}
-          savingDraft={savingDraft || loadingDraft}
-          initialDraftState={draftState}
-          onSaveDraft={(wizard) => void saveDraft(wizard)}
-          initializing={initializing}
-          submit={submit}
-        />
-      </div>
-    );
-  }
-
   return (
-    <div ref={pageRef} className="relative h-full min-h-0 w-full font-mono text-[#24252b] p-4">
-      <TaskFeedbackToast toast={error ? { status: "error", message: error } : null} onClose={() => setError(null)} />
-      {launchSequence !== "idle" && (
-        <div ref={launchSplashRef} className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden rounded-[30px] border-[3px] border-[#24252b] bg-[#24252b] p-6 text-center text-[#eceee6]">
-          <span className="absolute inset-x-0 top-0 h-2 bg-[#ba0dcb]" />
-          <span className="pointer-events-none absolute inset-0 opacity-20 [background:repeating-linear-gradient(0deg,transparent_0,transparent_3px,#eceee6_4px)]" />
-          {launchSequence === "transmitting" ? (
-            <div className="relative z-10 flex flex-col items-center">
-              <MaterialIcon name="satellite_alt" size="lg" className="animate-pulse text-[#f2b8f6]" />
-              <p className="mt-6 text-[10px] font-black uppercase tracking-[0.28em] text-[#c9ccc0]">Uploading quest data</p>
-              <h2 className="mt-3 text-2xl font-black uppercase tracking-[0.08em] sm:text-4xl">Transmitting Request</h2>
-              <div className="mt-7 flex h-9 items-end gap-2" aria-hidden="true">
-                {Array.from({ length: 8 }, (_, index) => <span key={index} className="launch-bit h-full w-4 border-2 border-[#eceee6] bg-[#ba0dcb]" />)}
-              </div>
-              <p className="mt-5 animate-pulse text-[9px] font-black uppercase tracking-[0.2em]">Do not close this screen...</p>
-            </div>
-          ) : (
-            <div className="relative z-10 flex flex-col items-center">
-              <span className="launch-success-mark flex size-24 items-center justify-center border-[3px] border-[#eceee6] bg-[#ba0dcb] shadow-[6px_6px_0_#eceee6]"><MaterialIcon name="check" size="lg" className="scale-150" /></span>
-              <p className="launch-success-copy mt-8 text-[10px] font-black uppercase tracking-[0.28em] text-[#f2b8f6]">Transmission complete</p>
-              <h2 className="launch-success-copy mt-3 text-3xl font-black uppercase tracking-[0.08em] sm:text-5xl">Quest Registered</h2>
-              <p className="launch-success-copy mt-5 text-[9px] font-black uppercase tracking-[0.18em] text-[#c9ccc0]">Opening all tasks...</p>
-            </div>
-          )}
-        </div>
-      )}
-      <OddsGameboyFrame
-        label={gameStarted ? "Odds Quest Builder" : "Ready Player"}
-        action={<Link href="/odds" className="rounded-md border-2 border-[#24252b] bg-[#eceee6] px-3 py-1.5 shadow-[0_2px_0_#24252b] transition active:translate-y-0.5 active:shadow-none">Exit</Link>}
-        className="h-full"
-      >
-
-        {!gameStarted ? (
-          <WelcomeScreen
-            onStart={() => setGameStarted(true)}
-            playerName={playerName}
-          />
-        ) : (
-        <form onSubmit={submit} className="game-stage-content min-h-0 flex-1">
-          <div className="grid h-full min-h-0 gap-3 lg:grid-cols-[minmax(0,1fr)_190px]">
-            <section className="game-stage-panel retro-scrollbar flex h-full min-w-0 flex-col overflow-y-auto rounded-xl border-[3px] border-[#24252b] bg-[#dfe2d3] p-3 shadow-[inset_0_0_0_3px_#b5b9ad] sm:p-4">
-              <div className="mb-3 flex items-center justify-between border-b-2 border-[#24252b] pb-2 text-[10px] font-black uppercase tracking-[0.14em]">
-                <span>Stage {String(currentStep).padStart(2, "0")} / {requestSteps[currentStep - 1].label}</span>
-                <span>{syncPercent}% Sync</span>
-              </div>
-          {currentStep === 1 && <RequestTypeSelectStage onContinue={selectDesignRequest} />}
-
-          {currentStep === 2 && (
-            <CategoryInventoryStage
-              categories={categories}
-              selectedCategoryId={form.category_id}
-              onSelect={selectCategory}
-              onBack={previousStep}
-              onContinue={nextStep}
-            />
-          )}
-
-          {currentStep === 3 && (
-            <DesignerCharacterSelectStage
-              profiles={selectableDesigners}
-              todayCapacity={todayCapacity}
-              selectedUserId={form.preferred_designer_id}
-              recommendedUserId={recommendedDesigner ? String(recommendedDesigner.user_id) : null}
-              onSelect={(profile) => update("preferred_designer_id", String(profile.user_id))}
-              onBack={previousStep}
-              onContinue={() => { setBriefEntryStep(1); nextStep(); }}
-            />
-          )}
-
-          {currentStep === 4 && (
-            <MissionBriefStage
-              initialStep={briefEntryStep}
-              form={form}
-              briefPlainText={briefPlainText}
-              attachments={uploadedAttachments}
-              uploading={uploadingAttachments}
-              onUpdate={update}
-              onUpload={addAttachmentFiles}
-              onRemoveAttachment={(id) => setUploadedAttachments((items) => items.filter((item) => item.id !== id))}
-              onBack={previousStep}
-              onContinue={nextStep}
-            />
-          )}
-
-          {currentStep === 5 && (
-            <Panel step="5" title="Request Terminal" icon="terminal" fill>
-              <div>
-                <MissionScrollReview
-                  title={form.design_purpose || "Untitled Mission"}
-                  requestType="Design"
-                  category={selectedCategory?.name || "-"}
-                  designer={selectedDesignerName(form.preferred_designer_id, designerProfiles) || "-"}
-                  priority={form.important_matrix}
-                  deadline={form.deadline || "Automatic timing"}
-                  brief={missionBriefText || "No mission transmission."}
-                  references={briefReferences}
-                  onEditType={() => setCurrentStep(1)}
-                  onEditCategory={() => setCurrentStep(2)}
-                  onEditDesigner={() => setCurrentStep(3)}
-                  onEditMission={() => { setBriefEntryStep(4); setCurrentStep(4); }}
-                />
-              </div>
-
-              <StepActions>
-                <button type="button" onClick={() => { setBriefEntryStep(4); setCurrentStep(4); }} className={secondaryButtonClass}>Back</button>
-                <button
-                  type="submit"
-                  disabled={loading || initializing || uploadingAttachments || !canSubmit}
-                  className={primaryButtonClass}
-                >
-                  <MaterialIcon name="send" size="sm" />
-                  {loading ? "Sending..." : "Launch Request"}
-                </button>
-              </StepActions>
-            </Panel>
-          )}
-            </section>
-
-            <aside className="game-stage-panel odds-scroll-hidden hidden h-full min-h-0 flex-col gap-3 overflow-y-auto font-mono lg:flex">
-              <RetroHudRoute steps={requestSteps} currentStep={currentStep} syncPercent={syncPercent} onSelect={setCurrentStep} />
-              <div className="rounded-lg border-2 border-[#24252b] bg-[#eceee6] p-2 shadow-[inset_0_0_0_2px_#c9ccc0]">
-                <p className="mb-2 truncate text-center text-[9px] font-black uppercase tracking-[0.14em]" title={playerName}>{playerName}</p>
-                <div className="flex min-h-28 items-center justify-center border-2 border-[#24252b] bg-[#dfe2d3] [image-rendering:pixelated]">
-                  {selectedRequestType
-                    ? <MaterialIcon name="brush" size="lg" className="scale-[1.8] text-[#ba0dcb]" />
-                    : <span className="text-5xl font-black leading-none text-[#24252b]">?</span>}
-                </div>
-              </div>
-              <div className="space-y-1 rounded-lg border-2 border-[#24252b] bg-[#eceee6] p-1.5 shadow-[inset_0_0_0_2px_#c9ccc0]">
-                  <LoadoutRow label="Type" value={selectedRequestType ? "Design" : "???"} active={Boolean(selectedRequestType)} onClick={() => setCurrentStep(1)} />
-                  <LoadoutRow label="Skill" value={selectedCategory?.name || "???"} active={Boolean(selectedCategory)} disabled={!selectedRequestType} onClick={() => setCurrentStep(2)} />
-                  <LoadoutRow label="Talent" value={selectedDesigner?.user?.name || "???"} active={Boolean(selectedDesigner)} disabled={!selectedCategory} onClick={() => setCurrentStep(3)} />
-                  <LoadoutRow label="Quest" value={form.design_purpose || "???"} active={Boolean(form.design_purpose)} disabled={!selectedDesigner} onClick={() => setCurrentStep(4)} />
-              </div>
-            </aside>
-          </div>
-        </form>
-        )}
-        <p className="mt-4 text-center text-[9px] font-black uppercase tracking-[0.12em] text-[#555850]">{gameStarted ? "Select request type Â· Build your request Â· Press launch" : "Creative Universe Â· ODDS Edition"}</p>
-      </OddsGameboyFrame>
+    <div ref={pageRef} className="relative min-h-0 w-full flex-1 flex flex-col p-4">
+      {launchSequence !== "idle" && <RequestLaunchSequence launchSequence={launchSequence} theme={theme} />}
+      <OddsRequestBuilder
+        theme={theme}
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+        form={form}
+        update={update}
+        categories={categories}
+        selectedCategory={selectedCategory ?? undefined}
+        selectableDesigners={selectableDesigners}
+        todayCapacity={todayCapacity}
+        selectedDesigner={selectedDesigner ?? undefined}
+        productCatalog={productCatalog}
+        onProductCategoryCommit={commitProductCategory}
+        onProductCommit={commitProduct}
+        recommendedDesignerId={recommendedDesigner ? String(recommendedDesigner.user_id) : null}
+        uploadedAttachments={uploadedAttachments}
+        uploadingAttachments={uploadingAttachments}
+        addAttachmentFiles={addAttachmentFiles}
+        onRemoveAttachment={(id) => setUploadedAttachments((items) => items.filter((item) => item.id !== id))}
+        loading={loading}
+        savingDraft={savingDraft || loadingDraft}
+        initialDraftState={draftState}
+        onSaveDraft={(wizard) => void saveDraft(wizard)}
+        initializing={initializing}
+        submit={submit}
+      />
     </div>
   );
 }
+
 
 

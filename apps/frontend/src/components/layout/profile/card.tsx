@@ -27,6 +27,7 @@ export interface CardProps {
   showAvailability?: boolean;
   compact?: boolean;
   autoPlayMedia?: boolean;
+  isRecommended?: boolean;
 }
 
 function getInitials(name: string): string {
@@ -153,6 +154,7 @@ export default function Card({
   showAvailability = true,
   compact = false,
   autoPlayMedia = false,
+  isRecommended = false,
 }: CardProps) {
   const mediaRef = useRef<HTMLVideoElement>(null);
   const configuredStatus: CardStatus = state === "Fullbook" ? "FullBook" : (state ?? status);
@@ -175,7 +177,7 @@ export default function Card({
 
   return (
     <article
-      className={`flex w-full min-w-0 flex-col items-start gap-2 overflow-hidden rounded-lg bg-white p-2 text-[#3b4446] shadow-[0_5px_14px_rgba(44,42,39,0.06)] ${compact ? "" : "lg:min-w-[360px] lg:p-4"} ${onClick ? "cursor-pointer transition-[box-shadow,outline-color,transform] duration-300 ease-out will-change-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,164,255,0.28),0_0_18px_rgba(0,164,255,0.28)]" : ""} ${active ? "outline outline-2 outline-[#00a4ff] shadow-[0_0_18px_rgba(0,164,255,0.42)]" : ""} ${className}`}
+      className={`relative flex w-full min-w-0 flex-col items-start gap-2 overflow-hidden rounded-lg bg-white p-2 text-[#3b4446] shadow-[0_5px_14px_rgba(44,42,39,0.06)] ${compact ? "" : "lg:min-w-[360px] lg:p-4"} ${onClick ? "cursor-pointer transition-[box-shadow,outline-color,transform] duration-300 ease-out will-change-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,164,255,0.28),0_0_18px_rgba(0,164,255,0.28)]" : ""} ${active ? "outline outline-2 outline-[#00a4ff] shadow-[0_0_18px_rgba(0,164,255,0.42)]" : ""} ${className}`}
       onClick={onClick}
       onMouseEnter={videoMedia ? () => void mediaRef.current?.play() : undefined}
       onMouseLeave={videoMedia && !autoPlayMedia ? () => { mediaRef.current?.pause(); if (mediaRef.current) mediaRef.current.currentTime = 0; } : undefined}
@@ -183,6 +185,11 @@ export default function Card({
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (event) => { if (event.key === "Enter" || event.key === " ") onClick(); } : undefined}
     >
+      {isRecommended && (
+        <span className="absolute right-3 top-3 z-10 rounded-full bg-[#00a4ff] px-2.5 py-1 text-[10px] font-semibold leading-3 text-white shadow-sm lg:right-4 lg:top-4 lg:text-xs lg:leading-4">
+          Rekomendasi
+        </span>
+      )}
       <div
         className={`flex w-full min-w-0 items-center gap-2 ${compact ? "" : "lg:gap-4"}`}
       >

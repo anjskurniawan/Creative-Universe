@@ -57,36 +57,30 @@ export function NavbarDocumentation() {
             </button>
           </div>
           
-          <div className="doc-playground-content" style={{ padding: '0', background: 'transparent' }}>
+          <div className="doc-playground-content bg-slate-50/50 p-4 md:p-8">
             {activeTab === 'preview' ? (
-              <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ padding: '1rem', background: 'hsl(var(--secondary))', borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <div className="flex w-full flex-col">
+                <div className="flex flex-wrap gap-4 border-b border-slate-200 bg-slate-100 p-4 rounded-t-2xl">
                   <Control label="Variant" value={variant} options={["light","dark","transparent-dark"]} onChange={(v) => setVariant(v as NavbarVariant)} />
                   <Control label="Session" value={session} options={["preview-authenticated","guest"]} onChange={(v) => setSession(v as typeof session)} />
                   <Control label="Position" value={sticky ? "sticky" : "relative"} options={["relative","sticky"]} onChange={(v) => setSticky(v === "sticky")} />
                   <Control label="Viewport" value={viewport} options={["desktop","mobile"]} onChange={(v) => setViewport(v as typeof viewport)} />
                 </div>
-                <div style={{ padding: '2rem', flex: 1, background: 'hsl(var(--card))', overflowX: 'auto' }}>
-                  <div className={`transition-[width] ${viewport === "mobile" ? "w-[390px] mx-auto border border-cu-line" : "w-full"}`}>
+                <div className="flex-1 bg-white p-8 overflow-x-auto rounded-b-2xl border-x border-b border-slate-200">
+                  <div className={`transition-[width] duration-300 ${viewport === "mobile" ? "w-[390px] mx-auto border border-slate-200 rounded-xl overflow-hidden" : "w-full"}`}>
                     <Navbar variant={variant} sticky={sticky} session={session} />
-                    <div style={{ height: '200px', background: 'white', padding: '1.5rem', color: '#999' }}>
+                    <div className="h-[200px] bg-slate-50 p-6 text-sm text-slate-400 border-t border-slate-100 flex items-center justify-center">
                       Page content area (Simulating scrolling surface)
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="doc-code-area" style={{ margin: '2rem', width: 'auto' }}>
-                <pre>
-                  <code>
-{`<Navbar 
+              <div className="p-6 bg-[#111]"><div className="doc-code-area"><pre><code>{`<Navbar 
   variant="${variant}" 
   sticky={${sticky}} 
   session="${session}" 
-/>`}
-                  </code>
-                </pre>
-              </div>
+/>`}</code></pre></div></div>
             )}
           </div>
         </div>

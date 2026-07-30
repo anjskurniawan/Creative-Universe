@@ -166,7 +166,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
         );
       }
       if (canReviewSpv) {
-        items.push({ id: "spv_review", label: "Review Leader Creative", icon: "rate_review", href: "/odds?section=spv_review", group: "tasks" });
+        items.push({ id: "spv_review", label: "Review Leader", icon: "rate_review", href: "/odds?section=spv_review", group: "tasks" });
       }
       if (canReviewSpv || canViewAllTasks) {
         items.push({ id: "client_review", label: "Review Client", icon: "reviews", href: "/odds?section=client_review", group: "tasks" });

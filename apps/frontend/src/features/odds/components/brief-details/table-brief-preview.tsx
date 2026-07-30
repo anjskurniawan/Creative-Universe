@@ -3,62 +3,62 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 import type { TableBriefRow } from "./table-brief-details";
 
 type TableBriefPreviewProps = {
-  category: string;
-  product: string;
   packagingImageId: number | null;
   packagingImageName: string;
   rows: TableBriefRow[];
+  designerName: string;
+  deadline: string;
+  title: string;
 };
 
 const emptyValue = "-";
 
 export function TableBriefPreview({
-  category,
-  product,
   packagingImageId,
   packagingImageName,
   rows,
+  designerName,
+  deadline,
+  title,
 }: TableBriefPreviewProps) {
   return (
     <div className="space-y-5">
+      <h3 className="text-lg font-bold text-[#04044A]">{title || emptyValue}</h3>
       <section className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
-        <h2 className="text-sm font-bold text-slate-900">Detail Packaging</h2>
-        <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+        <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-medium text-slate-400">Kategori</dt>
-            <dd className="mt-1 font-semibold text-slate-800">{category || emptyValue}</dd>
+            <dt className="text-xs font-medium text-slate-400">Designer</dt>
+            <dd className="mt-1 font-semibold text-[#04044A]">{designerName || emptyValue}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium text-slate-400">Produk</dt>
-            <dd className="mt-1 font-semibold text-slate-800">{product || emptyValue}</dd>
+            <dt className="text-xs font-medium text-slate-400">Deadline</dt>
+            <dd className="mt-1 font-semibold text-[#04044A]">{deadline || emptyValue}</dd>
           </div>
-          {packagingImageId && (
-            <div className="sm:col-span-2">
-              <dt className="text-xs font-medium text-slate-400">Gambar Packaging</dt>
-              <dd className="mt-2 flex items-center gap-3">
-                <Image
-                  src={`/api/v1/odds/uploads/${packagingImageId}/content`}
-                  alt={packagingImageName || "Gambar packaging"}
-                  width={72}
-                  height={72}
-                  unoptimized
-                  className="size-[72px] rounded-lg border border-slate-200 object-cover"
-                />
-                <span className="break-all text-xs text-slate-600">{packagingImageName}</span>
-              </dd>
-            </div>
-          )}
         </dl>
       </section>
+
+      {packagingImageId && (
+        <div className="flex">
+          <a
+            href={`/api/v1/odds/uploads/${packagingImageId}/content`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            <MaterialIcon name="visibility" size="sm" />
+            Lihat File Packaging ({packagingImageName})
+          </a>
+        </div>
+      )}
 
       <section className="overflow-x-auto rounded-xl border border-slate-200">
         <table className="w-full min-w-[760px] border-collapse text-sm">
           <thead className="bg-[#F1F9FF] text-xs font-bold text-[#04044A]">
             <tr>
-              <th className="w-20 border-b border-r border-[#BDEAFF] px-3 py-3 text-center">Urutan gambar</th>
-              <th className="w-[31%] border-b border-r border-[#BDEAFF] px-3 py-3 text-center">Deskripsi Gambar</th>
-              <th className="w-[31%] border-b border-r border-[#BDEAFF] px-3 py-3 text-center">Ilustrasi Gambar</th>
-              <th className="w-[38%] border-b border-[#BDEAFF] px-3 py-3 text-center">Keterangan Tambahan</th>
+              <th className="w-20 border-b border-r border-[#BDEAFF] px-3 py-3 text-center">No</th>
+              <th className="w-[31%] border-b border-r border-[#BDEAFF] px-3 py-3 text-center">Deskripsi</th>
+              <th className="w-[31%] border-b border-r border-[#BDEAFF] px-3 py-3 text-center">Referensi</th>
+              <th className="w-[38%] border-b border-[#BDEAFF] px-3 py-3 text-center">Keterangan</th>
             </tr>
           </thead>
           <tbody>
@@ -71,7 +71,7 @@ export function TableBriefPreview({
                     dangerouslySetInnerHTML={{ __html: row.image_description || emptyValue }}
                   />
                 </td>
-                <td className="border-r border-[#BDEAFF]/60 px-4 py-4">
+                <td className="border-r border-[#BDEAFF]/60 px-4 py-4 text-center">
                   {row.image_illustration_id ? (
                     <div className="relative h-40 w-full overflow-hidden rounded-lg border border-[#BDEAFF] bg-white">
                       <Image
@@ -84,9 +84,7 @@ export function TableBriefPreview({
                       />
                     </div>
                   ) : (
-                    <div className="flex h-28 items-center justify-center rounded-lg border border-dashed border-[#BDEAFF] text-xs text-slate-400">
-                      <MaterialIcon name="image" size="sm" className="mr-2" /> Belum ada ilustrasi
-                    </div>
+                    <span className="text-slate-400 font-semibold">{emptyValue}</span>
                   )}
                 </td>
                 <td className="px-4 py-4">

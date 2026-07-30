@@ -3,6 +3,15 @@ import type { OddsCategory, OddsDesignerProfile } from "@/features/odds/api";
 import { TableBriefPreview, type TableBriefRow } from "../../brief-details";
 import type { OddsRequestForm, RequestBuilderTheme } from "../types";
 
+function formatSla(minutes: number | undefined): string {
+  if (!minutes) return "-";
+  if (minutes < 60) return `${minutes} Menit`;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (remainingMinutes === 0) return `${hours} Jam`;
+  return `${hours} Jam ${remainingMinutes} Menit`;
+}
+
 export function RequestReviewStep({
   form,
   selectedCategory,
@@ -41,66 +50,10 @@ export function RequestReviewStep({
 
       {/* Obsidian-style Preview Panel */}
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto rounded-2xl border border-slate-200 bg-white p-8 shadow-md [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="w-full max-w-none space-y-6 font-mono text-xs">
+        <div className="grid gap-8 lg:grid-cols-4 w-full">
           
-          {/* Obsidian Document Header / File Name */}
-          <div className="flex items-center gap-2 pb-3 border-b border-slate-100 text-slate-400">
-            <MaterialIcon name="description" size="auto" className="text-sm" />
-            <span>{form.design_purpose ? `${form.design_purpose.toLowerCase().replace(/\s+/g, "-")}.md` : "untitled-request.md"}</span>
-          </div>
-
-          {/* Obsidian Properties (YAML Frontmatter Style) */}
-          <div className="p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-3 font-sans">
-            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 pb-1.5 border-b border-slate-100">
-              <div className="flex items-center gap-1.5">
-                <MaterialIcon name="tune" size="auto" className="text-xs" />
-                <span>Properties / Frontmatter</span>
-              </div>
-              <button
-                type="button"
-                onClick={onEditProperties}
-                className="text-slate-400 hover:text-[#00A4FF] transition"
-                title="Edit Properties"
-              >
-                <MaterialIcon name="edit" size="auto" className="text-xs" />
-              </button>
-            </div>
-
-            <div className="space-y-2 text-slate-600">
-              <div className="grid grid-cols-3 gap-2">
-                <span className="text-slate-400 font-medium">medium</span>
-                <span className="col-span-2 font-semibold text-slate-900">Graphic Design</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <span className="text-slate-400 font-medium">category</span>
-                <span className="col-span-2 font-semibold text-slate-900">{selectedCategory?.name || "-"}</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <span className="text-slate-400 font-medium">designer</span>
-                <span className="col-span-2 font-semibold text-slate-900">{selectedDesigner?.user?.name || "-"}</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <span className="text-slate-400 font-medium">deadline</span>
-                <span className="col-span-2 font-semibold text-slate-900">{form.deadline || "Otomatis"}</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2">
-                <span className="text-slate-400 font-medium">matrix</span>
-                <span className={`col-span-2 font-semibold uppercase ${
-                  (selectedCategory?.important_matrix || form.important_matrix) === "Q1" ? "text-red-500 font-bold" :
-                  (selectedCategory?.important_matrix || form.important_matrix) === "Q2" ? "text-orange-500 font-bold" :
-                  (selectedCategory?.important_matrix || form.important_matrix) === "Q3" ? "text-blue-500 font-bold" :
-                  "text-slate-700"
-                }`}>{selectedCategory?.important_matrix || form.important_matrix || "Q4"}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Obsidian Document Content */}
-          <div className="space-y-4 pt-2 font-sans">
+          {/* Main Obsidian Document Content (3/4 width on left) */}
+          <div className="lg:col-span-3 space-y-4 pt-2 font-sans">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
                 # {form.design_purpose || "Request Tanpa Judul"}
@@ -117,11 +70,12 @@ export function RequestReviewStep({
 
             {usesTableBrief ? (
               <TableBriefPreview
-                category={tableBriefCategory}
-                product={tableBriefProduct}
                 packagingImageId={tableBriefPackagingImageId}
                 packagingImageName={tableBriefPackagingImageName}
                 rows={tableBriefRows}
+                designerName={selectedDesigner?.user?.name || "-"}
+                deadline={form.deadline || "Otomatis"}
+                title={form.design_purpose || "Request Tanpa Judul"}
               />
             ) : (
               <div className="prose max-w-none text-sm leading-relaxed text-slate-800">
@@ -133,6 +87,55 @@ export function RequestReviewStep({
             )}
           </div>
 
+          {/* Obsidian Properties (1/4 width on right) */}
+          <div className="lg:col-span-1 p-4 rounded-xl border border-slate-100 bg-slate-50/50 space-y-3 font-sans h-fit">
+            <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-400 pb-1.5 border-b border-slate-100">
+              <div className="flex items-center gap-1.5">
+                <MaterialIcon name="tune" size="auto" className="text-xs" />
+                <span>Properties / Frontmatter</span>
+              </div>
+              <button
+                type="button"
+                onClick={onEditProperties}
+                className="text-slate-400 hover:text-[#00A4FF] transition"
+                title="Edit Properties"
+              >
+                <MaterialIcon name="edit" size="auto" className="text-xs" />
+              </button>
+            </div>
+
+            <div className="space-y-3.5 text-slate-600">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-slate-400 font-medium text-[10px] uppercase tracking-wider">medium</span>
+                <span className="font-semibold text-slate-900 break-words">Graphic Design</span>
+              </div>
+
+              <div className="flex flex-col gap-0.5">
+                <span className="text-slate-400 font-medium text-[10px] uppercase tracking-wider">category</span>
+                <span className="font-semibold text-slate-900 break-words">{selectedCategory?.name || "-"}</span>
+              </div>
+
+              <div className="flex flex-col gap-0.5">
+                <span className="text-slate-400 font-medium text-[10px] uppercase tracking-wider">designer</span>
+                <span className="font-semibold text-slate-900 break-words">{selectedDesigner?.user?.name || "-"}</span>
+              </div>
+
+              <div className="flex flex-col gap-0.5">
+                <span className="text-slate-400 font-medium text-[10px] uppercase tracking-wider">deadline</span>
+                <span className="font-semibold text-slate-900 break-words">{form.deadline || "Otomatis"}</span>
+              </div>
+
+              <div className="flex flex-col gap-0.5">
+                <span className="text-slate-400 font-medium text-[10px] uppercase tracking-wider">matrix</span>
+                <span className={`font-semibold uppercase break-words ${
+                  (selectedCategory?.important_matrix || form.important_matrix) === "Q1" ? "text-red-500 font-bold" :
+                  (selectedCategory?.important_matrix || form.important_matrix) === "Q2" ? "text-orange-500 font-bold" :
+                  (selectedCategory?.important_matrix || form.important_matrix) === "Q3" ? "text-blue-500 font-bold" :
+                  "text-slate-700"
+                }`}>{selectedCategory?.important_matrix || form.important_matrix || "Q4"}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
