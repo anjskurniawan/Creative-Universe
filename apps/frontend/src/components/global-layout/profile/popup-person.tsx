@@ -7,7 +7,7 @@ export type PopupPersonProps = {
   name: string;
   role?: string | null;
   division?: string | null;
-  avatarPath?: string | null;
+  cardImagePath?: string | null;
   className?: string;
 };
 
@@ -15,7 +15,7 @@ export default function PopupPerson({
   name,
   role,
   division,
-  avatarPath,
+  cardImagePath,
   className = "",
 }: PopupPersonProps) {
   const resolvedRole = role ?? "Creative";
@@ -29,7 +29,7 @@ export default function PopupPerson({
       name={name}
       role={resolvedRole}
       departments={[resolvedDivision, resolvedRole]}
-      profileImage={resolveStorageUrl(avatarPath) ?? undefined}
+      cardImage={resolveStorageUrl(cardImagePath) ?? undefined}
       className={`!min-w-0 shadow-[0_12px_28px_rgba(44,42,39,0.18)] ${className}`}
     />
   );

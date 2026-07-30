@@ -16,8 +16,9 @@ class AssessmentResource extends JsonResource
             'period' => $this->period->format('Y-m'),
             'user' => [
                 'id' => $this->member?->id ?? $this->user?->id,
-                'name' => $this->member?->name ?? $this->user?->name,
+                'name' => $this->user?->name ?? $this->member?->name,
                 'avatar_path' => $this->user?->avatar_path,
+                'card_image_path' => $this->member?->card_image_path,
                 'position' => $this->member?->position_name ?? $this->user?->position?->name,
                 'division' => 'Creative',
             ],

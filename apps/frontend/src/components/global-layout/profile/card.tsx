@@ -21,7 +21,7 @@ export interface CardProps {
   rating?: string;
   score?: string;
   capacity?: number;
-  profileImage?: string;
+  cardImage?: string;
   profileAlt?: string;
   showStats?: boolean;
   showAvailability?: boolean;
@@ -146,7 +146,7 @@ export default function Card({
   rating = "4.5/5",
   score = "12345",
   capacity,
-  profileImage,
+  cardImage,
   profileAlt = `${name} profile`,
   showStats = true,
   showAvailability = true,
@@ -164,7 +164,7 @@ export default function Card({
   const primaryDepartment = departmentList[0] ?? "";
   const remainingDepartments = departmentList.length - 1;
   const departmentsText = departmentList.join(" • ");
-  const videoMedia = isVideoSource(profileImage);
+  const videoMedia = isVideoSource(cardImage);
 
   return (
     <article
@@ -180,13 +180,13 @@ export default function Card({
         className={`flex w-full min-w-0 items-center gap-2 ${compact ? "" : "lg:gap-4"}`}
       >
         <div
-          className={`shrink-0 overflow-hidden rounded-lg border-0 ${profileImage ? "bg-white" : "bg-[#3b4446]"} outline-none ring-0 ${compact ? "size-14" : "size-[74px] lg:h-[154px] lg:w-[145px]"}`}
+          className={`shrink-0 overflow-hidden rounded-lg border-0 ${cardImage ? "bg-white" : "bg-[#3b4446]"} outline-none ring-0 ${compact ? "size-14" : "size-[74px] lg:h-[154px] lg:w-[145px]"}`}
         >
-          {videoMedia && profileImage ? (
-            <video ref={mediaRef} src={profileImage} muted loop playsInline preload="metadata" className="block size-full object-contain" />
-          ) : profileImage ? (
+          {videoMedia && cardImage ? (
+            <video ref={mediaRef} src={cardImage} muted loop playsInline preload="metadata" className="block size-full object-contain" />
+          ) : cardImage ? (
             <img
-              src={profileImage}
+              src={cardImage}
               alt={profileAlt}
               className="block size-full object-contain"
             />

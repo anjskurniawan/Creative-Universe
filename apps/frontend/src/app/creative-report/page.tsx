@@ -348,7 +348,7 @@ function AssessmentTable({
                           name={item.user.name}
                           role={item.user.position ?? "Creative"}
                           division={item.user.division}
-                          avatarPath={item.user.avatar_path}
+                          cardImagePath={item.user.card_image_path}
                         />
                       </div>}
                       </div>

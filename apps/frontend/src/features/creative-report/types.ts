@@ -4,6 +4,7 @@ export interface CreativeReportUser {
   id: number;
   name: string;
   avatar_path: string | null;
+  card_image_path: string | null;
   position: string | null;
   division: string | null;
 }

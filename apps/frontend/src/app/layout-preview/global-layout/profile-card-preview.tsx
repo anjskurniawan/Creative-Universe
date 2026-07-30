@@ -59,7 +59,7 @@ export default function ProfileCardPreview({ viewport }: { viewport: "Mobile" | 
             name={member.user.name}
             role={member.user.position ?? "Creative Member"}
             departments={member.user.departments}
-            profileImage={member.user.name.trim().toLowerCase() === "bobby linggar" ? "/images/layout-preview/profile-bobby.png" : undefined}
+            cardImage={member.user.name.trim().toLowerCase() === "bobby linggar" ? "/images/layout-preview/profile-bobby.png" : undefined}
             onClick={() => setSelectedMemberId(member.id)}
             active={member.id === selectedMemberId}
           />

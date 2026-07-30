@@ -84,7 +84,7 @@ export default function CreativeReportCreativeAgentPage() {
             role={displayCreativeRole(item.position_name)}
             departments={item.specialties?.length ? item.specialties : ["Belum ada spesialisasi ODDS"]}
             capacity={item.odds_metrics?.capacity_percent ?? 0}
-            profileImage={resolveStorageUrl(item.card_image_path) ?? undefined}
+            cardImage={resolveStorageUrl(item.card_image_path) ?? undefined}
             responseTime={item.odds_metrics?.avg_response_minutes != null ? `${item.odds_metrics.avg_response_minutes} min` : "—"}
             rating={item.odds_metrics?.user_rating != null ? `${item.odds_metrics.user_rating}/5` : "—"}
             score={item.odds_metrics?.average_score != null ? String(item.odds_metrics.average_score) : "—"}

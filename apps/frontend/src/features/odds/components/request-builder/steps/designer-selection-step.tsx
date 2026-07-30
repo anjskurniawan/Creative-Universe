@@ -37,7 +37,7 @@ export function DesignerSelectionStep({
             const isOff = profile.status === "off";
 
             return (
-              <div key={profile.user_id} className="min-w-0">
+              <div key={profile.user_id} className={`min-w-0 ${designers.length === 1 ? "flex justify-start" : ""}`}>
                 <ProfileCard
                   name={profile.user?.name ?? "Designer"}
                   role="Designer"
@@ -51,9 +51,10 @@ export function DesignerSelectionStep({
                   responseTime="—"
                   rating="—"
                   score="—"
-                  profileImage={resolveStorageUrl(profile.user?.avatar_path ?? profile.user?.avatar) ?? undefined}
+                  cardImage={resolveStorageUrl(profile.user?.card_image_path) ?? undefined}
                   active={selectedDesignerId === String(profile.user_id)}
                   onClick={() => onSelect(String(profile.user_id))}
+                  className={designers.length === 1 ? "w-full max-w-lg" : "w-full"}
                 />
               </div>
             );

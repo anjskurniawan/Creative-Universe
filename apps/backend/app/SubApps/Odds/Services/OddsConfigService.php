@@ -5,6 +5,7 @@ namespace App\SubApps\Odds\Services;
 use App\SubApps\Odds\Models\Category;
 use App\SubApps\Odds\Models\DesignerProfile;
 use App\SubApps\Odds\Models\SystemRule;
+use App\SubApps\CreativeReport\Models\CreativeMember;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OddsConfigService
@@ -33,11 +34,21 @@ class OddsConfigService
 
     public function designerProfiles(array $filters = []): LengthAwarePaginator
     {
-        return DesignerProfile::query()
+        $profiles = DesignerProfile::query()
             ->with('user:id,name,email,username')
             ->when(isset($filters['active']), fn ($query) => $query->where('is_active', (bool) $filters['active']))
             ->orderBy('id', 'desc')
             ->paginate((int) ($filters['per_page'] ?? 25));
+
+        $cardImages = CreativeMember::query()
+            ->whereIn('user_id', $profiles->getCollection()->pluck('user_id'))
+            ->pluck('card_image_path', 'user_id');
+
+        $profiles->getCollection()->each(function (DesignerProfile $profile) use ($cardImages): void {
+            $profile->user?->setAttribute('card_image_path', $cardImages->get($profile->user_id));
+        });
+
+        return $profiles;
     }
 
     public function saveDesignerProfile(array $data, int $userId, ?DesignerProfile $profile = null): DesignerProfile
