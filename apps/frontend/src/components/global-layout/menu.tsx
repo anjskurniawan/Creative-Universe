@@ -10,6 +10,7 @@ export type MenuItem = {
   badge?: number | string;
   group?: string;
   isActive?: boolean;
+  isHighlighted?: boolean;
 };
 
 export type MenuProps = {

@@ -8,7 +8,10 @@ import { MaterialIcon } from "@/components/material-icon";
 import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
 import { TaskFeedbackToast } from "@/components/odds/TaskCard";
 import { useOddsTheme } from "../odds-theme-context";
-import { ModernWizard } from "@/features/odds/components/modern-wizard";
+import {
+  OddsRequestBuilder,
+  type OddsRequestBuilderDraft,
+} from "@/features/odds/components/request-builder";
 import { stripRichText } from "@/components/odds-rich-text-editor";
 import { useAuth } from "@/providers/auth-provider";
 import { briefWithReferenceAliases, extractOddsBriefReferences } from "@/features/odds/brief-references";
@@ -16,11 +19,15 @@ import {
   OddsCategory,
   OddsDesignerProfile,
   createOddsTask,
+  createOddsTaskDraft,
+  deleteOddsTaskDraft,
+  getOddsTaskDraft,
   getOddsCategories,
   getOddsDesignerProfiles,
   getOddsSystemRules,
   oddsError,
   type OddsTaskAttachment,
+  updateOddsTaskDraft,
   uploadOddsTaskAttachment,
 } from "@/features/odds/api";
 
@@ -77,6 +84,10 @@ export default function NewOddsTaskPage() {
   const [launchSequence, setLaunchSequence] = useState<"idle" | "transmitting" | "success">("idle");
   const [selectedRequestType, setSelectedRequestType] = useState<"design" | null>(null);
   const [todayCapacity, setTodayCapacity] = useState(420);
+  const [draftId, setDraftId] = useState<number | null>(null);
+  const [draftState, setDraftState] = useState<OddsRequestBuilderDraft | null>(null);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [loadingDraft, setLoadingDraft] = useState(false);
 
   const playerName = useMemo(() => {
     const firstName = user?.name.trim().split(/\s+/)[0] ?? "";
@@ -165,6 +176,40 @@ export default function NewOddsTaskPage() {
     };
 
     void load();
+  }, []);
+
+  useEffect(() => {
+    const draftParam = new URLSearchParams(window.location.search).get("draft");
+    if (!draftParam || !/^\d+$/.test(draftParam)) return;
+
+    const loadDraft = async () => {
+      setLoadingDraft(true);
+      setError(null);
+      try {
+        const draft = await getOddsTaskDraft(draftParam);
+        const payload = draft.payload as {
+          form?: Partial<TaskForm>;
+          attachments?: OddsTaskAttachment[];
+          wizard?: OddsRequestBuilderDraft;
+        };
+        const draftForm = payload.form ?? {};
+        setDraftId(draft.id);
+        setForm({
+          ...emptyForm,
+          ...Object.fromEntries(
+            Object.entries(draftForm).filter(([, value]) => typeof value === "string"),
+          ),
+        });
+        setUploadedAttachments(Array.isArray(payload.attachments) ? payload.attachments : []);
+        setDraftState(payload.wizard ?? null);
+      } catch (err) {
+        setError(oddsError(err));
+      } finally {
+        setLoadingDraft(false);
+      }
+    };
+
+    void loadDraft();
   }, []);
 
   const selectedCategory = useMemo(() => {
@@ -259,6 +304,7 @@ export default function NewOddsTaskPage() {
         attachment_notes: form.attachment_notes || undefined,
         attachment_ids: uploadedAttachments.map((attachment) => attachment.id),
       });
+      if (draftId) await deleteOddsTaskDraft(draftId);
       setLaunchSequence("success");
       await new Promise((resolve) => window.setTimeout(resolve, 1600));
       router.push("/odds/?section=all_tasks");
@@ -267,6 +313,28 @@ export default function NewOddsTaskPage() {
       setLaunchSequence("idle");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const saveDraft = async (wizard: OddsRequestBuilderDraft) => {
+    setSavingDraft(true);
+    setError(null);
+    try {
+      const payload = {
+        form,
+        attachments: uploadedAttachments,
+        wizard,
+      };
+      const draft = draftId
+        ? await updateOddsTaskDraft(draftId, payload)
+        : await createOddsTaskDraft(payload);
+      setDraftId(draft.id);
+      setDraftState(wizard);
+      router.replace(`/odds/new?draft=${draft.id}`, { scroll: false });
+    } catch (err) {
+      setError(oddsError(err));
+    } finally {
+      setSavingDraft(false);
     }
   };
 
@@ -298,7 +366,7 @@ export default function NewOddsTaskPage() {
             )}
           </div>
         )}
-        <ModernWizard
+        <OddsRequestBuilder
           theme={theme}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
@@ -315,6 +383,9 @@ export default function NewOddsTaskPage() {
           addAttachmentFiles={addAttachmentFiles}
           onRemoveAttachment={(id) => setUploadedAttachments((items) => items.filter((item) => item.id !== id))}
           loading={loading}
+          savingDraft={savingDraft || loadingDraft}
+          initialDraftState={draftState}
+          onSaveDraft={(wizard) => void saveDraft(wizard)}
           initializing={initializing}
           submit={submit}
         />

@@ -193,6 +193,9 @@ class AssessmentController extends BaseApiController
             }
             unset($data['card_image'], $data['remove_card_image'], $data['specializations'], $data['odds_status']);
             $member->update($data);
+            if ($member->user_id && array_key_exists('name', $data)) {
+                $member->user()->update(['name' => $data['name']]);
+            }
             if ($member->user_id && (array_key_exists('specializations', $request->all()) || array_key_exists('odds_status', $request->all()))) {
                 $profile = DesignerProfile::firstOrCreate(['user_id' => $member->user_id], ['status' => 'available', 'specializations' => [], 'is_active' => true, 'created_by' => $request->user()->id]);
                 $profile->update(array_filter(['specializations' => $request->input('specializations'), 'status' => $request->input('odds_status')], fn ($value) => $value !== null));

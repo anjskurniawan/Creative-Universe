@@ -89,6 +89,9 @@ function DetailContent() {
   const [designerProfiles, setDesignerProfiles] = useState<OddsDesignerProfile[]>([]);
   const [reassignDesignerId, setReassignDesignerId] = useState("");
   const [extendedDeadline, setExtendedDeadline] = useState("");
+  const [activeTab, setActiveTab] = useState<
+    "brief" | "output" | "revision" | "discussion" | "status" | "audit" | "actions"
+  >("brief");
 
   const canReviewBrief = hasPermission("review-odds-briefs");
   const canStart = hasPermission("start-odds-tasks");
@@ -284,23 +287,23 @@ function DetailContent() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 p-4 md:gap-6 md:p-6">
       <TaskFeedbackToast
         toast={error ? { status: "error", message: error } : notice ? { status: "success", message: notice } : null}
         onClose={() => { setError(null); setNotice(null); }}
       />
-      <header className="flex flex-col gap-4 border-b border-cu-border pb-5 md:flex-row md:items-start md:justify-between">
+      <header className="flex flex-col gap-4 rounded-2xl border border-cu-border bg-white p-4 shadow-[0_8px_24px_rgba(4,4,74,0.05)] md:flex-row md:items-center md:justify-between md:p-5">
         <div className="flex items-start gap-3">
           <Link
             href="/odds"
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-cu-border text-cu-ink transition hover:bg-cu-panel-soft"
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-cu-border bg-cu-panel-soft text-cu-ink transition hover:border-cu-info hover:bg-white hover:text-cu-info"
             aria-label="Kembali"
           >
             <MaterialIcon name="arrow_back" size="sm" />
           </Link>
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">{task.task_number}</p>
-            <h1 className="mt-1 break-words text-2xl font-semibold text-cu-ink md:text-3xl">{task.design_purpose}</h1>
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-cu-info">{task.task_number}</p>
+            <h1 className="mt-1 break-words text-2xl font-bold tracking-tight text-cu-ink md:text-3xl">{task.design_purpose}</h1>
             <div className="mt-2 flex flex-wrap gap-2 text-sm text-cu-muted">
               <span>{task.category?.name ?? "-"}</span>
               <span aria-hidden="true">&middot;</span>
@@ -310,16 +313,42 @@ function DetailContent() {
             </div>
           </div>
         </div>
-        <span className={`inline-flex w-fit rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${badgeClass(task.status)}`}>
+        <span className={`inline-flex w-fit items-center rounded-full border px-3 py-1.5 text-xs font-bold capitalize ${badgeClass(task.status)}`}>
           {statusLabel(task.status)}
         </span>
       </header>
 
-      <section className="grid gap-6 xl:grid-cols-[1fr_24rem]">
-        <div className="space-y-6">
-          <section className="rounded-lg border border-cu-border bg-white p-5">
+      <nav className="flex gap-1 overflow-x-auto rounded-2xl border border-cu-border bg-white p-1.5 shadow-[0_8px_24px_rgba(4,4,74,0.04)]" aria-label="Detail task">
+        {([
+          ["brief", "description", "Brief"],
+          ["output", "folder_open", "Output"],
+          ["revision", "edit_note", "Revisi"],
+          ["discussion", "chat", "Diskusi"],
+          ["status", "info", "Status"],
+          ["audit", "timer", "Audit"],
+          ["actions", "bolt", "Aksi"],
+        ] as const).map(([tab, icon, label]) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={`inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition ${
+              activeTab === tab
+                ? "bg-cu-info text-white shadow-sm"
+                : "text-cu-muted hover:bg-cu-panel-soft hover:text-cu-ink"
+            }`}
+          >
+            <MaterialIcon name={icon} size="sm" />
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      <section className="grid gap-5">
+        <div className="min-w-0 space-y-5">
+          <section className={`${activeTab === "brief" ? "" : "hidden"} rounded-2xl border border-cu-border bg-white p-4 shadow-[0_8px_24px_rgba(4,4,74,0.04)] md:p-5`}>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-cu-ink">Brief</h2>
+              <div className="flex items-center gap-2"><span className="flex size-8 items-center justify-center rounded-lg bg-cu-info/10 text-cu-info"><MaterialIcon name="description" size="sm" /></span><h2 className="text-base font-bold text-cu-ink">Brief</h2></div>
               <span className="text-sm text-cu-muted">Return {task.brief_return_count}</span>
             </div>
             {task.brief?.last_return_note && (
@@ -353,7 +382,7 @@ function DetailContent() {
           </section>
 
           {activeRevision && (
-            <section className={`rounded-lg border p-5 ${
+            <section className={`${activeTab === "revision" ? "" : "hidden"} rounded-2xl border p-5 ${
               isLeaderRevisionTask
                 ? "border-cu-warning/30 bg-cu-warning/10"
                 : "border-cu-info/20 bg-cu-info/10"
@@ -378,8 +407,8 @@ function DetailContent() {
           )}
 
           {showOutputSection && (
-          <section className="rounded-lg border border-cu-border bg-white p-5">
-            <h2 className="mb-4 text-lg font-semibold text-cu-ink">{outputTitle}</h2>
+          <section className={`${activeTab === "output" ? "" : "hidden"} rounded-2xl border border-cu-border bg-white p-4 shadow-[0_8px_24px_rgba(4,4,74,0.04)] md:p-5`}>
+              <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-cu-ink"><span className="flex size-8 items-center justify-center rounded-lg bg-cu-info/10 text-cu-info"><MaterialIcon name="folder_open" size="sm" /></span>{outputTitle}</h2>
             {visibleLatestResult ? (
               <div className="rounded-lg border border-cu-border p-4">
                 <div className="flex items-center justify-between gap-3">
@@ -429,8 +458,8 @@ function DetailContent() {
           )}
 
           {showRevisionSection && (
-          <section className="rounded-lg border border-cu-border bg-white p-5">
-            <h2 className="mb-4 text-lg font-semibold text-cu-ink">Revisi</h2>
+          <section className={`${activeTab === "revision" ? "" : "hidden"} rounded-2xl border border-cu-border bg-white p-4 shadow-[0_8px_24px_rgba(4,4,74,0.04)] md:p-5`}>
+            <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-cu-ink"><span className="flex size-8 items-center justify-center rounded-lg bg-cu-warning/10 text-cu-warning"><MaterialIcon name="edit_note" size="sm" /></span>Revisi</h2>
             <div className="space-y-2">
               {visibleRevisions.map((revision) => (
                 <div key={revision.id} className="rounded-lg border border-cu-border px-3 py-2">
@@ -447,9 +476,9 @@ function DetailContent() {
           )}
         </div>
 
-        <aside className="space-y-6">
-          <section className="rounded-lg border border-cu-border bg-white p-5">
-            <h2 className="mb-4 text-lg font-semibold text-cu-ink">Status</h2>
+        <aside className="min-w-0 space-y-5">
+          <section className={`${activeTab === "status" ? "" : "hidden"} rounded-2xl border border-cu-border bg-white p-4 shadow-[0_8px_24px_rgba(4,4,74,0.04)] md:p-5`}>
+            <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-cu-ink"><span className="flex size-8 items-center justify-center rounded-lg bg-cu-info/10 text-cu-info"><MaterialIcon name="info" size="sm" /></span>Status</h2>
             <InfoRow label="Task type" value={statusLabel(task.task_type)} />
             <InfoRow label="SLA" value={`${task.category_snapshot?.sla_minutes ?? 0} menit`} />
             <InfoRow label="Priority" value={Number(task.priority_score).toFixed(1)} />
@@ -467,11 +496,11 @@ function DetailContent() {
             )}
           </section>
 
-          <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} />
+          {activeTab === "discussion" && <OddsTaskChat taskId={task.id} userId={user?.id} taskStatus={task.status} />}
 
           {!isClientSideView && (
-            <section className="rounded-lg border border-cu-border bg-white p-5">
-              <h2 className="mb-2 text-lg font-semibold text-cu-ink">Audit Durasi & Time Logging</h2>
+            <section className={`${activeTab === "audit" ? "" : "hidden"} rounded-2xl border border-cu-border bg-white p-4 shadow-[0_8px_24px_rgba(4,4,74,0.04)] md:p-5`}>
+            <h2 className="mb-2 flex items-center gap-2 text-base font-bold text-cu-ink"><span className="flex size-8 items-center justify-center rounded-lg bg-cu-info/10 text-cu-info"><MaterialIcon name="timer" size="sm" /></span>Audit Durasi & Time Logging</h2>
               <p className="mb-4 text-xs text-cu-muted">
                 Transparansi pencatatan durasi per fase untuk melacak bottleneck pengerjaan dan SLA desainer.
               </p>
@@ -517,8 +546,8 @@ function DetailContent() {
             </section>
           )}
 
-          <section className="rounded-lg border border-cu-border bg-white p-5">
-            <h2 className="mb-4 text-lg font-semibold text-cu-ink">Aksi</h2>
+          <section className={`${activeTab === "actions" ? "" : "hidden"} rounded-2xl border border-cu-info/20 bg-white p-4 shadow-[0_8px_24px_rgba(0,164,255,0.08)] md:p-5`}>
+            <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-cu-ink"><span className="flex size-8 items-center justify-center rounded-lg bg-cu-info/10 text-cu-info"><MaterialIcon name="bolt" size="sm" /></span>Aksi</h2>
             <div className="space-y-3">
               {canShowNoteInput && (
                 <textarea
@@ -764,7 +793,7 @@ function ActionButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold transition disabled:opacity-50 ${
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${
         danger
           ? "border border-cu-danger/20 bg-cu-danger/10 text-cu-danger hover:bg-cu-danger/15"
           : "border border-cu-border bg-white text-cu-ink hover:bg-cu-panel-soft"

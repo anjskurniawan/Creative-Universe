@@ -18,6 +18,7 @@ import {
   OddsAssignableUser,
   OddsCategory,
   OddsDailyReport,
+  OddsTaskDraft,
   OddsDesignerProfile,
   OddsRanking,
   OddsReportSummary,
@@ -44,6 +45,7 @@ import {
   getOddsReportSummary,
   getOddsSystemRules,
   getOddsTasks,
+  getOddsTaskDrafts,
   formatOddsDate,
   acceptOddsBrief,
   clientReviewOddsTask,
@@ -158,6 +160,7 @@ type ConfigSection =
   | "designer_report"
   | "designer_settings"
   | "client_all_requests"
+  | "client_drafts"
   | "client_queue"
   | "client_working"
   | "client_action_required"
@@ -254,6 +257,12 @@ const configSections: Array<{
     label: "Pengaturan & Jadwal",
     icon: "manage_accounts",
     description: "Pengaturan status desainer.",
+  },
+  {
+    id: "client_drafts",
+    label: "Draft",
+    icon: "draft",
+    description: "Request yang belum dikirim.",
   },
   {
     id: "client_all_requests",
@@ -481,6 +490,7 @@ function OddsPageContent() {
   const [rules, setRules] = useState<OddsSystemRule[]>([]);
   const [assignableUsers, setAssignableUsers] = useState<OddsAssignableUser[]>([]);
   const [tasks, setTasks] = useState<OddsTask[]>([]);
+  const [drafts, setDrafts] = useState<OddsTaskDraft[]>([]);
   const [dailyReports, setDailyReports] = useState<OddsDailyReport[]>([]);
   const [reportSummary, setReportSummary] = useState<OddsReportSummary | null>(null);
   const [rankings, setRankings] = useState<OddsRanking[]>([]);
@@ -593,7 +603,7 @@ function OddsPageContent() {
       if (section.id === "reports") return canViewReports;
       if (section.id === "rankings") return canViewRankings;
       if (["designer_today_tasks", "designer_queue", "designer_all_tasks", "designer_review", "designer_spv_review", "designer_client_review", "designer_revisions", "designer_done", "designer_report", "designer_settings"].includes(section.id)) return canViewAssignedTasks && !canUseControl;
-      if (["client_all_requests", "client_queue", "client_working", "client_action_required", "client_revisions", "client_archive"].includes(section.id)) return !canViewAssignedTasks && !canUseControl;
+      if (["client_drafts", "client_all_requests", "client_queue", "client_working", "client_action_required", "client_revisions", "client_archive"].includes(section.id)) return !canViewAssignedTasks && !canUseControl;
       return canViewAllTasks || canReviewSpv;
     });
   }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewQueueSkip, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports, canViewAssignedTasks, canUseControl]);
@@ -673,14 +683,16 @@ function OddsPageContent() {
     setError(null);
     try {
       const taskPagePromise = getOddsTasks();
+      const draftPromise = !canUseControl && !canViewAssignedTasks ? getOddsTaskDrafts() : Promise.resolve<OddsTaskDraft[]>([]);
       const reportPromise = getOddsDailyReports();
       const summaryPromise = canViewReports ? getOddsReportSummary() : Promise.resolve<OddsReportSummary | null>(null);
       const rankingPromise = canViewRankings ? getOddsRankings(rankingPeriod) : Promise.resolve<OddsRanking[]>([]);
       const profilePromise = getOddsConfigDesignerProfiles();
 
       if (!canUseControl) {
-        const [taskPage, profileList, reportList] = await Promise.all([taskPagePromise, profilePromise, reportPromise]);
+        const [taskPage, profileList, reportList, draftList] = await Promise.all([taskPagePromise, profilePromise, reportPromise, draftPromise]);
         setTasks(taskPage.data);
+        setDrafts(draftList);
         setDesignerProfiles(profileList);
         setDailyReports(reportList);
         return;
@@ -1557,6 +1569,7 @@ function OddsPageContent() {
     designer_report: "Laporan Kinerja",
     designer_settings: "Pengaturan & Jadwal",
     client_all_requests: "Semua Request",
+    client_drafts: "Draft",
     client_queue: "Dalam Antrean",
     client_working: "Sedang Dikerjakan",
     client_action_required: "Perlu Review",
@@ -1677,10 +1690,8 @@ function OddsPageContent() {
                 onChange={(value) => setCategoryForm((prev) => ({ ...prev, normal_revision_limit: value }))}
               />
 
-              <NumberField
-                label="SLA (Menit)"
+              <SlaDurationFields
                 value={categoryForm.sla_minutes}
-                help="Deadline default dalam menit jika client tidak mengisi deadline khusus."
                 onChange={(value) => setCategoryForm((prev) => ({ ...prev, sla_minutes: value }))}
               />
             </div>
@@ -1721,7 +1732,7 @@ function OddsPageContent() {
                 category.brief_format === "table" ? "Table Brief" : "Default Brief",
                 String(category.score_weight),
                 String(category.normal_revision_limit),
-                `${category.sla_minutes} menit`,
+                formatSlaDuration(category.sla_minutes),
                 category.is_active ? "Aktif" : "Nonaktif",
                 <RowActions
                   key={`category-actions-${category.id}`}
@@ -2821,6 +2832,33 @@ function OddsPageContent() {
              })()}
           </div>
         </ConfigPanel>
+      )}
+
+      {effectiveActiveSection === "client_drafts" && (
+        <section className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {loading ? (
+            <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-8 text-center text-sm text-cu-muted">Memuat draft...</div>
+          ) : drafts.length === 0 ? (
+            <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-8 text-center text-sm text-cu-muted">Belum ada request yang disimpan sebagai draft.</div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {drafts.map((draft) => {
+                const form = (draft.payload.form ?? {}) as { design_purpose?: string; category_id?: string };
+                return (
+                  <Link key={draft.id} href={`/odds/new?draft=${draft.id}`} className="group rounded-xl border border-cu-border bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-cu-info hover:shadow-md">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="inline-flex size-9 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-info"><MaterialIcon name="draft" size="sm" /></span>
+                      <span className="text-xs text-cu-muted">{formatOddsDate(draft.updated_at)}</span>
+                    </div>
+                    <h3 className="mt-4 line-clamp-2 font-bold text-cu-ink">{form.design_purpose?.trim() || "Request tanpa judul"}</h3>
+                    <p className="mt-1 text-xs text-cu-muted">Klik untuk melanjutkan request.</p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-cu-info">Lanjutkan <MaterialIcon name="arrow_forward" size="sm" /></span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </section>
       )}
 
       {["client_all_requests", "client_queue", "client_working", "client_action_required", "client_revisions", "client_archive"].includes(effectiveActiveSection) && (() => {
@@ -5229,6 +5267,41 @@ function NumberField({
       />
       {help && <FieldHelp>{help}</FieldHelp>}
     </label>
+  );
+}
+
+function formatSlaDuration(value: string | number | null | undefined): string {
+  const totalMinutes = Math.max(0, Math.floor(Number(value) || 0));
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  return [days && `${days} hari`, hours && `${hours} jam`, minutes && `${minutes} menit`].filter(Boolean).join(" ") || "0 menit";
+}
+
+function SlaDurationFields({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const totalMinutes = Math.max(0, Math.floor(Number(value) || 0));
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+
+  const updatePart = (part: "days" | "hours" | "minutes", rawValue: string) => {
+    const next = Math.max(0, Math.floor(Number(rawValue) || 0));
+    const nextDays = part === "days" ? next : days;
+    const nextHours = part === "hours" ? Math.min(23, next) : hours;
+    const nextMinutes = part === "minutes" ? Math.min(59, next) : minutes;
+    onChange(String((nextDays * 1440) + (nextHours * 60) + nextMinutes));
+  };
+
+  return (
+    <div className="col-span-2">
+      <span className="mb-1 block text-xs font-medium text-cu-muted">SLA</span>
+      <div className="grid grid-cols-3 gap-2">
+        <NumberField label="Hari" value={String(days)} onChange={(next) => updatePart("days", next)} />
+        <NumberField label="Jam" value={String(hours)} onChange={(next) => updatePart("hours", next)} />
+        <NumberField label="Menit" value={String(minutes)} onChange={(next) => updatePart("minutes", next)} />
+      </div>
+      <FieldHelp>Deadline default kategori. Sistem menyimpan total durasi dalam menit.</FieldHelp>
+    </div>
   );
 }
 

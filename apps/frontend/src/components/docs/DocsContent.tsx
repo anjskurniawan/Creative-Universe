@@ -5,15 +5,17 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import type { Components } from "react-markdown";
-import { NavbarDocumentation } from "@/design-system/templates/documentation/navbar-documentation";
-import { HeroHeadingDocumentation } from "@/design-system/templates/documentation/hero-heading-documentation";
-import { PrimaryActionLinkDocumentation } from "@/design-system/templates/documentation/primary-action-link-documentation";
-import { ErrorTetrisGameDocumentation } from "@/design-system/templates/documentation/error-tetris-game-documentation";
-import { UniversalErrorViewDocumentation } from "@/design-system/templates/documentation/universal-error-view-documentation";
-import { OddsDesignerDashboardCardsDocumentation } from "@/design-system/templates/documentation/odds-designer-dashboard-cards-documentation";
-import type { OddsDesignerDashboardCardId } from "@/design-system/templates/documentation/odds-designer-dashboard-cards-documentation";
-import { OddsTaskCardDocumentation } from "@/design-system/templates/documentation/odds-task-card-documentation";
-import type { OddsTaskCardView } from "@/design-system/templates/documentation/odds-task-card-documentation";
+import { NavbarDocumentation } from "@/components/docs/templates/navbar-documentation";
+import { HeroHeadingDocumentation } from "@/components/docs/templates/hero-heading-documentation";
+import { PrimaryActionLinkDocumentation } from "@/components/docs/templates/primary-action-link-documentation";
+import { ErrorTetrisGameDocumentation } from "@/components/docs/templates/error-tetris-game-documentation";
+import { UniversalErrorViewDocumentation } from "@/components/docs/templates/universal-error-view-documentation";
+import { OddsDesignerDashboardCardsDocumentation } from "@/components/docs/templates/odds-designer-dashboard-cards-documentation";
+import type { OddsDesignerDashboardCardId } from "@/components/docs/templates/odds-designer-dashboard-cards-documentation";
+import { OddsTaskCardDocumentation } from "@/components/docs/templates/odds-task-card-documentation";
+import type { OddsTaskCardView } from "@/components/docs/templates/odds-task-card-documentation";
+import { ExampleComponentDocumentation } from "@/components/docs/templates/example-component-documentation";
+import { LandingRouteDocumentation } from "@/components/docs/templates/landing-route-documentation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -194,6 +196,8 @@ export default function DocsContent({ slug }: DocsContentProps) {
   if (slug.startsWith("components/odds-task-card-")) {
     return <OddsTaskCardDocumentation view={slug.replace("components/odds-task-card-", "") as OddsTaskCardView} />;
   }
+  if (slug === "example") return <ExampleComponentDocumentation />;
+  if (slug === "routes/landing") return <LandingRouteDocumentation />;
 
   // ── Render states ──
   if (state.status === "idle") return <EmptyState />;

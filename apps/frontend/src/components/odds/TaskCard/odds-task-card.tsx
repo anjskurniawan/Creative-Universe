@@ -6,7 +6,7 @@ import { MaterialIcon } from "@/components/material-icon";
 import { type OddsTask, statusLabel } from "@/features/odds/api";
 import { TaskCardActionBar } from "./task-card-action-bar";
 import { TaskCardCompactDate, TaskCardMobileDate, TaskCardWideDate } from "./task-card-date";
-import { TaskCardPeople, TaskCardWidePeople } from "./task-card-people";
+import { TaskCardPeople, TaskCardPerson, TaskCardWidePeople } from "./task-card-people";
 import { TaskCardStatusBlock, TaskCardWideStatusPanel } from "./task-card-status-panel";
 import { TaskCardCompactLayout, TaskCardMobileLayout, TaskCardWideLayout } from "./task-card-layouts";
 
@@ -243,11 +243,19 @@ export function OddsTaskCard({
   const workActionLabel = workAction === "pause" ? "Jeda task" : workAction === "done" ? "Selesaikan task" : "Mulai task";
 
   const people = (compact = false) => (
-    <TaskCardPeople requesterName={requester?.name ?? "Client"} requesterRole={requester?.roles?.[0] ?? "Client"} designerName={assignedDesigner?.name ?? "Belum Ada"} compact={compact} />
+    viewerRole === "client"
+      ? <TaskCardPerson name={assignedDesigner?.name ?? "Belum Ada"} role="Designer" accent compact={compact} />
+      : viewerRole === "designer"
+        ? <TaskCardPerson name={requester?.name ?? "Client"} role={requester?.roles?.[0] ?? "Client"} accent compact={compact} />
+        : <TaskCardPeople requesterName={requester?.name ?? "Client"} requesterRole={requester?.roles?.[0] ?? "Client"} designerName={assignedDesigner?.name ?? "Belum Ada"} compact={compact} />
   );
 
   const widePeople = () => (
-    <TaskCardWidePeople requesterName={requester?.name ?? "Client"} requesterRole={requester?.roles?.[0] ?? "Client"} designerName={assignedDesigner?.name ?? "Belum Ada"} lineClass={palette.line} />
+    viewerRole === "client"
+      ? <div className={`flex min-w-0 items-center px-4 py-2 ${palette.line}`}><TaskCardPerson name={assignedDesigner?.name ?? "Belum Ada"} role="Designer" accent compact /></div>
+      : viewerRole === "designer"
+        ? <div className={`flex min-w-0 items-center px-4 py-2 ${palette.line}`}><TaskCardPerson name={requester?.name ?? "Client"} role={requester?.roles?.[0] ?? "Client"} accent compact /></div>
+        : <TaskCardWidePeople requesterName={requester?.name ?? "Client"} requesterRole={requester?.roles?.[0] ?? "Client"} designerName={assignedDesigner?.name ?? "Belum Ada"} lineClass={palette.line} />
   );
 
   const statusBlock = (compact = false) => (

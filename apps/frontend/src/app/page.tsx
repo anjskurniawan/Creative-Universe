@@ -5,8 +5,8 @@ import { gsap } from "gsap";
 import { Navbar } from "@/components/navbar";
 import { APP_ROUTES } from "@/core/navigation/routes";
 import { useAuth } from "@/providers/auth-provider";
-import { HeroHeading } from "@/design-system/atoms/typography/hero-heading";
-import { PrimaryActionLink } from "@/design-system/atoms/actions/primary-action-link";
+import { HeroHeading } from "@/components/typography/hero-heading";
+import { PrimaryActionLink } from "@/components/ui/primary-action-link";
 
 export default function GuestLandingPage() {
   const { isAuthenticated, isLoading } = useAuth();

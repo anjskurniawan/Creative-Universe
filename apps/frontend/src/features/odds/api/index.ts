@@ -258,6 +258,14 @@ export interface OddsTaskAttachment {
   size?: number | null;
 }
 
+export interface OddsTaskDraft {
+  id: number;
+  requester_id: number;
+  payload: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface SubmitResultInput {
   result_notes?: string;
   assets?: Array<{
@@ -489,6 +497,32 @@ export async function createOddsTask(input: CreateOddsTaskInput): Promise<OddsTa
     method: "POST",
     body: JSON.stringify(input),
   });
+}
+
+export async function getOddsTaskDrafts(): Promise<OddsTaskDraft[]> {
+  return apiFetch<OddsTaskDraft[]>("/odds/task-drafts");
+}
+
+export async function getOddsTaskDraft(id: string | number): Promise<OddsTaskDraft> {
+  return apiFetch<OddsTaskDraft>(`/odds/task-drafts/${id}`);
+}
+
+export async function createOddsTaskDraft(payload: Record<string, unknown>): Promise<OddsTaskDraft> {
+  return apiFetch<OddsTaskDraft>("/odds/task-drafts", {
+    method: "POST",
+    body: JSON.stringify({ payload }),
+  });
+}
+
+export async function updateOddsTaskDraft(id: string | number, payload: Record<string, unknown>): Promise<OddsTaskDraft> {
+  return apiFetch<OddsTaskDraft>(`/odds/task-drafts/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ payload }),
+  });
+}
+
+export async function deleteOddsTaskDraft(id: string | number): Promise<void> {
+  await apiFetch<null>(`/odds/task-drafts/${id}`, { method: "DELETE" });
 }
 
 export async function deleteOddsTask(id: string | number): Promise<void> {

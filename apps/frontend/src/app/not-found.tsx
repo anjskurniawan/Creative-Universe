@@ -1,4 +1,4 @@
-import { UniversalErrorView } from "@/design-system/templates/feedback/universal-error-view";
+import { UniversalErrorView } from "@/components/feedback/universal-error-view";
 
 export default function NotFoundPage() {
   return <UniversalErrorView />;

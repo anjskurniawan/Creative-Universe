@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { HeroHeading } from "@/design-system/atoms/typography/hero-heading";
-import { PrimaryActionLink } from "@/design-system/atoms/actions/primary-action-link";
+import { HeroHeading } from "@/components/typography/hero-heading";
+import { PrimaryActionLink } from "@/components/ui/primary-action-link";
 
 export function GuestLandingDocumentation() {
   const [typing, setTyping] = useState(true);

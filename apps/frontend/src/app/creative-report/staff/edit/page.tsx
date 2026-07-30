@@ -9,24 +9,19 @@ import { creativeReportApi } from "@/features/creative-report/api";
 import { getOddsCategories, type OddsCategory } from "@/features/odds/api";
 import type { CreativeMemberProfile } from "@/features/creative-report/types";
 import { useAuth } from "@/providers/auth-provider";
-
-const METRICS = [
-  ["creativity", "Creativity"],
-  ["speed", "Speed"],
-  ["communication", "Communication"],
-  ["quality", "Quality"],
-  ["teamwork", "Teamwork"],
-] as const;
+import { useCreativeReportTheme } from "../../theme-context";
 
 export default function EditCreativeMemberPage() {
   const memberId = useSearchParams().get("memberId");
   const router = useRouter();
   const { hasRole } = useAuth();
+  const { theme } = useCreativeReportTheme();
   const [member, setMember] = useState<CreativeMemberProfile | null>(null);
   const [categories, setCategories] = useState<OddsCategory[]>([]);
   const [image, setImage] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"identity" | "specialties">("identity");
   useEffect(() => {
     if (!hasRole("Root") && !hasRole("Manajer"))
       return router.replace("/creative-report/creative-agent");
@@ -54,11 +49,6 @@ export default function EditCreativeMemberPage() {
         {error ?? "Memuat profil anggota..."}
       </p>
     );
-  const setMetric = (key: string, value: number) =>
-    setMember({
-      ...member,
-      profile_metrics: { ...member.profile_metrics, [key]: value },
-    });
   const selected = new Set(
     (member.odds_profile?.specializations ?? []).map(String),
   );
@@ -70,7 +60,6 @@ export default function EditCreativeMemberPage() {
     body.set("position_name", member.position_name);
     body.set("joined_at", member.joined_at ?? "");
     body.set("resigned_at", member.resigned_at ?? "");
-    body.set("profile_metrics", JSON.stringify(member.profile_metrics));
     body.set(
       "specializations",
       JSON.stringify(member.odds_profile?.specializations ?? []),
@@ -92,37 +81,47 @@ export default function EditCreativeMemberPage() {
     ? URL.createObjectURL(image)
     : resolveStorageUrl(member.card_image_path);
   const photoIsVideo = Boolean(image?.type.startsWith("video/") || photo && /\.(mp4|webm|ogg)(?:\?.*)?$/i.test(photo));
+  const dark = theme === "dark";
+  const inputClass = `mt-1 h-10 w-full rounded-lg border px-3 text-sm outline-none transition ${dark ? "border-white/10 bg-[#181818] text-white focus:border-[#b0ff5e]" : "border-slate-200 bg-white text-slate-800 focus:border-[#00a4ff]"}`;
+  const mutedTextClass = dark ? "text-slate-400" : "text-slate-500";
+  const fieldLabelClass = dark ? "text-slate-300" : "text-slate-600";
   return (
-    <main className="w-full max-w-5xl">
-      <header className="mb-6 flex items-center justify-between">
+    <main className="flex h-full min-w-0 w-full flex-1 flex-col">
+      <header className="flex min-h-[45px] items-center justify-between gap-6 pb-4">
         <div>
-          <Link
-              href="/creative-report/creative-agent"
-            className="text-xs text-[#6d46eb]"
-          >
+          <span className="hidden">
             ← Kembali ke Staff
-          </Link>
-          <h1 className="mt-2 text-2xl font-semibold">Edit {member.name}</h1>
+          </span>
+          <h1 className={`text-4xl font-medium leading-none tracking-[-0.72px] ${theme === "dark" ? "text-white" : "text-[#24252b]"}`}>{member.name}</h1>
         </div>
-        <button
-          type="button"
-          onClick={() => void save()}
-          disabled={saving}
-          className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#6d46eb] px-4 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          <MaterialIcon name="save" size="sm" />
-          Simpan
-        </button>
       </header>
       {error && (
-        <p className="mb-4 rounded-lg bg-[#ffedf1] p-3 text-sm text-[#b4234d]">
+        <p className={`mb-4 rounded-lg p-3 text-sm ${theme === "dark" ? "bg-red-500/10 text-red-300" : "bg-[#ffedf1] text-[#b4234d]"}`}>
           {error}
         </p>
       )}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-xl border bg-white p-4">
-          <h2 className="font-semibold">Identitas & foto Card</h2>
-          <div className="mt-4 flex gap-4">
+      <div className={`flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border ${theme === "dark" ? "border-white/10 bg-white/5" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#e1e8eb] bg-white shadow-sm"}`}>
+        <nav className={`flex flex-nowrap gap-1 overflow-x-auto border-b p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${theme === "dark" ? "border-white/10" : theme === "retro" ? "border-[#24252b]" : "border-[#e1e8eb]"}`} aria-label="Pengaturan Creative Agent">
+          {([
+            ["identity", "badge", "Identitas & Foto"],
+            ["specialties", "category", "Spesialisasi ODDS"],
+          ] as const).map(([tab, icon, label]) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${activeTab === tab ? theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#6d46eb] text-white" : theme === "dark" ? "text-slate-300 hover:bg-white/10" : "text-slate-600 hover:bg-slate-100"}`}
+            >
+              <MaterialIcon name={icon} size="sm" />
+              {label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="min-h-0 flex-1 overflow-y-auto p-5 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
+        {activeTab === "identity" && <section>
+          <div className="flex items-center justify-between gap-3"><h2 className="font-semibold">Identitas & foto Card</h2><button type="button" onClick={() => void save()} disabled={saving} className={`inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-semibold disabled:opacity-50 ${theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#6d46eb] text-white"}`}><MaterialIcon name="save" size="sm" />Simpan</button></div>
+          <div className="mt-5 flex flex-wrap items-center gap-4">
             <div className="flex size-24 items-center justify-center overflow-hidden rounded-lg bg-[#3b4446] text-xl text-white">
               {photo ? photoIsVideo ? (
                 <video src={photo} muted playsInline controls className="size-full object-cover" />
@@ -142,18 +141,18 @@ export default function EditCreativeMemberPage() {
               onChange={(event) => setImage(event.target.files?.[0] ?? null)}
             />
           </div>
-          <label className="mt-3 block text-sm">
+          <label className={`mt-5 block text-sm ${fieldLabelClass}`}>
             Nama
             <input
               value={member.name}
               onChange={(event) =>
                 setMember({ ...member, name: event.target.value })
               }
-              className="mt-1 h-10 w-full rounded-lg border px-3"
+              className={inputClass}
             />
           </label>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <label className="text-sm">
+            <label className={`text-sm ${fieldLabelClass}`}>
               Tanggal masuk
               <input
                 type="date"
@@ -164,10 +163,10 @@ export default function EditCreativeMemberPage() {
                     joined_at: event.target.value || null,
                   })
                 }
-                className="mt-1 h-10 w-full rounded-lg border px-3"
+                className={inputClass}
               />
             </label>
-            <label className="text-sm">
+            <label className={`text-sm ${fieldLabelClass}`}>
               Tanggal keluar
               <input
                 type="date"
@@ -178,45 +177,18 @@ export default function EditCreativeMemberPage() {
                     resigned_at: event.target.value || null,
                   })
                 }
-                className="mt-1 h-10 w-full rounded-lg border px-3"
+                className={inputClass}
               />
             </label>
           </div>
-        </section>
-        <section className="rounded-xl border bg-white p-4">
-          <h2 className="font-semibold">Kompetensi manual</h2>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            {METRICS.map(([key, label]) => (
-              <label key={key} className="text-sm">
-                {label}
-                <input
-                  type="number"
-                  min="0"
-                  max="10"
-                  step="0.1"
-                  value={member.profile_metrics[key] ?? 0}
-                  onChange={(event) =>
-                    setMetric(
-                      key,
-                      Math.max(
-                        0,
-                        Math.min(10, Number(event.target.value) || 0),
-                      ),
-                    )
-                  }
-                  className="mt-1 h-10 w-full rounded-lg border px-3"
-                />
-              </label>
-            ))}
-          </div>
-        </section>
-        <section className="rounded-xl border bg-white p-4 lg:col-span-2">
-          <h2 className="font-semibold">Spesialisasi ODDS</h2>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        </section>}
+        {activeTab === "specialties" && <section>
+          <div className="flex items-center justify-between gap-3"><h2 className="font-semibold">Spesialisasi ODDS</h2><button type="button" onClick={() => void save()} disabled={saving} className={`inline-flex h-10 items-center gap-2 rounded-lg px-4 text-sm font-semibold disabled:opacity-50 ${theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#6d46eb] text-white"}`}><MaterialIcon name="save" size="sm" />Simpan</button></div>
+          <div className="mt-5 grid gap-2 sm:grid-cols-2">
             {categories.map((category) => (
               <label
                 key={category.id}
-                className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm"
+                className={`flex items-center gap-2 rounded-xl border px-3 py-3 text-sm transition-colors ${dark ? "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10" : "border-slate-200 bg-slate-50/70 text-slate-700 hover:border-[#bdb0f5] hover:bg-[#faf9ff]"}`}
               >
                 <input
                   type="checkbox"
@@ -240,7 +212,8 @@ export default function EditCreativeMemberPage() {
               </label>
             ))}
           </div>
-        </section>
+        </section>}
+        </div>
       </div>
     </main>
   );

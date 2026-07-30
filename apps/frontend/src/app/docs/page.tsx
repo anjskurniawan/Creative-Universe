@@ -7,6 +7,7 @@ import Link from "next/link";
 import { MaterialIcon } from "@/components/material-icon";
 import DocsMenu from "@/components/docs/DocsMenu";
 import DocsContent from "@/components/docs/DocsContent";
+import "./docs.css";
 
 function DocsPageInner() {
   const searchParams = useSearchParams();
@@ -50,9 +51,11 @@ export default function DocsPage() {
         </aside>
 
         <main className="docs-content" id="docs-main">
-          <Suspense fallback={<div className="docs-content-suspense-fallback">Memuat konten...</div>}>
-            <DocsPageInner />
-          </Suspense>
+          <div className="docs-content-inner">
+            <Suspense fallback={<div className="docs-content-suspense-fallback">Memuat konten...</div>}>
+              <DocsPageInner />
+            </Suspense>
+          </div>
         </main>
 
         <aside className="docs-toc" aria-label="On this page">
@@ -88,8 +91,7 @@ export default function DocsPage() {
           align-items: center;
           gap: 1.25rem;
           height: 100%;
-          max-width: 1440px;
-          margin: 0 auto;
+          width: 100%;
           padding: 0 1.5rem;
         }
 
@@ -179,18 +181,15 @@ export default function DocsPage() {
         }
 
         .docs-body {
-          display: flex;
+          display: grid;
+          grid-template-columns: 260px minmax(0, 1fr) 250px;
           flex: 1;
           min-height: 0;
           width: 100%;
-          max-width: 1440px;
-          margin: 0 auto;
           overflow: hidden;
         }
 
         .docs-sidebar {
-          width: 260px;
-          flex-shrink: 0;
           height: 100%;
           overflow-y: auto;
           border-right: 1px solid hsl(var(--border));
@@ -203,13 +202,17 @@ export default function DocsPage() {
         }
 
         .docs-content {
-          flex: 1;
           min-width: 0;
-          min-height: 0;
           height: 100%;
           overflow-y: auto;
-          padding: 2.25rem 2rem 4rem;
+          padding: 3rem 2rem 5rem;
           scrollbar-width: none;
+        }
+
+        .docs-content-inner {
+          max-width: 800px;
+          margin: 0 auto;
+          width: 100%;
         }
 
         .docs-content::-webkit-scrollbar {
@@ -217,8 +220,6 @@ export default function DocsPage() {
         }
 
         .docs-toc {
-          width: 250px;
-          flex-shrink: 0;
           height: 100%;
           border-left: 1px solid hsl(var(--border));
           background-color: hsl(var(--card));
@@ -260,12 +261,18 @@ export default function DocsPage() {
         }
 
         @media (max-width: 1180px) {
+          .docs-body {
+            grid-template-columns: 260px minmax(0, 1fr);
+          }
           .docs-toc {
             display: none;
           }
         }
 
         @media (max-width: 900px) {
+          .docs-body {
+            grid-template-columns: 240px minmax(0, 1fr);
+          }
           .docs-search,
           .docs-topnav {
             display: none;
@@ -273,10 +280,6 @@ export default function DocsPage() {
 
           .docs-brand {
             min-width: 0;
-          }
-
-          .docs-sidebar {
-            width: 240px;
           }
         }
       `}</style>

@@ -9,8 +9,8 @@ export type RichTextUpload = {
   mime_type?: string | null;
 };
 
-export function stripRichText(value: string): string {
-  return value
+export function stripRichText(value: string | null | undefined): string {
+  return (typeof value === "string" ? value : "")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<br\s*\/?>/gi, "\n")

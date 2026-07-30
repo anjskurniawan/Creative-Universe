@@ -3,7 +3,7 @@
 import PreviewNavbar, {
   type NavbarProps as PreviewNavbarProps,
 } from "@/app/layout-preview/components/content/navbar/navbar";
-export { CreativeUniverseLogo } from "@/design-system/atoms/brand/creative-universe-logo";
+export { CreativeUniverseLogo } from "@/components/ui/creative-universe-logo";
 
 export type NavbarVariant = "light" | "dark" | "transparent-dark";
 export type NavbarSession = "connected" | "guest" | "preview-authenticated";

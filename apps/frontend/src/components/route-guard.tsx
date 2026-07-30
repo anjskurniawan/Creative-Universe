@@ -11,7 +11,7 @@ import { resolveAuthenticatedRoute } from "@/core/auth";
 import { applicationForPath } from "@/core/applications";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { UniversalErrorView } from "@/design-system/templates/feedback/universal-error-view";
+import { UniversalErrorView } from "@/components/feedback/universal-error-view";
 import { EMERGENCY_MAINTENANCE_EVENT } from "@/core/api/client";
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {

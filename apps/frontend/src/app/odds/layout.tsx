@@ -70,6 +70,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
         all_tasks: taskPage.data.length,
         spv_review: taskPage.data.filter((t: OddsTask) => t.status === "spv_review").length,
         client_review: taskPage.data.filter((t: OddsTask) => t.status === "client_review").length,
+        client_drafts: 0,
         client_all_requests: taskPage.data.length,
         client_queue: taskPage.data.filter((t: OddsTask) => t.status === "queued").length,
         client_working: taskPage.data.filter((t: OddsTask) => t.status === "in_progress").length,
@@ -146,6 +147,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
       } else {
         items.push(
           { id: "workspace", label: "Dashboard", icon: "dashboard", href: "/odds", group: "tasks" },
+          { id: "client_drafts", label: "Draft", icon: "draft", href: "/odds?section=client_drafts", group: "tasks" },
           { id: "client_all_requests", label: "Semua Request", icon: "assignment", href: "/odds?section=client_all_requests", group: "tasks" },
           { id: "client_queue", label: "Dalam Antrean", icon: "hourglass_top", href: "/odds?section=client_queue", group: "tasks" },
           { id: "client_working", label: "Sedang Dikerjakan", icon: "autorenew", href: "/odds?section=client_working", group: "tasks" },

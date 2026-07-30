@@ -10,7 +10,7 @@ import { MessageBell } from "@/components/message-bell";
 import { NotificationBell } from "@/components/notification-bell";
 import { APPLICATION_ICONS, visibleSubApplications } from "@/core/applications";
 import { APP_ROUTES } from "@/core/navigation/routes";
-import { CreativeUniverseLogo } from "@/design-system/atoms/brand/creative-universe-logo";
+import { CreativeUniverseLogo } from "@/components/ui/creative-universe-logo";
 import { useAuth } from "@/providers/auth-provider";
 import { KV_RETAIL_PERFORMANCE_PAGE } from "@/features/kv-retail/performance-page-config";
 

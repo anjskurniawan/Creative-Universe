@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Odds\QueueController;
 use App\Http\Controllers\Api\Odds\ReportController;
 use App\Http\Controllers\Api\Odds\RevisionController;
 use App\Http\Controllers\Api\Odds\TaskController;
+use App\Http\Controllers\Api\Odds\TaskDraftController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds')->group(function () {
@@ -26,6 +27,11 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::post('/uploads', [TaskController::class, 'uploadAttachment']);
     Route::get('/uploads/{storedFile}/content', [TaskController::class, 'attachmentContent']);
     Route::post('/tasks', [TaskController::class, 'store'])->middleware('can:create-odds-tasks');
+    Route::get('/task-drafts', [TaskDraftController::class, 'index'])->middleware('can:create-odds-tasks');
+    Route::post('/task-drafts', [TaskDraftController::class, 'store'])->middleware('can:create-odds-tasks');
+    Route::get('/task-drafts/{draft}', [TaskDraftController::class, 'show'])->middleware('can:create-odds-tasks');
+    Route::patch('/task-drafts/{draft}', [TaskDraftController::class, 'update'])->middleware('can:create-odds-tasks');
+    Route::delete('/task-drafts/{draft}', [TaskDraftController::class, 'destroy'])->middleware('can:create-odds-tasks');
     Route::get('/tasks/{task}', [TaskController::class, 'show']);
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->middleware('can:cancel-odds-tasks');
     Route::get('/tasks/{task}/conversation', [TaskController::class, 'conversation']);

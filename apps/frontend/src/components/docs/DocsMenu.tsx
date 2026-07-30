@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Boxes, FileText, ChevronRight } from "lucide-react";
-import { COMPONENT_DOCS_MENU_GROUPS } from "@/design-system/documentation/component-registry";
+import { Boxes, FileText, ChevronRight, Star, Monitor, Server } from "lucide-react";
+import { COMPONENT_DOCS_MENU_GROUPS } from "@/components/docs/component-registry";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -70,10 +70,106 @@ const MENU_DATA: DocCategory[] = [
     ],
   },
   {
-    id: "design-system",
-    label: "Design System",
+    id: "components",
+    label: "Components",
     icon: Boxes,
     children: COMPONENT_DOCS_MENU_GROUPS,
+  },
+  {
+    id: "frontend-pages",
+    label: "Frontend Pages",
+    icon: Monitor,
+    children: [
+      {
+        label: "Public & Auth",
+        children: [
+          { label: "Landing", slug: "routes/landing" },
+          { label: "Login", slug: "routes/login" },
+          { label: "Forgot Password", slug: "routes/forgot-password" },
+          { label: "Onboarding", slug: "routes/onboarding" },
+          { label: "Forbidden & Errors", slug: "routes/errors" }
+        ]
+      },
+      {
+        label: "Core Dashboard",
+        children: [
+          { label: "Dashboard", slug: "routes/dashboard" },
+          { label: "User Profile", slug: "routes/profile" },
+          { label: "Notifications", slug: "routes/notifications" },
+          { label: "Messages", slug: "routes/messages" }
+        ]
+      },
+      {
+        label: "Administrative",
+        children: [
+          { label: "Settings", slug: "routes/settings" },
+          { label: "User Management", slug: "routes/users" },
+          { label: "Role Permissions", slug: "routes/roles" }
+        ]
+      },
+      {
+        label: "Creative Applications",
+        children: [
+          { label: "Creative AI", slug: "routes/creative-ai" },
+          { label: "Design Assets", slug: "routes/design-assets" },
+          { label: "Creative Report", slug: "routes/creative-report" },
+          { label: "KV Retail", slug: "routes/kv-retail" },
+          { label: "Generator", slug: "routes/generator" },
+          { label: "ODDS Workspace", slug: "routes/odds" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "api-endpoints",
+    label: "API Endpoints",
+    icon: Server,
+    children: [
+      {
+        label: "Auth & Identity",
+        children: [
+          { label: "POST /login", slug: "api/auth/login" },
+          { label: "GET /me", slug: "api/auth/me" },
+          { label: "GET /onboarding", slug: "api/onboarding/data" }
+        ]
+      },
+      {
+        label: "Access Control (RBAC)",
+        children: [
+          { label: "GET /users", slug: "api/users" },
+          { label: "GET /roles", slug: "api/roles" },
+          { label: "GET /permissions", slug: "api/permissions" }
+        ]
+      },
+      {
+        label: "Sub-Applications",
+        children: [
+          { label: "KV Retail APIs", slug: "api/kv-retail" },
+          { label: "ODDS Tasks API", slug: "api/odds/tasks" },
+          { label: "Creative AI API", slug: "api/creative-ai" },
+          { label: "Generator API", slug: "api/generator" }
+        ]
+      },
+      {
+        label: "System",
+        children: [
+          { label: "GET /settings", slug: "api/settings" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "examples",
+    label: "Examples & Showcases",
+    icon: Star,
+    children: [
+      {
+        label: "Demos",
+        children: [
+          { label: "Complete Component", slug: "example" }
+        ]
+      }
+    ],
   },
 ];
 

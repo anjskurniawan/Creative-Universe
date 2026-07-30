@@ -1,6 +1,6 @@
 "use client";
 
-import { CreativeUniverseLogo } from "@/design-system/atoms/brand/creative-universe-logo";
+import { CreativeUniverseLogo } from "@/components/ui/creative-universe-logo";
 import type { KvRetailTask } from "@/features/kv-retail/api";
 
 const STEPS = [
