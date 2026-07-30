@@ -1,4 +1,4 @@
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import type { OddsCategory, OddsDesignerProfile } from "@/features/odds/api";
 import { TableBriefPreview, type TableBriefRow } from "../../brief-details";
 import type { OddsRequestForm, RequestBuilderTheme } from "../types";

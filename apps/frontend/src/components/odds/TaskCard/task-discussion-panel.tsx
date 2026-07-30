@@ -1,7 +1,7 @@
 "use client";
 
 import { OddsTaskChat } from "@/components/odds-task-chat";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 /** Panel diskusi task yang dipakai oleh action `Diskusi Task`. */
 export function TaskDiscussionPanel({ taskId, userId, taskStatus, preview = false, title, onClose }: { taskId: string | number; userId?: number | null; taskStatus?: string | null; preview?: boolean; title?: string; onClose?: () => void }) {

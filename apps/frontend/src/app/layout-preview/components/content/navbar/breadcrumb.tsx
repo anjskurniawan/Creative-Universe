@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export type BreadcrumbProps = {
   className?: string;

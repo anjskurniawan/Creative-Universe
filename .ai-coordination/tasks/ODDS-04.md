@@ -1,10 +1,10 @@
 ---
 id: ODDS-04
 title: Update important matrix logic to Q1-Q4 category bound
-status: IN_PROGRESS
+status: DONE
 owner: antigravity
 branch: main
-updated: 2026-07-22T02:32:25Z
+updated: 2026-07-30T09:23:03Z
 ---
 
 ## Scope

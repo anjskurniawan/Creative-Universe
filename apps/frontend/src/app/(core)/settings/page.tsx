@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { SettingsLayout } from "@/components/settings-layout";
+import { SettingsLayout } from "@/components/layout/settings-layout";
 
 export default function SettingsIndexPage() {
   const router = useRouter();

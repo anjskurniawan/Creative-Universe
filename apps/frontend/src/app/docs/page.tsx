@@ -1,288 +1,137 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { MaterialIcon } from "@/components/material-icon";
-import DocsMenu from "@/components/docs/DocsMenu";
+import DocsMenu, { getDocsBreadcrumbs } from "@/components/docs/DocsMenu";
 import DocsContent from "@/components/docs/DocsContent";
+import GlobalLayoutNavbar from "@/components/layout/navbar";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import "./docs.css";
 
 function DocsPageInner() {
   const searchParams = useSearchParams();
   const slug = searchParams.get("section") ?? "";
+
   return <DocsContent slug={slug} />;
 }
 
-export default function DocsPage() {
+function DocsNavbar({
+  isDesktop,
+  onMenuClick,
+}: {
+  isDesktop: boolean;
+  onMenuClick: () => void;
+}) {
+  const searchParams = useSearchParams();
+  const slug = searchParams.get("section") ?? "";
+
   return (
-    <div className="docs-shell">
-      <header className="docs-topbar">
-        <div className="docs-topbar-inner">
-          <Link href="/" className="docs-brand" aria-label="Creative Universe home">
-            <span className="docs-brand-mark" aria-hidden="true">
-              <Image src="/images/landing/logo-navbar.svg" alt="" width={22} height={24} priority />
-            </span>
-            <span className="docs-brand-text">Creative Universe</span>
-            <span className="docs-version">docs</span>
-          </Link>
+    <GlobalLayoutNavbar
+      viewport={isDesktop ? "Desktop" : "Mobile"}
+      breadcrumbItems={["Documentation", ...getDocsBreadcrumbs(slug)]}
+      onMenuClick={onMenuClick}
+    />
+  );
+}
 
-          <label className="docs-search">
-            <MaterialIcon name="search" size="auto" className="text-lg" />
-            <input type="search" placeholder="Search" aria-label="Search documentation" />
-            <kbd>CTRL K</kbd>
-          </label>
+function DocsLoading({ label }: { label: string }) {
+  return (
+    <div className="flex min-h-24 items-center justify-center gap-2 text-sm text-slate-500">
+      <span className="size-4 animate-spin rounded-full border-2 border-slate-200 border-t-[#00a4ff]" />
+      {label}
+    </div>
+  );
+}
 
-          <nav className="docs-topnav" aria-label="Documentation top navigation">
-            <Link href="/dashboard">Dashboard</Link>
-            <Link href="/odds">ODDS</Link>
-            <Link href="/docs?section=components/odds-designer-dashboard-cards">Components</Link>
-            <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
-          </nav>
-        </div>
-      </header>
+export default function DocsPage() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-      <div className="docs-body">
-        <aside className="docs-sidebar">
-          <Suspense fallback={<div className="docs-menu-loading">Memuat menu...</div>}>
-            <DocsMenu />
-          </Suspense>
-        </aside>
+  useEffect(() => {
+    const updateViewport = () => {
+      const desktop = window.innerWidth >= 1024;
+      setIsDesktop(desktop);
+      if (desktop) setMenuOpen(false);
+    };
 
-        <main className="docs-content" id="docs-main">
-          <div className="docs-content-inner">
-            <Suspense fallback={<div className="docs-content-suspense-fallback">Memuat konten...</div>}>
+    updateViewport();
+    window.addEventListener("resize", updateViewport);
+    return () => window.removeEventListener("resize", updateViewport);
+  }, []);
+
+  return (
+    <div className="h-dvh w-dvw overflow-hidden bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)] p-2 lg:p-6">
+      <div className="flex size-full flex-col overflow-hidden rounded-2xl bg-[#f3fbff] shadow-[0_14px_42px_rgba(44,42,39,0.16)]">
+        <Suspense
+          fallback={
+            <GlobalLayoutNavbar
+              viewport={isDesktop ? "Desktop" : "Mobile"}
+              breadcrumbItems={["Documentation", "Overview"]}
+              onMenuClick={() => setMenuOpen(true)}
+            />
+          }
+        >
+          <DocsNavbar
+            isDesktop={isDesktop}
+            onMenuClick={() => setMenuOpen(true)}
+          />
+        </Suspense>
+
+        <div className="relative flex min-h-0 flex-1 overflow-hidden">
+          {isDesktop && (
+            <aside className="docs-global-sidebar">
+              <div className="docs-sidebar-scroll">
+                <Suspense fallback={<DocsLoading label="Memuat menu..." />}>
+                  <DocsMenu />
+                </Suspense>
+              </div>
+            </aside>
+          )}
+
+          <main className="docs-global-content" id="docs-main">
+            <Suspense fallback={<DocsLoading label="Memuat konten..." />}>
               <DocsPageInner />
             </Suspense>
-          </div>
-        </main>
+          </main>
 
-        <aside className="docs-toc" aria-label="On this page">
-          <p className="docs-toc-title">ON THIS PAGE</p>
-          <nav className="docs-toc-list">
-            <a href="#docs-main" className="active">Overview</a>
-            <a href="#docs-main">Playground</a>
-            <a href="#docs-main">Detail</a>
-            <a href="#docs-main">Implementation</a>
-          </nav>
-        </aside>
+          {!isDesktop && menuOpen && (
+            <div className="absolute inset-0 z-30 flex">
+              <button
+                type="button"
+                aria-label="Tutup menu dokumentasi"
+                className="absolute inset-0 bg-slate-950/35 backdrop-blur-[2px]"
+                onClick={() => setMenuOpen(false)}
+              />
+              <aside className="docs-mobile-menu">
+                <div className="docs-mobile-menu-header">
+                  <div className="flex items-center gap-3">
+                    <span className="docs-sidebar-icon">
+                      <MaterialIcon name="menu_book" size="sm" />
+                    </span>
+                    <div>
+                      <p>Documentation</p>
+                      <span>Creative Universe</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Tutup menu"
+                    className="flex size-9 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <MaterialIcon name="close" size="sm" />
+                  </button>
+                </div>
+                <div className="docs-sidebar-scroll">
+                  <Suspense fallback={<DocsLoading label="Memuat menu..." />}>
+                    <DocsMenu onNavigate={() => setMenuOpen(false)} />
+                  </Suspense>
+                </div>
+              </aside>
+            </div>
+          )}
+        </div>
       </div>
-
-      <style>{`
-        .docs-shell {
-          display: flex;
-          flex-direction: column;
-          height: 100vh;
-          overflow: hidden;
-          background-color: hsl(var(--background));
-          font-family: var(--font-sans);
-        }
-
-        .docs-topbar {
-          height: 64px;
-          flex-shrink: 0;
-          border-bottom: 1px solid hsl(var(--border));
-          background-color: hsl(var(--card));
-        }
-
-        .docs-topbar-inner {
-          display: flex;
-          align-items: center;
-          gap: 1.25rem;
-          height: 100%;
-          width: 100%;
-          padding: 0 1.5rem;
-        }
-
-        .docs-brand {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.65rem;
-          min-width: 240px;
-        }
-
-        .docs-brand-mark {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 28px;
-          height: 28px;
-          border-radius: 8px;
-          background: #000000;
-          padding: 4px;
-        }
-
-        .docs-brand-mark img {
-          display: block;
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-
-        .docs-brand-text {
-          font-size: 1.25rem;
-          font-weight: 750;
-          color: hsl(var(--foreground));
-        }
-
-        .docs-version {
-          border-radius: 999px;
-          background: #eef4ff;
-          padding: 0.2rem 0.55rem;
-          color: #0b5cff;
-          font-size: 0.72rem;
-          font-weight: 600;
-        }
-
-        .docs-search {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          width: min(360px, 30vw);
-          height: 38px;
-          border: 1px solid hsl(var(--border));
-          border-radius: 12px;
-          padding: 0 0.75rem;
-          color: hsl(var(--muted-foreground));
-          background: hsl(var(--background));
-        }
-
-        .docs-search input {
-          min-width: 0;
-          flex: 1;
-          border: none;
-          outline: none;
-          background: transparent;
-          font-size: 0.875rem;
-          color: hsl(var(--foreground));
-        }
-
-        .docs-search kbd {
-          font-size: 0.62rem;
-          color: hsl(var(--muted-foreground));
-        }
-
-        .docs-topnav {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-left: auto;
-          font-size: 0.875rem;
-          font-weight: 600;
-        }
-
-        .docs-topnav a {
-          color: hsl(var(--foreground));
-        }
-
-        .docs-topnav a:hover {
-          color: #0b5cff;
-        }
-
-        .docs-body {
-          display: grid;
-          grid-template-columns: 260px minmax(0, 1fr) 250px;
-          flex: 1;
-          min-height: 0;
-          width: 100%;
-          overflow: hidden;
-        }
-
-        .docs-sidebar {
-          height: 100%;
-          overflow-y: auto;
-          border-right: 1px solid hsl(var(--border));
-          background-color: hsl(var(--card));
-          scrollbar-width: none;
-        }
-
-        .docs-sidebar::-webkit-scrollbar {
-          display: none;
-        }
-
-        .docs-content {
-          min-width: 0;
-          height: 100%;
-          overflow-y: auto;
-          padding: 3rem 2rem 5rem;
-          scrollbar-width: none;
-        }
-
-        .docs-content-inner {
-          max-width: 800px;
-          margin: 0 auto;
-          width: 100%;
-        }
-
-        .docs-content::-webkit-scrollbar {
-          display: none;
-        }
-
-        .docs-toc {
-          height: 100%;
-          border-left: 1px solid hsl(var(--border));
-          background-color: hsl(var(--card));
-          padding: 2.5rem 1.5rem;
-        }
-
-        .docs-toc-title {
-          margin: 0 0 1rem;
-          color: hsl(var(--foreground));
-          font-size: 0.7rem;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-        }
-
-        .docs-toc-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.85rem;
-          font-size: 0.875rem;
-        }
-
-        .docs-toc-list a {
-          border-left: 2px solid transparent;
-          padding-left: 0.65rem;
-          color: hsl(var(--muted-foreground));
-        }
-
-        .docs-toc-list a.active {
-          border-left-color: #0b5cff;
-          color: #0b5cff;
-          font-weight: 600;
-        }
-
-        .docs-menu-loading,
-        .docs-content-suspense-fallback {
-          padding: 1.25rem 1rem;
-          font-size: 0.8125rem;
-          color: hsl(var(--muted-foreground));
-        }
-
-        @media (max-width: 1180px) {
-          .docs-body {
-            grid-template-columns: 260px minmax(0, 1fr);
-          }
-          .docs-toc {
-            display: none;
-          }
-        }
-
-        @media (max-width: 900px) {
-          .docs-body {
-            grid-template-columns: 240px minmax(0, 1fr);
-          }
-          .docs-search,
-          .docs-topnav {
-            display: none;
-          }
-
-          .docs-brand {
-            min-width: 0;
-          }
-        }
-      `}</style>
     </div>
   );
 }

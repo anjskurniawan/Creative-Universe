@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export type RichTextUpload = {
   id: number;

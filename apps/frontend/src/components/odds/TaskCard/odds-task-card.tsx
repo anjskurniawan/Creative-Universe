@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { type OddsTask, statusLabel } from "@/features/odds/api";
 import { TaskCardActionBar } from "./task-card-action-bar";
 import { TaskCardCompactDate, TaskCardMobileDate, TaskCardWideDate } from "./task-card-date";

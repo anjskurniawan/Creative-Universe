@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { stripRichText } from "@/components/odds-rich-text-editor";
 import type { OddsTaskAttachment } from "@/features/odds/api";
 

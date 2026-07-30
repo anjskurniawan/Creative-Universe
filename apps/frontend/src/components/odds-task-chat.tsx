@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { TaskFeedbackToast } from "@/components/odds/TaskCard/task-feedback-toast";
 import {
   chatApi,

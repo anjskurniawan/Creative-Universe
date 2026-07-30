@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, Suspense, useRef, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
-import { HeaderTitle } from "@/components/header-title";
-import { MaterialIcon } from "@/components/material-icon";
+import { HeaderTitle } from "@/components/typography/header-title";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { ScheduleConfig } from "@/features/odds/components/schedule-config";
 import { OddsGameboyFrame } from "@/components/odds/odds-gameboy-frame";
 import { OddsRichTextEditor, stripRichText } from "@/components/odds-rich-text-editor";
@@ -13,7 +13,7 @@ import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-car
 import { OddsTaskCard, OutputFilesPanel, OutputReviewPanel, TaskDiscussionPanel, TaskSubmissionPanel, publishTaskFeedbackToast } from "@/components/odds/TaskCard";
 import { useAuth } from "@/providers/auth-provider";
 import { useOddsTheme } from "./odds-theme-context";
-import TaskCardDate from "@/components/taskcard/date";
+import TaskCardDate from "@/components/odds/legacy-taskcard/date";
 import {
   OddsAssignableUser,
   OddsCategory,
@@ -1666,12 +1666,12 @@ function OddsPageContent() {
               onChange={(value) => setCategoryForm((prev) => ({ ...prev, important_matrix: value }))}
             />
             <SelectField
-              label="Format Brief"
+              label="Format Detail Brief"
               value={categoryForm.brief_format}
               help="Menentukan format detail brief yang otomatis dipakai saat client memilih kategori ini."
               options={[
-                { value: "default", label: "Default Brief" },
-                { value: "table", label: "Table Brief" },
+                { value: "default", label: "Default" },
+                { value: "table", label: "Deskripsi Produk" },
               ]}
               onChange={(value) => setCategoryForm((prev) => ({ ...prev, brief_format: value as CategoryForm["brief_format"] }))}
             />
@@ -1713,7 +1713,7 @@ function OddsPageContent() {
           <DataTable
             loading={loading}
             empty="Belum ada kategori."
-            headers={["Nama", "Matrix", "Format Brief", "Bobot", "Revisi", "SLA", "Status", ""]}
+            headers={["Nama", "Matrix", "Format Detail Brief", "Bobot", "Revisi", "SLA", "Status", ""]}
             className="flex h-full min-h-0 flex-col"
             scrollClassName="odds-scroll-hidden min-h-0 flex-1 overflow-auto"
             rows={categories.map((category) => {
@@ -1729,7 +1729,7 @@ function OddsPageContent() {
                 <span key={`cat-matrix-${category.id}`} className={`px-2 py-0.5 rounded text-[10px] font-extrabold border shrink-0 ${matrixBadgeColor}`}>
                   {matrix}
                 </span>,
-                category.brief_format === "table" ? "Table Brief" : "Default Brief",
+                category.brief_format === "table" ? "Deskripsi Produk" : "Default",
                 String(category.score_weight),
                 String(category.normal_revision_limit),
                 formatSlaDuration(category.sla_minutes),

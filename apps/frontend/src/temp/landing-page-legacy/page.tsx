@@ -7,10 +7,10 @@ import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import { gsap } from "gsap";
 import { useAuth } from "@/providers/auth-provider";
-import { SpinningWheel } from "@/components/spinning-wheel";
-import { Navbar } from "@/components/navbar";
-import { MaterialIcon } from "@/components/material-icon";
-import { GuestMobileOrbitMotion } from "@/components/guest-mobile-orbit-motion";
+import { SpinningWheel } from "@/components/ui/spinning-wheel";
+import { Navbar } from "@/components/archive/old-navbar";
+import { MaterialIcon } from "@/components/ui/material-icon";
+import { GuestMobileOrbitMotion } from "@/components/ui/guest-mobile-orbit-motion";
 
 const CAMERA_Z = 8;
 const PARTICLE_OPACITY = 0.78;

@@ -14,8 +14,61 @@ import { OddsDesignerDashboardCardsDocumentation } from "@/components/docs/templ
 import type { OddsDesignerDashboardCardId } from "@/components/docs/templates/odds-designer-dashboard-cards-documentation";
 import { OddsTaskCardDocumentation } from "@/components/docs/templates/odds-task-card-documentation";
 import type { OddsTaskCardView } from "@/components/docs/templates/odds-task-card-documentation";
+import { LayoutContainerDocumentation } from "@/components/docs/templates/layout-container-documentation";
+import { LayoutWorkspaceDocumentation } from "@/components/docs/templates/layout-workspace-documentation";
+import { LayoutSidebarDocumentation } from "@/components/docs/templates/layout-sidebar-documentation";
+import { LayoutMenuDocumentation } from "@/components/docs/templates/layout-menu-documentation";
+import { LayoutNavbarDocumentation } from "@/components/docs/templates/layout-navbar-documentation";
+import { NavbarBreadcrumbDocumentation } from "@/components/docs/templates/navbar-breadcrumb-documentation";
+import { NavbarAppsDropdownDocumentation } from "@/components/docs/templates/navbar-apps-dropdown-documentation";
+import { NavbarNotificationDropdownDocumentation } from "@/components/docs/templates/navbar-notification-dropdown-documentation";
+import { NavbarMessageDropdownDocumentation } from "@/components/docs/templates/navbar-message-dropdown-documentation";
+import { NavbarProfileDropdownDocumentation } from "@/components/docs/templates/navbar-profile-dropdown-documentation";
+import { NavbarButtonMenuDocumentation } from "@/components/docs/templates/navbar-button-menu-documentation";
+import { SideMenuDocumentation } from "@/components/docs/templates/side-menu-documentation";
 import { ExampleComponentDocumentation } from "@/components/docs/templates/example-component-documentation";
 import { LandingRouteDocumentation } from "@/components/docs/templates/landing-route-documentation";
+import { CreativeReportHeaderDocumentation } from "@/components/docs/templates/creative-report-header-documentation";
+import { CreativeReportTitleDocumentation } from "@/components/docs/templates/creative-report-title-documentation";
+import { CreativeReportMonthPickerButtonDocumentation } from "@/components/docs/templates/creative-report-month-picker-button-documentation";
+import { CreativeReportExportPdfButtonDocumentation } from "@/components/docs/templates/creative-report-export-pdf-button-documentation";
+import { CreativeReportToolbarDocumentation } from "@/components/docs/templates/creative-report-toolbar-documentation";
+import { CreativeReportGroupAccordionDocumentation } from "@/components/docs/templates/creative-report-group-accordion-documentation";
+import { CreativeReportAssessmentTableDocumentation } from "@/components/docs/templates/creative-report-assessment-table-documentation";
+import { CreativeReportAssessmentMobileCardsDocumentation } from "@/components/docs/templates/creative-report-assessment-mobile-cards-documentation";
+import { CreativeReportHrdDateModalDocumentation } from "@/components/docs/templates/creative-report-hrd-date-modal-documentation";
+import { CreativeReportHrdRulesFooterDocumentation } from "@/components/docs/templates/creative-report-hrd-rules-footer-documentation";
+import { CreativeReportDetailCardDocumentation } from "@/components/docs/templates/creative-report-detail-card-documentation";
+import { CreativeReportProfileCardDocumentation } from "@/components/docs/templates/creative-report-profile-card-documentation";
+import { CreativeAiHeroAuroraDocumentation } from "@/components/docs/templates/creative-ai-hero-aurora-documentation";
+import { CreativeAiTypewriterTitleDocumentation } from "@/components/docs/templates/creative-ai-typewriter-title-documentation";
+import { CreativeAiChatMessagesDocumentation } from "@/components/docs/templates/creative-ai-chat-messages-documentation";
+import { CreativeAiChatInputDocumentation } from "@/components/docs/templates/creative-ai-chat-input-documentation";
+import { OddsWelcomeScreenDocumentation } from "@/components/docs/templates/odds-welcome-screen-documentation";
+import { OddsRequestTypeSelectStageDocumentation } from "@/components/docs/templates/odds-request-type-select-stage-documentation";
+import { OddsCategoryInventoryStageDocumentation } from "@/components/docs/templates/odds-category-inventory-stage-documentation";
+import { OddsDesignerCharacterSelectStageDocumentation } from "@/components/docs/templates/odds-designer-character-select-stage-documentation";
+import { OddsMissionBriefStageDocumentation } from "@/components/docs/templates/odds-mission-brief-stage-documentation";
+import { OddsMissionScrollReviewDocumentation } from "@/components/docs/templates/odds-mission-scroll-review-documentation";
+import { OddsRetroHudRouteDocumentation } from "@/components/docs/templates/odds-retro-hud-route-documentation";
+import { OddsLoadoutRowDocumentation } from "@/components/docs/templates/odds-loadout-row-documentation";
+import { OddsPanelDocumentation } from "@/components/docs/templates/odds-panel-documentation";
+import { OddsStepActionsDocumentation } from "@/components/docs/templates/odds-step-actions-documentation";
+import { OddsRequestBuilderDocumentation } from "@/components/docs/templates/odds-request-builder-documentation";
+import { OddsGameboyFrameDocumentation } from "@/components/docs/templates/odds-gameboy-frame-documentation";
+import { OddsRequestFormatStepDocumentation } from "@/components/docs/templates/odds-request-format-step-documentation";
+import { OddsCategorySelectionStepDocumentation } from "@/components/docs/templates/odds-category-selection-step-documentation";
+import { OddsDesignerSelectionStepDocumentation } from "@/components/docs/templates/odds-designer-selection-step-documentation";
+import { OddsBriefCompositionStepDocumentation } from "@/components/docs/templates/odds-brief-composition-step-documentation";
+import { OddsRequestReviewStepDocumentation } from "@/components/docs/templates/odds-request-review-step-documentation";
+import { OddsRequestBuilderFooterDocumentation } from "@/components/docs/templates/odds-request-builder-footer-documentation";
+import { OddsRequestLaunchSequenceDocumentation } from "@/components/docs/templates/odds-request-launch-sequence-documentation";
+import { OddsBriefPurposeDocumentation } from "@/components/docs/templates/odds-brief-purpose-documentation";
+import { OddsRequestBriefEditorDocumentation } from "@/components/docs/templates/odds-request-brief-editor-documentation";
+import { OddsBriefImportantMatrixDocumentation } from "@/components/docs/templates/odds-brief-important-matrix-documentation";
+import { OddsBriefDeadlineDocumentation } from "@/components/docs/templates/odds-brief-deadline-documentation";
+import { OddsRequestBuilderShellDocumentation } from "@/components/docs/templates/odds-request-builder-shell-documentation";
+import { OddsTableBriefDetailsDocumentation } from "@/components/docs/templates/odds-table-brief-details-documentation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -196,6 +249,59 @@ export default function DocsContent({ slug }: DocsContentProps) {
   if (slug.startsWith("components/odds-task-card-")) {
     return <OddsTaskCardDocumentation view={slug.replace("components/odds-task-card-", "") as OddsTaskCardView} />;
   }
+  if (slug === "components/side-menu") return <SideMenuDocumentation />;
+  if (slug === "components/layout-container") return <LayoutContainerDocumentation />;
+  if (slug === "components/layout-workspace") return <LayoutWorkspaceDocumentation />;
+  if (slug === "components/layout-sidebar") return <LayoutSidebarDocumentation />;
+  if (slug === "components/layout-menu") return <LayoutMenuDocumentation />;
+  if (slug === "components/layout-navbar") return <LayoutNavbarDocumentation />;
+  if (slug === "components/navbar-breadcrumb") return <NavbarBreadcrumbDocumentation />;
+  if (slug === "components/navbar-apps-dropdown") return <NavbarAppsDropdownDocumentation />;
+  if (slug === "components/navbar-notification-dropdown") return <NavbarNotificationDropdownDocumentation />;
+  if (slug === "components/navbar-message-dropdown") return <NavbarMessageDropdownDocumentation />;
+  if (slug === "components/navbar-profile-dropdown") return <NavbarProfileDropdownDocumentation />;
+  if (slug === "components/navbar-button-menu") return <NavbarButtonMenuDocumentation />;
+  if (slug === "components/creative-report-header") return <CreativeReportHeaderDocumentation />;
+  if (slug === "components/creative-report-title") return <CreativeReportTitleDocumentation />;
+  if (slug === "components/creative-report-month-picker-button") return <CreativeReportMonthPickerButtonDocumentation />;
+  if (slug === "components/creative-report-export-pdf-button") return <CreativeReportExportPdfButtonDocumentation />;
+  if (slug === "components/creative-report-toolbar") return <CreativeReportToolbarDocumentation />;
+  if (slug === "components/creative-report-group-accordion") return <CreativeReportGroupAccordionDocumentation />;
+  if (slug === "components/creative-report-assessment-table") return <CreativeReportAssessmentTableDocumentation />;
+  if (slug === "components/creative-report-assessment-mobile-cards") return <CreativeReportAssessmentMobileCardsDocumentation />;
+  if (slug === "components/creative-report-hrd-date-modal") return <CreativeReportHrdDateModalDocumentation />;
+  if (slug === "components/creative-report-hrd-rules-footer") return <CreativeReportHrdRulesFooterDocumentation />;
+  if (slug === "components/creative-report-detail-card") return <CreativeReportDetailCardDocumentation />;
+  if (slug === "components/creative-report-profile-card") return <CreativeReportProfileCardDocumentation />;
+  if (slug === "components/creative-ai-hero-aurora") return <CreativeAiHeroAuroraDocumentation />;
+  if (slug === "components/creative-ai-typewriter-title") return <CreativeAiTypewriterTitleDocumentation />;
+  if (slug === "components/creative-ai-chat-messages") return <CreativeAiChatMessagesDocumentation />;
+  if (slug === "components/creative-ai-chat-input") return <CreativeAiChatInputDocumentation />;
+  if (slug === "components/odds-welcome-screen") return <OddsWelcomeScreenDocumentation />;
+  if (slug === "components/odds-request-type-select-stage") return <OddsRequestTypeSelectStageDocumentation />;
+  if (slug === "components/odds-category-inventory-stage") return <OddsCategoryInventoryStageDocumentation />;
+  if (slug === "components/odds-designer-character-select-stage") return <OddsDesignerCharacterSelectStageDocumentation />;
+  if (slug === "components/odds-mission-brief-stage") return <OddsMissionBriefStageDocumentation />;
+  if (slug === "components/odds-mission-scroll-review") return <OddsMissionScrollReviewDocumentation />;
+  if (slug === "components/odds-retro-hud-route") return <OddsRetroHudRouteDocumentation />;
+  if (slug === "components/odds-loadout-row") return <OddsLoadoutRowDocumentation />;
+  if (slug === "components/odds-panel") return <OddsPanelDocumentation />;
+  if (slug === "components/odds-step-actions") return <OddsStepActionsDocumentation />;
+  if (slug === "components/odds-request-builder") return <OddsRequestBuilderDocumentation />;
+  if (slug === "components/odds-request-builder-shell") return <OddsRequestBuilderShellDocumentation />;
+  if (slug === "components/odds-request-format-step") return <OddsRequestFormatStepDocumentation />;
+  if (slug === "components/odds-category-selection-step") return <OddsCategorySelectionStepDocumentation />;
+  if (slug === "components/odds-designer-selection-step") return <OddsDesignerSelectionStepDocumentation />;
+  if (slug === "components/odds-brief-composition-step") return <OddsBriefCompositionStepDocumentation />;
+  if (slug === "components/odds-request-review-step") return <OddsRequestReviewStepDocumentation />;
+  if (slug === "components/odds-request-builder-footer") return <OddsRequestBuilderFooterDocumentation />;
+  if (slug === "components/odds-request-launch-sequence") return <OddsRequestLaunchSequenceDocumentation />;
+  if (slug === "components/odds-brief-purpose") return <OddsBriefPurposeDocumentation />;
+  if (slug === "components/odds-request-brief-editor") return <OddsRequestBriefEditorDocumentation />;
+  if (slug === "components/odds-table-brief-details") return <OddsTableBriefDetailsDocumentation />;
+  if (slug === "components/odds-brief-important-matrix") return <OddsBriefImportantMatrixDocumentation />;
+  if (slug === "components/odds-brief-deadline") return <OddsBriefDeadlineDocumentation />;
+  if (slug === "components/odds-gameboy-frame") return <OddsGameboyFrameDocumentation />;
   if (slug === "example") return <ExampleComponentDocumentation />;
   if (slug === "routes/landing") return <LandingRouteDocumentation />;
 
@@ -264,7 +370,8 @@ export default function DocsContent({ slug }: DocsContentProps) {
       <style>{`
         /* ── Article wrapper ── */
         .docs-md-article {
-          max-width: 760px;
+          width: 100%;
+          max-width: none;
           padding-bottom: 5rem;
         }
 

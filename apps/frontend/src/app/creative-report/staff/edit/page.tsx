@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { resolveStorageUrl } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import { getOddsCategories, type OddsCategory } from "@/features/odds/api";

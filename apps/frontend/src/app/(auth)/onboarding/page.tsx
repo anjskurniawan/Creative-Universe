@@ -7,7 +7,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { ValidationError } from "@/core/api/client";
 import { authApi, type OnboardingDivision, type OnboardingInput } from "@/core/auth";
 import { APP_ROUTES } from "@/core/navigation/routes";
-import { AuthParticleBackground } from "@/components/auth-particle-background";
+import { AuthParticleBackground } from "@/components/ui/auth-particle-background";
 
 // --- SVG Icons ---
 

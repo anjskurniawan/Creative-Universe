@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/archive/old-navbar";
 
 const CORE_CONTENT_GUTTER = "px-4 md:px-16";
 

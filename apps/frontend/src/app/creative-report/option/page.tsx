@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { CreativeMemberManagement } from "@/features/creative-report/creative-member-management";
 import { useAuth } from "@/providers/auth-provider";
 import { useCreativeReportTheme } from "../theme-context";

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 type Comparison = { label: string; current: number; previous: number };
 type Stage = { label: string; total: number };

@@ -1,4 +1,4 @@
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import type { RequestBuilderTheme } from "../types";
 
 export function RequestFormatStep({
@@ -11,10 +11,10 @@ export function RequestFormatStep({
   return (
     <section className="my-auto flex w-full flex-1 flex-col items-center justify-center space-y-6">
       <header className="text-center">
-        <h2 className={`text-xl font-bold tracking-tight ${textTitle}`}>
+        <h2 className={`text-4xl font-bold tracking-tight ${textTitle}`}>
           Mau buat project apa hari ini ?
         </h2>
-        <p className={`mt-0.5 text-xs ${textMuted}`}>
+        <p className={`mt-0.5 text-2xl ${textMuted}`}>
           Pilih jenis request visual yang ingin diajukan
         </p>
       </header>

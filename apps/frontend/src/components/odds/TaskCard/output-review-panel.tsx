@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { OddsRichTextEditor, stripRichText } from "@/components/odds-rich-text-editor";
 import type { OutputFileAsset } from "./output-files-panel";
 

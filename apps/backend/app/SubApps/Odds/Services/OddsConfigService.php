@@ -56,8 +56,15 @@ class OddsConfigService
         $payload = $data + ['updated_by' => $userId];
 
         if (! $profile) {
-            $payload['created_by'] = $userId;
-            $profile = new DesignerProfile;
+            // user_id is unique at the database level, including for soft-deleted
+            // rows. Reuse a trashed profile instead of attempting a duplicate insert.
+            $profile = DesignerProfile::withTrashed()->firstOrNew(['user_id' => $data['user_id']]);
+            if ($profile->exists && $profile->trashed()) {
+                $profile->restore();
+            }
+            if (! $profile->exists) {
+                $payload['created_by'] = $userId;
+            }
         }
 
         $profile->fill($payload)->save();

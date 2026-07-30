@@ -1,8 +1,8 @@
 "use client";
 
 import { FormEvent, ReactNode, useCallback, useEffect, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
-import { SettingsLayout } from "@/components/settings-layout";
+import { MaterialIcon } from "@/components/ui/material-icon";
+import { SettingsLayout } from "@/components/layout/settings-layout";
 import { errorMessage, ManagedRole, type ManagedPermission } from "@/core/admin";
 import { coreApi } from "@/core/api";
 import { useAuth } from "@/providers/auth-provider";

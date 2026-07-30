@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
-import { type SideMenuItem } from "@/components/side-menu";
-import { TaskDesktopPageTransition } from "@/components/task-desktop-page-transition";
-import { type TaskcardMobileChange, type TaskcardMobileTone } from "@/components/taskcard-mobile";
-import { TaskCardMobile, type TaskCardConfig } from "@/components/taskcard";
-import { TaskCard, type TaskCardState } from "@/components/task-card";
-import { TaskFormModal } from "@/components/task-form-modal";
+import { MaterialIcon } from "@/components/ui/material-icon";
+import { type SideMenuItem } from "@/components/navigation/side-menu";
+import { TaskDesktopPageTransition } from "@/components/ui/task-desktop-page-transition";
+import { type TaskcardMobileChange, type TaskcardMobileTone } from "@/components/odds/taskcard-mobile";
+import { TaskCardMobile, type TaskCardConfig } from "@/components/odds/legacy-taskcard";
+import { TaskCard, type TaskCardState } from "@/components/odds/task-card";
+import { TaskFormModal } from "@/components/odds/task-form-modal";
 import { PerformanceNavbar } from "@/features/kv-retail/components/performance-navbar";
 import { PerformanceSidebar } from "@/features/kv-retail/components/performance-sidebar";
 import { resolveStorageUrl } from "@/core/api/client";
@@ -869,10 +869,10 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
                   draftFileUrl={normalizeFileList(task.draft_file_path)}
                   fileLink={task.file_link}
                   isLate={Boolean(task.timing_evaluation?.late)}
-                  onTitleSave={(taskName) => handleTitleSave(task.id, taskName)}
+                  onTitleSave={(taskName: string) => handleTitleSave(task.id, taskName)}
                   delayReasonStage={requiredDelayReasonStage(task)}
-                  onStepClick={(step, delayReason) => handleStepClick(task.id, step, delayReason)}
-                  onNextClick={(link, delayReason) => handleNextClick(task.id, link, delayReason)}
+                  onStepClick={(step: string, delayReason?: string) => handleStepClick(task.id, step, delayReason)}
+                  onNextClick={(link?: string, delayReason?: string) => handleNextClick(task.id, link, delayReason)}
                   onDeleteConfirm={() => handleDelete(task.id)}
                   onRefresh={fetchTasks}
                 config={taskConfig}

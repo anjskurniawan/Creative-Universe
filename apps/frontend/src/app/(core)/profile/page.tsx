@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function ProfilePage() {

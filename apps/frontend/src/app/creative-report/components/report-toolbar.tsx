@@ -1,6 +1,6 @@
 "use client";
 
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export type ReportMetric = { label: string; value: string; icon: string; tone: string; accent: string };
 

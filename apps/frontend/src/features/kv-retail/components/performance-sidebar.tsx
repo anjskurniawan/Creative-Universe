@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { KV_RETAIL_PERFORMANCE_PAGE } from "@/features/kv-retail/performance-page-config";
 
 export type PerformanceSidebarItem = {

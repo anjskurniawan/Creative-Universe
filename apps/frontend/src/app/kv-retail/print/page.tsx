@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toBlob } from "html-to-image";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { kvRetailApi, type KvRetailTask } from "@/features/kv-retail/api";
 import { TaskPrintPreview } from "@/features/kv-retail/components/task-print-preview";
 

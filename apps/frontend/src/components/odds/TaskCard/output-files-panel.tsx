@@ -1,6 +1,6 @@
 "use client";
 
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { useState } from "react";
 
 export type OutputFileAsset = { id: string | number; label: string; url: string };

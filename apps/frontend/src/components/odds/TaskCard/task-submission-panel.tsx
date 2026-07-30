@@ -1,7 +1,7 @@
 "use client";
 
 import { type ChangeEvent, type DragEvent, type FormEvent } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 type TaskSubmissionPanelProps = {
   theme: "light" | "dark" | "retro";

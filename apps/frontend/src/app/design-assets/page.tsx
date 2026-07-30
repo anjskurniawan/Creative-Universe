@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import * as THREE from "three";
 import { gsap } from "gsap";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 const CAMERA_Z = 8;
 const PARTICLE_OPACITY = 0.78;

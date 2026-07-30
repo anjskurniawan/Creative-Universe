@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { KV_RETAIL_PERFORMANCE_PAGE } from "@/features/kv-retail/performance-page-config";
 
 /** Title bar based on Figma node 27:357, used only by the performance page. */

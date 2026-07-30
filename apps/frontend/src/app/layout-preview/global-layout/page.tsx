@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Container from "@/components/global-layout/container";
+import Container from "@/components/layout/container";
 import profileCardMenu from "./profile-card-menu";
 import oddsTaskCardMenu from "./odds-task-card-menu";
 import ProfileCardPreview from "./profile-card-preview";

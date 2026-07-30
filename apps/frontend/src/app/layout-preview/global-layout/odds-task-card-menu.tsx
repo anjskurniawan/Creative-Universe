@@ -1,4 +1,4 @@
-import type { MenuItem } from "@/components/global-layout/menu";
+import type { MenuItem } from "@/components/layout/menu";
 
 const oddsTaskCardMenu: MenuItem = {
   label: "ODDS TaskCard",

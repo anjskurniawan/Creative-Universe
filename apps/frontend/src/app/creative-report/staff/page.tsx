@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import DetailCard, { type DetailCardRating } from "@/components/global-layout/profile/detail-card";
-import ProfileCard from "@/components/global-layout/profile/card";
+import DetailCard, { type DetailCardRating } from "@/components/layout/profile/detail-card";
+import ProfileCard from "@/components/layout/profile/card";
 import { resolveStorageUrl } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeMemberProfile, CreativeReportAssessment } from "@/features/creative-report/types";

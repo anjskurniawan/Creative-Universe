@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { RecommendationButton } from "./recommendation-button";
 
 type Palette = { primary: string; secondary: string; accent: string; soft: string };

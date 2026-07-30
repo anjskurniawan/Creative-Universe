@@ -1,4 +1,4 @@
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import type { RequestBuilderTheme } from "../types";
 
 export function RequestBuilderLoading({ theme }: { theme: RequestBuilderTheme }) {

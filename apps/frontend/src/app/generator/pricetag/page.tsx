@@ -3,7 +3,7 @@
 import React, { FormEvent, useCallback, useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { pricetagApi } from "@/features/generator/pricetag/api";
 import { pushLocalNotification } from "@/lib/local-notifications";
 import {

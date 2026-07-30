@@ -25,7 +25,7 @@ export function NavbarDocumentation() {
       {/* ── Hero Section ── */}
       <header className="doc-hero">
         <div className="doc-hero-badge">Navigation</div>
-        <h1 className="doc-hero-title">Navbar</h1>
+        <h1 className="doc-hero-title">Navbar (Legacy)</h1>
         <p className="doc-hero-subtitle">
           The main navigation bar for Creative Universe. It provides responsive routing, application switching, and user account management across different module boundaries.
         </p>

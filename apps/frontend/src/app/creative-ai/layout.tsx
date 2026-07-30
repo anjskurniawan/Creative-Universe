@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/archive/old-navbar";
 
 export default function CreativeAiLayout({ children }: { children: ReactNode }) {
   const [dark, setDark] = useState(false);

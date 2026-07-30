@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export type ButtonMenuProps = {
   className?: string;

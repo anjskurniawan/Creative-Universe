@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import Container from "@/components/global-layout/container";
+import Container from "@/components/layout/container";
 import { CreativeReportThemeContext } from "./theme-context";
 
 const creativeReportMenu = [

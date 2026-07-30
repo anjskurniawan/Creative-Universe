@@ -42,6 +42,9 @@ export type OddsRequestBuilderProps = {
   selectableDesigners: OddsDesignerProfile[];
   todayCapacity: number;
   selectedDesigner: OddsDesignerProfile | undefined;
+  productCatalog: Array<{ id: number; name: string; products: Array<{ id: number; name: string }> }>;
+  onProductCategoryCommit?: (name: string) => Promise<void>;
+  onProductCommit?: (category: string, name: string) => Promise<void>;
   recommendedDesignerId?: string | null;
   uploadedAttachments: OddsTaskAttachment[];
   uploadingAttachments: boolean;

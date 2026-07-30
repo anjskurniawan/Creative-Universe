@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export function CreativeReportGroup({ index, name, staffCount, open, onToggle, children }: { index: number; name: string; staffCount: number; open: boolean; onToggle: () => void; children?: ReactNode }) {
   return <div>

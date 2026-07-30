@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { type TaskPerformanceTask } from "@/components/task-performance-mobile";
+import { type TaskPerformanceTask } from "@/components/odds/task-performance-mobile";
 import { ApiError } from "@/core/api/client";
 import { kvRetailApi, type KvRetailTaskDeletedEvent, type KvRetailTaskEvent } from "@/features/kv-retail/api";
 import { getEchoClient } from "@/core/realtime";
 import { useAuth } from "@/providers/auth-provider";
-import { MaterialIcon } from "@/components/material-icon";
-import { TaskDesktopPageTransition } from "@/components/task-desktop-page-transition";
+import { MaterialIcon } from "@/components/ui/material-icon";
+import { TaskDesktopPageTransition } from "@/components/ui/task-desktop-page-transition";
 import { PerformanceNavbar } from "@/features/kv-retail/components/performance-navbar";
 import { PerformanceSidebar } from "@/features/kv-retail/components/performance-sidebar";
 import { PerformanceContentTitle } from "@/features/kv-retail/components/performance-content-title";

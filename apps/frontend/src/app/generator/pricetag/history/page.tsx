@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { getEchoClient } from "@/core/realtime";
 import { downloadPricetagBatch, pricetagApi } from "@/features/generator/pricetag/api";
 import { pushLocalNotification } from "@/lib/local-notifications";

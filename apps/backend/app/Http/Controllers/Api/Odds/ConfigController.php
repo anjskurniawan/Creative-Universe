@@ -9,6 +9,8 @@ use App\Http\Requests\Odds\SaveSystemRuleRequest;
 use App\SubApps\Odds\Models\Category;
 use App\SubApps\Odds\Models\DesignerProfile;
 use App\SubApps\Odds\Models\SystemRule;
+use App\SubApps\Odds\Models\ProductCategory;
+use App\SubApps\Odds\Models\Product;
 use App\SubApps\Odds\Services\OddsConfigService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,6 +43,30 @@ class ConfigController extends BaseApiController
         $category->delete();
 
         return $this->sendResponse(null, 'Kategori ODDS berhasil dihapus.');
+    }
+
+    public function productCatalog(Request $request): JsonResponse
+    {
+        $categories = ProductCategory::query()->where('is_active', true)->with(['products' => fn ($query) => $query->where('is_active', true)->orderBy('name')])->orderBy('name')->get();
+
+        return $this->sendResponse($categories, 'Katalog produk ODDS berhasil diambil.');
+    }
+
+    public function storeProductCategory(Request $request): JsonResponse
+    {
+        $data = $request->validate(['name' => ['required', 'string', 'max:120']]);
+        $category = ProductCategory::firstOrCreate(['name' => trim($data['name'])], ['created_by' => $request->user()->id, 'updated_by' => $request->user()->id]);
+
+        return $this->sendResponse($category, 'Kategori produk berhasil disimpan.', 201);
+    }
+
+    public function storeProduct(Request $request): JsonResponse
+    {
+        $data = $request->validate(['category' => ['required', 'string', 'max:120'], 'name' => ['required', 'string', 'max:160']]);
+        $category = ProductCategory::firstOrCreate(['name' => trim($data['category'])], ['created_by' => $request->user()->id, 'updated_by' => $request->user()->id]);
+        $product = Product::firstOrCreate(['product_category_id' => $category->id, 'name' => trim($data['name'])], ['created_by' => $request->user()->id, 'updated_by' => $request->user()->id]);
+
+        return $this->sendResponse($product->load('productCategory'), 'Produk berhasil disimpan.', 201);
     }
 
     public function designerProfiles(Request $request): JsonResponse

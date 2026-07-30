@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import type { OddsCategory } from "@/features/odds/api";
 import type { OddsRequestForm, RequestBuilderTheme } from "../types";
 

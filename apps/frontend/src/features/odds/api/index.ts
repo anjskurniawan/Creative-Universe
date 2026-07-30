@@ -49,6 +49,12 @@ export interface OddsSystemRule {
   is_active: boolean;
 }
 
+export interface OddsProductCatalogCategory {
+  id: number;
+  name: string;
+  products: Array<{ id: number; name: string; product_category_id: number }>;
+}
+
 export interface OddsAssignableUser extends OddsUser {
   roles: string[];
 }
@@ -363,6 +369,24 @@ export async function getOddsConfigDesignerProfiles(): Promise<OddsDesignerProfi
 export async function getOddsSystemRules(): Promise<OddsSystemRule[]> {
   const page = await apiFetch<OddsPagination<OddsSystemRule>>("/odds/system-rules?per_page=100");
   return normalizePage(page).data;
+}
+
+export async function getOddsProductCatalog(): Promise<OddsProductCatalogCategory[]> {
+  return apiFetch<OddsProductCatalogCategory[]>('/odds/product-catalog');
+}
+
+export async function saveOddsProductCategory(name: string): Promise<OddsProductCatalogCategory> {
+  return apiFetch<OddsProductCatalogCategory>('/odds/product-catalog/categories', {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function saveOddsProduct(category: string, name: string): Promise<unknown> {
+  return apiFetch<unknown>('/odds/product-catalog/products', {
+    method: 'POST',
+    body: JSON.stringify({ category, name }),
+  });
 }
 
 export async function getOddsAssignableUsers(): Promise<OddsAssignableUser[]> {

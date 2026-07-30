@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/providers/auth-provider";
-import { RouteGuard } from "@/components/route-guard";
+import { RouteGuard } from "@/components/layout/route-guard";
 import "./globals.css";
 
 /* eslint-disable @next/next/no-page-custom-font -- App Router root layout owns this global icon font. */

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getOddsSystemRules, updateOddsSystemRule, createOddsSystemRule } from "../api";
 import type { OddsSystemRule } from "../api";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export function ScheduleConfig() {
   const [rules, setRules] = useState<OddsSystemRule[]>([]);

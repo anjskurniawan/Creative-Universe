@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { pricetagApi } from "@/features/generator/pricetag/api";
 import { pushLocalNotification } from "@/lib/local-notifications";
 import {

@@ -11,9 +11,9 @@ import { NavbarAction, navbarActionClass, type NavbarTone } from "@/components/n
 import { NavbarAvatar } from "@/components/navigation/navbar-avatar";
 import { NavbarMenuItem } from "@/components/navigation/navbar-menu-item";
 import { NavbarUserSummary } from "@/components/navigation/navbar-user-summary";
-import { MaterialIcon } from "@/components/material-icon";
-import { MessageBell } from "@/components/message-bell";
-import { NotificationBell } from "@/components/notification-bell";
+import { MaterialIcon } from "@/components/ui/material-icon";
+import { MessageBell } from "@/components/navigation/message-bell";
+import { NotificationBell } from "@/components/navigation/notification-bell";
 
 export type NavbarVariant = NavbarTone;
 export type NavbarSession = "connected" | "guest" | "preview-authenticated";

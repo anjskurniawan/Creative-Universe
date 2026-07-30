@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export type NavbarTone = "light" | "dark" | "transparent-dark";
 export const navbarActionClass = (tone: NavbarTone) => `relative inline-flex size-9 cursor-pointer items-center justify-center overflow-hidden rounded-full p-1 transition-colors focus:outline-none focus-visible:ring-2 ${tone !== "light" ? "text-white hover:bg-white/10 focus-visible:ring-white/30" : "text-black hover:bg-black/5 focus-visible:ring-black/20"}`;

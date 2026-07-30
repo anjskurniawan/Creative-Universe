@@ -2,7 +2,7 @@
 
 import React, { Fragment } from "react";
 import Link from "next/link";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export type SidebarItem = {
   label: string;

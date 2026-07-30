@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { OddsRichTextEditor } from "@/components/odds-rich-text-editor";
 
 export type TableBriefRow = {
@@ -31,7 +31,68 @@ export type TableBriefDetailsProps = {
   onRemoveRow: (id: string) => void;
   onReorderRows: (sourceId: string, targetId: string) => void;
   dark?: boolean;
+  productCatalog?: Array<{ id: number; name: string; products: Array<{ id: number; name: string }> }>;
+  onProductCategoryCommit?: (name: string) => Promise<void>;
+  onProductCommit?: (category: string, name: string) => Promise<void>;
 };
+
+function CatalogCombobox({
+  value,
+  placeholder,
+  options,
+  disabled = false,
+  dark,
+  onChange,
+  onCommit,
+}: {
+  value: string;
+  placeholder: string;
+  options: string[];
+  disabled?: boolean;
+  dark: boolean;
+  onChange: (value: string) => void;
+  onCommit?: (value: string) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const filteredOptions = options.filter((option) => option.toLowerCase().includes(value.trim().toLowerCase()));
+  const exactMatch = options.some((option) => option.toLowerCase() === value.trim().toLowerCase());
+  const inputClass = dark
+    ? "border-white/10 bg-[#0E0E0E] text-white placeholder:text-slate-500"
+    : "border-[#BDEAFF] bg-white text-[#04044A] placeholder:text-slate-400";
+
+  return (
+    <div className="relative">
+      <input
+        value={value}
+        disabled={disabled}
+        placeholder={placeholder}
+        onFocus={() => setOpen(true)}
+        onChange={(event) => { onChange(event.target.value); setOpen(true); }}
+        onBlur={() => {
+          window.setTimeout(() => setOpen(false), 120);
+          if (value.trim() && onCommit) void onCommit(value.trim());
+        }}
+        className={`h-11 w-full rounded-xl border px-3.5 pr-10 text-sm outline-none transition focus:ring-1 ${inputClass} ${dark ? "focus:border-[#B0FF5E] focus:ring-[#B0FF5E]" : "focus:border-[#00A4FF] focus:ring-[#00A4FF]"}`}
+      />
+      <MaterialIcon name="expand_more" size="sm" className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 ${dark ? "text-[#B9B9B9]" : "text-[#04044A]/60"}`} />
+      {open && !disabled && (
+        <div className={`absolute inset-x-0 top-[calc(100%+6px)] z-30 max-h-56 overflow-y-auto rounded-xl border p-1.5 shadow-[0_10px_24px_rgba(4,4,74,0.14)] ${dark ? "border-white/10 bg-[#171717]" : "border-[#BDEAFF] bg-white"}`}>
+          {filteredOptions.map((option) => (
+            <button key={option} type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => { onChange(option); setOpen(false); }} className={`block w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${dark ? "text-white hover:bg-white/10" : "text-[#04044A] hover:bg-[#F3FAFF]"}`}>
+              {option}
+            </button>
+          ))}
+          {value.trim() && !exactMatch && (
+            <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => { onChange(value.trim()); setOpen(false); if (onCommit) void onCommit(value.trim()); }} className={`mt-1 block w-full rounded-lg border-t px-3 py-2.5 text-left text-sm font-semibold transition-colors ${dark ? "border-white/10 text-[#B0FF5E] hover:bg-white/10" : "border-[#BDEAFF] text-[#00A4FF] hover:bg-[#F3FAFF]"}`}>
+              + Tambah &quot;{value.trim()}&quot;
+            </button>
+          )}
+          {!filteredOptions.length && !value.trim() && <p className={`px-3 py-2 text-sm ${dark ? "text-[#B9B9B9]" : "text-[#04044A]/50"}`}>Belum ada pilihan tersimpan.</p>}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /** Brief packaging berbasis tabel untuk kategori yang memilih format `table`. */
 export function TableBriefDetails({
@@ -51,11 +112,11 @@ export function TableBriefDetails({
   onRemoveRow,
   onReorderRows,
   dark = false,
+  productCatalog = [],
+  onProductCategoryCommit,
+  onProductCommit,
 }: TableBriefDetailsProps) {
   const [draggingRowId, setDraggingRowId] = useState<string | null>(null);
-  const inputClass = dark
-    ? "border-white/10 bg-[#0E0E0E] text-white placeholder:text-slate-500"
-    : "border-[#BDEAFF] bg-white text-[#04044A] placeholder:text-slate-400";
   const labelClass = dark ? "text-[#B9B9B9]" : "text-[#04044A]/70";
 
   return (
@@ -64,11 +125,11 @@ export function TableBriefDetails({
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
           <span className={`mb-1.5 block text-xs font-semibold ${labelClass}`}>Kategori</span>
-          <input value={category} onChange={(event) => onCategoryChange(event.target.value)} placeholder="Kategori produk" className={`w-full rounded-xl border px-3 py-2.5 text-sm outline-none ${inputClass}`} />
+          <CatalogCombobox value={category} placeholder="Cari atau tambah kategori produk" options={productCatalog.map((item) => item.name)} dark={dark} onChange={onCategoryChange} onCommit={onProductCategoryCommit} />
           </label>
           <label className="block">
           <span className={`mb-1.5 block text-xs font-semibold ${labelClass}`}>Product</span>
-          <input value={product} onChange={(event) => onProductChange(event.target.value)} placeholder="Nama produk" className={`w-full rounded-xl border px-3 py-2.5 text-sm outline-none ${inputClass}`} />
+          <CatalogCombobox value={product} placeholder={category ? "Cari atau tambah produk" : "Pilih kategori terlebih dahulu"} options={productCatalog.find((item) => item.name === category)?.products.map((item) => item.name) ?? []} disabled={!category} dark={dark} onChange={onProductChange} onCommit={async (value) => { if (category.trim()) await onProductCommit?.(category.trim(), value); }} />
         </label>
         </div>
         <div>

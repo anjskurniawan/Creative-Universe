@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { pricetagApi } from "@/features/generator/pricetag/api";
 import { pushLocalNotification } from "@/lib/local-notifications";
 import {

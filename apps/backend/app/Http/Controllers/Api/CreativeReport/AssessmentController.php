@@ -197,7 +197,20 @@ class AssessmentController extends BaseApiController
                 $member->user()->update(['name' => $data['name']]);
             }
             if ($member->user_id && (array_key_exists('specializations', $request->all()) || array_key_exists('odds_status', $request->all()))) {
-                $profile = DesignerProfile::firstOrCreate(['user_id' => $member->user_id], ['status' => 'available', 'specializations' => [], 'is_active' => true, 'created_by' => $request->user()->id]);
+                // The user_id is unique even when a profile was soft-deleted. Reuse and
+                // restore that row instead of firstOrCreate() attempting a duplicate insert.
+                $profile = DesignerProfile::withTrashed()->firstOrNew(['user_id' => $member->user_id]);
+                if ($profile->exists && $profile->trashed()) {
+                    $profile->restore();
+                }
+                if (! $profile->exists) {
+                    $profile->fill([
+                        'status' => 'available',
+                        'specializations' => [],
+                        'is_active' => true,
+                        'created_by' => $request->user()->id,
+                    ]);
+                }
                 $profile->update(array_filter(['specializations' => $request->input('specializations'), 'status' => $request->input('odds_status')], fn ($value) => $value !== null));
             }
         });

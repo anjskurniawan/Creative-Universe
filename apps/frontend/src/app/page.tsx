@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/archive/old-navbar";
 import { APP_ROUTES } from "@/core/navigation/routes";
 import { useAuth } from "@/providers/auth-provider";
 import { HeroHeading } from "@/components/typography/hero-heading";

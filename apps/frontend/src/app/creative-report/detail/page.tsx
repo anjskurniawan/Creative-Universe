@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportUserDetail } from "@/features/creative-report/types";
 import { useCreativeReportTheme } from "../theme-context";

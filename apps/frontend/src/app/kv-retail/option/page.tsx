@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { type SideMenuItem } from "@/components/side-menu";
+import { type SideMenuItem } from "@/components/navigation/side-menu";
 import { coreApi } from "@/core/api";
-import { type TaskCardConfig } from "@/components/taskcard";
+import { type TaskCardConfig } from "@/components/odds/legacy-taskcard";
 import { useAuth } from "@/providers/auth-provider";
-import { TaskDesktopPageTransition } from "@/components/task-desktop-page-transition";
+import { TaskDesktopPageTransition } from "@/components/ui/task-desktop-page-transition";
 import { PerformanceNavbar } from "@/features/kv-retail/components/performance-navbar";
 import { PerformanceSidebar } from "@/features/kv-retail/components/performance-sidebar";
 import { useKvRetailDesktopSidebar } from "@/features/kv-retail/hooks";

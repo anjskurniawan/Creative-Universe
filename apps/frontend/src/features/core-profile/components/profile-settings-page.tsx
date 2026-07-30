@@ -4,8 +4,8 @@ import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { apiFetch, ApiError, ValidationError } from "@/core/api/client";
 import { User, useAuth } from "@/providers/auth-provider";
-import { MaterialIcon } from "@/components/material-icon";
-import { SettingsLayout } from "@/components/settings-layout";
+import { MaterialIcon } from "@/components/ui/material-icon";
+import { SettingsLayout } from "@/components/layout/settings-layout";
 
 interface UserSession {
   id: string;

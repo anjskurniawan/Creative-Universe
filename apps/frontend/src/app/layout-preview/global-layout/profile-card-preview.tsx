@@ -5,8 +5,8 @@ import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportAssessment } from "@/features/creative-report/types";
 import { getOddsCategories, getOddsDesignerProfiles } from "@/features/odds/api";
 import type { OddsCategory, OddsDesignerProfile } from "@/features/odds/api";
-import ProfileCard from "@/components/global-layout/profile/card";
-import DetailCard from "@/components/global-layout/profile/detail-card";
+import ProfileCard from "@/components/layout/profile/card";
+import DetailCard from "@/components/layout/profile/detail-card";
 
 type PreviewMember = CreativeReportAssessment & {
   user: CreativeReportAssessment["user"] & { departments?: [string, string] };

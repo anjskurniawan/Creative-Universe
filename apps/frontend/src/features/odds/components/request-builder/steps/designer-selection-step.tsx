@@ -1,4 +1,4 @@
-import ProfileCard from "@/components/global-layout/profile/card";
+import ProfileCard from "@/components/layout/profile/card";
 import { resolveStorageUrl } from "@/core/api/client";
 import type { OddsCategory, OddsDesignerProfile } from "@/features/odds/api";
 import type { RequestBuilderTheme } from "../types";
@@ -7,6 +7,7 @@ export function DesignerSelectionStep({
   categories,
   designers,
   selectedDesignerId,
+  recommendedDesignerId,
   todayCapacity,
   onSelect,
   theme,
@@ -14,6 +15,7 @@ export function DesignerSelectionStep({
   categories: OddsCategory[];
   designers: OddsDesignerProfile[];
   selectedDesignerId: string;
+  recommendedDesignerId?: string | null;
   todayCapacity: number;
   onSelect: (designerId: string) => void;
   theme: RequestBuilderTheme;
@@ -35,6 +37,8 @@ export function DesignerSelectionStep({
             const capacityMinutes = todayCapacity || 420;
             const percentage = Math.min(profile.current_load_minutes || 0, capacityMinutes) / capacityMinutes * 100;
             const isOff = profile.status === "off";
+            const isRecommended = recommendedDesignerId === String(profile.user_id);
+            const isActive = selectedDesignerId === String(profile.user_id) || (!selectedDesignerId && isRecommended);
 
             return (
               <div key={profile.user_id} className={`min-w-0 ${designers.length === 1 ? "flex justify-start" : ""}`}>
@@ -52,7 +56,8 @@ export function DesignerSelectionStep({
                   rating="—"
                   score="—"
                   cardImage={resolveStorageUrl(profile.user?.card_image_path) ?? undefined}
-                  active={selectedDesignerId === String(profile.user_id)}
+                  active={isActive}
+                  autoPlayMedia={isRecommended}
                   onClick={() => onSelect(String(profile.user_id))}
                   className={designers.length === 1 ? "w-full max-w-lg" : "w-full"}
                 />

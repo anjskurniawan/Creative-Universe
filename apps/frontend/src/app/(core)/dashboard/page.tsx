@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { coreApi } from "@/core/api";
 import { useAuth } from "@/providers/auth-provider";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 interface ActivityItem {
   id: number;

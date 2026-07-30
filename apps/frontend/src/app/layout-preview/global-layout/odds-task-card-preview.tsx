@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { OddsTaskCard, OutputFilesPanel, OutputReviewPanel, RecommendationButton, TaskCardActionBar, TaskCardCompactDate, TaskCardCompactLayout, TaskCardMobileDate, TaskCardMobileLayout, TaskCardPeople, TaskCardPerson, TaskCardStatusBlock, TaskCardWideDate, TaskCardWideLayout, TaskCardWidePeople, TaskCardWideStatusPanel, TaskDiscussionPanel, TaskFeedbackToast, TaskSubmissionPanel, type OddsTaskCardAction, type TaskFeedbackToastState } from "@/components/odds/TaskCard";
 import type { OddsTask } from "@/features/odds/api";
 

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ValidationError } from "@/core/api/client";
 import { authApi } from "@/core/auth";
 import { APP_ROUTES } from "@/core/navigation/routes";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 type Step = "REQUEST" | "VERIFY" | "RESET";
 

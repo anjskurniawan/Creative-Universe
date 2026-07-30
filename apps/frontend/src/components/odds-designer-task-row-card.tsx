@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { OddsTask, formatOddsDate, statusLabel } from "@/features/odds/api";
 
 interface OddsDesignerTaskRowCardProps {

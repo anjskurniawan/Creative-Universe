@@ -14,6 +14,9 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::post('/categories', [ConfigController::class, 'storeCategory'])->middleware('can:manage-odds-config');
     Route::patch('/categories/{category}', [ConfigController::class, 'updateCategory'])->middleware('can:manage-odds-config');
     Route::delete('/categories/{category}', [ConfigController::class, 'deleteCategory'])->middleware('can:manage-odds-config');
+    Route::get('/product-catalog', [ConfigController::class, 'productCatalog']);
+    Route::post('/product-catalog/categories', [ConfigController::class, 'storeProductCategory'])->middleware('can:create-odds-tasks');
+    Route::post('/product-catalog/products', [ConfigController::class, 'storeProduct'])->middleware('can:create-odds-tasks');
     Route::get('/designer-profiles', [ConfigController::class, 'designerProfiles']);
     Route::post('/designer-profiles', [ConfigController::class, 'storeDesignerProfile'])->middleware('can:manage-odds-config');
     Route::patch('/designer-profiles/{designerProfile}', [ConfigController::class, 'updateDesignerProfile'])->middleware('can:manage-odds-config');

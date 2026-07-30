@@ -11,6 +11,7 @@ import { RequestReviewStep } from "./steps/request-review-step";
 import { RequestBuilderFooter } from "./components/request-builder-footer";
 import { RequestBuilderLoading } from "./components/request-builder-loading";
 import { createRequestBuilderTheme } from "./theme";
+import { RequestBuilderShell } from "./components/request-builder-shell";
 import type { OddsRequestBuilderProps } from "./types";
 
 const dateFromNow = (days: number) => {
@@ -38,6 +39,10 @@ export function OddsRequestBuilder({
   selectableDesigners,
   todayCapacity,
   selectedDesigner,
+  recommendedDesignerId,
+  productCatalog,
+  onProductCategoryCommit,
+  onProductCommit,
   uploadingAttachments,
   addAttachmentFiles,
   loading,
@@ -48,7 +53,7 @@ export function OddsRequestBuilder({
   submit,
 }: OddsRequestBuilderProps) {
   const builderTheme = createRequestBuilderTheme(theme);
-  const { dark, containerClass } = builderTheme;
+  const { dark } = builderTheme;
 
   // Mini-step tracking for Step 4
   const [miniStep, setMiniStep] = useState(1);
@@ -96,11 +101,10 @@ export function OddsRequestBuilder({
     if (currentStep === 3) return !!form.preferred_designer_id;
     if (currentStep === 4) {
       if (miniStep === 1) return !!form.design_purpose.trim();
-      if (miniStep === 2) return true;
-      if (miniStep === 3) return true;
-      if (miniStep === 4) return usesTableBrief
+      if (miniStep === 2) return usesTableBrief
         ? Boolean(tableBriefProduct.trim()) || tableBriefRows.some((row) => [row.image_description, row.image_illustration, row.additional_notes].some((value) => value.trim()))
         : !!stripRichText(form.brief_text).trim();
+      if (miniStep === 3 || miniStep === 4) return true;
     }
     return true;
   }, [currentStep, miniStep, form, tableBriefProduct, tableBriefRows, usesTableBrief]);
@@ -121,11 +125,13 @@ export function OddsRequestBuilder({
 
   const updateTableBriefCategory = (value: string) => {
     setTableBriefCategory(value);
+    update("design_purpose", [value.trim(), tableBriefProduct.trim()].filter(Boolean).join(" - "));
     syncTableBrief(value, tableBriefProduct, tableBriefPackagingImageName, tableBriefRows);
   };
 
   const updateTableBriefProduct = (value: string) => {
     setTableBriefProduct(value);
+    update("design_purpose", [tableBriefCategory.trim(), value.trim()].filter(Boolean).join(" - "));
     syncTableBrief(tableBriefCategory, value, tableBriefPackagingImageName, tableBriefRows);
   };
 
@@ -187,6 +193,9 @@ export function OddsRequestBuilder({
 
   const handleNextStep = () => {
     if (!canGoNext) return;
+    if (currentStep === 2 && !form.preferred_designer_id && recommendedDesignerId) {
+      update("preferred_designer_id", recommendedDesignerId);
+    }
     if (currentStep === 4) {
       if (miniStep < 4) {
         setMiniStep(miniStep + 1);
@@ -194,6 +203,7 @@ export function OddsRequestBuilder({
         setCurrentStep(5);
       }
     } else {
+      if (currentStep === 3 && usesTableBrief) setMiniStep(2);
       setCurrentStep(currentStep + 1);
     }
   };
@@ -217,108 +227,97 @@ export function OddsRequestBuilder({
   if (initializing) return <RequestBuilderLoading theme={builderTheme} />;
 
   return (
-    <div className={`flex w-full flex-col flex-1 min-h-0 ${dark ? "text-[#F1F1F1]" : "text-[#04044A]"}`}>
-      <form
-        onSubmit={submit}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && currentStep < 5) {
-            const target = e.target as HTMLElement;
-            if (target.tagName !== "TEXTAREA" && !target.isContentEditable) {
-              e.preventDefault();
-              handleNextStep();
-            }
-          }
-        }}
-        className="flex min-h-0 flex-1"
-      >
-        {/* Form Body */}
-        <div className={`flex min-h-[560px] flex-1 flex-col p-6 sm:p-8 ${containerClass}`}>
-          
-          {currentStep === 1 && <RequestFormatStep theme={builderTheme} />}
+    <RequestBuilderShell
+      theme={builderTheme}
+      onSubmit={submit}
+      footer={
+        <RequestBuilderFooter
+          currentStep={currentStep}
+          canContinue={canGoNext}
+          loading={loading}
+          initializing={initializing}
+          uploadingAttachments={uploadingAttachments}
+          savingDraft={savingDraft}
+          canSaveDraft={Boolean(onSaveDraft)}
+          onPrevious={handlePrevStep}
+          onNext={handleNextStep}
+          onSaveDraft={saveDraft}
+          theme={builderTheme}
+        />
+      }
+    >
+      {currentStep === 1 && <RequestFormatStep theme={builderTheme} />}
 
-          {currentStep === 2 && (
-            <CategorySelectionStep
-              categories={categories}
-              selectedCategoryId={form.category_id}
-              update={update}
-              theme={builderTheme}
-            />
-          )}
+      {currentStep === 2 && (
+        <CategorySelectionStep
+          categories={categories}
+          selectedCategoryId={form.category_id}
+          update={update}
+          theme={builderTheme}
+        />
+      )}
 
-          {currentStep === 3 && (
-            <DesignerSelectionStep
-              categories={categories}
-              designers={selectableDesigners}
-              selectedDesignerId={form.preferred_designer_id}
-              todayCapacity={todayCapacity}
-              onSelect={(designerId) => update("preferred_designer_id", designerId)}
-              theme={builderTheme}
-            />
-          )}
+      {currentStep === 3 && (
+        <DesignerSelectionStep
+          categories={categories}
+          designers={selectableDesigners}
+          selectedDesignerId={form.preferred_designer_id}
+          recommendedDesignerId={recommendedDesignerId}
+          todayCapacity={todayCapacity}
+          onSelect={(designerId) => update("preferred_designer_id", designerId)}
+          theme={builderTheme}
+        />
+      )}
 
-          {currentStep === 4 && (
-            <BriefCompositionStep
-              miniStep={miniStep}
-              form={form}
-              update={update}
-              selectedCategory={selectedCategory}
-              usesTableBrief={usesTableBrief}
-              todayDate={todayDate}
-              tomorrowDate={tomorrowDate}
-              threeDaysDate={threeDaysDate}
-              tableBriefCategory={tableBriefCategory}
-              tableBriefProduct={tableBriefProduct}
-              tableBriefPackagingImageName={tableBriefPackagingImageName}
-              tableBriefPackagingImageId={tableBriefPackagingImageId}
-              tableBriefRows={tableBriefRows}
-              uploadingAttachments={uploadingAttachments}
-              uploadingIllustrationId={uploadingIllustrationId}
-              onTableBriefCategoryChange={updateTableBriefCategory}
-              onTableBriefProductChange={updateTableBriefProduct}
-              onPackagingImageUpload={(files) => void uploadTableBriefPackagingImage(files)}
-              onTableBriefRowChange={updateTableBriefRow}
-              onIllustrationUpload={(id, files) => void uploadTableBriefIllustration(id, files)}
-              onAddTableBriefRow={addTableBriefRow}
-              onRemoveTableBriefRow={removeTableBriefRow}
-              onReorderTableBriefRows={reorderTableBriefRows}
-              addAttachmentFiles={addAttachmentFiles}
-              theme={builderTheme}
-            />
-          )}
+      {currentStep === 4 && (
+        <BriefCompositionStep
+          miniStep={miniStep}
+          form={form}
+          update={update}
+          selectedCategory={selectedCategory}
+          usesTableBrief={usesTableBrief}
+          todayDate={todayDate}
+          tomorrowDate={tomorrowDate}
+          threeDaysDate={threeDaysDate}
+          tableBriefCategory={tableBriefCategory}
+          tableBriefProduct={tableBriefProduct}
+          tableBriefPackagingImageName={tableBriefPackagingImageName}
+          tableBriefPackagingImageId={tableBriefPackagingImageId}
+          tableBriefRows={tableBriefRows}
+          productCatalog={productCatalog}
+          onProductCategoryCommit={onProductCategoryCommit}
+          onProductCommit={onProductCommit}
+          uploadingAttachments={uploadingAttachments}
+          uploadingIllustrationId={uploadingIllustrationId}
+          onTableBriefCategoryChange={updateTableBriefCategory}
+          onTableBriefProductChange={updateTableBriefProduct}
+          onPackagingImageUpload={(files) => void uploadTableBriefPackagingImage(files)}
+          onTableBriefRowChange={updateTableBriefRow}
+          onIllustrationUpload={(id, files) => void uploadTableBriefIllustration(id, files)}
+          onAddTableBriefRow={addTableBriefRow}
+          onRemoveTableBriefRow={removeTableBriefRow}
+          onReorderTableBriefRows={reorderTableBriefRows}
+          addAttachmentFiles={addAttachmentFiles}
+          theme={builderTheme}
+        />
+      )}
 
-          {currentStep === 5 && (
-            <RequestReviewStep
-              form={form}
-              selectedCategory={selectedCategory}
-              selectedDesigner={selectedDesigner}
-              usesTableBrief={usesTableBrief}
-              tableBriefCategory={tableBriefCategory}
-              tableBriefProduct={tableBriefProduct}
-              tableBriefPackagingImageId={tableBriefPackagingImageId}
-              tableBriefPackagingImageName={tableBriefPackagingImageName}
-              tableBriefRows={tableBriefRows}
-              onEditProperties={() => setCurrentStep(2)}
-              onEditContent={() => { setMiniStep(4); setCurrentStep(4); }}
-              theme={builderTheme}
-            />
-          )}
-
-          <RequestBuilderFooter
-            currentStep={currentStep}
-            canContinue={canGoNext}
-            loading={loading}
-            initializing={initializing}
-            uploadingAttachments={uploadingAttachments}
-            savingDraft={savingDraft}
-            canSaveDraft={Boolean(onSaveDraft)}
-            onPrevious={handlePrevStep}
-            onNext={handleNextStep}
-            onSaveDraft={saveDraft}
-            theme={builderTheme}
-          />
-        </div>
-
-      </form>
-    </div>
+      {currentStep === 5 && (
+        <RequestReviewStep
+          form={form}
+          selectedCategory={selectedCategory}
+          selectedDesigner={selectedDesigner}
+          usesTableBrief={usesTableBrief}
+          tableBriefCategory={tableBriefCategory}
+          tableBriefProduct={tableBriefProduct}
+          tableBriefPackagingImageId={tableBriefPackagingImageId}
+          tableBriefPackagingImageName={tableBriefPackagingImageName}
+          tableBriefRows={tableBriefRows}
+          onEditProperties={() => setCurrentStep(2)}
+          onEditContent={() => { setMiniStep(2); setCurrentStep(4); }}
+          theme={builderTheme}
+        />
+      )}
+    </RequestBuilderShell>
   );
 }

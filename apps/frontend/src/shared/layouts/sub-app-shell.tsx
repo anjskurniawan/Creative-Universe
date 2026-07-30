@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/archive/old-navbar";
 
 interface SubAppShellProps {
   children: ReactNode;

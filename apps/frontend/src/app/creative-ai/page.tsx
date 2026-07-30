@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { useAuth } from "@/providers/auth-provider";
 import { creativeAiApi } from "@/features/creative-ai/api";
 

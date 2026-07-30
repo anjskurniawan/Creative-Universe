@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export function NavbarMenuItem({ href, icon, label, tone, badge, onClick, highlighted = false }: { href: string; icon: string; label: string; tone: "light" | "dark" | "transparent-dark"; badge?: string; onClick?: () => void; highlighted?: boolean }) {
   const dark = tone !== "light";

@@ -9,7 +9,10 @@ import { COMPONENT_DOCS_MENU_GROUPS } from "@/components/docs/component-registry
 
 interface DocItem {
   label: string;
-  slug: string;
+  slug?: string;
+  children?: DocItem[];
+  isNested?: boolean;
+  isParent?: boolean;
 }
 
 interface DocSubCategory {
@@ -173,9 +176,56 @@ const MENU_DATA: DocCategory[] = [
   },
 ];
 
+export function getDocsBreadcrumbs(slug: string): string[] {
+  if (!slug) return ["Overview"];
+
+  for (const category of MENU_DATA) {
+    for (const sub of category.children) {
+      if (sub.slug === slug) return [category.label, sub.label];
+
+      if (sub.children) {
+        for (const item of sub.children) {
+          if (item.slug === slug) return [category.label, sub.label, item.label];
+          
+          if (item.children) {
+            for (const child of item.children) {
+              if (child.slug === slug) return [category.label, sub.label, item.label, child.label];
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return [slug
+    .split("/")
+    .at(-1)!
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ")];
+}
+
+function getDocsMenuPath(slug: string) {
+  for (const category of MENU_DATA) {
+    for (const sub of category.children) {
+      if (
+        sub.slug === slug ||
+        sub.children?.some((entry) => entry.slug === slug)
+      ) {
+        return {
+          categoryId: category.id,
+          subKey: sub.children ? `${category.id}::${sub.label}` : undefined,
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function DocsMenu() {
+export default function DocsMenu({ onNavigate }: { onNavigate?: () => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -183,10 +233,16 @@ export default function DocsMenu() {
   const activeSlug = searchParams.get("section") ?? "";
 
   // Expanded state: Set of category ids + sub-category keys (categoryId::subLabel)
+  const initialPath = getDocsMenuPath(activeSlug);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set()
+    () => new Set(initialPath ? [initialPath.categoryId] : [])
   );
-  const [expandedSubs, setExpandedSubs] = useState<Set<string>>(new Set());
+  const [expandedSubs, setExpandedSubs] = useState<Set<string>>(
+    () => new Set(initialPath?.subKey ? [initialPath.subKey] : [])
+  );
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(
+    () => new Set()
+  );
 
   const toggleCategory = useCallback((id: string) => {
     setExpandedCategories((prev) => {
@@ -212,13 +268,43 @@ export default function DocsMenu() {
     });
   }, []);
 
+  const toggleItem = useCallback((key: string) => {
+    setExpandedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }, []);
+
   const navigateTo = useCallback(
     (slug: string) => {
+      const menuPath = getDocsMenuPath(slug);
+      if (menuPath) {
+        setExpandedCategories((current) => {
+          const next = new Set(current);
+          next.add(menuPath.categoryId);
+          return next;
+        });
+        const subKey = menuPath.subKey;
+        if (subKey) {
+          setExpandedSubs((current) => {
+            const next = new Set(current);
+            next.add(subKey);
+            return next;
+          });
+        }
+      }
+
       const params = new URLSearchParams(searchParams.toString());
       params.set("section", slug);
       router.push(`?${params.toString()}`, { scroll: false });
+      onNavigate?.();
     },
-    [router, searchParams]
+    [onNavigate, router, searchParams]
   );
 
   return (
@@ -298,16 +384,52 @@ export default function DocsMenu() {
                       {hasChildren && isSubExpanded && (
                         <div className="docs-menu-items">
                           {sub.children!.map((item) => {
-                            const isItemActive = item.slug === activeSlug;
-                            const isNestedCardItem = item.slug.startsWith("components/odds-designer-dashboard-cards-") || item.slug.startsWith("components/odds-task-card-");
-                            const isCardParentItem = item.slug === "components/odds-designer-dashboard-cards" || item.slug === "components/odds-task-card";
+                            const isItemActive = item.slug === activeSlug || item.children?.some((c) => c.slug === activeSlug);
+                            const itemHasChildren = Array.isArray(item.children) && item.children.length > 0;
+                            const isItemExpanded = expandedItems.has(item.label);
+                            
+                            if (itemHasChildren) {
+                              return (
+                                <div key={item.label} className="docs-menu-item-group">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      toggleItem(item.label);
+                                      if (item.slug) navigateTo(item.slug);
+                                    }}
+                                    className={`docs-menu-item parent-item${isItemActive ? " active" : ""}`}
+                                  >
+                                    <span>{item.label}</span>
+                                    <ChevronRight size={12} className={`docs-menu-chevron${isItemExpanded ? " rotated" : ""}`} />
+                                  </button>
+                                  {isItemExpanded && (
+                                    <div className="docs-menu-items nested">
+                                      {item.children!.map((child) => {
+                                        const isChildActive = child.slug === activeSlug;
+                                        return (
+                                          <button
+                                            key={child.slug}
+                                            type="button"
+                                            onClick={() => child.slug && navigateTo(child.slug)}
+                                            className={`docs-menu-item nested-card${isChildActive ? " active" : ""}`}
+                                          >
+                                            {child.label}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+
                             return (
                               <button
-                                key={item.slug}
+                                key={item.label}
                                 type="button"
-                                id={`docs-item-${item.slug.replace(/\//g, "-")}`}
-                                onClick={() => navigateTo(item.slug)}
-                                className={`docs-menu-item${isItemActive ? " active" : ""}${isNestedCardItem ? " nested-card" : ""}${isCardParentItem ? " parent-item" : ""}`}
+                                id={item.slug ? `docs-item-${item.slug.replace(/\//g, "-")}` : undefined}
+                                onClick={() => item.slug && navigateTo(item.slug)}
+                                className={`docs-menu-item${isItemActive ? " active" : ""}`}
                               >
                                 {item.label}
                               </button>
@@ -365,8 +487,8 @@ export default function DocsMenu() {
         }
 
         .docs-menu-category.active {
-          background-color: hsl(var(--foreground));
-          color: hsl(var(--background));
+          background-color: #00a4ff;
+          color: #ffffff;
         }
 
         .docs-menu-category-left {
@@ -474,6 +596,9 @@ export default function DocsMenu() {
         }
 
         .docs-menu-item.parent-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           margin-top: 0.25rem;
           color: hsl(var(--foreground));
           font-weight: 650;
@@ -481,8 +606,8 @@ export default function DocsMenu() {
         }
 
         .docs-menu-item.parent-item.active {
-          background-color: hsl(var(--foreground));
-          color: hsl(var(--background));
+          background-color: #00a4ff;
+          color: #ffffff;
         }
 
         .docs-menu-item.nested-card {
@@ -506,9 +631,9 @@ export default function DocsMenu() {
         }
 
         .docs-menu-item.nested-card.active {
-          color: hsl(var(--foreground));
+          color: #0078bd;
           font-weight: 700;
-          background-color: hsl(var(--secondary));
+          background-color: #e5f6ff;
         }
       `}</style>
     </nav>

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { MaterialIcon } from "@/components/material-icon";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import type { TableBriefRow } from "./table-brief-details";
 
 type TableBriefPreviewProps = {
