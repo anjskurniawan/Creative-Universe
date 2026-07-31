@@ -12,6 +12,8 @@ import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-car
 import { OddsTaskCard, OutputFilesPanel, OutputReviewPanel, TaskDiscussionPanel, TaskSubmissionPanel, publishTaskFeedbackToast } from "@/components/odds/TaskCard";
 import { useAuth } from "@/providers/auth-provider";
 import { useOddsTheme } from "./odds-theme-context";
+
+import { OddsBriefViewer } from "@/features/odds/components/brief-details";
 import TaskCardDate from "@/components/odds/legacy-taskcard/date";
 import {
   OddsAssignableUser,
@@ -4217,13 +4219,10 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
         </div>
         <div className="grid min-h-0 flex-1 overflow-hidden grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(280px,1fr)]">
           <section className="min-h-0 overflow-hidden bg-white/70 p-5 lg:border-r lg:border-[#e1e8eb]">
-            <div className="odds-scroll-hidden h-full overflow-y-auto bg-white pr-2">
+            <div className="odds-scroll-hidden h-full overflow-auto bg-white pr-2">
               <h2 className="mb-4 text-base font-semibold leading-7 text-[#303431]">{task.design_purpose}</h2>
               {hasBriefContent ? (
-                <div
-                  className="prose-odds max-w-none whitespace-normal text-sm leading-7 text-[#303431] [&_br]:block [&_br]:h-1 [&_div]:mb-3 [&_p]:mb-3 [&_p:has(br:only-child)]:mb-2 [&_p:has(br:only-child)]:h-2 [&_figure]:my-5 [&_figcaption]:mt-2 [&_figcaption]:text-xs [&_figcaption]:text-[#6b7280] [&_img]:max-h-72 [&_img]:w-auto [&_img]:max-w-full"
-                  dangerouslySetInnerHTML={{ __html: task.brief_text }}
-                />
+                <OddsBriefViewer task={task} briefText={task.brief_text} theme={theme} />
               ) : (
                 <p className="text-sm leading-7 text-[#6b7280]">Brief belum tersedia.</p>
               )}
@@ -4873,13 +4872,10 @@ function ClientOddsTaskCard({ task, theme, userId, nowMs, onReviewed, detailOnly
           </button>
         </div>
         <section className="min-h-0 flex-1 overflow-hidden bg-white/70 p-5">
-          <div className="odds-scroll-hidden h-full overflow-y-auto bg-white pr-2">
+          <div className="odds-scroll-hidden h-full overflow-auto bg-white pr-2">
             <h2 className="mb-4 text-base font-semibold leading-7 text-[#303431]">{task.design_purpose}</h2>
             {hasBriefContent ? (
-              <div
-                className="prose-odds max-w-none whitespace-normal text-sm leading-7 text-[#303431] [&_br]:block [&_br]:h-1 [&_div]:mb-3 [&_p]:mb-3 [&_p:has(br:only-child)]:mb-2 [&_p:has(br:only-child)]:h-2 [&_figure]:my-5 [&_figcaption]:mt-2 [&_figcaption]:text-xs [&_figcaption]:text-[#6b7280] [&_img]:max-h-72 [&_img]:w-auto [&_img]:max-w-full"
-                dangerouslySetInnerHTML={{ __html: task.brief_text }}
-              />
+              <OddsBriefViewer task={task} briefText={task.brief_text} theme={theme} />
             ) : (
               <p className="text-sm leading-7 text-[#6b7280]">Brief belum tersedia.</p>
             )}

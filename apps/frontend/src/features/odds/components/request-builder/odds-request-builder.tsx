@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useCallback, useMemo, useState, useRef, useEffect } from "react";
 import { stripRichText } from "@/components/odds-rich-text-editor";
 import { type TableBriefRow } from "../brief-details";
 import { BriefCompositionStep } from "./steps/brief-composition-step";
@@ -67,7 +67,9 @@ export function OddsRequestBuilder({
   const tableBriefRowCounter = useRef(2);
   const [uploadingIllustrationId, setUploadingIllustrationId] = useState<string | null>(null);
   const hasAppliedDraft = useRef(false);
-  const usesTableBrief = selectedCategory?.brief_format === "table";
+  const briefFormat = String(selectedCategory?.brief_format ?? "").trim().toLowerCase().replace(/[\s-]+/g, "_");
+  const usesTableBrief = ["table", "deskripsi_produk", "product_description"].includes(briefFormat)
+    || /<table\b/i.test(form.brief_text ?? "");
 
   useEffect(() => {
     if (!initialDraftState || hasAppliedDraft.current) return;
@@ -109,30 +111,31 @@ export function OddsRequestBuilder({
     return true;
   }, [currentStep, miniStep, form, tableBriefProduct, tableBriefRows, usesTableBrief]);
 
-  const buildTableBriefMarkup = (category: string, product: string, packagingImageName: string, rows: TableBriefRow[]) => `<h3>Detail Packaging</h3><table><tbody><tr><th>Kategori</th><td>${escapeBriefTableCell(category)}</td></tr><tr><th>Product</th><td>${escapeBriefTableCell(product)}</td></tr><tr><th>Gambar Packaging</th><td>${escapeBriefTableCell(packagingImageName)}</td></tr></tbody></table><table><thead><tr><th>Urutan gambar</th><th>Deskripsi Gambar</th><th>Ilustrasi Gambar</th><th>Keterangan Tambahan</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td>${row.image_description}</td><td>${escapeBriefTableCell(row.image_illustration)}</td><td>${row.additional_notes}</td></tr>`).join("")}</tbody></table>`;
+  const buildTableBriefMarkup = useCallback((category: string, product: string, packagingImageName: string, rows: TableBriefRow[]) => `<table><tbody><tr><th>Gambar Packaging</th><td>${escapeBriefTableCell(packagingImageName) || "-"}</td></tr></tbody></table><table><thead><tr><th>No</th><th>Deskripsi</th><th>Referensi</th><th>Keterangan</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td>${row.image_description || "-"}</td><td>${escapeBriefTableCell(row.image_illustration) || "-"}</td><td>${row.additional_notes || "-"}</td></tr>`).join("")}</tbody></table>`, []);
 
-  const syncTableBrief = (category: string, product: string, packagingImageName: string, rows: TableBriefRow[]) => {
+  const syncTableBrief = useCallback((category: string, product: string, packagingImageName: string, rows: TableBriefRow[]) => {
     update("brief_text", buildTableBriefMarkup(category, product, packagingImageName, rows));
-  };
+  }, [buildTableBriefMarkup, update]);
+
+  useEffect(() => {
+    if (!usesTableBrief) return;
+    syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, tableBriefRows);
+  }, [usesTableBrief, tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, tableBriefRows, syncTableBrief]);
 
   const updateTableBriefRow = (id: string, field: keyof Omit<TableBriefRow, "id">, value: string) => {
     setTableBriefRows((currentRows) => {
-      const nextRows = currentRows.map((row) => row.id === id ? { ...row, [field]: value } : row);
-      syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
-      return nextRows;
+      return currentRows.map((row) => row.id === id ? { ...row, [field]: value } : row);
     });
   };
 
   const updateTableBriefCategory = (value: string) => {
     setTableBriefCategory(value);
     update("design_purpose", [value.trim(), tableBriefProduct.trim()].filter(Boolean).join(" - "));
-    syncTableBrief(value, tableBriefProduct, tableBriefPackagingImageName, tableBriefRows);
   };
 
   const updateTableBriefProduct = (value: string) => {
     setTableBriefProduct(value);
     update("design_purpose", [tableBriefCategory.trim(), value.trim()].filter(Boolean).join(" - "));
-    syncTableBrief(tableBriefCategory, value, tableBriefPackagingImageName, tableBriefRows);
   };
 
   const uploadTableBriefPackagingImage = async (files: FileList | null) => {
@@ -140,7 +143,6 @@ export function OddsRequestBuilder({
     if (!uploaded) return;
     setTableBriefPackagingImageName(uploaded.name);
     setTableBriefPackagingImageId(uploaded.id);
-    syncTableBrief(tableBriefCategory, tableBriefProduct, uploaded.name, tableBriefRows);
   };
 
   const uploadTableBriefIllustration = async (id: string, files: FileList | null) => {
@@ -149,9 +151,7 @@ export function OddsRequestBuilder({
       const [uploaded] = await addAttachmentFiles(files);
       if (uploaded) {
         setTableBriefRows((currentRows) => {
-          const nextRows = currentRows.map((row) => row.id === id ? { ...row, image_illustration: uploaded.name, image_illustration_id: uploaded.id } : row);
-          syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
-          return nextRows;
+          return currentRows.map((row) => row.id === id ? { ...row, image_illustration: uploaded.name, image_illustration_id: uploaded.id } : row);
         });
       }
     } finally {
@@ -161,18 +161,14 @@ export function OddsRequestBuilder({
 
   const addTableBriefRow = () => {
     setTableBriefRows((currentRows) => {
-      const nextRows = [...currentRows, { id: `image-${tableBriefRowCounter.current++}`, image_order: "", image_description: "", image_illustration: "", image_illustration_id: null, additional_notes: "" }];
-      syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
-      return nextRows;
+      return [...currentRows, { id: `image-${tableBriefRowCounter.current++}`, image_order: "", image_description: "", image_illustration: "", image_illustration_id: null, additional_notes: "" }];
     });
   };
 
   const removeTableBriefRow = (id: string) => {
     setTableBriefRows((currentRows) => {
       if (currentRows.length === 1) return currentRows;
-      const nextRows = currentRows.filter((row) => row.id !== id);
-      syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
-      return nextRows;
+      return currentRows.filter((row) => row.id !== id);
     });
   };
 
@@ -186,7 +182,6 @@ export function OddsRequestBuilder({
       const [movedRow] = nextRows.splice(sourceIndex, 1);
       const insertionIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
       nextRows.splice(insertionIndex, 0, movedRow);
-      syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, nextRows);
       return nextRows;
     });
   };
@@ -229,7 +224,12 @@ export function OddsRequestBuilder({
   return (
     <RequestBuilderShell
       theme={builderTheme}
-      onSubmit={submit}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (currentStep === 5) {
+          void submit(e);
+        }
+      }}
       footer={
         <RequestBuilderFooter
           currentStep={currentStep}

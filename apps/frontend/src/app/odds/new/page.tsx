@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { MaterialIcon } from "@/components/ui/material-icon";
@@ -262,9 +262,9 @@ export default function NewOddsTaskPage() {
     nextStep();
   };
 
-  const update = (field: keyof TaskForm, value: string) => {
+  const update = useCallback((field: keyof TaskForm, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
   const selectCategory = (category: OddsCategory) => {
     setForm((prev) => ({

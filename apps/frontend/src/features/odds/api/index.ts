@@ -341,6 +341,16 @@ export function statusLabel(status: string): string {
     in_progress: "Proses Pengerjaan",
     spv_review: "Review Leader Creative",
     client_review: "Menunggu Review Client",
+    submitted: "Menunggu Pemeriksaan Brief",
+    done: "Selesai",
+    cancelled: "Dibatalkan",
+    cancelled_by_spv: "Dibatalkan Leader",
+    paused: "Dijeda",
+    new_task: "Tugas Baru",
+    leader_revision: "Revisi dari Leader",
+    client_revision: "Revisi dari Client",
+    extra_revision: "Revisi Tambahan",
+    urgent_revision: "Revisi Mendesak",
   };
 
   return labels[status] ?? status.replace(/_/g, " ");

@@ -12,7 +12,7 @@ export function TaskDiscussionPanel({ taskId, userId, taskStatus, preview = fals
     ];
 
     return <section className="flex w-full flex-col gap-4" aria-label="Diskusi task contoh">
-      <div className="flex items-center justify-between gap-3"><h3 className="truncate text-base font-semibold leading-6 text-[#3b4446]">Diskusi Project - {title ?? "Task ODDS"}</h3>{onClose && <button type="button" onClick={onClose} aria-label="Tutup diskusi" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#d9e1e6] text-[#3b4446] transition hover:bg-[#f3fbff]"><MaterialIcon name="close" size="sm" /></button>}</div>
+      <div className="flex items-center justify-between gap-3"><h3 className="truncate text-base font-semibold leading-6 text-[#3b4446]">Diskusi Project{title ? ` - ${title}` : ""}</h3>{onClose && <button type="button" onClick={onClose} aria-label="Tutup diskusi" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#d9e1e6] text-[#3b4446] transition hover:bg-[#f3fbff]"><MaterialIcon name="close" size="sm" /></button>}</div>
       <div className="flex flex-col gap-4">
         {messages.map((message) => <div key={message.name} className="flex items-start gap-2"><span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-200 text-[10px] font-bold text-[#3b4446]">{message.initials}</span><div className={`min-w-0 flex-1 rounded-lg p-2 ${message.surface}`}><p className={`text-xs font-medium ${message.accent}`}>{message.name}</p><p className="mt-1 text-sm leading-5 text-black">{message.body}</p><p className="mt-1 text-right text-xs text-[#7d7c7c]">{message.time}</p></div></div>)}
       </div>
@@ -27,7 +27,7 @@ export function TaskDiscussionPanel({ taskId, userId, taskStatus, preview = fals
 
   return <section className="flex w-full flex-col gap-4" aria-label="Diskusi task">
     <div className="flex items-center justify-between gap-3">
-      <h3 className="truncate text-base font-semibold leading-6 text-[#3b4446]">Diskusi Project - {title ?? "Task ODDS"}</h3>
+      <h3 className="truncate text-base font-semibold leading-6 text-[#3b4446]">Diskusi Project{title ? ` - ${title}` : ""}</h3>
       {onClose && <button type="button" onClick={onClose} aria-label="Tutup diskusi" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#d9e1e6] text-[#3b4446] transition hover:bg-[#f3fbff]"><MaterialIcon name="close" size="sm" /></button>}
     </div>
     <OddsTaskChat taskId={taskId} userId={userId} taskStatus={taskStatus} compact />

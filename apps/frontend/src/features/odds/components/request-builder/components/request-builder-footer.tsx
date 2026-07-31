@@ -54,12 +54,12 @@ export function RequestBuilderFooter({
         )}
 
         {currentStep < 5 ? (
-          <button type="button" disabled={!canContinue} onClick={onNext} className={`${theme.primaryButtonClass} h-[58px] px-6`}>
+          <button key="btn-next" type="button" disabled={!canContinue} onClick={onNext} className={`${theme.primaryButtonClass} h-[58px] px-6`}>
             <span>Lanjutkan</span>
             <MaterialIcon name="chevron_right" size="auto" className="text-lg" />
           </button>
         ) : (
-          <button type="submit" disabled={loading || initializing || uploadingAttachments} className={`${theme.primaryButtonClass} h-[58px] px-6`}>
+          <button key="btn-submit" type="submit" disabled={loading || initializing || uploadingAttachments} className={`${theme.primaryButtonClass} h-[58px] px-6`}>
             <MaterialIcon name="send" size="auto" className="text-lg" />
             <span>{loading ? "Mengirim..." : "Kirim Request"}</span>
           </button>

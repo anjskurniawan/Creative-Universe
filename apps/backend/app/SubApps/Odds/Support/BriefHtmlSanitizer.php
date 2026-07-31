@@ -8,7 +8,11 @@ use DOMNode;
 
 class BriefHtmlSanitizer
 {
-    private const ALLOWED_TAGS = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'a', 'figure', 'img', 'figcaption'];
+    private const ALLOWED_TAGS = [
+        'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li',
+        'a', 'figure', 'img', 'figcaption',
+        'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
+    ];
 
     public function sanitize(string $html): string
     {
