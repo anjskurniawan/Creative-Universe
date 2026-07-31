@@ -157,7 +157,7 @@ export function OddsRichTextEditor({
 
   return (
     <div className={`relative min-w-0 rounded-lg border border-cu-border bg-white ${fillHeight ? "flex h-full flex-col" : ""} ${toolbarMode === "focus" ? "overflow-visible" : "overflow-hidden"}`}>
-      {(toolbarMode === "always" || isFocused) && <div className={`odds-scroll-hidden flex items-center gap-1 overflow-x-auto border-b border-cu-border bg-cu-panel-soft p-1.5 ${toolbarMode === "focus" ? "absolute bottom-full left-0 right-0 z-30 mb-1 rounded-lg border shadow-lg" : ""}`}>
+      {(toolbarMode === "always" || isFocused) && <div className={`odds-scroll-hidden flex items-center gap-1 overflow-x-auto border-b border-cu-border bg-cu-panel-soft p-1 ${toolbarMode === "focus" ? "absolute bottom-full left-0 right-0 z-30 mb-1 rounded-lg border shadow-lg" : ""}`}>
         {tools.map((tool) => (
           <button
             key={tool.command}
@@ -167,17 +167,17 @@ export function OddsRichTextEditor({
             aria-pressed={activeTools.includes(tool.command)}
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => runCommand(tool.command)}
-            className={`flex size-8 shrink-0 items-center justify-center rounded-md border text-cu-ink transition hover:bg-white ${activeTools.includes(tool.command) ? "border-cu-info bg-cu-info/10 text-cu-info" : "border-cu-border bg-white"}`}
+            className={`flex size-7 shrink-0 items-center justify-center rounded-md border text-cu-ink transition hover:bg-white ${activeTools.includes(tool.command) ? "border-cu-info bg-cu-info/10 text-cu-info" : "border-cu-border bg-white"}`}
           >
             <MaterialIcon name={tool.icon} size="sm" />
           </button>
         ))}
-        <span className="mx-1 h-5 w-px shrink-0 bg-cu-border" />
-        <button type="button" title="Clear formatting" aria-label="Clear formatting" onMouseDown={(event) => event.preventDefault()} onClick={() => runCommand("removeFormat")} className="flex size-8 shrink-0 items-center justify-center rounded-md border border-cu-border bg-white text-cu-ink transition hover:bg-white">
+        <span className="mx-1 h-4 w-px shrink-0 bg-cu-border" />
+        <button type="button" title="Clear formatting" aria-label="Clear formatting" onMouseDown={(event) => event.preventDefault()} onClick={() => runCommand("removeFormat")} className="flex size-7 shrink-0 items-center justify-center rounded-md border border-cu-border bg-white text-cu-ink transition hover:bg-white">
           <MaterialIcon name="format_clear" size="sm" />
         </button>
         {onUploadImage && (
-          <label title="Insert image" aria-label="Insert image" className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-cu-border bg-white text-cu-ink transition hover:bg-white">
+          <label title="Insert image" aria-label="Insert image" className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-cu-border bg-white text-cu-ink transition hover:bg-white">
             <MaterialIcon name={imageUploading ? "hourglass_top" : "image"} size="sm" className={imageUploading ? "animate-spin" : ""} />
             <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple disabled={imageUploading} onChange={(event) => event.target.files && void insertImages(event.target.files)} className="sr-only" />
           </label>

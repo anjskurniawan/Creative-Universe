@@ -349,7 +349,7 @@ export default function NewOddsTaskPage() {
   const { theme } = useOddsTheme();
 
   return (
-    <div ref={pageRef} className="relative min-h-0 w-full flex-1 flex flex-col p-4">
+    <div ref={pageRef} className="relative min-h-0 w-full flex-1 flex flex-col p-0">
       {launchSequence !== "idle" && <RequestLaunchSequence launchSequence={launchSequence} theme={theme} />}
       <OddsRequestBuilder
         theme={theme}

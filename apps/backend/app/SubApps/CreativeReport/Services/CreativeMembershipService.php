@@ -69,8 +69,8 @@ class CreativeMembershipService
 
     public function ensureAssessmentsForPeriod(Carbon $period): void
     {
-        CreativeMember::query()->whereIn('status', [CreativeMember::STATUS_ACTIVE, CreativeMember::STATUS_RESIGNED])
-            ->whereNot('position_name', 'Manajer')
+        CreativeMember::query()
+            ->whereIn('status', [CreativeMember::STATUS_ACTIVE, CreativeMember::STATUS_RESIGNED])
             ->whereDate('joined_at', '<=', $period->copy()->endOfMonth())
             ->where(fn ($query) => $query->whereNull('resigned_at')->orWhereDate('resigned_at', '>=', $period->copy()->startOfMonth()))
             ->each(fn (CreativeMember $member) => $this->ensureAssessment($member, $period));
@@ -95,13 +95,19 @@ class CreativeMembershipService
             }],
         );
 
-        Assessment::firstOrCreate(
-            ['creative_report_member_id' => $member->id, 'period' => $period->toDateString()],
-            [
+        $assessment = Assessment::query()
+            ->where('creative_report_member_id', $member->id)
+            ->whereDate('period', $period->toDateString())
+            ->first();
+
+        if (! $assessment) {
+            Assessment::create([
                 'creative_report_group_id' => $group->id,
+                'creative_report_member_id' => $member->id,
                 'user_id' => $member->user_id,
+                'period' => $period->toDateString(),
                 'creative_scores' => array_fill(0, 10, 0),
-            ],
-        );
+            ]);
+        }
     }
 }

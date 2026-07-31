@@ -39,6 +39,7 @@ export interface OddsDesignerProfile {
   is_active: boolean;
   current_load_minutes: number;
   user?: OddsUser;
+  tasks?: Array<{ id: number; assigned_designer_id: number; design_purpose: string; status: string }>;
 }
 
 export interface OddsSystemRule {

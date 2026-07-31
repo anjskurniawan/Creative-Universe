@@ -76,7 +76,7 @@ class BriefHtmlSanitizer
 
         if ($tag === 'a') {
             $href = $element->getAttribute('href');
-            if (! preg_match('/^https?:\/\/[^\s]+$/i', $href)) {
+            if (! preg_match('/^(?:https?:\/\/[^\s]+|\/api\/v1\/odds\/uploads\/\d+\/content)$/i', $href)) {
                 $element->removeAttribute('href');
             }
             $element->setAttribute('target', '_blank');

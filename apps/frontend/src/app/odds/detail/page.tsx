@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { OddsRichTextEditor, RichTextViewer, stripRichText } from "@/components/odds-rich-text-editor";
@@ -64,10 +64,13 @@ function durationSeconds(log: { started_at: string; stopped_at: string | null; d
 }
 
 function formatDuration(totalSeconds: number) {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const days = Math.floor(totalSeconds / 86400);
+  const remainingSeconds = totalSeconds % 86400;
+  const hours = Math.floor(remainingSeconds / 3600);
+  const minutes = Math.floor((remainingSeconds % 3600) / 60);
+  const seconds = remainingSeconds % 60;
 
+  if (days > 0) return `${days}h ${hours}j`;
   if (hours > 0) return `${hours}j ${minutes}m`;
   if (minutes > 0) return `${minutes}m ${seconds}d`;
   return `${seconds}d`;
@@ -85,38 +88,38 @@ function DetailContent() {
     : "border border-[#BDEAFF]/60 bg-white shadow-[0_8px_30px_rgba(0,164,255,0.04)] p-4 md:p-5 text-[#04044A] rounded-2xl flex-grow flex flex-col min-h-0 overflow-hidden";
 
   const textLabelClass = retro
-    ? "block text-[10px] font-bold uppercase tracking-wider text-[#24252b]"
+    ? "block text-[9px] font-bold uppercase tracking-wider text-[#24252b]"
     : dark
-    ? "block text-[10px] font-bold uppercase tracking-wider text-[#7d827f]"
-    : "block text-[10px] font-bold uppercase tracking-wider text-[#04044A]/60";
+    ? "block text-[9px] font-bold uppercase tracking-wider text-[#7d827f]"
+    : "block text-[9px] font-bold uppercase tracking-wider text-[#04044A]/60";
 
   const textValueClass = retro
-    ? "mt-1 block font-extrabold text-sm text-[#24252b]"
+    ? "mt-1 block font-extrabold text-xs text-[#24252b]"
     : dark
-    ? "mt-1 block font-semibold text-sm text-[#f1f1f1]"
-    : "mt-1 block font-semibold text-sm text-[#04044A]";
+    ? "mt-1 block font-semibold text-xs text-[#f1f1f1]"
+    : "mt-1 block font-semibold text-xs text-[#04044A]";
 
   const navClass = retro
-    ? "flex gap-2 overflow-x-auto rounded-none border-2 border-[#24252b] bg-[#eceee6] p-2 shadow-[2px_2px_0px_#24252b] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    ? "flex gap-2 overflow-x-auto rounded-none border-2 border-[#24252b] bg-[#eceee6] p-1 shadow-[2px_2px_0px_#24252b] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     : dark
-    ? "flex gap-2 overflow-x-auto rounded-2xl border border-white/10 bg-[#171717]/85 backdrop-blur-md p-2 shadow-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    : "flex gap-2 overflow-x-auto rounded-2xl border border-[#BDEAFF]/60 bg-white p-2 shadow-[0_8px_30px_rgba(0,164,255,0.03)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+    ? "flex gap-2 overflow-x-auto rounded-2xl border border-white/10 bg-[#171717]/85 backdrop-blur-md p-1 shadow-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    : "flex gap-2 overflow-x-auto rounded-2xl border border-[#BDEAFF]/60 bg-white p-1 shadow-[0_8px_30px_rgba(0,164,255,0.03)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
 
   const tabButtonClass = (tab: string) => {
     const active = activeTab === tab;
     if (retro) {
       return active
-        ? "border-[#ba0dcb] text-[#ba0dcb]"
-        : "border-transparent text-[#24252b]/60 hover:text-[#24252b]";
+        ? "text-[#ba0dcb]"
+        : "text-[#24252b]/60 hover:text-[#24252b]";
     }
     if (dark) {
       return active
-        ? "border-[#b0ff5e] text-[#b0ff5e]"
-        : "border-transparent text-[#7d827f] hover:text-white";
+        ? "text-[#b0ff5e]"
+        : "text-[#7d827f] hover:text-white";
     }
     return active
-      ? "border-[#00A4FF] text-[#00A4FF]"
-      : "border-transparent text-[#04044A]/60 hover:text-[#00A4FF]";
+      ? "text-[#00A4FF]"
+      : "text-[#04044A]/60 hover:text-[#00A4FF]";
   };
 
   const searchParams = useSearchParams();
@@ -140,7 +143,7 @@ function DetailContent() {
   const [reassignDropdownOpen, setReassignDropdownOpen] = useState(false);
   const [extendedDeadline, setExtendedDeadline] = useState("");
   const [activeTab, setActiveTab] = useState<
-    "brief" | "output" | "revision" | "discussion" | "status" | "audit" | "actions"
+    "brief" | "output" | "revision" | "discussion" | "status" | "audit" | "actions" | "history"
   >("brief");
 
   const canReviewBrief = hasPermission("review-odds-briefs");
@@ -161,8 +164,15 @@ function DetailContent() {
     setError(null);
     try {
       const data = await getOddsTask(id);
-      setTask(data);
-      setBriefText(data.brief?.content ?? data.brief_text ?? "");
+      setTask((prev) => {
+        if (prev && JSON.stringify(prev) === JSON.stringify(data)) return prev;
+        return data;
+      });
+      const newBrief = data.brief?.content ?? data.brief_text ?? "";
+      setBriefText((current) => {
+        if (current === newBrief) return current;
+        return newBrief;
+      });
     } catch (err) {
       setError(oddsError(err));
     } finally {
@@ -171,20 +181,35 @@ function DetailContent() {
   }, [id]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void loadTask();
-    }, 0);
-    const interval = window.setInterval(() => {
-      void loadTask(true);
-    }, 10000);
-
-    return () => {
-      window.clearTimeout(timer);
-      window.clearInterval(interval);
-    };
+    void loadTask();
   }, [loadTask]);
 
   useEffect(() => {
+    const handleTaskUpdated = (event: Event) => {
+      const updatedTask = (event as CustomEvent<OddsTask>).detail;
+      if (updatedTask && String(updatedTask.id) === String(id)) {
+        void loadTask(true);
+      }
+    };
+    const handleTaskDeleted = (event: Event) => {
+      const deletedTaskId = (event as CustomEvent<number | string>).detail;
+      if (String(deletedTaskId) === String(id)) {
+        setError("Tugas ini telah dihapus.");
+        setTask(null);
+      }
+    };
+
+    window.addEventListener("odds:task-updated", handleTaskUpdated);
+    window.addEventListener("odds:task-deleted", handleTaskDeleted);
+    return () => {
+      window.removeEventListener("odds:task-updated", handleTaskUpdated);
+      window.removeEventListener("odds:task-deleted", handleTaskDeleted);
+    };
+  }, [id]);
+
+  useEffect(() => {
+    if (activeTab !== "audit") return;
+    setTimerNow(Date.now());
     const interval = window.setInterval(() => {
       setTimerNow(Date.now());
     }, 1000);
@@ -192,7 +217,7 @@ function DetailContent() {
     return () => {
       window.clearInterval(interval);
     };
-  }, []);
+  }, [activeTab]);
 
   useEffect(() => {
     if (!canManageEscalations) return;
@@ -337,34 +362,34 @@ function DetailContent() {
   };
 
   return (
-    <div className="flex w-full h-full min-h-0 flex-col gap-4 lg:gap-6 p-4 overflow-hidden">
+    <div className="flex w-full h-full min-h-0 flex-col gap-4 lg:gap-4 overflow-hidden">
       <TaskFeedbackToast
         toast={error ? { status: "error", message: error } : notice ? { status: "success", message: notice } : null}
         onClose={() => { setError(null); setNotice(null); }}
       />
-      <HeaderTitle>{task.design_purpose}</HeaderTitle>
+      <HeaderTitle className="!py-0">{task.design_purpose}</HeaderTitle>
 
       <div className="grid gap-5 lg:grid-cols-4 items-stretch flex-1 min-h-0 h-[calc(100vh-200px)] lg:h-[calc(100vh-220px)]">
         <div className="lg:col-span-3 flex flex-col gap-5 h-full min-h-0">
           {/* Details Box */}
-          <div className={`${cardClass} flex flex-row flex-nowrap items-stretch gap-x-6 overflow-x-auto md:p-5 flex-grow-0`}>
-            <div className="w-fit shrink-0 border-r border-cu-border pr-6">
+          <div className={`${cardClass} flex flex-row flex-nowrap items-stretch gap-x-4 overflow-x-auto md:p-5 flex-grow-0`}>
+            <div className="w-fit shrink-0 border-r border-cu-border pr-4">
               <span className={textLabelClass}>Kategori</span>
               <span className={textValueClass}>{task.category?.name ?? "-"}</span>
             </div>
-            <div className="w-fit shrink-0 border-r border-cu-border pr-6">
+            <div className="w-fit shrink-0 border-r border-cu-border pr-4">
               <span className={textLabelClass}>Tanggal Submit</span>
               <span className={textValueClass}>{formatOddsDate(task.created_at, true)}</span>
             </div>
-            <div className="w-fit shrink-0 border-r border-cu-border pr-6">
+            <div className="w-fit shrink-0 border-r border-cu-border pr-4">
               <span className={textLabelClass}>Perequest</span>
               <span className={textValueClass}>{task.requester?.name?.trim().split(/\s+/)[0] ?? "-"}</span>
             </div>
-            <div className="w-fit shrink-0 border-r border-cu-border pr-6">
+            <div className="w-fit shrink-0 border-r border-cu-border pr-4">
               <span className={textLabelClass}>Desainer</span>
               <span className={textValueClass}>{assignedDesigner?.name?.trim().split(/\s+/)[0] ?? "Belum ada desainer"}</span>
             </div>
-            <div className="w-fit shrink-0 border-r border-cu-border pr-6">
+            <div className="w-fit shrink-0 border-r border-cu-border pr-4">
               <span className={textLabelClass}>Deadline</span>
               <span className={textValueClass}>{formatOddsDate(task.deadline, true)}</span>
             </div>
@@ -383,15 +408,16 @@ function DetailContent() {
                 ["revision", "edit_note", "Revisi"],
                 ["discussion", "chat", "Diskusi"],
                 ["audit", "timer", "Audit"],
+                ["history", "history", "Log Task"],
                 ["actions", "bolt", "Aksi"],
               ] as const).map(([tab, icon, label]) => (
                 <button
                   key={tab}
                   type="button"
                   onClick={() => setActiveTab(tab)}
-                  className={`inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-t-xl rounded-b-none px-5 text-sm font-semibold border-b-2 transition-all duration-200 ${tabButtonClass(tab)}`}
+                  className={`inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-t-xl rounded-b-none px-5 text-sm font-semibold transition-all duration-200 ${tabButtonClass(tab)}`}
                 >
-                  <MaterialIcon name={icon} size="sm" />
+                  <MaterialIcon name={icon} size="sm" style={{ fontSize: "20px" }} />
                   {label}
                 </button>
               ))}
@@ -424,7 +450,7 @@ function DetailContent() {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex justify-between items-center mt-auto gap-4 text-sm text-cu-muted">
+                      <div className="flex justify-between items-center mt-auto gap-4 text-sm text-cu-muted pt-3 border-t border-cu-border/10">
                         <p>
                           Brief hanya bisa diubah client saat desainer meminta update brief.
                         </p>
@@ -527,14 +553,17 @@ function DetailContent() {
                 </section>
               )}
 
-               {!isClientSideView && activeTab === "audit" && (
-                <section className={cardClass}>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    <TimerTile label={`Work (SLA: ${slaMinutes}m)`} value={formatDuration(timerTotals.work)} />
-                    <TimerTile label="Revisi" value={formatDuration(timerTotals.revision)} />
-                    <TimerTile label="Review Leader" value={formatDuration(timerTotals.spv_review)} />
-                    <TimerTile label="Review Client" value={formatDuration(timerTotals.client_review)} />
-                  </div>
+               {!isClientSideView && activeTab === "audit" && (() => {
+                  const totalDuration = timerTotals.work + timerTotals.revision + timerTotals.spv_review + timerTotals.client_review;
+                  return (
+                    <section className={cardClass}>
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                        <TimerTile label="PENGERJAAN" value={formatDuration(timerTotals.work)} />
+                        <TimerTile label="REVIEW LEADER" value={formatDuration(timerTotals.spv_review)} />
+                        <TimerTile label="REVIEW CLIENT" value={formatDuration(timerTotals.client_review)} />
+                        <TimerTile label="REVISI" value={formatDuration(timerTotals.revision)} />
+                        <TimerTile label="TOTAL DURASI" value={formatDuration(totalDuration)} />
+                      </div>
 
                   {isSlaOverdue && (
                     <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400">
@@ -556,21 +585,116 @@ function DetailContent() {
                       Quality issue: {task.quality_issue_note ?? "Revisi SPV melewati batas wajar."}
                     </p>
                   )}
-                  <div className="mt-3 space-y-2 flex-1 overflow-y-auto">
-                    {designerTimeLogs.slice(-6).reverse().map((log) => (
-                      <div key={log.id} className={`flex items-center justify-between rounded-lg border px-3 py-2 text-xs ${dark ? "border-white/5 bg-white/5" : "border-cu-border"}`}>
-                        <div>
-                          <p className="font-semibold capitalize text-cu-ink">{statusLabel(log.log_type)}</p>
-                          <p className="text-cu-muted">{log.stopped_at ? "Selesai" : "Berjalan"}</p>
-                        </div>
-                        <span className="font-medium text-cu-muted">{formatDuration(durationSeconds(log, timerNow))}</span>
-                      </div>
-                    ))}
-                    {designerTimeLogs.length === 0 && <p className="rounded-lg border border-dashed border-cu-border px-3 py-3 text-sm text-cu-muted">Belum ada timer pengerjaan desainer.</p>}
-                  </div>
                   <p className="text-sm text-cu-muted mt-auto">
-                    Transparansi pencatatan durasi per fase untuk melacak bottleneck pengerjaan dan SLA desainer.
+                    Transparansi pencatatan durasi per fase untuk melacak bottleneck pengerjaan desainer.
                   </p>
+                </section>
+              )})()}
+
+              {activeTab === "history" && (
+                <section className={cardClass}>
+                  <div className="space-y-4 flex-1 overflow-y-auto pr-1">
+                    {(() => {
+                      const events: Array<{ label: string; date: string; note?: ReactNode }> = [];
+                      
+                      if (task.created_at) {
+                        events.push({
+                          label: "TUGAS DIBUAT",
+                          date: task.created_at,
+                          note: (
+                            <>
+                              <strong className="font-bold text-cu-ink">{task.design_purpose}</strong> berhasil dibuat oleh {task.requester?.name ?? "Client"}.
+                            </>
+                          ),
+                        });
+                      }
+
+                      if (task.status !== "submitted" && task.status !== "new_task") {
+                        const approvedDate = (task.current_queue || task.currentQueue as any)?.created_at || (timeLogs[0]?.started_at) || task.created_at;
+                        events.push({
+                          label: "BRIEF DI-APPROVE",
+                          date: approvedDate,
+                          note: (
+                            <>
+                              Brief untuk tugas <strong className="font-bold text-cu-ink">{task.design_purpose}</strong> telah disetujui dan dimasukkan ke antrean pengerjaan.
+                            </>
+                          ),
+                        });
+                      }
+
+                      timeLogs.forEach((log) => {
+                        events.push({
+                          label: `MULAI FASE: ${statusLabel(log.log_type).toUpperCase()}`,
+                          date: log.started_at,
+                          note: `Fase ${statusLabel(log.log_type)} dimulai oleh ${task.assigned_designer?.name ?? "Desainer"}.`,
+                        });
+                        
+                        if (log.stopped_at) {
+                          events.push({
+                            label: `SELESAI FASE: ${statusLabel(log.log_type).toUpperCase()}`,
+                            date: log.stopped_at,
+                            note: `Fase ${statusLabel(log.log_type)} selesai/dijeda. Durasi: ${formatDuration(log.duration_seconds)}.`,
+                          });
+                        }
+                      });
+
+                      (task.results ?? []).forEach((r) => {
+                        if (r.submitted_at) {
+                          events.push({
+                            label: `OUTPUT SUBMITTED (V${r.version_number})`,
+                            date: r.submitted_at,
+                            note: r.result_notes,
+                          });
+                        }
+                      });
+
+                      (task.reviews ?? []).forEach((rev) => {
+                        const date = rev.created_at || rev.updated_at || task.updated_at || "";
+                        if (date) {
+                          events.push({
+                            label: `REVIEW ${rev.review_type.toUpperCase()}`,
+                            date,
+                            note: (
+                              <>
+                                Keputusan: <span className="font-bold text-cu-ink">{rev.decision.toUpperCase()}</span>{rev.notes ? ` | Catatan: ${rev.notes}` : ""}
+                              </>
+                            ),
+                          });
+                        }
+                      });
+
+                      if (task.done_at) {
+                        events.push({
+                          label: "TUGAS SELESAI",
+                          date: task.done_at,
+                          note: "Tugas dinyatakan selesai dan diarsipkan.",
+                        });
+                      }
+
+                      const sortedEvents = events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+                      if (sortedEvents.length === 0) {
+                        return <p className="text-sm text-cu-muted">Belum ada riwayat aktivitas.</p>;
+                      }
+
+                      return (
+                        <div className="relative border-l border-cu-border/50 ml-3 pl-4 space-y-5">
+                          {sortedEvents.map((event, idx) => (
+                            <div key={idx} className="relative">
+                              <span className="absolute -left-[21px] top-1.5 flex size-2.5 items-center justify-center rounded-full bg-cu-info ring-4 ring-white dark:ring-[#171717]" />
+                              <div>
+                                <span className={`text-[10px] font-bold tracking-wider ${dark ? "text-slate-500" : "text-[#7d7c7c]/80"}`}>
+                                  {formatOddsDate(event.date, true)}
+                                </span>
+                                <h4 className="text-xs font-bold uppercase tracking-wide text-cu-ink mt-0.5">{event.label}</h4>
+                                {event.note && <p className="text-xs text-cu-muted mt-1 leading-relaxed">{event.note}</p>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()}
+                  </div>
                 </section>
               )}
 
@@ -948,10 +1072,10 @@ function TimerTile({ label, value }: { label: string; value: string }) {
     : "rounded-2xl border border-[#BDEAFF]/50 bg-[#F3FAFF]/30 p-4 aspect-square flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md hover:bg-[#F3FAFF]/50 transition-all duration-200";
 
   const labelClass = retro
-    ? "text-[10px] text-[#24252b] font-bold uppercase tracking-wider"
+    ? "text-sm text-[#24252b] font-bold uppercase tracking-wider"
     : dark
-    ? "text-[10px] text-[#7d827f] font-bold uppercase tracking-wider"
-    : "text-[10px] text-[#04044A]/50 font-bold uppercase tracking-wider";
+    ? "text-sm text-[#7d827f] font-bold uppercase tracking-wider"
+    : "text-sm text-[#04044A]/50 font-bold uppercase tracking-wider";
 
   const valueClass = retro
     ? "mt-2 text-base font-extrabold text-black md:text-lg"

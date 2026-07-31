@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { Check, Copy, Code2, MonitorPlay, Accessibility, FileCode } from "lucide-react";
@@ -7,6 +7,7 @@ import { TableBriefDetails, type TableBriefRow } from "@/features/odds/component
 function MockTableBriefDetailsWrapper() {
   const [category, setCategory] = useState("Apparel");
   const [product, setProduct] = useState("T-Shirt");
+  const [deadline, setDeadline] = useState("");
   const [rows, setRows] = useState<TableBriefRow[]>([
     { id: "1", image_order: "1", image_description: "Front print illustration", image_illustration: "", image_illustration_id: null, additional_notes: "Keep colors vivid" }
   ]);
@@ -19,6 +20,24 @@ function MockTableBriefDetailsWrapper() {
   const handleRowChange = (id: string, field: keyof Omit<TableBriefRow, "id">, value: string) => {
     setRows(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
   };
+
+  const today = new Date().toLocaleDateString("en-CA");
+  const tomorrow = new Date(Date.now() + 86400000).toLocaleDateString("en-CA");
+  const threeDays = new Date(Date.now() + 3 * 86400000).toLocaleDateString("en-CA");
+
+  // Minimal mock for form and update
+  const mockForm = {
+    request_type: "design",
+    category_id: "",
+    preferred_designer_id: "",
+    design_purpose: "",
+    brief_text: "",
+    reference_visual: "",
+    deadline,
+    important_matrix: "Q4",
+    attachment_notes: "",
+  } as unknown as Parameters<typeof import("@/features/odds/components/brief-details")["TableBriefDetails"]>[0]["form"];
+  const mockUpdate = (field: string, value: string) => { if (field === "deadline") setDeadline(value); };
 
   return (
     <div className="w-full max-w-[950px] bg-white border border-slate-200 rounded-3xl shadow-sm flex flex-col p-6 min-h-[400px]">
@@ -37,8 +56,14 @@ function MockTableBriefDetailsWrapper() {
         uploadingIllustrationId={null}
         onAddRow={() => setRows(prev => [...prev, { id: String(Date.now()), image_order: String(prev.length + 1), image_description: "", image_illustration: "", image_illustration_id: null, additional_notes: "" }])}
         onRemoveRow={(id) => setRows(prev => prev.filter(r => r.id !== id))}
-        onReorderRows={(src, dest) => {}}
+        onReorderRows={() => {}}
         productCatalog={productCatalog}
+        form={mockForm}
+        update={mockUpdate as Parameters<typeof import("@/features/odds/components/brief-details")["TableBriefDetails"]>[0]["update"]}
+        selectedCategory={undefined}
+        todayDate={today}
+        tomorrowDate={tomorrow}
+        threeDaysDate={threeDays}
       />
     </div>
   );

@@ -33,7 +33,15 @@ class AssessmentController extends BaseApiController
     {
         Gate::authorize('viewAny', Assessment::class);
         $period = $request->string('month', now()->format('Y-m'))->toString();
-        $this->memberships->ensureAssessmentsForPeriod(Carbon::createFromFormat('Y-m', $period)->startOfMonth());
+        $selectedPeriod = Carbon::createFromFormat('Y-m', $period)->startOfMonth();
+        if ($selectedPeriod->gt(now()->startOfMonth())) {
+            return $this->sendResponse([
+                'month' => $period,
+                'groups' => [],
+                'notice' => 'Data Bulan '.$selectedPeriod->locale('id')->monthName.' '.$selectedPeriod->year.' belum disiapkan.',
+            ], 'Data bulan belum disiapkan.');
+        }
+        $this->memberships->ensureAssessmentsForPeriod($selectedPeriod);
         $query = Assessment::query()->with(['group', 'member', 'user.position.division'])->whereDate('period', $period.'-01');
         if ($request->filled('jobdesk')) {
             $query->where(fn ($q) => $q->whereHas('member', fn ($member) => $member->where('position_name', $request->string('jobdesk')))
@@ -52,7 +60,7 @@ class AssessmentController extends BaseApiController
             'assessments' => AssessmentResource::collection($rows)->resolve($request),
         ])->sortBy('sort_order')->values();
 
-        return $this->sendResponse(['month' => $period, 'groups' => $groups], 'Laporan creative berhasil diambil.');
+        return $this->sendResponse(['month' => $period, 'groups' => $groups, 'notice' => null], 'Laporan creative berhasil diambil.');
     }
 
     public function update(UpdateAssessmentRequest $request, Assessment $assessment): JsonResponse

@@ -35,7 +35,10 @@ class OddsConfigService
     public function designerProfiles(array $filters = []): LengthAwarePaginator
     {
         $profiles = DesignerProfile::query()
-            ->with('user:id,name,email,username')
+            ->with([
+                'user:id,name,email,username',
+                'tasks' => fn ($query) => $query->select('id', 'assigned_designer_id', 'design_purpose', 'status')->where('status', 'in_progress')
+            ])
             ->when(isset($filters['active']), fn ($query) => $query->where('is_active', (bool) $filters['active']))
             ->orderBy('id', 'desc')
             ->paginate((int) ($filters['per_page'] ?? 25));

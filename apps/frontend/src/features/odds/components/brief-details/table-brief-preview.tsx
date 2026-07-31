@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import type { TableBriefRow } from "./table-brief-details";
+import { openProtectedAttachment } from "@/core/api/client";
 
 type TableBriefPreviewProps = {
   packagingImageId: number | null;
@@ -40,13 +41,12 @@ export function TableBriefPreview({
       {packagingImageId && (
         <div className="flex">
           <a
-            href={`/api/v1/odds/uploads/${packagingImageId}/content`}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#"
+            onClick={(event) => { event.preventDefault(); void openProtectedAttachment(packagingImageId); }}
             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
           >
             <MaterialIcon name="visibility" size="sm" />
-            Lihat File Packaging ({packagingImageName})
+            Buka Gambar
           </a>
         </div>
       )}
@@ -73,16 +73,10 @@ export function TableBriefPreview({
                 </td>
                 <td className="border-r border-[#BDEAFF]/60 px-4 py-4 text-center">
                   {row.image_illustration_id ? (
-                    <div className="relative h-40 w-full overflow-hidden rounded-lg border border-[#BDEAFF] bg-white">
-                      <Image
-                        src={`/api/v1/odds/uploads/${row.image_illustration_id}/content`}
-                        alt="Ilustrasi gambar"
-                        fill
-                        unoptimized
-                        sizes="(max-width: 640px) 280px, 31vw"
-                        className="object-contain p-2"
-                      />
-                    </div>
+                    <a href="#" onClick={(event) => { event.preventDefault(); void openProtectedAttachment(row.image_illustration_id as number); }} className="group relative block h-40 w-full overflow-hidden rounded-lg border border-[#BDEAFF] bg-white">
+                      <Image src={`/api/v1/odds/uploads/${row.image_illustration_id}/content`} alt="Ilustrasi gambar" fill unoptimized sizes="(max-width: 640px) 280px, 31vw" className="object-contain p-2" />
+                      <span className="absolute inset-x-0 bottom-0 bg-white/90 py-1 text-center text-[10px] font-semibold text-[#00A4FF] opacity-0 transition group-hover:opacity-100">Buka Gambar</span>
+                    </a>
                   ) : (
                     <span className="text-slate-400 font-semibold">{emptyValue}</span>
                   )}

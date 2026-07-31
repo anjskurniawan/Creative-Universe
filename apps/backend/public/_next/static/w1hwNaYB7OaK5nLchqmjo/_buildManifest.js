@@ -2,6 +2,9 @@ self.__BUILD_MANIFEST = {
   "__rewrites": {
     "afterFiles": [
       {
+        "source": "/storage/:path*"
+      },
+      {
         "source": "/api/v1/:path*"
       },
       {

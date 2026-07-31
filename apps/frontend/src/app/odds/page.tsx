@@ -498,6 +498,8 @@ function OddsPageContent() {
   const [rankingPeriod, setRankingPeriod] = useState<"daily" | "monthly" | "yearly">("daily");
   const [reviewNote, setReviewNote] = useState("");
   const [categoryForm, setCategoryForm] = useState<CategoryForm>(emptyCategoryForm);
+  const [categoryDrafts, setCategoryDrafts] = useState<Record<number, CategoryForm>>({});
+  const [editingCategories, setEditingCategories] = useState(false);
   const [designerForm, setDesignerForm] = useState<DesignerForm>(emptyDesignerForm);
   const [ruleForm, setRuleForm] = useState<RuleForm>(emptyRuleForm);
   const [loading, setLoading] = useState(true);
@@ -935,6 +937,70 @@ function OddsPageContent() {
     try {
       await deleteOddsCategory(category.id);
       setNotice("Kategori ODDS dihapus.");
+      await loadConfig();
+    } catch (err) {
+      setError(oddsError(err));
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const categoryDraft = (category: OddsCategory): CategoryForm => categoryDrafts[category.id] ?? {
+    id: category.id,
+    name: category.name,
+    score_weight: String(category.score_weight),
+    normal_revision_limit: String(category.normal_revision_limit),
+    sla_minutes: String(category.sla_minutes),
+    important_matrix: category.important_matrix ?? "Q4",
+    brief_format: category.brief_format ?? "default",
+    is_active: category.is_active,
+  };
+
+  const updateCategoryDraft = (category: OddsCategory, changes: Partial<CategoryForm>) => {
+    setCategoryDrafts((current) => ({ ...current, [category.id]: { ...categoryDraft(category), ...changes } }));
+  };
+
+  const saveInlineCategory = async (category: OddsCategory) => {
+    const draft = categoryDraft(category);
+    resetMessages();
+    setSaving(`category-${category.id}`);
+    try {
+      await updateOddsCategory(category.id, {
+        name: draft.name,
+        score_weight: Number(draft.score_weight),
+        normal_revision_limit: Number(draft.normal_revision_limit),
+        sla_minutes: Number(draft.sla_minutes),
+        important_matrix: draft.important_matrix,
+        brief_format: draft.brief_format,
+        is_active: draft.is_active,
+      });
+      setNotice("Kategori ODDS diperbarui.");
+      await loadConfig();
+    } catch (err) {
+      setError(oddsError(err));
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const saveAllInlineCategories = async () => {
+    resetMessages();
+    setSaving("categories");
+    try {
+      await Promise.all(categories.map((category) => {
+        const draft = categoryDraft(category);
+        return updateOddsCategory(category.id, {
+          name: draft.name,
+          score_weight: Number(draft.score_weight),
+          normal_revision_limit: Number(draft.normal_revision_limit),
+          sla_minutes: Number(draft.sla_minutes),
+          important_matrix: draft.important_matrix,
+          brief_format: draft.brief_format,
+          is_active: draft.is_active,
+        });
+      }));
+      setEditingCategories(false);
+      setNotice("Semua kategori ODDS berhasil disimpan.");
       await loadConfig();
     } catch (err) {
       setError(oddsError(err));
@@ -1598,10 +1664,10 @@ function OddsPageContent() {
   ].includes(effectiveActiveSection);
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 lg:gap-6 lg:p-4">
+    <div className="flex h-full min-h-0 flex-col gap-4 lg:gap-4">
       {/* Desktop header title */}
       <div className="hidden lg:block">
-        <HeaderTitle>{pageTitle}</HeaderTitle>
+        <HeaderTitle className="!py-0">{pageTitle}</HeaderTitle>
       </div>
 
       {/* Mobile header — kv-retail style */}
@@ -1711,6 +1777,12 @@ function OddsPageContent() {
         </ConfigPanel>
 
         <ConfigPanel title="Kategori ODDS" icon="view_list" className="h-full min-h-0" bodyClassName="min-h-0 flex-1 overflow-hidden">
+          <div className="mb-3 flex justify-end gap-2">
+            {editingCategories && <button type="button" onClick={() => setEditingCategories(false)} className="rounded-lg border border-cu-border px-3 py-1.5 text-xs font-semibold text-cu-ink">Batal</button>}
+            <button type="button" disabled={Boolean(saving)} onClick={() => editingCategories ? void saveAllInlineCategories() : setEditingCategories(true)} className="rounded-lg bg-[#00a4ff] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50">
+              {editingCategories ? "Simpan semua" : "Edit semua"}
+            </button>
+          </div>
           <DataTable
             loading={loading}
             empty="Belum ada kategori."
@@ -1718,6 +1790,8 @@ function OddsPageContent() {
             className="flex h-full min-h-0 flex-col"
             scrollClassName="odds-scroll-hidden min-h-0 flex-1 overflow-auto"
             rows={categories.map((category) => {
+              const draft = categoryDraft(category);
+              const editing = editingCategories;
               const matrix = (category.important_matrix || "Q4").toUpperCase();
               const matrixBadgeColor = 
                 matrix === "Q1" ? "bg-red-500/20 text-red-500 border-red-500/30" :
@@ -1726,21 +1800,16 @@ function OddsPageContent() {
                 "bg-slate-500/20 text-slate-400 border-slate-500/30";
 
               return [
-                category.name,
-                <span key={`cat-matrix-${category.id}`} className={`px-2 py-0.5 rounded text-[10px] font-extrabold border shrink-0 ${matrixBadgeColor}`}>
-                  {matrix}
-                </span>,
-                category.brief_format === "table" ? "Deskripsi Produk" : "Default",
-                String(category.score_weight),
-                String(category.normal_revision_limit),
-                formatSlaDuration(category.sla_minutes),
-                category.is_active ? "Aktif" : "Nonaktif",
-                <RowActions
-                  key={`category-actions-${category.id}`}
-                  disabled={Boolean(saving)}
-                  onEdit={() => editCategory(category)}
-                  onDelete={() => void removeCategory(category)}
-                />,
+                <input disabled={!editing} aria-label={`Nama ${category.name}`} value={draft.name} onChange={(event) => updateCategoryDraft(category, { name: event.target.value })} className="w-full min-w-0 rounded border border-transparent bg-transparent px-1 py-1 text-xs font-medium outline-none focus:border-[#00a4ff] focus:bg-white disabled:cursor-default" />,
+                <select disabled={!editing} key={`cat-matrix-${category.id}`} value={draft.important_matrix} onChange={(event) => updateCategoryDraft(category, { important_matrix: event.target.value })} className={`rounded px-1 py-1 text-[10px] font-extrabold outline-none disabled:appearance-none ${matrixBadgeColor}`}><option value="Q1">Q1</option><option value="Q2">Q2</option><option value="Q3">Q3</option><option value="Q4">Q4</option></select>,
+                <select disabled={!editing} key={`cat-format-${category.id}`} value={draft.brief_format} onChange={(event) => updateCategoryDraft(category, { brief_format: event.target.value as CategoryForm["brief_format"] })} className="w-full rounded border border-transparent bg-transparent px-1 py-1 text-[11px] outline-none focus:border-[#00a4ff] focus:bg-white disabled:appearance-none" ><option value="default">Default</option><option value="table">Deskripsi Produk</option></select>,
+                <input disabled={!editing} type="number" step="0.5" value={draft.score_weight} onChange={(event) => updateCategoryDraft(category, { score_weight: event.target.value })} className="w-14 rounded border border-transparent bg-transparent px-1 py-1 text-xs outline-none focus:border-[#00a4ff] focus:bg-white" />,
+                <input disabled={!editing} type="number" value={draft.normal_revision_limit} onChange={(event) => updateCategoryDraft(category, { normal_revision_limit: event.target.value })} className="w-14 rounded border border-transparent bg-transparent px-1 py-1 text-xs outline-none focus:border-[#00a4ff] focus:bg-white" />,
+                <input disabled={!editing} type="number" value={draft.sla_minutes} onChange={(event) => updateCategoryDraft(category, { sla_minutes: event.target.value })} className="w-16 rounded border border-transparent bg-transparent px-1 py-1 text-xs outline-none focus:border-[#00a4ff] focus:bg-white" />,
+                <label className="flex items-center justify-center gap-1 text-[11px]"><input disabled={!editing} type="checkbox" checked={draft.is_active} onChange={(event) => updateCategoryDraft(category, { is_active: event.target.checked })} />{draft.is_active ? "Aktif" : "Off"}</label>,
+                <div key={`category-actions-${category.id}`} className="flex justify-end gap-1">
+                  <button type="button" disabled={Boolean(saving)} onClick={() => void removeCategory(category)} className="rounded-lg border border-cu-danger/20 px-2 py-1 text-[11px] font-semibold text-cu-danger disabled:opacity-50">Hapus</button>
+                </div>,
               ];
             })}
           />
@@ -2352,7 +2421,7 @@ function OddsPageContent() {
                   ) : myTasks.length === 0 ? (
                   <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-8 text-center text-sm text-cu-muted">Belum ada riwayat tugas.</div>
                   ) : (
-                    <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-5 overflow-auto pb-1 pr-1">
+                    <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-3 lg:gap-4 overflow-auto pb-1 pr-1">
                       {/* Mobile: use mobileFilteredTasks */}
                       {mobileFilteredTasks.map((task) => {
                         const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));

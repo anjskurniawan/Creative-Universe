@@ -42,6 +42,7 @@ export interface CreativeReportGroup {
 export interface CreativeReportIndex {
   month: string;
   groups: CreativeReportGroup[];
+  notice?: string | null;
 }
 
 export interface CreativeReportUserDetail extends CreativeReportAssessment {

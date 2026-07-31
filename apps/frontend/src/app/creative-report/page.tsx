@@ -16,8 +16,8 @@ const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer"];
 
 export default function CreativeReportPage() {
   const { theme } = useCreativeReportTheme();
-  const { hasPermission } = useAuth();
-  const canEdit = hasPermission("creative-report.assessments.update");
+  const { hasPermission, hasRole } = useAuth();
+  const canEdit = hasPermission("creative-report.assessments.update") || hasRole("Manajer") || hasRole("SPV");
 
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [jobdesk, setJobdesk] = useState(JOBDESKS[0]);
@@ -133,6 +133,12 @@ export default function CreativeReportPage() {
         {error && (
           <p className="mt-4 rounded-lg bg-[#ffedf1] p-3 text-sm text-[#b4234d]">
             {error}
+          </p>
+        )}
+
+        {report?.notice && (
+          <p className="mt-4 rounded-lg bg-[#fff7e8] p-4 text-sm font-medium text-[#9a6700]">
+            {report.notice}
           </p>
         )}
 

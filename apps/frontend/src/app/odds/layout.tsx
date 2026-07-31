@@ -216,6 +216,8 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     return item.id === defaultItem?.id;
   }, [activeSection, menuItems, normalizedPathname]);
 
+  const isNoPaddingPage = normalizedPathname === "/odds/new" || normalizedPathname === "/odds/detail";
+
   const sidebarItems = useMemo(() => [
     ...(canCreateTask ? [{
       label: "Request Baru",
@@ -258,6 +260,11 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
               onToggleSidebarExpanded: () => setSidebarExpanded((current) => !current),
               onToggleSidebarTheme: () => setDesktopTheme((current) => current === "dark" ? "light" : "dark"),
               onToggleSidebarRetro: () => setDesktopTheme((current) => current === "retro" ? "light" : "retro"),
+              contentProps: {
+                className: isNoPaddingPage
+                  ? "flex h-full min-h-0 w-full flex-1 flex-col items-stretch overflow-hidden p-4"
+                  : "flex h-full min-h-0 w-full flex-1 flex-col items-start overflow-y-auto p-4 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden",
+              },
             }}
             menuItems={sidebarItems}
             activeMenuHref={activeHref}
