@@ -94,6 +94,20 @@ export function resolveStorageUrl(path: string | null | undefined): string | nul
   return resolveBackendUrl(path.startsWith("/storage/") ? path : `/storage/${path.replace(/^\/+/, "")}`);
 }
 
+export async function openProtectedAttachment(attachmentId: number | string): Promise<void> {
+  const tab = window.open("about:blank", "_blank");
+  try {
+    const blob = await apiFetch<Blob>(`/odds/uploads/${attachmentId}/content`, { responseType: "blob" });
+    const url = URL.createObjectURL(blob);
+    if (tab) tab.location.href = url;
+    else window.open(url, "_blank");
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (error) {
+    tab?.close();
+    throw error;
+  }
+}
+
 export function getCookie(name: string): string | undefined {
   if (typeof document === "undefined") return undefined;
   const encodedName = encodeURIComponent(name);

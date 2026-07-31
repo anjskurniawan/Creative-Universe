@@ -25,8 +25,7 @@ export function CategorySelectionStep({
     <section className="flex min-h-0 flex-1 flex-col space-y-5">
       <header className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <div className="shrink-0">
-          <h2 className={`text-xl font-bold tracking-tight ${textTitle}`}>Pilih Kategori Desain</h2>
-          <p className={`mt-0.5 text-xs ${textMuted}`}>Pilih kategori spesifik yang mewakili request Anda</p>
+          <h2 className={`text-4xl font-bold tracking-tight ${textTitle}`}>Kategori Desain</h2>
         </div>
         <div className="relative w-full flex-1">
           <MaterialIcon name="search" size="xs" className="absolute left-3.5 top-3 text-slate-400" />
@@ -43,7 +42,7 @@ export function CategorySelectionStep({
       {filteredCategories.length === 0 ? (
         <div className="flex flex-1 items-center justify-center text-sm text-slate-400">Kategori tidak ditemukan.</div>
       ) : (
-        <div className="grid min-h-0 flex-1 content-start gap-3.5 overflow-y-auto p-2 [scrollbar-width:none] sm:grid-cols-2 lg:grid-cols-3 [&::-webkit-scrollbar]:hidden">
+        <div className="grid min-h-0 flex-1 content-start gap-3.5 overflow-y-auto p-2 [scrollbar-width:none] sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 [&::-webkit-scrollbar]:hidden">
           {filteredCategories.map((category) => {
             const isSelected = selectedCategoryId === String(category.id);
             const matrix = (category.important_matrix || "Q4").toUpperCase();
@@ -64,7 +63,7 @@ export function CategorySelectionStep({
                   update("category_id", String(category.id));
                   update("important_matrix", category.important_matrix || "Q4");
                 }}
-                className={`group relative flex items-center justify-between overflow-hidden rounded-2xl border p-4 pl-6 text-left transition-all duration-200 ${
+                className={`group relative flex h-auto min-h-[46px] items-center justify-between overflow-hidden rounded-lg border p-0 text-left transition-all duration-200 ${
                   isSelected
                     ? dark
                       ? "border-[#B0FF5E] bg-[#B0FF5E]/10 text-white"
@@ -75,12 +74,22 @@ export function CategorySelectionStep({
                 }`}
               >
                 <span className={`absolute bottom-0 left-0 top-0 w-1.5 transition-colors ${isSelected ? dark ? "bg-[#B0FF5E]" : "bg-[#00A4FF]" : "bg-transparent"}`} />
-                <span className="mr-2 flex min-w-0 items-center gap-2">
-                  <span className="truncate text-xs font-semibold">{category.name}</span>
-                  <span className={`shrink-0 rounded border px-2 py-0.5 text-[10px] font-extrabold ${matrixBadgeClass}`}>{matrix}</span>
-                </span>
+                <div className="flex h-full min-h-[46px] items-center gap-2.5">
+                  <span className={`flex h-full min-h-[46px] w-11 shrink-0 items-center justify-center text-[10px] font-extrabold leading-none border-r ${
+                    isSelected
+                      ? dark
+                        ? "border-[#B0FF5E]/20"
+                        : "border-[#00A4FF]/20"
+                      : dark
+                        ? "border-white/5"
+                        : "border-[#BDEAFF]"
+                  } ${matrixBadgeClass}`}>
+                    {matrix}
+                  </span>
+                  <span className="truncate text-xs font-semibold py-2">{category.name}</span>
+                </div>
                 {isSelected && (
-                  <MaterialIcon name="check_circle" size="auto" className={`shrink-0 text-lg ${dark ? "text-[#B0FF5E]" : "text-[#00A4FF]"}`} />
+                  <MaterialIcon name="check_circle" size="auto" className={`shrink-0 text-lg mr-3 ${dark ? "text-[#B0FF5E]" : "text-[#00A4FF]"}`} />
                 )}
               </button>
             );

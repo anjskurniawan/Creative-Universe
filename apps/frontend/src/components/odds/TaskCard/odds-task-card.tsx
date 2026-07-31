@@ -88,6 +88,7 @@ export function OddsTaskCard({
   const [activeTab, setActiveTab] = useState<OddsTaskCardAction | null>(null);
   const [showDeadlineCountdown, setShowDeadlineCountdown] = useState(false);
   const isDone = task.status === "done";
+  const dark = theme === "dark";
   const isReview = task.status === "spv_review" || task.status === "client_review";
   const clientRatingReview = [...(task.reviews ?? [])].reverse().find((review) => review.review_type === "client" && review.rating != null);
   const doneRating = wideRating ?? task.rating ?? clientRatingReview?.rating ?? undefined;
@@ -232,10 +233,30 @@ export function OddsTaskCard({
   };
   const panel = typeof children === "function" ? children(activeTab, closePanel) : children;
 
+  const getShortLabel = (action: OddsTaskCardAction | "open_in_new"): string => {
+    switch (action) {
+      case "brief": return "Brief";
+      case "chat": return "Diskusi";
+      case "start": return "Mulai";
+      case "pause": return "Jeda";
+      case "done": return "Selesai";
+      case "file": return "File";
+      case "check": return "Cek";
+      case "delete": return "Batal";
+      case "open_in_new": return "Detail";
+      default: return "";
+    }
+  };
+
   const renderIconButton = ({ action, icon, label, active = false, danger = false, disabled = false }: { action: OddsTaskCardAction; icon: string; label: string; active?: boolean; danger?: boolean; disabled?: boolean }) => disabled ? null : (
-    <button type="button" title={label} aria-label={label} onClick={() => action === "brief" ? openBrief() : ["file", "check", "delete"].includes(action) ? toggle(action) : run(action)} className={`flex size-11 shrink-0 items-center justify-center rounded-lg transition ${buttonClass(active, danger)} hover:brightness-95 active:scale-95`}>
-      <MaterialIcon name={icon} size="sm" />
-    </button>
+    <div className="flex flex-col items-center gap-1 select-none">
+      <button type="button" title={label} aria-label={label} onClick={() => action === "brief" ? openBrief() : ["file", "check", "delete"].includes(action) ? toggle(action) : run(action)} className={`flex size-11 shrink-0 items-center justify-center rounded-lg transition ${buttonClass(active, danger)} hover:brightness-95 active:scale-95`}>
+        <MaterialIcon name={icon} size="sm" />
+      </button>
+      <span className={`text-[9px] font-bold tracking-wider uppercase ${dark ? "text-slate-500" : "text-[#7d7c7c]/80"}`}>
+        {getShortLabel(action)}
+      </span>
+    </div>
   );
 
   const workAction = showPause ? "pause" : showDone ? "done" : "start";
@@ -252,9 +273,9 @@ export function OddsTaskCard({
 
   const renderWidePeople = () => (
     viewerRole === "client"
-      ? <div className={`flex w-[240px] shrink-0 min-w-0 items-center px-4 py-2 ${palette.line}`}><TaskCardPerson name={assignedDesigner?.name ?? "Belum Ada"} role="Designer" accent compact /></div>
+      ? <div className={`flex w-[180px] shrink-0 min-w-0 items-center px-4 py-2 ${palette.line}`}><TaskCardPerson name={assignedDesigner?.name ?? "Belum Ada"} role="Designer" accent compact /></div>
       : viewerRole === "designer"
-        ? <div className={`flex w-[240px] shrink-0 min-w-0 items-center px-4 py-2 ${palette.line}`}><TaskCardPerson name={requester?.name ?? "Client"} role={requester?.roles?.[0] ?? "Client"} accent compact /></div>
+        ? <div className={`flex w-[180px] shrink-0 min-w-0 items-center px-4 py-2 ${palette.line}`}><TaskCardPerson name={requester?.name ?? "Client"} role={requester?.roles?.[0] ?? "Client"} accent compact /></div>
         : <TaskCardWidePeople requesterName={requester?.name ?? "Client"} requesterRole={requester?.roles?.[0] ?? "Client"} designerName={assignedDesigner?.name ?? "Belum Ada"} lineClass={palette.line} />
   );
 
@@ -266,7 +287,12 @@ export function OddsTaskCard({
     <TaskCardActionBar mobile={mobile} fillHeight={fillHeight} overlay={actionOverlayOpen ? actionOverlay : undefined}>
       {renderIconButton({ action: "brief", icon: "description", label: "Detail brief", active: activeTab === "brief", disabled: isActionDisabled("brief") })}
       {chatAvailable && renderIconButton({ action: "chat", icon: "chat", label: "Diskusi task", active: chatOpen, disabled: isActionDisabled("chat") })}
-      <Link href={`/odds/detail?id=${task.id}`} title="Buka detail task" aria-label="Buka detail task" aria-disabled={disableOpen} tabIndex={disableOpen ? -1 : undefined} className={`flex size-11 shrink-0 items-center justify-center rounded-lg transition ${disableOpen ? "pointer-events-none bg-slate-100 text-slate-400 opacity-40" : buttonClass()} ${disableOpen ? "" : "hover:brightness-95 active:scale-95"}`}><MaterialIcon name="open_in_new" size="sm" /></Link>
+      <div className="flex flex-col items-center gap-1 select-none">
+        <Link href={`/odds/detail?id=${task.id}`} title="Buka detail task" aria-label="Buka detail task" aria-disabled={disableOpen} tabIndex={disableOpen ? -1 : undefined} className={`flex size-11 shrink-0 items-center justify-center rounded-lg transition ${disableOpen ? "pointer-events-none bg-slate-100 text-slate-400 opacity-40" : buttonClass()} ${disableOpen ? "" : "hover:brightness-95 active:scale-95"}`}><MaterialIcon name="open_in_new" size="sm" /></Link>
+        <span className={`text-[9px] font-bold tracking-wider uppercase ${dark ? "text-slate-500" : "text-[#7d7c7c]/80"}`}>
+          {getShortLabel("open_in_new")}
+        </span>
+      </div>
       {(showStart || showPause || showDone || showAllActions) && renderIconButton({
         action: workAction,
         icon: workActionIcon,
@@ -284,7 +310,7 @@ export function OddsTaskCard({
     <article className={`overflow-hidden rounded-lg border transition-shadow hover:shadow-md ${palette.shell}`}>
       <TaskCardMobileLayout surfaceClass={palette.surface} lineClass={palette.line} isOpen={isOpen} onToggle={() => { setExpanded((value) => !value); setActiveTab(null); }} dateBlock={<TaskCardMobileDate quadrant={rawQuadrant} date={date} monthYear={monthYear} isDone={isDone} />} heading={<div className="flex items-start justify-between gap-2"><div className="min-w-0"><h3 className={`line-clamp-2 text-[15px] font-semibold leading-snug ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-[11px] ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><span className={`mt-1 block text-[11px] ${palette.accent}`}>Lihat detail brief</span></div><MaterialIcon name={isOpen ? "expand_less" : "expand_more"} size="xs" className={palette.secondary} /></div>} people={renderPeople(true)} meta={<><span className={`truncate ${palette.secondary}`}>Deadline: {deadlineText}</span>{showTimer && <span className={`shrink-0 font-mono font-semibold ${isOverdue ? "text-rose-500" : palette.accent}`}>{isReview ? "--:--:--" : timerText}</span>}</>} actions={renderActions(true)} />
       <TaskCardCompactLayout surfaceClass={palette.surface} lineClass={palette.line} dateBlock={<TaskCardCompactDate quadrant={quadrant} date={date} day={day} monthYear={monthYear} time={time} isDone={isDone} accentClass={palette.accent} primaryClass={palette.primary} secondaryClass={palette.secondary} />} taskInfo={<div><h3 className={`truncate text-base font-semibold ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-xs ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><button type="button" onClick={openBrief} className={`mt-1 text-xs ${palette.accent}`}>Lihat detail brief</button></div>} people={renderPeople(true)} actions={renderActions()} sidePanel={<div className={`flex w-[230px] shrink-0 flex-col justify-between border-l pl-4 ${palette.line}`}><div><p className={`border-b pb-2 text-sm font-medium ${palette.secondary}`}>DEADLINE: <span className={palette.primary}>{deadlineText}</span></p><div className="pt-3">{renderStatusBlock()}</div></div>{!isActionDisabled(outputAction) && <button type="button" onClick={() => toggle(outputAction)} className={`h-11 rounded-lg text-sm font-semibold ${buttonClass(activeTab === outputAction)}`}>{outputLabel}</button>}</div>} />
-      <TaskCardWideLayout surfaceClass={palette.surface} dateBlock={<TaskCardWideDate quadrant={quadrant} date={date} day={day} monthYear={monthYear} time={time} isDone={isDone} />} taskInfo={<div className="flex w-[340px] shrink-0 flex-col justify-center px-5"><h3 className={`truncate text-xl font-medium ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-xs ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><button type="button" onClick={openBrief} className={`mt-1 w-max text-xs ${palette.accent}`}>Lihat detail brief</button></div>} people={<div className={`flex w-[240px] shrink-0 items-center border-l ${palette.line}`}>{renderWidePeople()}</div>} deadline={<div className={`flex w-[130px] shrink-0 items-center px-4 text-white ${isDone ? "bg-[#238653]" : isOverdue ? "bg-rose-600" : "bg-[#00a4ff]"}`}><div className="w-full"><p key={isDone ? "done" : showDeadlineCountdown ? "countdown" : "deadline"} className="min-h-4 animate-fade-in text-[10px] font-medium leading-tight">{isDone ? "SELESAI" : showDeadlineCountdown ? deadlineCountdownLabel : "DEADLINE"}</p><p className="mt-1 text-sm">{deadlineText}</p></div></div>} actions={<div className="flex min-w-[180px] flex-1 items-center justify-start px-8">{renderActions(false, true)}</div>} status={<TaskCardWideStatusPanel isDone={isDone} isReview={isReview} status={status} statusDescription={statusDescription} feedbackHref={feedbackHref} highlightLabel={wideHighlightLabel} highlightValue={wideHighlightValue} rating={isDone ? doneRating : wideRating} timerText={isReview || isBriefCheck ? "--:--:--" : timerText} onRecommendation={handleWideRecommendation} recommendationDisabled={wideHighlightLabel === "Proses" && startDisabled} />} />
+      <TaskCardWideLayout surfaceClass={palette.surface} dateBlock={<TaskCardWideDate quadrant={quadrant} date={date} day={day} monthYear={monthYear} time={time} isDone={isDone} />} taskInfo={<div className="flex w-[240px] shrink-0 flex-col justify-center px-5"><h3 className={`truncate text-xl font-medium ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-xs ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><button type="button" onClick={openBrief} className={`mt-1 w-max text-xs ${palette.accent}`}>Lihat detail brief</button></div>} people={<div className={`flex w-[180px] shrink-0 items-center border-l ${palette.line}`}>{renderWidePeople()}</div>} deadline={<div className={`flex w-[130px] shrink-0 items-center px-4 text-white ${isDone ? "bg-[#238653]" : isOverdue ? "bg-rose-600" : "bg-[#00a4ff]"}`}><div className="w-full"><p key={isDone ? "done" : showDeadlineCountdown ? "countdown" : "deadline"} className="min-h-4 animate-fade-in text-[10px] font-medium leading-tight">{isDone ? "SELESAI" : showDeadlineCountdown ? deadlineCountdownLabel : "DEADLINE"}</p><p className="mt-1 text-sm">{deadlineText}</p></div></div>} actions={<div className="flex min-w-[180px] flex-1 items-center justify-start px-8">{renderActions(false, true)}</div>} status={<TaskCardWideStatusPanel isDone={isDone} isReview={isReview} status={status} statusDescription={statusDescription} feedbackHref={feedbackHref} highlightLabel={wideHighlightLabel} highlightValue={wideHighlightValue} rating={isDone ? doneRating : wideRating} timerText={isReview || isBriefCheck ? "--:--:--" : timerText} onRecommendation={handleWideRecommendation} recommendationDisabled={wideHighlightLabel === "Proses" && startDisabled} />} />
       {isOpen && <div className={`border-t p-3 lg:p-4 ${palette.line} ${palette.surface}`}>{panel}</div>}
     </article>
   );

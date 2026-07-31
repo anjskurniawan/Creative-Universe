@@ -210,40 +210,40 @@ export function AssessmentTable({
 
   return (
     <>
-      <div className="hidden overflow-x-auto overflow-y-hidden rounded-b-xl border border-t-0 border-[#c9bbfc] bg-white lg:block">
-        <table className="w-full min-w-[960px] table-fixed border-collapse text-left">
+      <div className="hidden w-full overflow-hidden rounded-b-xl border border-t-0 border-[#c9bbfc] bg-white lg:block">
+        <table className="w-full table-fixed border-collapse text-left">
           <colgroup>
-            <col className="w-10" />
-            <col className="w-48" />
+            <col className="w-7" />
+            <col className="w-[140px]" />
             {/* Collab aspects */}
-            <col className="w-[72px]" />
-            <col className="w-[72px]" />
-            <col className="w-[72px]" />
-            <col className="w-[72px]" />
-            <col className="w-[72px]" />
-            <col className="w-16" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-11" />
             {/* Perf aspects */}
-            <col className="w-[72px]" />
-            <col className="w-[72px]" />
-            <col className="w-[72px]" />
-            <col className="w-[72px]" />
-            <col className="w-[72px]" />
-            <col className="w-16" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-11" />
             {/* HRD aspects */}
-            <col className="w-14" />
-            <col className="w-14" />
-            <col className="w-14" />
-            <col className="w-14" />
-            <col className="w-16" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-[42px]" />
+            <col className="w-11" />
             {/* Nilai akhir */}
-            <col className="w-16" />
+            <col className="w-12" />
           </colgroup>
           <thead>
             <tr className="bg-[#f7f5ff] text-xs font-semibold text-[#3b4446]">
-              <th rowSpan={2} className="border-b border-r border-[#ded7fb] px-1 py-3 text-center">
+              <th rowSpan={2} className="border-b border-r border-[#ded7fb] px-0.5 py-2 text-center text-[10px]">
                 No
               </th>
-              <th rowSpan={2} className="border-b border-r border-[#ded7fb] px-3 py-3 text-center">
+              <th rowSpan={2} className="border-b border-r border-[#ded7fb] px-1 py-2 text-center text-[10px]">
                 Nama
               </th>
               <th colSpan={6} className="border-b border-r border-[#ded7fb] px-2 py-3 text-center">
@@ -255,7 +255,7 @@ export function AssessmentTable({
               <th colSpan={5} className="border-b border-r border-[#a9dcb0] bg-[#e8f7ea] px-2 py-3 text-center text-[#248235]">
                 HRD Review (20%)
               </th>
-              <th rowSpan={2} className="border-b border-[#ded7fb] px-1 py-3 text-center">
+              <th rowSpan={2} className="border-b border-[#ded7fb] px-0.5 py-2 text-center text-[10px]">
                 Nilai akhir
               </th>
             </tr>
@@ -264,7 +264,7 @@ export function AssessmentTable({
                 return (
                   <th
                     key={`${aspect.name}-${index}`}
-                    className={`border-b px-1.5 py-2.5 text-center text-[10.5px] leading-tight break-normal ${
+                    className={`border-b px-0.5 py-1.5 text-center text-[9px] leading-tight break-words ${
                       index < 6
                         ? "border-[#ece8fb] bg-[#fcfbff] text-[#6d46eb]"
                         : index < 12
@@ -307,14 +307,14 @@ export function AssessmentTable({
               ];
               return (
                 <tr key={item.id} className={finalScore < 75 ? "bg-[#ffedf1] hover:bg-[#fff0f3]" : "bg-white hover:bg-[#fbfcfd]"}>
-                  <td className="border-r border-[#e5edf0] px-1 py-3 text-center text-[#7b868a]">
+                      <td className="border-r border-[#e5edf0] px-0.5 py-2 text-center text-[10px] text-[#7b868a]">
                     {rowIndex + 1}
                   </td>
-                  <td className="border-r border-[#e5edf0] px-3 py-3">
+                  <td className="border-r border-[#e5edf0] px-1 py-2">
                     <div className="relative" onMouseEnter={() => setHoveredAssessmentId(item.id)} onMouseLeave={() => setHoveredAssessmentId(null)}>
                       <Link
                         href={`/creative-report/detail?user=${item.user.id}&month=${month}`}
-                        className="flex min-w-0 items-center gap-2 rounded-md outline-none hover:text-[#6d46eb] focus-visible:ring-2 focus-visible:ring-[#6d46eb]"
+                        className="flex min-w-0 items-center gap-1 rounded-md outline-none hover:text-[#6d46eb] focus-visible:ring-2 focus-visible:ring-[#6d46eb]"
                       >
                         <Avatar name={item.user.name} imagePath={item.user.avatar_path} />
                         <span className="truncate font-semibold">{item.user.name}</span>
@@ -339,7 +339,7 @@ export function AssessmentTable({
                     return (
                       <td
                         key={index}
-                        className={`border-b px-1 py-3 text-center ${
+                        className={`border-b px-0.5 py-2 text-center text-[10px] ${
                           finalScore < 75
                             ? "border-[#f2cbd3] bg-[#ffedf1]"
                             : `border-[#edf1f3] ${index >= 6 && index < 12 ? "bg-[#fffaf4]" : index >= 12 ? "bg-[#f6fcf7]" : ""}`
@@ -413,7 +413,7 @@ export function AssessmentTable({
                       </td>
                     );
                   })}
-                  <td className={`border-b px-1 py-3 text-center font-bold ${finalScore < 75 ? "border-[#f2cbd3] bg-[#fbd5dc] text-[#b4234d]" : "border-[#edf1f3] bg-[#f4f1ff] text-[#5d35d9]"}`}>
+                  <td className={`border-b px-0.5 py-2 text-center text-[10px] font-bold ${finalScore < 75 ? "border-[#f2cbd3] bg-[#fbd5dc] text-[#b4234d]" : "border-[#edf1f3] bg-[#f4f1ff] text-[#5d35d9]"}`}>
                     {finalScore}
                   </td>
                 </tr>

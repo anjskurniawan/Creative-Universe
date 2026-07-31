@@ -12,6 +12,7 @@ import { RequestBuilderFooter } from "./components/request-builder-footer";
 import { RequestBuilderLoading } from "./components/request-builder-loading";
 import { createRequestBuilderTheme } from "./theme";
 import { RequestBuilderShell } from "./components/request-builder-shell";
+import { uploadOddsTaskAttachment } from "../../api";
 import type { OddsRequestBuilderProps } from "./types";
 
 const dateFromNow = (days: number) => {
@@ -64,6 +65,7 @@ export function OddsRequestBuilder({
   const [tableBriefRows, setTableBriefRows] = useState<TableBriefRow[]>([
     { id: "image-1", image_order: "1", image_description: "", image_illustration: "", image_illustration_id: null, additional_notes: "" },
   ]);
+  const [uploadingPackaging, setUploadingPackaging] = useState(false);
   const tableBriefRowCounter = useRef(2);
   const [uploadingIllustrationId, setUploadingIllustrationId] = useState<string | null>(null);
   const hasAppliedDraft = useRef(false);
@@ -111,16 +113,16 @@ export function OddsRequestBuilder({
     return true;
   }, [currentStep, miniStep, form, tableBriefProduct, tableBriefRows, usesTableBrief]);
 
-  const buildTableBriefMarkup = useCallback((category: string, product: string, packagingImageName: string, rows: TableBriefRow[]) => `<table><tbody><tr><th>Gambar Packaging</th><td>${escapeBriefTableCell(packagingImageName) || "-"}</td></tr></tbody></table><table><thead><tr><th>No</th><th>Deskripsi</th><th>Referensi</th><th>Keterangan</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td>${row.image_description || "-"}</td><td>${escapeBriefTableCell(row.image_illustration) || "-"}</td><td>${row.additional_notes || "-"}</td></tr>`).join("")}</tbody></table>`, []);
+  const buildTableBriefMarkup = useCallback((category: string, product: string, packagingImageName: string, packagingImageId: number | null, rows: TableBriefRow[]) => `<table><tbody><tr><th>Gambar Packaging</th><td>${packagingImageId ? `<a href="/api/v1/odds/uploads/${packagingImageId}/content" target="_blank" rel="noopener noreferrer">Buka Gambar</a>` : escapeBriefTableCell(packagingImageName) || "-"}</td></tr></tbody></table><table><thead><tr><th>No</th><th>Deskripsi</th><th>Referensi</th><th>Keterangan</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td>${row.image_description || "-"}</td><td>${row.image_illustration_id ? `<a href="/api/v1/odds/uploads/${row.image_illustration_id}/content" target="_blank" rel="noopener noreferrer">Buka Gambar</a>` : escapeBriefTableCell(row.image_illustration) || "-"}</td><td>${row.additional_notes || "-"}</td></tr>`).join("")}</tbody></table>`, []);
 
-  const syncTableBrief = useCallback((category: string, product: string, packagingImageName: string, rows: TableBriefRow[]) => {
-    update("brief_text", buildTableBriefMarkup(category, product, packagingImageName, rows));
+  const syncTableBrief = useCallback((category: string, product: string, packagingImageName: string, packagingImageId: number | null, rows: TableBriefRow[]) => {
+    update("brief_text", buildTableBriefMarkup(category, product, packagingImageName, packagingImageId, rows));
   }, [buildTableBriefMarkup, update]);
 
   useEffect(() => {
     if (!usesTableBrief) return;
-    syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, tableBriefRows);
-  }, [usesTableBrief, tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, tableBriefRows, syncTableBrief]);
+    syncTableBrief(tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, tableBriefPackagingImageId, tableBriefRows);
+  }, [usesTableBrief, tableBriefCategory, tableBriefProduct, tableBriefPackagingImageName, tableBriefPackagingImageId, tableBriefRows, syncTableBrief]);
 
   const updateTableBriefRow = (id: string, field: keyof Omit<TableBriefRow, "id">, value: string) => {
     setTableBriefRows((currentRows) => {
@@ -139,21 +141,31 @@ export function OddsRequestBuilder({
   };
 
   const uploadTableBriefPackagingImage = async (files: FileList | null) => {
-    const [uploaded] = await addAttachmentFiles(files);
-    if (!uploaded) return;
-    setTableBriefPackagingImageName(uploaded.name);
-    setTableBriefPackagingImageId(uploaded.id);
+    const file = files?.[0];
+    if (!file) return;
+    setUploadingPackaging(true);
+    try {
+      const uploaded = await uploadOddsTaskAttachment(file);
+      setTableBriefPackagingImageName(uploaded.name);
+      setTableBriefPackagingImageId(uploaded.id);
+    } catch (err) {
+      // Ignore or handle upload error silently/transparently
+    } finally {
+      setUploadingPackaging(false);
+    }
   };
 
   const uploadTableBriefIllustration = async (id: string, files: FileList | null) => {
+    const file = files?.[0];
+    if (!file) return;
     setUploadingIllustrationId(id);
     try {
-      const [uploaded] = await addAttachmentFiles(files);
-      if (uploaded) {
-        setTableBriefRows((currentRows) => {
-          return currentRows.map((row) => row.id === id ? { ...row, image_illustration: uploaded.name, image_illustration_id: uploaded.id } : row);
-        });
-      }
+      const uploaded = await uploadOddsTaskAttachment(file);
+      setTableBriefRows((currentRows) => {
+        return currentRows.map((row) => row.id === id ? { ...row, image_illustration: uploaded.name, image_illustration_id: uploaded.id } : row);
+      });
+    } catch (err) {
+      // Ignore or handle upload error silently/transparently
     } finally {
       setUploadingIllustrationId(null);
     }
@@ -192,7 +204,9 @@ export function OddsRequestBuilder({
       update("preferred_designer_id", recommendedDesignerId);
     }
     if (currentStep === 4) {
-      if (miniStep < 4) {
+      if (usesTableBrief) {
+        setCurrentStep(5);
+      } else if (miniStep < 4) {
         setMiniStep(miniStep + 1);
       } else {
         setCurrentStep(5);
@@ -204,8 +218,13 @@ export function OddsRequestBuilder({
   };
 
   const handlePrevStep = () => {
-    if (currentStep === 4) {
-      if (miniStep > 1) {
+    if (currentStep === 5 && usesTableBrief) {
+      setMiniStep(2);
+      setCurrentStep(4);
+    } else if (currentStep === 4) {
+      if (usesTableBrief && miniStep === 2) {
+        setCurrentStep(3);
+      } else if (miniStep > 1) {
         setMiniStep(miniStep - 1);
       } else {
         setCurrentStep(3);
@@ -287,7 +306,7 @@ export function OddsRequestBuilder({
           productCatalog={productCatalog}
           onProductCategoryCommit={onProductCategoryCommit}
           onProductCommit={onProductCommit}
-          uploadingAttachments={uploadingAttachments}
+          uploadingAttachments={uploadingAttachments || uploadingPackaging}
           uploadingIllustrationId={uploadingIllustrationId}
           onTableBriefCategoryChange={updateTableBriefCategory}
           onTableBriefProductChange={updateTableBriefProduct}

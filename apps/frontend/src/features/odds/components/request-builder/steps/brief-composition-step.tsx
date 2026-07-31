@@ -1,4 +1,5 @@
-﻿import { MaterialIcon } from "@/components/ui/material-icon";
+import { useState } from "react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import type { OddsCategory, OddsTaskAttachment } from "@/features/odds/api";
 import { StandardBriefDetails, TableBriefDetails, type TableBriefRow } from "../../brief-details";
 import { RequestBriefEditor } from "../components/request-brief-editor";
@@ -56,10 +57,12 @@ export function BriefCompositionStep({
 
         {/* Mini Step 2: WYSIWYG Brief Editor */}
         {miniStep === 2 && (
-          <div className="flex min-h-0 flex-1 flex-col space-y-3 p-2">
-            <label className="block text-xs font-bold mb-1">
-              {usesTableBrief ? "Detail Brief" : "Deskripsi Ide / Brief Detail"}
-            </label>
+          <div className="flex min-h-0 flex-1 flex-col space-y-3 p-0">
+            {!usesTableBrief && (
+              <label className="block text-xs font-bold mb-1">
+                Deskripsi Ide / Brief Detail
+              </label>
+            )}
             {usesTableBrief ? (
               <TableBriefDetails
                 category={tableBriefCategory}
@@ -81,6 +84,12 @@ export function BriefCompositionStep({
                 onProductCategoryCommit={onProductCategoryCommit}
                 onProductCommit={onProductCommit}
                 dark={dark}
+                form={form}
+                update={update}
+                selectedCategory={selectedCategory}
+                todayDate={todayDate}
+                tomorrowDate={tomorrowDate}
+                threeDaysDate={threeDaysDate}
               />
             ) : (
               <RequestBriefEditor

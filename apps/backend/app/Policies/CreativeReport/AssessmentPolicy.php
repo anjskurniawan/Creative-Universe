@@ -19,11 +19,11 @@ class AssessmentPolicy
 
     public function update(User $user, Assessment $assessment): bool
     {
-        return $user->can('creative-report.assessments.update');
+        return $user->hasRole(['Root', 'Manajer', 'SPV']) || $user->can('creative-report.assessments.update');
     }
 
     public function complete(User $user, Assessment $assessment): bool
     {
-        return $user->can('creative-report.assessments.update');
+        return $user->hasRole(['Root', 'Manajer', 'SPV']) || $user->can('creative-report.assessments.update');
     }
 }

@@ -28,6 +28,7 @@ export interface CardProps {
   compact?: boolean;
   autoPlayMedia?: boolean;
   isRecommended?: boolean;
+  disableMarquee?: boolean;
 }
 
 function getInitials(name: string): string {
@@ -155,6 +156,7 @@ export default function Card({
   compact = false,
   autoPlayMedia = false,
   isRecommended = false,
+  disableMarquee = false,
 }: CardProps) {
   const mediaRef = useRef<HTMLVideoElement>(null);
   const configuredStatus: CardStatus = state === "Fullbook" ? "FullBook" : (state ?? status);
@@ -185,17 +187,17 @@ export default function Card({
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (event) => { if (event.key === "Enter" || event.key === " ") onClick(); } : undefined}
     >
-      {isRecommended && (
-        <span className="absolute right-3 top-3 z-10 rounded-full bg-[#00a4ff] px-2.5 py-1 text-[10px] font-semibold leading-3 text-white shadow-sm lg:right-4 lg:top-4 lg:text-xs lg:leading-4">
-          Rekomendasi
-        </span>
-      )}
       <div
         className={`flex w-full min-w-0 items-center gap-2 ${compact ? "" : "lg:gap-4"}`}
       >
         <div
-          className={`shrink-0 overflow-hidden rounded-lg border-0 ${cardImage ? "bg-white" : "bg-[#3b4446]"} outline-none ring-0 ${compact ? "size-14" : "size-[74px] lg:h-[154px] lg:w-[145px]"}`}
+          className={`relative shrink-0 overflow-hidden rounded-lg border-0 ${cardImage ? "bg-white" : "bg-[#3b4446]"} outline-none ring-0 ${compact ? "size-14" : "size-[74px] lg:h-[154px] lg:w-[145px]"}`}
         >
+          {isRecommended && (
+            <span className="absolute left-0 top-0 z-10 rounded-br bg-[#00a4ff] px-2.5 py-1.5 text-[10px] font-extrabold leading-none text-white shadow-sm uppercase tracking-wider">
+              {compact ? "★" : "Rekomendasi"}
+            </span>
+          )}
           {videoMedia && cardImage ? (
             <video ref={mediaRef} src={cardImage} muted loop playsInline autoPlay={autoPlayMedia} preload="metadata" className="block size-full object-contain" />
           ) : cardImage ? (
@@ -250,7 +252,11 @@ export default function Card({
             className={`hidden w-full min-w-0 overflow-hidden whitespace-nowrap text-[#7d7c7c] lg:block ${compact ? "text-[9px] leading-3 tracking-[0.14px]" : "text-[10px] leading-3 tracking-[0.2px] lg:text-xs lg:leading-[14px] lg:tracking-[0.24px]"}`}
             aria-label={departmentsText}
           >
-            <MarqueeTrack text={departmentsText} />
+            {disableMarquee ? (
+              <span className="block truncate">{departmentsText}</span>
+            ) : (
+              <MarqueeTrack text={departmentsText} />
+            )}
           </div>
         </div>
       </div>

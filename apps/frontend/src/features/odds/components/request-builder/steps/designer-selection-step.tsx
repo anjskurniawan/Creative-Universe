@@ -23,8 +23,7 @@ export function DesignerSelectionStep({
   return (
     <section className="flex min-h-0 flex-1 flex-col space-y-5">
       <header>
-        <h2 className={`text-xl font-bold tracking-tight ${theme.textTitle}`}>Pilih Talent Desainer</h2>
-        <p className={`mt-0.5 text-xs ${theme.textMuted}`}>Pilih desainer profesional untuk mengerjakan tugas ini</p>
+        <h2 className={`text-4xl font-bold tracking-tight ${theme.textTitle}`}>Pilih Desainer</h2>
       </header>
 
       {designers.length === 0 ? (
@@ -40,19 +39,20 @@ export function DesignerSelectionStep({
             const isRecommended = recommendedDesignerId === String(profile.user_id);
             const isActive = selectedDesignerId === String(profile.user_id) || (!selectedDesignerId && isRecommended);
 
+            const activeTask = profile.tasks?.find((t) => t.status === "in_progress");
+            const runningText = activeTask
+              ? `Sedang Mengerjakan: ${activeTask.design_purpose}`
+              : "Tidak ada task aktif";
+
             return (
               <div
                 key={profile.user_id}
-                className={`w-full min-w-0 max-w-full ${designers.length < 2 ? "sm:max-w-md" : "sm:w-[32rem] sm:max-w-full"} ${designers.length === 1 ? "flex justify-start" : ""}`}
+                className={`w-full min-w-0 max-w-full ${designers.length <= 2 ? "sm:max-w-sm" : "sm:w-[32rem] sm:max-w-full"} ${designers.length === 1 ? "flex justify-start" : ""}`}
               >
                 <ProfileCard
                   name={profile.user?.name ?? "Designer"}
                   role="Designer"
-                  departments={(profile.specializations ?? []).map(
-                    (specialization) =>
-                      categories.find((category) => String(category.id) === String(specialization))?.name
-                      ?? String(specialization),
-                  )}
+                  departments={[runningText]}
                   capacity={Math.round(percentage)}
                   status={isOff || percentage >= 100 ? "FullBook" : percentage >= 70 ? "Busy" : "Available"}
                   responseTime="—"
@@ -62,8 +62,9 @@ export function DesignerSelectionStep({
                   active={isActive}
                   isRecommended={isRecommended}
                   autoPlayMedia={isRecommended}
+                  disableMarquee={true}
                   onClick={() => onSelect(String(profile.user_id))}
-                  className={designers.length < 2 ? "w-full max-w-md" : "w-full"}
+                  className={designers.length <= 2 ? "w-full max-w-sm" : "w-full"}
                 />
               </div>
             );
