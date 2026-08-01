@@ -56,5 +56,6 @@ class OnboardingDataSeeder extends Seeder
         $creative?->positions()->firstOrCreate(['name' => 'SPV']);
         $creative?->positions()->firstOrCreate(['name' => 'Designer']);
         $creative?->positions()->firstOrCreate(['name' => 'Videographer']);
+        $creative?->positions()->firstOrCreate(['name' => 'Content Creator']);
     }
 }

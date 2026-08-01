@@ -16,11 +16,17 @@ class CreativeReportDemoSeeder extends Seeder
     public function run(): void
     {
         $creative = Division::firstOrCreate(['name' => 'Creative']);
-        $positions = ['SPV' => Position::firstOrCreate(['division_id' => $creative->id, 'name' => 'SPV']), 'Videographer' => Position::firstOrCreate(['division_id' => $creative->id, 'name' => 'Videographer']), 'Designer' => Position::firstOrCreate(['division_id' => $creative->id, 'name' => 'Designer'])];
+        $positions = [
+            'SPV' => Position::firstOrCreate(['division_id' => $creative->id, 'name' => 'SPV']),
+            'Videographer' => Position::firstOrCreate(['division_id' => $creative->id, 'name' => 'Videographer']),
+            'Designer' => Position::firstOrCreate(['division_id' => $creative->id, 'name' => 'Designer']),
+            'Content Creator' => Position::firstOrCreate(['division_id' => $creative->id, 'name' => 'Content Creator']),
+        ];
         $staffGroups = [
             ['Supervisor Creative Production', 'SPV', ['Raka Pradana']],
             ['Creative Video Production', 'Videographer', ['Bagas Pratama', 'Dimas Saputra', 'Fajar Nugroho', 'Galang Mahendra', 'Yoga Firmansyah']],
             ['Creative Design Production', 'Designer', ['Alya Putri', 'Citra Lestari', 'Dinda Maharani', 'Farhan Akbar', 'Gita Savitri', 'Hanif Ramadhan', 'Intan Permata', 'Kevin Aditya', 'Laras Wulandari', 'Nadia Prameswari', 'Rafi Kurniawan', 'Salsa Azzahra', 'Tio Prasetyo']],
+            ['Creative Content Production', 'Content Creator', []],
         ];
         $groups = collect($staffGroups)->mapWithKeys(fn ($item, $index) => [$item[0] => ReportGroup::updateOrCreate(['name' => $item[0]], ['sort_order' => $index + 1])]);
         $periods = collect(range(0, 2))->map(fn (int $monthsAgo) => now()->startOfMonth()->subMonths($monthsAgo));

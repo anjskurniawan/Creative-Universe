@@ -194,6 +194,28 @@ class UserController extends BaseApiController
 
             $user->save();
             $user->syncRoles($selectedRoles);
+            
+            // Sync position_id and CreativeReport member based on selected roles
+            $creativeRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Content Creator'];
+            $matchingRole = collect($selectedRoles)->first(fn ($role) => in_array($role, $creativeRoles, true));
+            if ($matchingRole) {
+                $position = \App\Models\Core\Position::where('name', $matchingRole)
+                    ->whereHas('division', fn ($query) => $query->where('name', 'Creative'))
+                    ->first();
+                if ($position) {
+                    $user->position_id = $position->id;
+                    $user->saveQuietly();
+
+                    $member = \App\SubApps\CreativeReport\Models\CreativeMember::where('user_id', $user->id)->first();
+                    if ($member) {
+                        $member->update([
+                            'position_id' => $position->id,
+                            'position_name' => $position->name,
+                        ]);
+                    }
+                }
+            }
+
             $user->syncPermissions($permissionsToSync);
             $applicationIds = Application::query()->whereIn('key', $applicationsToSync)->pluck('id');
             $user->applications()->syncWithPivotValues($applicationIds, ['granted_by' => $actor->id]);

@@ -74,6 +74,37 @@ class CreativeMembershipService
             ->whereDate('joined_at', '<=', $period->copy()->endOfMonth())
             ->where(fn ($query) => $query->whereNull('resigned_at')->orWhereDate('resigned_at', '>=', $period->copy()->startOfMonth()))
             ->each(fn (CreativeMember $member) => $this->ensureAssessment($member, $period));
+
+        $assessments = Assessment::query()
+            ->whereDate('period', $period->toDateString())
+            ->with('user.position')
+            ->get();
+
+        foreach ($assessments as $assessment) {
+            $user = $assessment->user;
+            if ($user && $user->position) {
+                $group = ReportGroup::firstOrCreate(
+                    ['name' => match ($user->position->name) {
+                        'SPV' => 'Supervisor Creative Production',
+                        'Videographer' => 'Creative Video Production',
+                        'Content Creator' => 'Creative Content Production',
+                        default => 'Creative Design Production',
+                    }],
+                    ['sort_order' => match ($user->position->name) {
+                        'SPV' => 1,
+                        'Videographer' => 3,
+                        'Content Creator' => 4,
+                        default => 2,
+                    }],
+                );
+
+                if ($assessment->creative_report_group_id !== $group->id) {
+                    $assessment->update([
+                        'creative_report_group_id' => $group->id,
+                    ]);
+                }
+            }
+        }
     }
 
     private function ensureAssessment(CreativeMember $member, Carbon $period): void
@@ -110,6 +141,12 @@ class CreativeMembershipService
                 'period' => $period->toDateString(),
                 'creative_scores' => array_fill(0, 10, 0),
             ]);
+        } else {
+            if ($assessment->creative_report_group_id !== $group->id) {
+                $assessment->update([
+                    'creative_report_group_id' => $group->id,
+                ]);
+            }
         }
     }
 }
