@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use App\Models\AppSetting;
+use App\SubApps\CreativeReport\Models\CreativeMember;
 
 class UserProfileResource extends JsonResource
 {
@@ -32,6 +33,9 @@ class UserProfileResource extends JsonResource
                 ->orWhereHas('users', fn ($query) => $query->whereKey($this->getKey()))
                 ->orderBy('sort_order')
                 ->get();
+        $creativeMember = in_array($this->getRoleNames()->first(), ['Designer', 'Videographer', 'Content Creator'], true)
+            ? CreativeMember::query()->where('user_id', $this->id)->first()
+            : null;
 
         return [
             'id' => $this->id,
@@ -44,6 +48,9 @@ class UserProfileResource extends JsonResource
             'position_id' => $this->position_id,
             'avatar_url' => $this->avatar_path
                 ? Storage::disk('public')->url($this->avatar_path)
+                : null,
+            'card_image_url' => $creativeMember?->card_image_path
+                ? Storage::disk('public')->url($creativeMember->card_image_path)
                 : null,
 
             'roles' => $this->getRoleNames()->values()->all(),

@@ -7,6 +7,7 @@ interface CustomDatePickerProps {
   placeholder?: string;
   className?: string;
   required?: boolean;
+  compact?: boolean;
 }
 
 const MONTH_NAMES = [
@@ -39,7 +40,8 @@ export function CustomDatePicker({
   onChange,
   placeholder = "Pilih tanggal...",
   className = "",
-  required = false
+  required = false,
+  compact = false
 }: CustomDatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -113,7 +115,7 @@ export function CustomDatePicker({
         key={`day-${d}`}
         type="button"
         onClick={(e) => { e.stopPropagation(); selectDate(d); }}
-        className={`size-8 flex items-center justify-center rounded-full text-sm font-medium transition-colors ${
+        className={`${compact ? "size-7 text-xs" : "size-8 text-sm"} flex items-center justify-center rounded-full font-medium transition-colors ${
           isSelected
             ? "bg-[#8474f9] text-white shadow-md"
             : isToday
@@ -129,14 +131,14 @@ export function CustomDatePicker({
   return (
     <div className={`relative w-full ${className}`} ref={containerRef}>
       <div
-        className={`min-h-[52px] cursor-pointer flex flex-wrap items-center gap-2 rounded-xl border px-4 py-3 outline-none transition-all ${
+        className={`${compact ? "h-10 rounded-lg px-3" : "min-h-[52px] rounded-xl px-4 py-3"} cursor-pointer flex flex-wrap items-center gap-2 border outline-none transition-all ${
           isOpen
             ? "bg-white border-[#8474f9] ring-4 ring-[#8474f9]/10"
             : "bg-gray-50/50 border-transparent hover:bg-gray-50 hover:border-gray-200"
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className={`text-base tracking-[0.32px] ${value ? "text-[#222]" : "text-[#aeb6b8]"}`}>
+        <span className={`${compact ? "text-sm" : "text-base tracking-[0.32px]"} ${value ? "text-[#222]" : "text-[#aeb6b8]"}`}>
           {value ? formatDisplayDate(value) : placeholder}
         </span>
         
@@ -148,17 +150,17 @@ export function CustomDatePicker({
         <MaterialIcon
           name="calendar_today"
           size="auto"
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-[#aeb6b8] text-[20px] pointer-events-none"
+          className={`absolute top-1/2 -translate-y-1/2 text-[#aeb6b8] pointer-events-none ${compact ? "right-3 text-[18px]" : "right-4 text-[20px]"}`}
         />
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-20 mt-2 min-w-[280px] w-full rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-xl">
-          <div className="flex items-center justify-between mb-4">
+        <div className={`${compact ? "bottom-full mb-2 w-[240px] max-w-[calc(100vw-2rem)] rounded-xl p-3" : "left-0 top-full mt-2 min-w-[280px] w-full rounded-2xl p-4"} absolute z-20 border border-[#e5e7eb] bg-white shadow-xl`}>
+          <div className={`flex items-center justify-between ${compact ? "mb-2" : "mb-4"}`}>
             <button
               type="button"
               onClick={prevMonth}
-              className="size-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+              className={`${compact ? "size-7" : "size-8"} flex items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100`}
             >
               <MaterialIcon name="chevron_left" size="auto" className="text-[20px]" />
             </button>
@@ -168,21 +170,21 @@ export function CustomDatePicker({
             <button
               type="button"
               onClick={nextMonth}
-              className="size-8 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 transition-colors"
+              className={`${compact ? "size-7" : "size-8"} flex items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100`}
             >
               <MaterialIcon name="chevron_right" size="auto" className="text-[20px]" />
             </button>
           </div>
           
-          <div className="grid grid-cols-7 gap-1 mb-2 text-center">
+          <div className={`mb-2 grid grid-cols-7 gap-1 text-center ${compact ? "text-[10px]" : ""}`}>
             {DAYS_IN_WEEK.map((day) => (
-              <div key={day} className="text-xs font-semibold text-gray-400 w-8">
+              <div key={day} className={`${compact ? "w-7 text-[10px]" : "w-8 text-xs"} font-semibold text-gray-400`}>
                 {day}
               </div>
             ))}
           </div>
           
-          <div className="grid grid-cols-7 gap-1 place-items-center">
+          <div className="grid grid-cols-7 place-items-center gap-1">
             {gridCells}
           </div>
         </div>

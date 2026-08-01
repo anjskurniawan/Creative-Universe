@@ -7,6 +7,7 @@ export interface AuthUser {
   email: string | null;
   whatsapp_number: string | null;
   avatar_url: string | null;
+  card_image_url?: string | null;
   is_onboarded: boolean;
   division_id: number | null;
   position_id: number | null;

@@ -45,7 +45,7 @@ class AssessmentController extends BaseApiController
         $this->memberships->ensureAssessmentsForPeriod($selectedPeriod);
         $query = Assessment::query()
             ->with(['group', 'member', 'user.position.division'])
-            ->whereHas('member', fn ($member) => $member->whereNotNull('user_id')->whereHas('user'))
+            ->whereHas('member', fn ($member) => $member->whereNotNull('user_id')->where('position_name', '!=', 'Manajer')->whereHas('user'))
             ->whereDate('period', $period.'-01');
         if ($request->filled('jobdesk')) {
             $query->where(fn ($q) => $q->whereHas('member', fn ($member) => $member->where('position_name', $request->string('jobdesk')))
@@ -120,6 +120,7 @@ class AssessmentController extends BaseApiController
             ->with('user')
             ->whereNotNull('user_id')
             ->whereHas('user')
+            ->where('position_name', '!=', 'Manajer')
             ->whereIn('status', [CreativeMember::STATUS_ACTIVE, CreativeMember::STATUS_RESIGNED])
             ->orderBy('name')
             ->get()
@@ -181,7 +182,11 @@ class AssessmentController extends BaseApiController
     public function updateMember(Request $request, CreativeMember $member, FileStorageService $files): JsonResponse
     {
         $this->authorizeMembershipReview($request);
-        foreach (['profile_metrics', 'specializations'] as $jsonField) {
+        $request->merge([
+            'email' => $request->input('email') ?: null,
+            'whatsapp_number' => $request->input('whatsapp_number') ?: null,
+        ]);
+        foreach (['profile_metrics', 'specializations', 'roles'] as $jsonField) {
             if (is_string($request->input($jsonField))) {
                 $decoded = json_decode($request->input($jsonField), true);
                 if (json_last_error() === JSON_ERROR_NONE) $request->merge([$jsonField => $decoded]);
@@ -189,6 +194,10 @@ class AssessmentController extends BaseApiController
         }
         $data = $request->validate([
             'name' => 'sometimes|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'whatsapp_number' => 'nullable|string|regex:/^62[0-9]{8,13}$/',
+            'roles' => 'sometimes|array',
+            'roles.*' => 'string|exists:roles,name',
             'position_name' => 'sometimes|in:Manajer,SPV,Designer,Videographer,Content Creator',
             'joined_at' => 'nullable|date',
             'resigned_at' => 'nullable|date|after_or_equal:joined_at',
@@ -212,9 +221,13 @@ class AssessmentController extends BaseApiController
             }
             unset($data['card_image'], $data['remove_card_image'], $data['specializations'], $data['odds_status']);
             $member->update($data);
-            if ($member->user_id && array_key_exists('name', $data)) {
-                $member->user()->update(['name' => $data['name']]);
+            if ($member->user_id && (array_key_exists('name', $data) || array_key_exists('email', $data) || array_key_exists('whatsapp_number', $data))) {
+                $member->user()->update(array_intersect_key($data, array_flip(['name', 'email', 'whatsapp_number'])));
             }
+            if ($member->user_id && array_key_exists('roles', $data)) {
+                $member->user->syncRoles($data['roles']);
+            }
+            unset($data['email'], $data['whatsapp_number'], $data['roles']);
             if ($member->user_id && (array_key_exists('specializations', $request->all()) || array_key_exists('odds_status', $request->all()))) {
                 // The user_id is unique even when a profile was soft-deleted. Reuse and
                 // restore that row instead of firstOrCreate() attempting a duplicate insert.
@@ -249,7 +262,7 @@ class AssessmentController extends BaseApiController
         $categoryNames = Category::query()->whereIn('id', $categoryIds)->pluck('name')->all();
         $legacyNames = collect($specializations)->filter(fn ($value) => is_string($value) && !is_numeric($value))->values()->all();
 
-        return ['id' => $member->id, 'name' => $member->user?->name ?? $member->name, 'position_name' => $member->position_name, 'status' => $member->status, 'card_image_path' => $member->card_image_path, 'profile_metrics' => $member->profile_metrics ?? [], 'joined_at' => $member->joined_at?->toDateString(), 'resigned_at' => $member->resigned_at?->toDateString(), 'specialties' => array_values(array_unique([...$categoryNames, ...$legacyNames])), 'odds_metrics' => $this->oddsMetrics($member->user_id)];
+        return ['id' => $member->id, 'name' => $member->user?->name ?? $member->name, 'email' => $member->user?->email, 'whatsapp_number' => $member->user?->whatsapp_number, 'roles' => $member->user?->getRoleNames()->values()->all() ?? [], 'position_name' => $member->position_name, 'status' => $member->status, 'card_image_path' => $member->card_image_path, 'profile_metrics' => $member->profile_metrics ?? [], 'joined_at' => $member->joined_at?->toDateString(), 'resigned_at' => $member->resigned_at?->toDateString(), 'specialties' => array_values(array_unique([...$categoryNames, ...$legacyNames])), 'odds_metrics' => $this->oddsMetrics($member->user_id)];
     }
 
     private function oddsMetrics(?int $userId): array

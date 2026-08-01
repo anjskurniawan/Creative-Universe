@@ -10,9 +10,10 @@ export interface HeroHeadingProps {
   typingSpeed?: number;
   typingDelay?: number;
   onTypingComplete?: () => void;
+  gradientSuffix?: string;
 }
 
-export function HeroHeading({ children, align = "center", className = "", typing = false, typingSpeed = 110, typingDelay = 0, onTypingComplete }: HeroHeadingProps) {
+export function HeroHeading({ children, align = "center", className = "", typing = false, typingSpeed = 110, typingDelay = 0, onTypingComplete, gradientSuffix }: HeroHeadingProps) {
   const text = typeof children === "string" ? children : "";
   const characters = splitCharacters(text);
   const [visibleCount, setVisibleCount] = useState(typing ? 0 : characters.length);
@@ -45,7 +46,7 @@ export function HeroHeading({ children, align = "center", className = "", typing
         <span aria-hidden="true" className="relative inline-block max-w-full text-left">
           <span className="block opacity-0">{text}</span>
           <span className="absolute inset-0 block text-left">
-            {visibleText}<span className="hero-heading-cursor-anchor" />
+            {gradientSuffix && visibleText.endsWith(gradientSuffix) ? <>{visibleText.slice(0, -gradientSuffix.length)}<span className="hero-heading-gradient-suffix">{gradientSuffix}</span></> : visibleText}<span className="hero-heading-cursor-anchor" />
           </span>
         </span>
       ) : children}

@@ -9,7 +9,7 @@ import { HeroHeading } from "@/components/typography/hero-heading";
 import { PrimaryActionLink } from "@/components/ui/primary-action-link";
 
 export default function GuestLandingPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [hasTypingCompleted, setHasTypingCompleted] = useState(false);
   const [isPrimaryActionVisible, setIsPrimaryActionVisible] = useState(false);
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -43,23 +43,20 @@ export default function GuestLandingPage() {
   }
 
   if (isAuthenticated) {
+    const creativeRole = user?.roles.find((role) => ["Designer", "Videographer", "Content Creator"].includes(role));
+    const firstName = user?.name?.trim().split(/\s+/).slice(0, 2).join(" ") || "Creative";
+    const cardImage = user?.card_image_url ?? user?.avatar_url;
+    const cardIsVideo = Boolean(cardImage && /\.(mp4|webm|ogg)(?:\?.*)?$/i.test(cardImage));
     return (
-      <div className="flex min-h-screen flex-col bg-white font-sans text-cu-ink antialiased">
+      <div className={`flex ${creativeRole ? "h-screen overflow-hidden" : "min-h-screen"} flex-col bg-white font-sans text-cu-ink antialiased`}>
         <Navbar hideBrand />
-        <main aria-label="Universe landing" className="flex flex-1 flex-col justify-center px-4 md:px-16 lg:px-24">
-          <div className="w-full max-w-4xl text-left">
-            <h2 className="animate-slide-up text-3xl font-medium leading-[0.95] tracking-[-0.04em] text-cu-ink opacity-0 md:text-5xl lg:text-6xl" style={{ animationDelay: "100ms", animationFillMode: "forwards" }}>
-              Selamat datang di
-            </h2>
-            <HeroHeading typing typingDelay={700} onTypingComplete={completeTyping} className="w-full !text-left mt-2" align="left">
-              Creative Universe
+        <main aria-label="Universe landing" className={`min-h-0 flex-1 ${creativeRole ? "grid lg:grid-cols-2" : "flex items-center pb-0 pl-8 pr-8 pt-8"}`}>
+          <div className={creativeRole ? "flex min-h-0 flex-col items-start justify-center px-8 py-8 text-left lg:px-16" : "w-full max-w-4xl text-left"}>
+            <HeroHeading key={creativeRole ? firstName : "creative-universe"} typing typingDelay={700} onTypingComplete={completeTyping} gradientSuffix={creativeRole ? firstName : undefined} className="w-full !text-left !text-4xl [&_.hero-heading-gradient-suffix]:bg-gradient-to-r [&_.hero-heading-gradient-suffix]:from-[#7c3aed] [&_.hero-heading-gradient-suffix]:via-[#c084fc] [&_.hero-heading-gradient-suffix]:to-[#22d3ee] [&_.hero-heading-gradient-suffix]:bg-clip-text [&_.hero-heading-gradient-suffix]:text-transparent md:!text-5xl lg:!text-6xl" align="left">
+              {creativeRole ? `Hello ${firstName}` : "Creative Universe"}
             </HeroHeading>
-            {isPrimaryActionVisible && (
-              <p className="animate-fade-in mt-6 max-w-3xl text-lg text-cu-muted opacity-0 md:text-xl" style={{ animationDelay: "0ms", animationFillMode: "forwards" }}>
-                Satu ekosistem untuk semua kebutuhan kreatif. Kelola tugas, pantau performance tim, serta terintegrasi dengan Creative AI untuk decision making.
-              </p>
-            )}
           </div>
+          {creativeRole && <div className="flex min-h-0 h-full w-full items-end justify-center overflow-hidden bg-white">{cardImage ? cardIsVideo ? <video src={cardImage} muted autoPlay loop playsInline className="h-full w-full object-contain object-bottom" /> : <img src={cardImage} alt={`Card ${user?.name ?? "Creative"}`} className="h-full w-full object-contain object-bottom" /> : <span className="text-sm text-cu-muted">Belum ada image card</span>}</div>}
         </main>
       </div>
     );

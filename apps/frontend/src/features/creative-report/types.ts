@@ -77,6 +77,9 @@ export interface CreativeMember {
 }
 
 export interface CreativeMemberProfile extends CreativeMember {
+  email?: string | null;
+  whatsapp_number?: string | null;
+  roles?: string[];
   joined_at: string | null;
   resigned_at: string | null;
   card_image_path: string | null;
