@@ -18,6 +18,7 @@ export const coreApi = {
     options: <T>() => apiFetch<T>("/users/options"),
     detail: <T>(id: number | string) => apiFetch<T>(`/users/${id}`),
     update: <T>(id: number | string, body: unknown) => apiFetch<T>(`/users/${id}`, json("PATCH", body)),
+    remove: (id: number | string) => apiFetch<null>(`/users/${id}`, json("DELETE")),
     revokeSession: (id: number | string, session: string) => apiFetch<null>(`/users/${id}/sessions/${session}`, json("DELETE")),
     managerWhitelist: {
       update: <T>(permissions: string[]) => apiFetch<T>("/users/whitelist-manager-permissions", json("POST", { permissions })),

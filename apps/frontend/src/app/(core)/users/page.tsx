@@ -183,6 +183,23 @@ export default function UsersPage() {
     }
   };
 
+  const deleteUser = async () => {
+    if (!selected || !window.confirm(`Hapus akun ${selected.user.name}? Akun akan dinonaktifkan dan tidak dapat digunakan lagi.`)) return;
+    setIsSaving(true);
+    setModalError(null);
+    try {
+      await coreApi.users.remove(selected.user.id);
+      const name = selected.user.name;
+      closeUser();
+      setNotice(`Akun ${name} berhasil dihapus.`);
+      await loadUsers();
+    } catch (requestError) {
+      setModalError(errorMessage(requestError));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const revokeSession = async (sessionId: string) => {
     if (!selected || !window.confirm("Cabut sesi perangkat pengguna ini?")) return;
 
@@ -433,6 +450,7 @@ export default function UsersPage() {
                 )}
               </div>
               <div className="flex justify-end gap-3 border-t border-cu-line bg-cu-panel-soft/40 px-6 py-4">
+                {hasRole("Root") && <button type="button" onClick={() => void deleteUser()} disabled={isSaving} className="mr-auto btn btn-danger">Hapus Akun</button>}
                 <button type="button" onClick={closeUser} className="btn btn-secondary">Batal</button>
                 <button type="submit" disabled={isSaving} className="btn btn-primary">{isSaving ? "Menyimpan..." : "Simpan Perubahan"}</button>
               </div>

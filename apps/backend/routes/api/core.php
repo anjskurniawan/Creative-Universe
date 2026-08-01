@@ -69,6 +69,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('can:manage-users')->group(function () {
         Route::get('/users/{user}', [UserController::class, 'show']);
         Route::patch('/users/{user}', [UserController::class, 'update']);
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('role:Root');
         Route::get('/users/{user}/audit', [UserController::class, 'audit'])->middleware('role:Root');
         Route::get('/users/{user}/sessions', [UserController::class, 'sessions'])->middleware('role:Root');
         Route::delete('/users/{user}/sessions/{session}', [UserController::class, 'destroySession']);

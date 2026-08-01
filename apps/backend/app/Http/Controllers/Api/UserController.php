@@ -19,6 +19,23 @@ use Spatie\Permission\PermissionRegistrar;
 
 class UserController extends BaseApiController
 {
+    public function destroy(Request $request, User $user): JsonResponse
+    {
+        if ($request->user()->is($user)) {
+            return $this->sendError('Akun Root yang sedang digunakan tidak dapat dihapus.', [], 422);
+        }
+
+        DB::transaction(function () use ($request, $user): void {
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+            $user->roles()->detach();
+            $user->permissions()->detach();
+            $user->applications()->detach();
+            $user->forceDelete();
+        });
+
+        return $this->sendResponse(null, "Akun {$user->name} berhasil dihapus.");
+    }
+
     public function index(Request $request): JsonResponse
     {
         $search = trim((string) $request->query('search', ''));
