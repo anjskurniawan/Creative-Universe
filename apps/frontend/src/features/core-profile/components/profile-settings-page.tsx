@@ -76,7 +76,6 @@ export default function ProfileSettingsPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [theme, setTheme] = useState("system");
   const [language, setLanguage] = useState("id");
   const [timezone, setTimezone] = useState("Asia/Bangkok");
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -155,7 +154,6 @@ export default function ProfileSettingsPage() {
       setUsername(user.username);
       setEmail(user.email ?? "");
       setWhatsappNumber(user.whatsapp_number || "");
-      setTheme(settingValue(user, "theme", "system"));
       setLanguage(settingValue(user, "language", "id"));
       setTimezone(settingValue(user, "timezone", "Asia/Bangkok"));
       setReduceMotion(settingBoolean(user, "reduce_motion", false));
@@ -419,7 +417,6 @@ export default function ProfileSettingsPage() {
           email: email || null,
           whatsapp_number: whatsappNumber || null,
           settings: {
-            theme,
             language,
             timezone,
             reduce_motion: reduceMotion,
@@ -669,22 +666,12 @@ export default function ProfileSettingsPage() {
                   </p>
                 </div>
 
-                {/* Preferensi Tampilan */}
+                {/* Preferensi pengguna */}
                 <div className="pt-4 border-t border-cu-line/60 space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-cu-ink" htmlFor="theme-select">
+                    <label className="hidden" htmlFor="theme-select">
                       Tema Tampilan
                     </label>
-                    <select
-                      id="theme-select"
-                      value={theme}
-                      onChange={(e) => setTheme(e.target.value)}
-                      className="mt-1.5 block w-full rounded-lg border border-cu-line bg-cu-surface px-3 py-2 text-sm text-cu-ink focus:border-cu-focus focus:ring-1 focus:ring-cu-focus focus:outline-none"
-                    >
-                      <option value="system">Sistem (Default)</option>
-                      <option value="light">Mode Terang</option>
-                      <option value="dark">Mode Gelap</option>
-                    </select>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">

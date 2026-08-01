@@ -44,7 +44,6 @@ class ProfileUpdateRequest extends FormRequest
                 'mimes:jpeg,png,jpg,webp',
             ],
             'settings' => ['nullable', 'array'],
-            'settings.theme' => ['nullable', 'string', 'in:light,dark,system'],
             'settings.navbar_variant' => ['nullable', 'string', 'in:solid,glass,dark-glass'],
         ];
     }

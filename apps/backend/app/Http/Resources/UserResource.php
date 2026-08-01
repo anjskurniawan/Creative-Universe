@@ -13,7 +13,6 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $safeSettings = Arr::only($this->settings ?? [], [
-            'theme',
             'navbar_variant',
             'redirect_to',
             'notify_new_registration',
