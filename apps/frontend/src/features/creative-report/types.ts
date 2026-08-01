@@ -72,7 +72,7 @@ export interface CreativeReportUpdateInput {
 export interface CreativeMember {
   id: number;
   name: string;
-  position_name: "Manajer" | "SPV" | "Designer" | "Videographer";
+  position_name: "Manajer" | "SPV" | "Designer" | "Videographer" | "Content Creator";
   status: "pending" | "active" | "resigned";
 }
 
@@ -88,7 +88,7 @@ export interface CreativeMemberProfile extends CreativeMember {
 
 export interface HistoricalCreativeMemberInput {
   name: string;
-  position_name: "SPV" | "Designer" | "Videographer";
+  position_name: "SPV" | "Designer" | "Videographer" | "Content Creator";
   start_month: string;
   end_month: string;
 }

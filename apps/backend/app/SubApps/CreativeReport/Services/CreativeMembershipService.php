@@ -86,11 +86,13 @@ class CreativeMembershipService
             ['name' => match ($member->position_name) {
                 'SPV' => 'Supervisor Creative Production',
                 'Videographer' => 'Creative Video Production',
+                'Content Creator' => 'Creative Content Production',
                 default => 'Creative Design Production',
             }],
             ['sort_order' => match ($member->position_name) {
                 'SPV' => 1,
                 'Videographer' => 3,
+                'Content Creator' => 4,
                 default => 2,
             }],
         );

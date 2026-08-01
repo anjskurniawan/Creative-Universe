@@ -1836,7 +1836,7 @@ function OddsPageContent() {
                   </option>
                 ))}
               </select>
-              <FieldHelp>User dengan role Designer atau Videographer yang akan masuk antrean ODDS.</FieldHelp>
+              <FieldHelp>User dengan role Designer, Videographer, atau Content Creator yang akan masuk antrean ODDS.</FieldHelp>
             </label>
             <label className="block">
               <span className="mb-1 block text-xs font-medium text-cu-muted">Status</span>

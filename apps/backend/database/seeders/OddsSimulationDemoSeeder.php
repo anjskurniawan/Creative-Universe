@@ -80,10 +80,10 @@ class OddsSimulationDemoSeeder extends Seeder
         $categoryIds = $categories->pluck('id')->map(fn($id) => (string) $id)->toArray();
 
         // Ensure Designers & Randomize Category Connections
-        $designerUsers = User::whereHas('roles', fn($q) => $q->whereIn('name', ['Designer', 'Videographer']))->get();
+        $designerUsers = User::whereHas('roles', fn($q) => $q->whereIn('name', ['Designer', 'Videographer', 'Content Creator']))->get();
         if ($designerUsers->isEmpty()) {
             $this->call(LocalTestAccountsSeeder::class);
-            $designerUsers = User::whereHas('roles', fn($q) => $q->whereIn('name', ['Designer', 'Videographer']))->get();
+            $designerUsers = User::whereHas('roles', fn($q) => $q->whereIn('name', ['Designer', 'Videographer', 'Content Creator']))->get();
         }
 
         $designers = [];

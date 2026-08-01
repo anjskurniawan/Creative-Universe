@@ -20,6 +20,7 @@ class OnboardingController extends BaseApiController
         'SPV',
         'Designer',
         'Videographer',
+        'Content Creator',
     ];
 
     private const SINGLE_OCCUPANCY_CREATIVE_POSITION_NAMES = [

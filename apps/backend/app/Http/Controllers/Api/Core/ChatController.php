@@ -121,7 +121,7 @@ class ChatController extends BaseApiController
 
         if (! $conversation) {
             // Check roles auth
-            $allowedRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Root'];
+            $allowedRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Content Creator', 'Root'];
             $isStaff = $user->hasAnyRole($allowedRoles);
 
             // For now, if not staff, we'll just allow creating if the receiver is Designer
@@ -262,7 +262,7 @@ class ChatController extends BaseApiController
     public function getContacts()
     {
         $user = auth()->user();
-        $allowedRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Root'];
+        $allowedRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Content Creator', 'Root'];
 
         if ($user->hasAnyRole($allowedRoles)) {
             $contacts = User::whereHas('roles', function ($q) use ($allowedRoles) {

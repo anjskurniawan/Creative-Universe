@@ -62,6 +62,7 @@ class RolePermissionSeeder extends Seeder
         $spv = Role::firstOrCreate(['name' => 'SPV']);
         $designer = Role::firstOrCreate(['name' => 'Designer']);
         $videographer = Role::firstOrCreate(['name' => 'Videographer']);
+        $contentCreator = Role::firstOrCreate(['name' => 'Content Creator']);
         $client = Role::firstOrCreate(['name' => 'Client']);
         $leaderRetail = Role::firstOrCreate(['name' => 'Leader Retail']);
         $picRetail = Role::firstOrCreate(['name' => 'PIC Retail']);
@@ -119,6 +120,12 @@ class RolePermissionSeeder extends Seeder
 
         // Videographer: akses core & pricetag (sama seperti designer)
         $videographer->syncPermissions([
+            'access-core',
+            'access-pricetag',
+        ]);
+
+        // Content Creator: akses core & pricetag (sama seperti designer/videographer)
+        $contentCreator->syncPermissions([
             'access-core',
             'access-pricetag',
         ]);

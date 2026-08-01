@@ -42,7 +42,7 @@ function userAvatarUrl(user: ChatMessage["sender"]): string | null {
 function isDesignerSender(message: ChatMessage): boolean {
   const roles = (message.sender?.roles ?? []).map((role) => String(role).toLowerCase());
   const identity = `${message.sender?.name ?? ""} ${message.sender?.username ?? ""}`.toLowerCase();
-  return roles.some((role) => role.includes("designer") || role.includes("videographer")) || identity.includes("designer");
+  return roles.some((role) => role.includes("designer") || role.includes("videographer") || role.includes("content creator") || role.includes("content_creator")) || identity.includes("designer");
 }
 
 function ChatAvatar({ sender, align, compact = false }: { sender: ChatMessage["sender"]; align: "left" | "right"; compact?: boolean }) {

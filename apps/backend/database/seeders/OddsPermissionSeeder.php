@@ -63,7 +63,7 @@ class OddsPermissionSeeder extends Seeder
             ]);
         }
 
-        foreach (['Designer', 'Videographer'] as $roleName) {
+        foreach (['Designer', 'Videographer', 'Content Creator'] as $roleName) {
             Role::firstOrCreate(['name' => $roleName])->givePermissionTo([
                 'access-odds',
                 'view-assigned-odds-tasks',

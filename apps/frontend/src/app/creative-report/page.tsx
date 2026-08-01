@@ -12,7 +12,7 @@ import { AssessmentTable } from "@/components/creative-report/assessment-table";
 import { AssessmentMobileCards } from "@/components/creative-report/assessment-mobile-cards";
 import { HrdRulesFooter } from "./components/hrd-rules-footer";
 
-const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer"];
+const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer", "Content Creator"];
 
 export default function CreativeReportPage() {
   const { theme } = useCreativeReportTheme();

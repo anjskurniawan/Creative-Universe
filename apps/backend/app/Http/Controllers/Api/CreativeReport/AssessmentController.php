@@ -143,7 +143,7 @@ class AssessmentController extends BaseApiController
         $this->authorizeMembershipReview($request);
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'position_name' => 'required|in:SPV,Designer,Videographer',
+            'position_name' => 'required|in:SPV,Designer,Videographer,Content Creator',
             'start_month' => 'required|date_format:Y-m',
             'end_month' => 'required|date_format:Y-m|after_or_equal:start_month',
         ]);
@@ -178,7 +178,7 @@ class AssessmentController extends BaseApiController
         }
         $data = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'position_name' => 'sometimes|in:Manajer,SPV,Designer,Videographer',
+            'position_name' => 'sometimes|in:Manajer,SPV,Designer,Videographer,Content Creator',
             'joined_at' => 'nullable|date',
             'resigned_at' => 'nullable|date|after_or_equal:joined_at',
             'profile_metrics' => 'sometimes|array',
