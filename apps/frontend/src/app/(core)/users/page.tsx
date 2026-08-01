@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, ReactNode, useCallback, useEffect, useState } from "react";
+import { FormEvent, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { HeaderTitle } from "@/components/typography/header-title";
 import {
   errorMessage,
   formatDate,
@@ -47,6 +48,8 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+  const roleMenuRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -102,6 +105,14 @@ export default function UsersPage() {
     if (!hasPermission("manage-users")) return;
     queueMicrotask(() => void loadOptions());
   }, [hasPermission, loadOptions]);
+
+  useEffect(() => {
+    const closeMenu = (event: MouseEvent) => {
+      if (!roleMenuRef.current?.contains(event.target as Node)) setRoleMenuOpen(false);
+    };
+    document.addEventListener("mousedown", closeMenu);
+    return () => document.removeEventListener("mousedown", closeMenu);
+  }, []);
 
   if (!hasPermission("manage-users")) {
     return <AccessDenied />;
@@ -215,22 +226,14 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 px-6 sm:flex-row sm:items-end sm:justify-between md:px-0">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-cu-muted">
-            Administrasi Core
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold text-cu-ink">Kelola Pengguna</h1>
-          <p className="mt-1 text-sm text-cu-muted">
-            {total} akun aktif atau pernah disetujui terdaftar di sistem.
-          </p>
-        </div>
+    <div className="flex min-h-full flex-col gap-6">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <HeaderTitle>Kelola Pengguna</HeaderTitle>
         {hasRole("Root") && (
           <button
             type="button"
             onClick={() => setShowWhitelist(true)}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-cu-line bg-cu-panel-soft px-4 text-sm font-semibold text-cu-ink transition hover:bg-cu-line"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-cu-ink px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-black"
           >
             <MaterialIcon name="settings_suggest" size="sm" />
             Atur Izin Manajer
@@ -241,8 +244,8 @@ export default function UsersPage() {
       {notice && <div className="px-6 md:px-0"><Alert type="success" message={notice} onClose={() => setNotice(null)} /></div>}
       {error && <div className="px-6 md:px-0"><Alert type="error" message={error} onClose={() => setError(null)} /></div>}
 
-      <div className="flex flex-col gap-3 px-6 sm:flex-row md:px-0">
-        <form onSubmit={submitSearch} className="relative w-full max-w-lg">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <form onSubmit={submitSearch} className="relative min-w-0 flex-1">
           <MaterialIcon
             name="search"
             size="sm"
@@ -253,26 +256,21 @@ export default function UsersPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Cari nama, username, atau email..."
-            className="h-10 w-full rounded-full border border-cu-line bg-cu-surface pl-10 pr-4 text-sm outline-none transition focus:border-cu-ink"
+            className="h-10 w-full rounded-xl border border-[#dbe4e8] bg-white pl-10 pr-4 text-sm text-cu-ink shadow-[0_2px_8px_rgba(44,42,39,0.05)] outline-none transition placeholder:text-[#9aa7ab] focus:border-[#00a4ff] focus:ring-2 focus:ring-[#00a4ff]/10"
           />
         </form>
-        <select
-          value={roleFilter}
-          onChange={(event) => {
-            setRoleFilter(event.target.value);
-            setPage(1);
-          }}
-          className="h-10 rounded-full border border-cu-line bg-cu-surface px-4 text-sm text-cu-ink outline-none focus:border-cu-ink"
-        >
-          <option value="">Semua peran</option>
-          {options?.roles.map((role) => (
-            <option key={role} value={role}>{role}</option>
-          ))}
-        </select>
+        <div ref={roleMenuRef} className="relative sm:w-52">
+          <button type="button" onClick={() => setRoleMenuOpen((open) => !open)} className="flex h-10 w-full items-center justify-between rounded-xl border border-[#dbe4e8] bg-white px-4 text-sm font-medium text-cu-ink shadow-[0_2px_8px_rgba(44,42,39,0.05)] transition hover:border-[#00a4ff] focus:outline-none focus:ring-2 focus:ring-[#00a4ff]/10">
+            <span>{roleFilter || "Semua peran"}</span><MaterialIcon name="expand_more" size="sm" className={`transition-transform ${roleMenuOpen ? "rotate-180" : ""}`} />
+          </button>
+          {roleMenuOpen && <div className="absolute right-0 top-[calc(100%+6px)] z-30 w-full rounded-xl border border-[#dbe4e8] bg-white p-1.5 shadow-[0_12px_28px_rgba(44,42,39,0.14)]">
+            {["", ...(options?.roles ?? [])].map((role) => <button key={role || "all"} type="button" onClick={() => { setRoleFilter(role); setPage(1); setRoleMenuOpen(false); }} className={`flex w-full items-center rounded-lg px-3 py-2 text-left text-xs font-medium transition ${roleFilter === role ? "bg-[#eaf7ff] text-[#008bd6]" : "text-cu-ink hover:bg-[#f5fafc]"}`}>{role || "Semua peran"}</button>)}
+          </div>}
+        </div>
       </div>
 
-      <div className="overflow-hidden border border-cu-line bg-cu-surface shadow-sm md:rounded-2xl">
-        <div className="block space-y-2 bg-white p-4 md:hidden">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#c9bbfc] bg-white">
+        <div className="block space-y-2 bg-white p-3 md:hidden">
           {isLoading ? (
             <div className="rounded-[24px] border border-cu-line bg-cu-surface px-4 py-8 text-center text-sm text-cu-muted">Memuat pengguna...</div>
           ) : users.length === 0 ? (
@@ -315,36 +313,34 @@ export default function UsersPage() {
             );
           })}
         </div>
-        <div className="hidden overflow-x-auto md:block">
-          <table className="w-full min-w-[960px] table-fixed text-left text-sm xl:min-w-[1120px]">
+        <div className="hidden min-h-0 flex-1 max-w-full overflow-y-auto overflow-x-hidden md:block">
+          <table className="w-full table-fixed border-collapse text-left text-xs">
             <colgroup>
-              <col className="w-[22%]" />
-              <col className="w-[17%]" />
-              <col className="w-[22%]" />
-              <col className="w-[24%]" />
-              <col className="w-[9%]" />
-              <col className="w-[6%]" />
+              <col className="w-[28%]" />
+              <col className="w-[18%]" />
+              <col className="w-[34%]" />
+              <col className="w-[12%]" />
+              <col className="w-[8%]" />
             </colgroup>
-            <thead className="border-b border-cu-line bg-cu-panel-soft/60 text-[10px] font-bold uppercase tracking-wider text-cu-muted">
-              <tr>
-                <th className="px-5 py-4">Nama</th>
-                <th className="px-4 py-4">Username</th>
-                <th className="px-4 py-4">Email</th>
-                <th className="px-4 py-4">Peran & izin langsung</th>
-                <th className="px-4 py-4">Bergabung</th>
-                <th className="px-5 py-4 text-right">Aksi</th>
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-[#f7f5ff] text-[12px] font-semibold text-[#3b4446]">
+                <th className="border-b border-r border-[#ded7fb] px-3 py-4 text-center">Nama</th>
+                <th className="border-b border-r border-[#ded7fb] px-3 py-4 text-center">Username</th>
+                <th className="border-b border-r border-[#ded7fb] px-3 py-4 text-center">Peran & izin</th>
+                <th className="border-b border-r border-[#ded7fb] px-3 py-4 text-center">Bergabung</th>
+                <th className="border-b border-[#ded7fb] px-3 py-4 text-center">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-cu-line/50">
+            <tbody className="text-xs text-[#3b4446]">
               {isLoading ? (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-cu-muted">Memuat pengguna...</td></tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-cu-muted">Memuat pengguna...</td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan={6} className="px-6 py-12 text-center text-cu-muted">Tidak ada pengguna yang sesuai.</td></tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-cu-muted">Tidak ada pengguna yang sesuai.</td></tr>
               ) : users.map((managedUser) => {
                 const protectedFromManager = !hasRole("Root") && managedUser.roles.includes("Root");
                 return (
                   <tr key={managedUser.id} className="group transition hover:bg-cu-panel-soft/30">
-                    <td className="px-5 py-4 align-middle">
+                    <td className="border-b border-[#ece8fb] px-3 py-2 align-middle">
                       <div className="flex items-center gap-3">
                         <Avatar user={managedUser} />
                         <div className="min-w-0">
@@ -353,17 +349,16 @@ export default function UsersPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 align-middle"><span className="block truncate text-cu-ink" title={managedUser.username}>@{managedUser.username}</span></td>
-                    <td className="px-4 py-4 align-middle"><span className="block truncate text-cu-muted" title={managedUser.email}>{managedUser.email}</span></td>
-                    <td className="px-4 py-4 align-middle">
+                    <td className="border-b border-[#ece8fb] px-3 py-2 align-middle"><span className="block truncate text-cu-ink" title={managedUser.username}>@{managedUser.username}</span></td>
+                    <td className="border-b border-[#ece8fb] px-3 py-2 align-middle">
                       <div className="flex flex-wrap gap-1.5">
                         {managedUser.roles.map((role) => <Badge key={role} tone={role === "Root" ? "danger" : role === "Manajer" ? "info" : "neutral"}>{role}</Badge>)}
                         {managedUser.permissions.slice(0, 2).map((permission) => <Badge key={permission} tone="soft">+{options?.permission_aliases[permission] ?? permission}</Badge>)}
                         {managedUser.permissions.length > 2 && <Badge tone="soft">+{managedUser.permissions.length - 2} lagi</Badge>}
                       </div>
                     </td>
-                    <td className="px-4 py-4 align-middle text-xs text-cu-muted"><span className="whitespace-nowrap">{formatDate(managedUser.created_at)}</span></td>
-                    <td className="px-5 py-4 text-right align-middle">
+                    <td className="border-b border-[#ece8fb] px-3 py-2 text-center align-middle text-[10px] text-cu-muted"><span className="whitespace-nowrap">{formatDate(managedUser.created_at)}</span></td>
+                    <td className="border-b border-[#ece8fb] px-3 py-2 text-center align-middle">
                       {protectedFromManager ? (
                         <span className="text-xs italic text-cu-muted">Protected</span>
                       ) : (
@@ -392,7 +387,7 @@ export default function UsersPage() {
           ) : selected ? (
             <form onSubmit={saveUser}>
               <div className={`grid gap-6 p-6 ${selected.can_view_audit ? "lg:grid-cols-[1.1fr_0.9fr]" : ""}`}>
-                <div className="space-y-6">
+                <div className="min-w-0 space-y-6">
                   <div>
                     <h3 className="text-sm font-semibold text-cu-ink">{selected.user.name}</h3>
                     <p className="text-xs text-cu-muted">@{selected.user.username} · {selected.user.email}</p>
@@ -403,7 +398,7 @@ export default function UsersPage() {
                       <input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="form-input" />
                     </Field>
                     <Field label="Email">
-                      <input required type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="form-input" />
+                      <input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="form-input" />
                     </Field>
                     <Field label="Nomor WhatsApp">
                       <input value={form.whatsapp_number} onChange={(event) => setForm({ ...form, whatsapp_number: event.target.value })} placeholder="62812..." className="form-input" />
@@ -429,7 +424,7 @@ export default function UsersPage() {
                 </div>
 
                 {selected.can_view_audit && (
-                  <div className="space-y-5 border-cu-line lg:border-l lg:pl-6">
+                  <div className="min-w-0 w-full space-y-5 overflow-hidden border-cu-line lg:border-l lg:pl-6">
                     <AuditPanel
                       detail={selected}
                       onRevoke={(sessionId) => void revokeSession(sessionId)}
@@ -540,11 +535,11 @@ function CheckboxGroup({ title, items, labels = {}, selected, onToggle, empty }:
 function AuditPanel({ detail, onRevoke }: { detail: ManagedUserDetail; onRevoke: (id: string) => void }) {
   return (
     <>
-      <section>
+      <section className="min-w-0 w-full">
         <h4 className="mb-3 text-xs font-bold uppercase tracking-wider text-cu-ink">Sesi Aktif</h4>
         <div className="space-y-2">
           {detail.sessions.length === 0 ? <p className="text-xs text-cu-muted">Tidak ada sesi aktif.</p> : detail.sessions.map((session) => (
-            <div key={session.id} className="rounded-xl border border-cu-line bg-cu-panel-soft/30 p-3">
+            <div key={session.id} className="min-w-0 w-full overflow-hidden rounded-xl border border-cu-line bg-cu-panel-soft/30 p-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold text-cu-ink">{session.user_agent || "Perangkat tidak dikenal"}</p>
@@ -556,7 +551,7 @@ function AuditPanel({ detail, onRevoke }: { detail: ManagedUserDetail; onRevoke:
           ))}
         </div>
       </section>
-      <section>
+      <section className="min-w-0 w-full">
         <h4 className="mb-3 text-xs font-bold uppercase tracking-wider text-cu-ink">Aktivitas Terakhir</h4>
         <div className="space-y-2">
           {detail.activities.length === 0 ? <p className="text-xs text-cu-muted">Belum ada aktivitas.</p> : detail.activities.map((activity) => (

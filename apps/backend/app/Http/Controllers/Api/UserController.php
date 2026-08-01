@@ -183,7 +183,7 @@ class UserController extends BaseApiController
         DB::transaction(function () use ($request, $user, $actor, $selectedRoles, $permissionsToSync, $applicationsToSync) {
             $user->fill([
                 'name' => $request->string('name')->toString(),
-                'email' => $request->string('email')->toString(),
+                'email' => $request->input('email') ?: null,
                 'whatsapp_number' => $request->input('whatsapp_number'),
                 'updated_by' => $actor->id,
             ]);
