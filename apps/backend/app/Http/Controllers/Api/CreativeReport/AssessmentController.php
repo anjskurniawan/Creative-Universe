@@ -41,6 +41,7 @@ class AssessmentController extends BaseApiController
                 'notice' => 'Data Bulan '.$selectedPeriod->locale('id')->monthName.' '.$selectedPeriod->year.' belum disiapkan.',
             ], 'Data bulan belum disiapkan.');
         }
+        $this->memberships->syncFromCreativeRoles();
         $this->memberships->ensureAssessmentsForPeriod($selectedPeriod);
         $query = Assessment::query()->with(['group', 'member', 'user.position.division'])->whereDate('period', $period.'-01');
         if ($request->filled('jobdesk')) {
@@ -112,7 +113,14 @@ class AssessmentController extends BaseApiController
     public function members(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Assessment::class);
-        return $this->sendResponse(CreativeMember::query()->with('user')->whereIn('status', [CreativeMember::STATUS_ACTIVE, CreativeMember::STATUS_RESIGNED])->orderBy('name')->get()->map(fn (CreativeMember $member) => $this->memberPayload($member)), 'Anggota Creative berhasil diambil.');
+        return $this->sendResponse(CreativeMember::query()
+            ->with('user')
+            ->whereNotNull('user_id')
+            ->whereHas('user')
+            ->whereIn('status', [CreativeMember::STATUS_ACTIVE, CreativeMember::STATUS_RESIGNED])
+            ->orderBy('name')
+            ->get()
+            ->map(fn (CreativeMember $member) => $this->memberPayload($member)), 'Anggota Creative berhasil diambil.');
     }
 
     public function approveMember(Request $request, CreativeMember $member): JsonResponse

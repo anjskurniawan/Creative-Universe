@@ -27,6 +27,11 @@ class UserController extends BaseApiController
 
         DB::transaction(function () use ($request, $user): void {
             DB::table('sessions')->where('user_id', $user->id)->delete();
+            // Asset links require an owner. Transfer ownership to the Root actor
+            // so the generated assets remain available after hard deletion.
+            DB::table('asset_links')
+                ->where('created_by', $user->id)
+                ->update(['created_by' => $request->user()->id]);
             $user->roles()->detach();
             $user->permissions()->detach();
             $user->applications()->detach();
@@ -212,26 +217,8 @@ class UserController extends BaseApiController
             $user->save();
             $user->syncRoles($selectedRoles);
             
-            // Sync position_id and CreativeReport member based on selected roles
-            $creativeRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Content Creator'];
-            $matchingRole = collect($selectedRoles)->first(fn ($role) => in_array($role, $creativeRoles, true));
-            if ($matchingRole) {
-                $position = \App\Models\Core\Position::where('name', $matchingRole)
-                    ->whereHas('division', fn ($query) => $query->where('name', 'Creative'))
-                    ->first();
-                if ($position) {
-                    $user->position_id = $position->id;
-                    $user->saveQuietly();
-
-                    $member = \App\SubApps\CreativeReport\Models\CreativeMember::where('user_id', $user->id)->first();
-                    if ($member) {
-                        $member->update([
-                            'position_id' => $position->id,
-                            'position_name' => $position->name,
-                        ]);
-                    }
-                }
-            }
+            app(\App\SubApps\CreativeReport\Services\CreativeMembershipService::class)
+                ->syncFromCreativeRoles();
 
             $user->syncPermissions($permissionsToSync);
             $applicationIds = Application::query()->whereIn('key', $applicationsToSync)->pluck('id');

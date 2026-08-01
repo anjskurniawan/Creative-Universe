@@ -11,6 +11,48 @@ use Illuminate\Support\Facades\DB;
 
 class CreativeMembershipService
 {
+    public function syncFromCreativeRoles(): void
+    {
+        $creativeRoles = ['Manajer', 'SPV', 'Designer', 'Videographer', 'Content Creator'];
+
+        User::query()
+            ->whereHas('roles', fn ($query) => $query->whereIn('name', $creativeRoles))
+            ->with(['roles', 'position'])
+            ->each(function (User $user) use ($creativeRoles): void {
+                $roleName = $user->roles
+                    ->pluck('name')
+                    ->first(fn (string $role) => in_array($role, $creativeRoles, true));
+                if (! $roleName) return;
+
+                $position = \App\Models\Core\Position::query()
+                    ->where('name', $roleName)
+                    ->with('division')
+                    ->orderByRaw("CASE WHEN EXISTS (SELECT 1 FROM divisions WHERE divisions.id = positions.division_id AND divisions.name = 'Creative') THEN 0 ELSE 1 END")
+                    ->first();
+                if (! $position) return;
+
+                if ($user->position_id !== $position->id) {
+                    $user->updateQuietly(['position_id' => $position->id]);
+                }
+
+                $member = CreativeMember::query()->firstOrCreate(
+                    ['user_id' => $user->id],
+                    [
+                        'name' => $user->name,
+                        'position_id' => $position->id,
+                        'position_name' => $roleName,
+                        'status' => CreativeMember::STATUS_ACTIVE,
+                        'joined_at' => $user->created_at?->toDateString() ?? now()->toDateString(),
+                    ],
+                );
+                $member->update([
+                    'name' => $user->name,
+                    'position_id' => $position->id,
+                    'position_name' => $roleName,
+                ]);
+            });
+    }
+
     public function registerPending(User $user): CreativeMember
     {
         return CreativeMember::updateOrCreate(
@@ -69,6 +111,8 @@ class CreativeMembershipService
 
     public function ensureAssessmentsForPeriod(Carbon $period): void
     {
+        $this->syncFromCreativeRoles();
+
         CreativeMember::query()
             ->whereIn('status', [CreativeMember::STATUS_ACTIVE, CreativeMember::STATUS_RESIGNED])
             ->whereDate('joined_at', '<=', $period->copy()->endOfMonth())

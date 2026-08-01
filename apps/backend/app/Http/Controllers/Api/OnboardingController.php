@@ -33,6 +33,9 @@ class OnboardingController extends BaseApiController
      */
     public function data(): JsonResponse
     {
+        $creativeDivision = Division::firstOrCreate(['name' => self::CREATIVE_DIVISION_NAME]);
+        $creativeDivision->positions()->firstOrCreate(['name' => 'Content Creator']);
+
         $occupiedSingletonPositionIds = User::query()
             ->where('id', '!=', Auth::id())
             ->whereHas('position', function ($query) {
