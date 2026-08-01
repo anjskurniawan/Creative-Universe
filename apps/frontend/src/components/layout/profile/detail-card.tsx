@@ -127,16 +127,16 @@ export default function DetailCard({
   ratingAnimationKey = 0,
 }: DetailCardProps) {
   const primarySpecialty = specialties[0];
-  const desktopSpecialties = specialties.slice(1, 4);
-  const mobileHiddenSpecialties = specialties.slice(1);
-  const desktopHiddenSpecialties = specialties.slice(4);
+  const desktopSpecialties = specialties.slice(1, 2);
+  const mobileHiddenSpecialties = specialties.slice(2);
+  const desktopHiddenSpecialties = specialties.slice(2);
   return (
     <article
-      className={`flex w-full max-w-none flex-col gap-4 rounded-lg bg-white p-3 shadow-[0_5px_14px_rgba(44,42,39,0.06)] sm:grid sm:grid-cols-[194px_minmax(0,1fr)_200px] sm:items-stretch sm:gap-6 sm:p-4 ${className ?? ""}`}
+      className={`flex w-full max-w-none flex-col gap-4 rounded-lg bg-white p-3 shadow-[0_5px_14px_rgba(44,42,39,0.06)] sm:grid sm:grid-cols-[214px_minmax(0,1fr)_200px] sm:items-stretch sm:gap-6 sm:p-4 ${className ?? ""}`}
       data-name="DetailCard"
       data-node-id="159:756"
     >
-      <div className={`flex h-36 w-full shrink-0 items-center justify-center self-center overflow-hidden rounded-lg sm:h-full sm:min-h-[275px] sm:w-[194px] sm:justify-self-center ${profileImage ? "bg-transparent" : "bg-[#3b4446]"}`}>
+      <div className={`flex h-36 w-full shrink-0 items-center justify-center self-center overflow-hidden rounded-lg sm:h-full sm:min-h-[275px] sm:w-[214px] sm:justify-self-center ${profileImage ? "bg-transparent" : "bg-[#3b4446]"}`}>
           {profileImage ? (
             <DetailMedia source={profileImage} alt={profileAlt ?? name} autoPlay={autoPlayMedia} />
           ) : (
@@ -169,7 +169,7 @@ export default function DetailCard({
                 </span>
               )}
               {desktopSpecialties.map((specialty) => (
-                <span key={specialty} className="hidden rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs text-[#7d7c7c] sm:inline-flex sm:px-4 sm:py-2 sm:text-sm">
+                <span key={specialty} className="inline-flex rounded-lg border border-[#bdeaff] bg-[#f3faff] px-3 py-1.5 text-center text-xs text-[#7d7c7c] sm:px-4 sm:py-2 sm:text-sm">
                   {specialty}
                 </span>
               ))}
