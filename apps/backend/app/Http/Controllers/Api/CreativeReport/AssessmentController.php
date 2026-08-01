@@ -43,7 +43,10 @@ class AssessmentController extends BaseApiController
         }
         $this->memberships->syncFromCreativeRoles();
         $this->memberships->ensureAssessmentsForPeriod($selectedPeriod);
-        $query = Assessment::query()->with(['group', 'member', 'user.position.division'])->whereDate('period', $period.'-01');
+        $query = Assessment::query()
+            ->with(['group', 'member', 'user.position.division'])
+            ->whereHas('member', fn ($member) => $member->whereNotNull('user_id')->whereHas('user'))
+            ->whereDate('period', $period.'-01');
         if ($request->filled('jobdesk')) {
             $query->where(fn ($q) => $q->whereHas('member', fn ($member) => $member->where('position_name', $request->string('jobdesk')))
                 ->orWhereHas('user.position', fn ($user) => $user->where('name', $request->string('jobdesk'))));

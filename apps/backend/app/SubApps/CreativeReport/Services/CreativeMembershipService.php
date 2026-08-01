@@ -114,6 +114,8 @@ class CreativeMembershipService
         $this->syncFromCreativeRoles();
 
         CreativeMember::query()
+            ->whereNotNull('user_id')
+            ->whereHas('user')
             ->whereIn('status', [CreativeMember::STATUS_ACTIVE, CreativeMember::STATUS_RESIGNED])
             ->whereDate('joined_at', '<=', $period->copy()->endOfMonth())
             ->where(fn ($query) => $query->whereNull('resigned_at')->orWhereDate('resigned_at', '>=', $period->copy()->startOfMonth()))

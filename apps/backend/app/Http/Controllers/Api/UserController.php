@@ -32,6 +32,17 @@ class UserController extends BaseApiController
             DB::table('asset_links')
                 ->where('created_by', $user->id)
                 ->update(['created_by' => $request->user()->id]);
+            // These records are personal performance history and use
+            // restrict-on-delete foreign keys, so remove them with the account.
+            DB::table('odds_designer_daily_reports')->where('designer_id', $user->id)->delete();
+            DB::table('odds_designer_rankings')->where('designer_id', $user->id)->delete();
+            DB::table('odds_task_queue')->where('designer_id', $user->id)->delete();
+            DB::table('odds_task_results')->where('submitted_by', $user->id)->delete();
+            $memberIds = DB::table('creative_report_members')->where('user_id', $user->id)->pluck('id');
+            if ($memberIds->isNotEmpty()) {
+                DB::table('creative_report_assessments')->whereIn('creative_report_member_id', $memberIds)->delete();
+                DB::table('creative_report_members')->whereIn('id', $memberIds)->delete();
+            }
             $user->roles()->detach();
             $user->permissions()->detach();
             $user->applications()->detach();
