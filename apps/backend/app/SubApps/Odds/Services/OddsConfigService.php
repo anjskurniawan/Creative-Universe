@@ -7,6 +7,7 @@ use App\SubApps\Odds\Models\DesignerProfile;
 use App\SubApps\Odds\Models\SystemRule;
 use App\SubApps\CreativeReport\Models\CreativeMember;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 
 class OddsConfigService
 {
@@ -37,6 +38,7 @@ class OddsConfigService
         $profiles = DesignerProfile::query()
             ->with([
                 'user:id,name,email,username',
+                'user.roles',
                 'tasks' => fn ($query) => $query->select('id', 'assigned_designer_id', 'design_purpose', 'status')->where('status', 'in_progress')
             ])
             ->when(isset($filters['active']), fn ($query) => $query->where('is_active', (bool) $filters['active']))
@@ -48,7 +50,10 @@ class OddsConfigService
             ->pluck('card_image_path', 'user_id');
 
         $profiles->getCollection()->each(function (DesignerProfile $profile) use ($cardImages): void {
-            $profile->user?->setAttribute('card_image_path', $cardImages->get($profile->user_id));
+            $cardImagePath = $cardImages->get($profile->user_id);
+            $profile->user?->setAttribute('card_image_path', $cardImagePath);
+            $profile->user?->setAttribute('card_image_url', $cardImagePath ? Storage::disk('public')->url($cardImagePath) : null);
+            $profile->user?->setAttribute('roles', $profile->user?->roles?->pluck('name')->values()->all() ?? []);
         });
 
         return $profiles;

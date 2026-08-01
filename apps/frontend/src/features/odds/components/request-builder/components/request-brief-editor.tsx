@@ -10,11 +10,13 @@ export function RequestBriefEditor({
   onChange,
   onUploadImage,
   dark,
+  fullHeight = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   onUploadImage: (files: FileList | File[] | null) => Promise<OddsTaskAttachment[]>;
   dark: boolean;
+  fullHeight?: boolean;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -154,7 +156,7 @@ export function RequestBriefEditor({
   }`;
 
   return (
-    <div className={`flex flex-col min-h-0 flex-1 rounded-2xl border overflow-hidden ${
+    <div className={`flex ${fullHeight ? "h-full flex-1" : "h-[280px] flex-none xl:h-auto xl:flex-1"} flex-col min-h-0 rounded-2xl border overflow-hidden ${
       dark ? "border-white/10 bg-[#171717]" : "border-[#BDEAFF] bg-white shadow-sm"
     }`}>
       {/* Editor Toolbar */}
@@ -248,7 +250,7 @@ export function RequestBriefEditor({
       {/* Editor Input Area */}
       <div className="relative flex-1 min-h-0">
         {isEmpty && (
-          <span className={`pointer-events-none absolute left-4 top-4 z-10 text-xs font-semibold select-none ${
+          <span className={`pointer-events-none absolute left-3 top-3 z-10 text-sm font-normal select-none ${
             dark ? "text-slate-500" : "text-slate-400"
           }`}>
             Tulis kebutuhan desain, ukuran, copy teks, channel, dan output final...
@@ -293,7 +295,7 @@ export function RequestBriefEditor({
             event.preventDefault();
             pastePlainTextAsParagraphs(event.clipboardData.getData("text/plain"));
           }}
-          className={`h-full overflow-y-auto p-4 text-sm leading-6 outline-none transition [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+          className={`h-full overflow-y-auto p-3 text-sm leading-6 outline-none transition [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
             dark
               ? "bg-[#0E0E0E] text-white [caret-color:#B0FF5E] focus:bg-[#0a0a0a]"
               : "bg-white text-[#04044A] [caret-color:#00A4FF] focus:bg-white"

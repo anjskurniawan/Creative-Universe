@@ -105,7 +105,7 @@ export default function EditCreativeMemberPage() {
         </p>
       )}
       <div className={`flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border ${theme === "dark" ? "border-white/10 bg-white/5" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#e1e8eb] bg-white shadow-sm"}`}>
-        <nav className={`flex flex-nowrap gap-2 overflow-x-auto border-b p-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${theme === "dark" ? "border-white/10 bg-[#151515]" : theme === "retro" ? "border-[#24252b] bg-[#e3e5dc]" : "border-[#edf0f2] bg-[#fbfcfd]"}`} aria-label="Pengaturan Creative Agent">
+        <nav className={`flex w-full flex-nowrap gap-2 overflow-x-auto border-b p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${theme === "dark" ? "border-white/10 bg-[#151515]" : theme === "retro" ? "border-[#24252b] bg-[#e3e5dc]" : "border-[#edf0f2] bg-[#fbfcfd]"}`} aria-label="Pengaturan Creative Agent">
           {([
             ["identity", "badge", "Personal"],
             ["specialties", "category", "Spesialisasi ODDS"],
@@ -114,7 +114,7 @@ export default function EditCreativeMemberPage() {
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`group flex min-h-9 shrink-0 items-center gap-2 whitespace-nowrap rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all ${activeTab === tab ? theme === "dark" ? "border-[#b0ff5e]/40 bg-[#b0ff5e] text-[#181818] shadow-[0_5px_14px_rgba(176,255,94,0.16)]" : "border-[#6d46eb] bg-[#6d46eb] text-white shadow-[0_5px_14px_rgba(109,70,235,0.2)]" : theme === "dark" ? "border-transparent text-slate-300 hover:border-white/10 hover:bg-white/10" : "border-transparent text-slate-600 hover:border-[#e0dafe] hover:bg-white"}`}
+              className={`group flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-semibold transition-all ${activeTab === tab ? theme === "dark" ? "border-[#b0ff5e]/40 bg-[#b0ff5e] text-[#181818] shadow-[0_5px_14px_rgba(176,255,94,0.16)]" : "border-[#6d46eb] bg-[#6d46eb] text-white shadow-[0_5px_14px_rgba(109,70,235,0.2)]" : theme === "dark" ? "border-transparent text-slate-300 hover:border-white/10 hover:bg-white/10" : "border-transparent text-slate-600 hover:border-[#e0dafe] hover:bg-white"}`}
             >
               <span className={`flex size-6 items-center justify-center rounded-md ${activeTab === tab ? theme === "dark" ? "bg-black/10" : "bg-white/15" : theme === "dark" ? "bg-white/10" : "bg-[#f0edff] text-[#6d46eb]"}`}><MaterialIcon name={icon} size="xs" /></span>
               <span>{label}</span>

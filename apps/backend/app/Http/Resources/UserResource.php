@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Http\Resources\Core\ApplicationResource;
+use App\SubApps\CreativeReport\Models\CreativeMember;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
@@ -32,6 +33,7 @@ class UserResource extends JsonResource
             'avatar_url' => $this->avatar_path
                 ? Storage::disk('public')->url($this->avatar_path)
                 : null,
+            'card_image_path' => CreativeMember::query()->where('user_id', $this->id)->value('card_image_path'),
 
             'created_at' => $this->created_at?->toIso8601String(),
             'roles' => $this->getRoleNames()->values()->all(),

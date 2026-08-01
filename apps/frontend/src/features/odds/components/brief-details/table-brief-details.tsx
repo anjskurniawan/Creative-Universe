@@ -85,7 +85,7 @@ function CatalogCombobox({
       />
       <MaterialIcon name="expand_more" size="sm" className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 ${dark ? "text-[#B9B9B9]" : "text-[#04044A]/60"}`} />
       {open && !disabled && (
-        <div className={`absolute inset-x-0 top-[calc(100%+6px)] z-30 max-h-56 overflow-y-auto rounded-xl border p-1.5 shadow-[0_10px_24px_rgba(4,4,74,0.14)] ${dark ? "border-white/10 bg-[#171717]" : "border-[#BDEAFF] bg-white"}`}>
+        <div className={`absolute inset-x-0 top-[calc(100%+6px)] z-30 max-h-36 overflow-y-auto rounded-xl border p-1.5 shadow-[0_10px_24px_rgba(4,4,74,0.14)] ${dark ? "border-white/10 bg-[#171717]" : "border-[#BDEAFF] bg-white"}`}>
           {filteredOptions.map((option) => (
             <button key={option} type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => { onChange(option); setOpen(false); }} className={`block w-full rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${dark ? "text-white hover:bg-white/10" : "text-[#04044A] hover:bg-[#F3FAFF]"}`}>
               {option}
@@ -122,21 +122,21 @@ function BriefTable({
   onAddRow: () => void;
 }) {
   return (
-    <table className={`w-full min-w-[700px] table-fixed border-collapse text-sm [&_td]:min-w-0 border ${dark ? "border-white/10" : "border-[#BDEAFF]"}`}>
+    <table className={`w-full table-fixed border-collapse text-sm [&_td]:min-w-0 border ${dark ? "border-white/10" : "border-[#BDEAFF]"}`}>
       <colgroup>
-        <col className="w-16" />
-        <col className="w-[42%]" />
-        <col className="w-[26%]" />
-        <col className="w-[32%]" />
-        <col className="w-16" />
+        <col className="w-[6%]" />
+        <col className="w-[36%]" />
+        <col className="w-[25%]" />
+        <col className="w-[25%]" />
+        <col className="w-[8%]" />
       </colgroup>
       <thead className={dark ? "bg-white/5 text-[#B9B9B9]" : "bg-[#F3FAFF] text-[#04044A]/70"}>
         <tr>
           <th className={`w-16 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>No</th>
-          <th className={`min-w-44 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Deskripsi</th>
-          <th className={`min-w-44 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Referensi</th>
-          <th className={`min-w-48 px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Keterangan</th>
-          <th className="w-16 px-3 py-3 text-center text-xs font-semibold">Action</th>
+          <th className={`px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Deskripsi</th>
+          <th className={`px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Referensi</th>
+          <th className={`px-3 py-3 text-center text-xs font-semibold ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]"}`}>Keterangan</th>
+          <th className="px-2 py-3 text-center text-xs font-semibold">Action</th>
         </tr>
       </thead>
       <tbody className="h-full">
@@ -172,7 +172,9 @@ function BriefTable({
               </div>
             </td>
             <td className={`h-full p-2 align-top ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]/60"}`}>
-              <OddsRichTextEditor value={row.image_description} onChange={(value) => onRowChange(row.id, "image_description", value)} minHeight={0} placeholder="Apa yang perlu terlihat?" toolbarMode="focus" fillHeight />
+              <div className="h-full min-h-[164px]">
+                <OddsRichTextEditor value={row.image_description} onChange={(value) => onRowChange(row.id, "image_description", value)} minHeight={0} placeholder="Apa yang perlu terlihat?" toolbarMode="focus" fillHeight className="min-h-[164px]" />
+              </div>
             </td>
             <td className={`h-full p-2 align-top ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]/60"}`}>
               <label className={`relative flex h-full min-h-[164px] cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border border-dashed px-3 py-4 text-center text-xs transition ${dark ? "border-white/15 text-[#B9B9B9] hover:bg-white/5" : "border-[#BDEAFF] text-[#04044A]/70 hover:bg-[#F3FAFF]"}`}>
@@ -188,7 +190,9 @@ function BriefTable({
               </label>
             </td>
             <td className={`h-full p-2 align-top ${dark ? "border-r border-white/10" : "border-r border-[#BDEAFF]/60"}`}>
-              <OddsRichTextEditor value={row.additional_notes} onChange={(value) => onRowChange(row.id, "additional_notes", value)} minHeight={0} placeholder="Catatan tambahan" toolbarMode="focus" fillHeight />
+              <div className="h-full min-h-[164px]">
+                <OddsRichTextEditor value={row.additional_notes} onChange={(value) => onRowChange(row.id, "additional_notes", value)} minHeight={0} placeholder="Catatan tambahan" toolbarMode="focus" fillHeight className="min-h-[164px]" />
+              </div>
             </td>
             <td className="p-2 text-center align-middle">
               <button type="button" onClick={() => onRemoveRow(row.id)} disabled={rows.length === 1} title="Hapus baris" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-rose-500 transition hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-30">
@@ -200,8 +204,8 @@ function BriefTable({
       </tbody>
       <tfoot className={dark ? "border-t border-white/10" : "border-t border-[#BDEAFF]"}>
         <tr>
-          <td colSpan={5} className="p-3">
-            <button type="button" onClick={onAddRow} className={dark ? "inline-flex items-center gap-1.5 rounded-xl border border-[#B0FF5E]/40 px-3 py-2 text-xs font-semibold text-[#B0FF5E]" : "inline-flex items-center gap-1.5 rounded-xl border border-[#BDEAFF] px-3 py-2 text-xs font-semibold text-[#00A4FF]"}>
+          <td colSpan={5} className="p-0">
+            <button type="button" onClick={onAddRow} className={dark ? "flex w-full items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-xs font-semibold text-[#B0FF5E] hover:bg-white/5" : "flex w-full items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-xs font-semibold text-[#00A4FF] hover:bg-[#F3FAFF]"}>
               <MaterialIcon name="add" size="sm" />
               Tambah Baris
             </button>
@@ -210,6 +214,45 @@ function BriefTable({
       </tfoot>
     </table>
   );
+}
+
+function MobileBriefTable({
+  rows, dark, labelClass, onRowChange, onIllustrationUpload, uploadingIllustrationId, onRemoveRow, onAddRow,
+}: Pick<Parameters<typeof BriefTable>[0], "rows" | "dark" | "labelClass" | "onRowChange" | "onIllustrationUpload" | "uploadingIllustrationId" | "onRemoveRow" | "onAddRow">) {
+  return (
+    <div className="space-y-3 sm:hidden">
+      {rows.map((row, index) => (
+        <section key={row.id} className={`rounded-xl border p-3 ${dark ? "border-white/10 bg-white/[0.03]" : "border-[#BDEAFF] bg-white"}`}>
+          <div className="mb-3 flex items-center justify-between">
+            <span className={`text-xs font-bold ${labelClass}`}>Baris {index + 1}</span>
+            <button type="button" onClick={() => onRemoveRow(row.id)} disabled={rows.length === 1} title="Hapus baris" className="text-rose-500 disabled:opacity-30"><MaterialIcon name="delete" size="sm" /></button>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <span className={`mb-1 block text-[10px] font-semibold ${labelClass}`}>Deskripsi</span>
+              <OddsRichTextEditor value={row.image_description} onChange={(value) => onRowChange(row.id, "image_description", value)} minHeight={96} placeholder="Apa yang perlu terlihat?" toolbarMode="focus" />
+            </div>
+            <div>
+              <span className={`mb-1 block text-[10px] font-semibold ${labelClass}`}>Referensi</span>
+              <label className={`flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-4 text-center text-xs ${dark ? "border-white/15 text-[#B9B9B9]" : "border-[#BDEAFF] text-[#04044A]/70"}`}>
+                {row.image_illustration_id ? <Image src={`/api/v1/odds/uploads/${row.image_illustration_id}/content`} alt="Ilustrasi gambar" width={160} height={96} unoptimized className="max-h-24 w-auto object-contain" /> : <><MaterialIcon name={uploadingIllustrationId === row.id ? "progress_activity" : "add_photo_alternate"} size="sm" className={uploadingIllustrationId === row.id ? "animate-spin" : ""} /><span>{uploadingIllustrationId === row.id ? "Mengunggah..." : "Upload / seret referensi"}</span></>}
+                <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={uploadingIllustrationId === row.id} onChange={(event) => onIllustrationUpload(row.id, event.target.files)} className="sr-only" />
+              </label>
+            </div>
+            <div>
+              <span className={`mb-1 block text-[10px] font-semibold ${labelClass}`}>Keterangan</span>
+              <OddsRichTextEditor value={row.additional_notes} onChange={(value) => onRowChange(row.id, "additional_notes", value)} minHeight={72} placeholder="Catatan tambahan" toolbarMode="focus" />
+            </div>
+          </div>
+        </section>
+      ))}
+      <button type="button" onClick={onAddRow} className={`flex w-full items-center justify-center gap-1.5 rounded-xl px-3 py-3 text-xs font-semibold ${dark ? "text-[#B0FF5E]" : "text-[#00A4FF]"}`}><MaterialIcon name="add" size="sm" />Tambah Baris</button>
+    </div>
+  );
+}
+
+function ResponsiveBriefTable(props: Parameters<typeof BriefTable>[0]) {
+  return <><div className="hidden sm:block"><BriefTable {...props} /></div><MobileBriefTable {...props} /></>;
 }
 
 /** Brief packaging berbasis tabel untuk kategori yang memilih format `table`. */
@@ -253,14 +296,14 @@ export function TableBriefDetails({
   return (
     <>
       {/* Normal embedded layout */}
-      <div className="flex min-h-0 flex-1 overflow-hidden">
-        <div className="grid grid-cols-4 gap-4 w-full h-full min-h-0">
+      <div className="flex min-h-0 flex-1 overflow-auto sm:overflow-hidden">
+        <div className="grid w-full h-auto min-h-0 grid-cols-1 gap-4 sm:h-full sm:grid-cols-4">
 
           {/* Left Side (3/4): container with header + table */}
-          <div className={`col-span-3 flex flex-col min-h-0 overflow-hidden ${dark ? "bg-[#171717]" : "bg-white"}`}>
+          <div className={`order-2 flex min-h-0 flex-col overflow-visible sm:order-none sm:col-span-3 sm:overflow-hidden ${dark ? "bg-[#171717]" : "bg-white"}`}>
             {/* Header bar */}
-            <div className={`flex shrink-0 items-center justify-between px-3 py-2`}>
-              <span className={`text-xs font-bold ${dark ? "text-white" : "text-[#04044A]"}`}>Tabel Brief</span>
+            <div className="flex shrink-0 items-center justify-between px-0 py-2 sm:px-8 sm:py-6">
+              <span className={`text-2xl font-bold tracking-tight sm:text-4xl ${dark ? "text-white" : "text-[#04044A]"}`}>Tabel Brief</span>
               <button
                 type="button"
                 onClick={() => setIsFullscreen(true)}
@@ -273,15 +316,16 @@ export function TableBriefDetails({
             </div>
 
             {/* Table — scrollable area below the header */}
-            <div className="flex min-h-0 flex-1 flex-col overflow-auto pr-1 pb-2">
+            <div className="flex min-h-0 flex-1 flex-col overflow-visible px-0 sm:overflow-auto sm:px-8">
               <div className="min-w-0">
-                <BriefTable {...tableProps} />
+                <ResponsiveBriefTable {...tableProps} />
+                <div aria-hidden="true" className="h-2" />
               </div>
             </div>
           </div>
 
           {/* Right Side (1/4): detail inputs */}
-          <div className="col-span-1 flex flex-col space-y-4 min-w-0 overflow-y-auto">
+          <div className="order-1 flex min-w-0 flex-col space-y-4 overflow-visible sm:order-none sm:col-span-1 sm:overflow-y-auto">
             <label className="block">
               <span className={`mb-1.5 block text-xs font-semibold ${labelClass}`}>Kategori</span>
               <CatalogCombobox value={category} placeholder="Cari/tambah kategori" options={productCatalog.map((item) => item.name)} dark={dark} onChange={onCategoryChange} onCommit={onProductCategoryCommit} />
@@ -354,13 +398,13 @@ export function TableBriefDetails({
       {isFullscreen && createPortal(
         <div className={`fixed inset-0 z-[9999] flex flex-col ${dark ? "bg-[#0E0E0E]" : "bg-white"}`}>
           {/* Popup Header */}
-          <div className={`flex shrink-0 items-center justify-between border-b px-5 py-3 ${dark ? "border-white/10" : "border-[#BDEAFF]"}`}>
-            <span className={`text-sm font-bold ${dark ? "text-white" : "text-[#04044A]"}`}>Tabel Brief</span>
+          <div className="flex shrink-0 items-center justify-between px-8 py-6">
+            <span className={`text-4xl font-bold tracking-tight ${dark ? "text-white" : "text-[#04044A]"}`}>Tabel Brief</span>
             <button
               type="button"
               onClick={() => setIsFullscreen(false)}
               title="Tutup layar penuh"
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${dark ? "text-[#B9B9B9] hover:bg-white/10 hover:text-white" : "text-[#04044A]/60 hover:bg-[#BDEAFF]/40 hover:text-[#04044A]"}`}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition ${dark ? "text-[#B9B9B9] hover:bg-white/10 hover:text-white" : "text-[#04044A]/60 hover:bg-[#BDEAFF]/40 hover:text-[#04044A]"}`}
             >
               <MaterialIcon name="close_fullscreen" size="sm" />
               Tutup
@@ -368,9 +412,10 @@ export function TableBriefDetails({
           </div>
 
           {/* Popup Body — full-width table */}
-          <div className="flex min-h-0 flex-1 overflow-auto p-4">
-            <div className="w-full min-w-0">
-              <BriefTable {...tableProps} />
+          <div className="flex min-h-0 flex-1 overflow-auto px-8 pb-8">
+            <div className="w-full min-w-0 pb-8 mb-8">
+              <ResponsiveBriefTable {...tableProps} />
+              <div aria-hidden="true" className="h-8" />
             </div>
           </div>
         </div>,

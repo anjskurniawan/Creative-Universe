@@ -12,6 +12,44 @@ import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-car
 import { OddsTaskCard, OutputFilesPanel, OutputReviewPanel, TaskDiscussionPanel, TaskSubmissionPanel, publishTaskFeedbackToast } from "@/components/odds/TaskCard";
 import { useAuth } from "@/providers/auth-provider";
 import { useOddsTheme } from "./odds-theme-context";
+import { resolveStorageUrl } from "@/core/api/client";
+import { creativeReportApi } from "@/features/creative-report/api";
+import { CustomDatePicker } from "@/components/ui/custom-date-picker";
+
+function DesignerDropdown({ id, value, placeholder, options, onChange, searchable = false }: { id: string; value: string; placeholder: string; options: ReadonlyArray<{ value: string; label: string; badge?: string; searchText?: string }>; onChange: (value: string) => void; searchable?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const selected = options.find((option) => option.value === value);
+  const filteredOptions = options.filter((option) => (option.searchText ?? `${option.label} ${option.badge ?? ""}`).toLowerCase().includes(query.toLowerCase()));
+  const badgeClass = (badge?: string) => badge?.toLowerCase().includes("designer") && !badge.toLowerCase().includes("content") ? "bg-[#ffe8ec] text-[#d92d55]" : badge?.toLowerCase().includes("videographer") ? "bg-[#e5f3ff] text-[#0877c9]" : "bg-[#f0e8ff] text-[#7746c8]";
+  useEffect(() => { const closeOutside = (event: MouseEvent) => { if (!containerRef.current?.contains(event.target as Node)) setOpen(false); }; const closeOther = (event: Event) => { if ((event as CustomEvent<string>).detail !== id) setOpen(false); }; document.addEventListener("mousedown", closeOutside); document.addEventListener("odds-designer-dropdown-open", closeOther); return () => { document.removeEventListener("mousedown", closeOutside); document.removeEventListener("odds-designer-dropdown-open", closeOther); }; }, [id]);
+  return <div ref={containerRef} className="relative">
+    <button type="button" onClick={() => { const next = !open; setOpen(next); if (next) document.dispatchEvent(new CustomEvent("odds-designer-dropdown-open", { detail: id })); }} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border bg-white px-3 py-2 text-left shadow-[0_2px_8px_rgba(4,64,90,0.04)] transition ${open ? "border-[#00a4ff] ring-4 ring-[#00a4ff]/10" : "border-[#d7e3ea] hover:border-[#9bdcff]"}`}>
+      <span className="flex min-w-0 items-center justify-between gap-2"><span className={selected ? "truncate text-cu-ink" : "text-cu-muted"}>{selected?.label ?? placeholder}</span>{selected?.badge && <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold ${badgeClass(selected.badge)}`}>{selected.badge}</span>}</span>
+      <MaterialIcon name={open ? "expand_less" : "expand_more"} size="sm" className="text-cu-muted" />
+    </button>
+    {open && <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-xl border border-[#d7e3ea] bg-white p-1.5 shadow-[0_12px_30px_rgba(4,64,90,0.14)]">
+      {searchable && <div className="mb-1 bg-white p-1"><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari user..." className="h-9 w-full rounded-lg border border-[#d7e3ea] bg-[#f8fbfd] px-3 text-sm outline-none focus:border-[#00a4ff] focus:ring-2 focus:ring-[#00a4ff]/10" /></div>}
+      <div className="max-h-[180px] overflow-y-auto">{filteredOptions.length > 0 ? filteredOptions.map((option) => <button key={option.value} type="button" onClick={() => { onChange(option.value); setQuery(""); setOpen(false); }} className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-sm transition hover:bg-[#eefaff] ${option.value === value ? "bg-[#e8f8ff] font-semibold text-[#0077bf]" : "text-cu-ink"}`}><span className="truncate">{option.label}</span>{option.badge && <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-semibold ${badgeClass(option.badge)}`}>{option.badge}</span>}</button>) : <p className="px-3 py-3 text-sm text-cu-muted">User tidak ditemukan.</p>}</div>
+    </div>}
+  </div>;
+}
+
+function DesignerMultiDropdown({ id, selected, options, onToggle }: { id: string; selected: Set<string>; options: ReadonlyArray<{ value: string; label: string }>; onToggle: (value: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const filtered = options.filter((option) => option.label.toLowerCase().includes(query.toLowerCase()));
+  useEffect(() => { const closeOutside = (event: MouseEvent) => { if (!containerRef.current?.contains(event.target as Node)) setOpen(false); }; const closeOther = (event: Event) => { if ((event as CustomEvent<string>).detail !== id) setOpen(false); }; document.addEventListener("mousedown", closeOutside); document.addEventListener("odds-designer-dropdown-open", closeOther); return () => { document.removeEventListener("mousedown", closeOutside); document.removeEventListener("odds-designer-dropdown-open", closeOther); }; }, [id]);
+  return <div ref={containerRef} className="relative">
+    <button type="button" onClick={() => { const next = !open; setOpen(next); if (next) document.dispatchEvent(new CustomEvent("odds-designer-dropdown-open", { detail: id })); }} className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border bg-white px-3 py-2 text-left shadow-[0_2px_8px_rgba(4,64,90,0.04)] transition ${open ? "border-[#00a4ff] ring-4 ring-[#00a4ff]/10" : "border-[#d7e3ea] hover:border-[#9bdcff]"}`}>
+      <span className="flex min-w-0 flex-wrap gap-1">{selected.size > 0 ? Array.from(selected).slice(0, 4).map((id) => <span key={id} className="rounded-full bg-[#e8f8ff] px-2 py-1 text-[10px] font-semibold text-[#0077bf]">{options.find((option) => option.value === id)?.label ?? id}</span>) : <span className="text-sm text-cu-muted">Pilih spesialisasi</span>}{selected.size > 4 && <span className="rounded-full bg-[#f0f3f5] px-2 py-1 text-[10px] text-cu-muted">+{selected.size - 4}</span>}</span>
+      <MaterialIcon name={open ? "expand_less" : "expand_more"} size="sm" className="shrink-0 text-cu-muted" />
+    </button>
+    {open && <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-xl border border-[#d7e3ea] bg-white p-1.5 shadow-[0_12px_30px_rgba(4,64,90,0.14)]"><div className="mb-1 bg-white p-1"><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari spesialisasi..." className="h-9 w-full rounded-lg border border-[#d7e3ea] bg-[#f8fbfd] px-3 text-sm outline-none focus:border-[#00a4ff] focus:ring-2 focus:ring-[#00a4ff]/10" /></div><div className="max-h-[180px] overflow-y-auto">{filtered.length > 0 ? filtered.map((option) => <button key={option.value} type="button" onClick={() => onToggle(option.value)} className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition hover:bg-[#eefaff] ${selected.has(option.value) ? "bg-[#e8f8ff] font-semibold text-[#0077bf]" : "text-cu-ink"}`}><span>{option.label}</span>{selected.has(option.value) && <MaterialIcon name="check" size="sm" />}</button>) : <p className="px-3 py-3 text-sm text-cu-muted">Spesialisasi tidak ditemukan.</p>}</div></div>}
+  </div>;
+}
 
 import { OddsBriefViewer } from "@/features/odds/components/brief-details";
 import TaskCardDate from "@/components/odds/legacy-taskcard/date";
@@ -488,6 +526,7 @@ function OddsPageContent() {
 
   const [categories, setCategories] = useState<OddsCategory[]>([]);
   const [designerProfiles, setDesignerProfiles] = useState<OddsDesignerProfile[]>([]);
+  const [creativeCardPaths, setCreativeCardPaths] = useState<Record<string, string | null>>({});
   const [rules, setRules] = useState<OddsSystemRule[]>([]);
   const [assignableUsers, setAssignableUsers] = useState<OddsAssignableUser[]>([]);
   const [tasks, setTasks] = useState<OddsTask[]>([]);
@@ -501,6 +540,7 @@ function OddsPageContent() {
   const [categoryDrafts, setCategoryDrafts] = useState<Record<number, CategoryForm>>({});
   const [editingCategories, setEditingCategories] = useState(false);
   const [designerForm, setDesignerForm] = useState<DesignerForm>(emptyDesignerForm);
+  const [designerPanelTab, setDesignerPanelTab] = useState<"form" | "list">("list");
   const [ruleForm, setRuleForm] = useState<RuleForm>(emptyRuleForm);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
@@ -513,6 +553,16 @@ function OddsPageContent() {
   const [outputTotal, setOutputTotal] = useState("");
   const [outputDragActive, setOutputDragActive] = useState(false);
   const [outputBusy, setOutputBusy] = useState(false);
+
+  useEffect(() => {
+    void creativeReportApi.members.list().then((members) => {
+      setCreativeCardPaths(Object.fromEntries(members.flatMap((member) => {
+        const entries: Array<[string, string | null]> = [[member.name.trim().toLowerCase(), member.card_image_path ?? null]];
+        if (member.user_id != null) entries.push([String(member.user_id), member.card_image_path ?? null]);
+        return entries;
+      })));
+    }).catch(() => setCreativeCardPaths({}));
+  }, []);
   const [adminTaskAction, setAdminTaskAction] = useState<{ taskId: number; type: string; nonce: number } | null>(null);
   const [deleteConfirmTaskId, setDeleteConfirmTaskId] = useState<number | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
@@ -879,22 +929,29 @@ function OddsPageContent() {
       status: designerForm.status,
       specializations: designerForm.specializations,
       leave_dates: designerForm.leave_dates_text.split("\n").map((d) => d.trim()).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)),
-      is_active: designerForm.is_active,
+      is_active: designerForm.status === "available",
     };
 
     try {
+      let savedProfile: OddsDesignerProfile;
       if (designerForm.id) {
-        await updateOddsDesignerProfile(designerForm.id, payload);
+        savedProfile = await updateOddsDesignerProfile(designerForm.id, payload);
         setNotice("Profil desainer ODDS diperbarui.");
       } else {
-        await createOddsDesignerProfile(payload);
+        savedProfile = await createOddsDesignerProfile(payload);
         setNotice("Profil desainer ODDS dibuat.");
       }
+      const selectedUser = assignableUsers.find((item) => item.id === payload.user_id);
+      setDesignerProfiles((current) => {
+        const nextProfile = { ...savedProfile, user: savedProfile.user ?? selectedUser };
+        return designerForm.id
+          ? current.map((profile) => profile.id === designerForm.id ? nextProfile : profile)
+          : [nextProfile, ...current];
+      });
       setDesignerForm({
         ...emptyDesignerForm,
         user_id: availableUsersForProfile[0] ? String(availableUsersForProfile[0].id) : "",
       });
-      await loadConfig();
     } catch (err) {
       setError(oddsError(err));
     } finally {
@@ -1015,7 +1072,7 @@ function OddsPageContent() {
     try {
       await deleteOddsDesignerProfile(profile.id);
       setNotice("Profil desainer ODDS dihapus.");
-      await loadConfig();
+      setDesignerProfiles((current) => current.filter((item) => item.id !== profile.id));
     } catch (err) {
       setError(oddsError(err));
     } finally {
@@ -1051,6 +1108,7 @@ function OddsPageContent() {
   };
 
   const editDesignerProfile = (profile: OddsDesignerProfile) => {
+    setDesignerPanelTab("form");
     const savedSpecializations = profile.specializations ?? [];
     const visibleSpecializations = savedSpecializations.length > 0
       ? savedSpecializations.map(String)
@@ -1708,7 +1766,7 @@ function OddsPageContent() {
         )}
       </div>
 
-      <div className={`flex min-h-0 min-w-0 flex-1 flex-col ${isDesignerTaskSection ? "overflow-hidden" : "odds-scroll-hidden overflow-y-auto"}`}>
+      <div className={`flex min-h-0 min-w-0 flex-1 flex-col ${isDesignerTaskSection || effectiveActiveSection === "designers" ? "overflow-hidden" : "odds-scroll-hidden overflow-y-auto"}`}>
       {effectiveActiveSection === "categories" && (
       <section className="grid min-h-[calc(100vh-10rem)] gap-6 xl:h-[calc(100vh-10rem)] xl:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
         <ConfigPanel title={categoryForm.id ? "Edit Kategori" : "Tambah Kategori"} icon="category" className="h-full" bodyClassName="flex min-h-0 flex-col">
@@ -1818,96 +1876,84 @@ function OddsPageContent() {
       )}
 
       {effectiveActiveSection === "designers" && (
-      <section className="grid gap-6 xl:grid-cols-[minmax(18rem,22rem)_minmax(0,1fr)]">
-        <ConfigPanel title={designerForm.id ? "Edit Profil Desainer" : "Tambah Profil Desainer"} icon="groups">
-          <form onSubmit={submitDesignerProfile} className="space-y-3">
-            <label className="block">
+      <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-hidden">
+        <nav className={`flex shrink-0 gap-2 overflow-x-auto rounded-2xl border p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${theme === "dark" ? "border-white/10 bg-[#171717]/85" : theme === "retro" ? "rounded-none border-2 border-[#24252b] bg-[#eceee6]" : "border-[#BDEAFF]/60 bg-white shadow-[0_8px_30px_rgba(0,164,255,0.03)]"}`} aria-label="Panel profil designer">
+          <button type="button" onClick={() => setDesignerPanelTab("list")} className={`inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-t-xl rounded-b-none border-b-2 px-5 text-sm font-semibold transition-all ${designerPanelTab === "list" ? theme === "dark" ? "border-[#b0ff5e] text-[#b0ff5e]" : theme === "retro" ? "border-[#ba0dcb] text-[#ba0dcb]" : "border-[#00A4FF] text-[#00A4FF]" : theme === "dark" ? "border-transparent text-[#7d827f] hover:text-white" : "border-transparent text-[#04044A]/60 hover:text-[#00A4FF]"}`}><MaterialIcon name="groups" size="sm" />Daftar Profil</button>
+          <button type="button" onClick={() => setDesignerPanelTab("form")} className={`inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-t-xl rounded-b-none border-b-2 px-5 text-sm font-semibold transition-all ${designerPanelTab === "form" ? theme === "dark" ? "border-[#b0ff5e] text-[#b0ff5e]" : theme === "retro" ? "border-[#ba0dcb] text-[#ba0dcb]" : "border-[#00A4FF] text-[#00A4FF]" : theme === "dark" ? "border-transparent text-[#7d827f] hover:text-white" : "border-transparent text-[#04044A]/60 hover:text-[#00A4FF]"}`}><MaterialIcon name="edit" size="sm" />Kelola Profil</button>
+        </nav>
+        <div className="grid min-h-0 min-w-0 flex-1 gap-6">
+        <div className={designerPanelTab === "form" ? "min-h-0" : "hidden"}>
+        <ConfigPanel title={designerForm.id ? "Edit Profil Desainer" : "Tambah Profil Desainer"} icon="groups" showHeader={false} className="h-full min-h-0 overflow-hidden">
+          <form onSubmit={submitDesignerProfile} className="grid min-h-0 flex-1 gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <div className="odds-scroll-hidden flex min-h-0 flex-col gap-2 overflow-y-auto pb-0 pr-1">
+            <label className="block h-fit pb-0">
               <span className="mb-1 block text-xs font-medium text-cu-muted">User</span>
-              <select
-                value={designerForm.user_id}
-                onChange={(event) => setDesignerForm((prev) => ({ ...prev, user_id: event.target.value }))}
-                required
-                className="h-10 w-full rounded-lg border border-cu-border bg-white px-3 text-sm outline-none focus:border-cu-info"
-              >
-                <option value="">Pilih user</option>
-                {availableUsersForProfile.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name} ({item.roles.join(", ")})
-                  </option>
-                ))}
-              </select>
-              <FieldHelp>User dengan role Designer, Videographer, atau Content Creator yang akan masuk antrean ODDS.</FieldHelp>
+              <DesignerDropdown id="designer-user" searchable value={designerForm.user_id} placeholder="Pilih user" onChange={(value) => setDesignerForm((prev) => ({ ...prev, user_id: value }))} options={availableUsersForProfile.map((item) => ({ value: String(item.id), label: item.name, badge: item.roles.join(", "), searchText: `${item.name} ${item.roles.join(" ")}` }))} />
             </label>
-            <label className="block">
-              <span className="mb-1 block text-xs font-medium text-cu-muted">Status</span>
-              <select
-                value={designerForm.status}
-                onChange={(event) => setDesignerForm((prev) => ({ ...prev, status: event.target.value as DesignerForm["status"] }))}
-                className="h-10 w-full rounded-lg border border-cu-border bg-white px-3 text-sm outline-none focus:border-cu-info"
-              >
-                {statusOptions.map((item) => (
-                  <option key={item.value} value={item.value}>{item.label}</option>
-                ))}
-              </select>
-              <FieldHelp>Available bisa menerima task, Offline disembunyikan dari pilihan client.</FieldHelp>
+            <label className="block h-fit pb-0">
+              <span className="mb-1 block text-xs font-medium text-cu-muted">Status ketersediaan</span>
+              <DesignerDropdown id="designer-status" value={designerForm.status} onChange={(value) => setDesignerForm((prev) => ({ ...prev, status: value as DesignerForm["status"] }))} options={statusOptions} placeholder="Pilih status" />
             </label>
-            <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-3 py-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-cu-muted">Makna status</p>
-              <p className="mt-1 text-sm text-cu-ink">
-                Status mengatur ketersediaan harian desainer. Checklist Aktif di bawah mengatur apakah profil ini dipakai sistem assignment.
-              </p>
-            </div>
-            <div>
+            <div className="h-fit pb-0">
               <span className="mb-2 block text-xs font-medium text-cu-muted">Spesialisasi</span>
-              <FieldHelp>Kategori yang dicentang adalah kategori yang cocok untuk desainer ini. Saat edit, spesialisasi tersimpan otomatis tercentang.</FieldHelp>
-              <div className="odds-scroll-hidden grid max-h-40 gap-2 overflow-auto rounded-lg border border-cu-border p-2">
-                {categories.map((category) => (
-                  <CheckField
-                    key={category.id}
-                    label={`${category.name}${category.is_active ? "" : " (nonaktif)"}`}
-                    checked={selectedSpecializationIds.has(String(category.id))}
-                    onChange={() => toggleSpecialization(category.id)}
-                  />
-                ))}
-                {categories.length === 0 && (
-                  <p className="px-1 py-2 text-sm text-cu-muted">Kategori belum tersedia.</p>
-                )}
-              </div>
+              <DesignerMultiDropdown id="designer-specialties" selected={selectedSpecializationIds} onToggle={(value) => toggleSpecialization(Number(value))} options={categories.map((category) => ({ value: String(category.id), label: `${category.name}${category.is_active ? "" : " (nonaktif)"}` }))} />
             </div>
-            <label className="block">
+            <label className="block h-fit pb-0">
               <span className="mb-1 block text-xs font-medium text-cu-muted">Tanggal Cuti (Opsional)</span>
-              <textarea
-                value={designerForm.leave_dates_text}
-                onChange={(e) => setDesignerForm((prev) => ({ ...prev, leave_dates_text: e.target.value }))}
-                rows={3}
-                placeholder="2026-12-25&#10;2026-12-26"
-                className="w-full resize-y rounded-lg border border-cu-border px-3 py-2 font-mono text-sm outline-none focus:border-cu-info"
-              />
-              <FieldHelp>Masukkan daftar tanggal cuti spesifik untuk desainer ini dalam format YYYY-MM-DD. Pisahkan per baris.</FieldHelp>
+              <CustomDatePicker compact value="" placeholder="Tambah tanggal cuti" onChange={(value) => setDesignerForm((prev) => ({ ...prev, leave_dates_text: Array.from(new Set([...prev.leave_dates_text.split("\n").filter(Boolean), value])).join("\n") }))} />
+              {designerForm.leave_dates_text && <div className="mt-2 flex flex-wrap gap-1.5">{designerForm.leave_dates_text.split("\n").filter(Boolean).map((date) => <span key={date} className="inline-flex items-center gap-1 rounded-full bg-[#e8f8ff] px-2 py-1 text-[10px] font-semibold text-[#0077bf]">{date}<button type="button" onClick={() => setDesignerForm((prev) => ({ ...prev, leave_dates_text: prev.leave_dates_text.split("\n").filter((item) => item && item !== date).join("\n") }))} className="text-[#0077bf] hover:text-[#d92d55]" aria-label={`Hapus tanggal cuti ${date}`}>×</button></span>)}</div>}
             </label>
-            <CheckField
-              label="Profil aktif untuk assignment"
-              help="Jika nonaktif, profil tidak dipakai untuk assignment dan pilihan designer client."
-              checked={designerForm.is_active}
-              onChange={(value: boolean) => setDesignerForm((prev) => ({ ...prev, is_active: value }))}
-            />
-            <FormActions
-              saving={saving === "designer"}
-              editing={Boolean(designerForm.id)}
-              onCancel={() => setDesignerForm(emptyDesignerForm)}
-            />
+            <div className="mt-auto pt-3">
+              <FormActions
+                saving={saving === "designer"}
+                editing={Boolean(designerForm.id)}
+                onCancel={() => setDesignerForm(emptyDesignerForm)}
+              />
+            </div>
+            </div>
+            <aside className="min-h-0 self-stretch">
+              <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-cu-border bg-white">
+                <div className="aspect-square w-full shrink-0 overflow-hidden bg-white">
+                  {(() => {
+                    const selectedUser = assignableUsers.find((item) => String(item.id) === designerForm.user_id);
+                    const selectedProfile = designerProfiles.find((item) => String(item.user_id) === designerForm.user_id);
+                    const previewUser = selectedProfile?.user ?? selectedUser;
+                    const imagePath = previewUser?.card_image_path ?? creativeCardPaths[designerForm.user_id] ?? (previewUser?.name ? creativeCardPaths[previewUser.name.trim().toLowerCase()] : null) ?? null;
+                    const imageUrl = resolveStorageUrl(imagePath ?? previewUser?.avatar_path ?? previewUser?.avatar) ?? previewUser?.card_image_url ?? null;
+                    const isVideo = Boolean(imageUrl && /\.(mp4|webm|ogg)(?:\?.*)?$/i.test(imageUrl));
+                    return imageUrl ? isVideo ? <video src={imageUrl} muted autoPlay loop playsInline preload="metadata" className="pointer-events-none size-full object-contain" /> : <img src={imageUrl} alt={`Card ${previewUser?.name ?? "Designer"}`} className="size-full object-contain" /> : <div className="flex size-full items-center justify-center text-4xl font-semibold text-white">{(previewUser?.name ?? "Designer").slice(0, 2).toUpperCase()}</div>;
+                  })()}
+                </div>
+                <div className="space-y-2 p-3">
+                  <p className="truncate text-base font-semibold text-cu-ink">{assignableUsers.find((item) => String(item.id) === designerForm.user_id)?.name ?? "Pilih user"}</p>
+                  <p className="text-xs text-cu-muted">{designerForm.status === "available" ? "Available" : "Offline"}</p>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedSpecializationIds.size > 0 ? Array.from(selectedSpecializationIds).slice(0, 3).map((id) => <span key={id} className="rounded-full bg-cu-panel-soft px-2 py-1 text-[10px] text-cu-muted">{categoryNameById.get(id) ?? `#${id}`}</span>) : <span className="text-xs text-cu-muted">Semua kategori</span>}
+                  </div>
+                </div>
+              </div>
+            </aside>
           </form>
         </ConfigPanel>
+        </div>
 
-        <ConfigPanel title="Profil Desainer" icon="badge">
+        <div className={designerPanelTab === "list" ? "min-h-0 h-full" : "hidden"}>
+        <ConfigPanel title="Profil Desainer" icon="badge" showHeader={false} className="h-full min-h-0 overflow-hidden">
           <DataTable
             loading={loading}
             empty="Belum ada profil desainer."
-            headers={["User", "Status", "Profil Aktif", "Spesialisasi", ""]}
+            creativeReportStyle
+            scrollClassName="odds-scroll-hidden max-h-full overflow-auto"
+            headers={["Creative Agent", "Status", "Roles", "Spesialisasi", ""]}
             rows={designerProfiles.map((profile) => [
               profile.user?.name ?? `User #${profile.user_id}`,
               profile.status === "available" ? "Available" : "Offline",
-              profile.is_active ? "Ya" : "Tidak",
+              (profile.user?.roles?.length
+                ? profile.user.roles
+                : assignableUsers.find((item) => String(item.id) === String(profile.user_id))?.roles ?? [])
+                .map((role) => typeof role === "string" ? role : (role as { name?: string; label?: string }).name ?? (role as { label?: string }).label ?? "")
+                .filter(Boolean)
+                .join(", ") || "-",
               (profile.specializations ?? []).length > 0
                 ? (profile.specializations ?? []).map((id) => categoryNameById.get(String(id)) ?? `#${id}`).join(", ")
                 : "Semua kategori",
@@ -1920,6 +1966,8 @@ function OddsPageContent() {
             ])}
           />
         </ConfigPanel>
+        </div>
+        </div>
       </section>
       )}
 
@@ -5715,6 +5763,7 @@ function DataTable({
   rows,
   className = "",
   scrollClassName = "overflow-x-auto",
+  creativeReportStyle = false,
 }: {
   loading: boolean;
   empty: string;
@@ -5722,19 +5771,20 @@ function DataTable({
   rows: Array<Array<React.ReactNode>>;
   className?: string;
   scrollClassName?: string;
+  creativeReportStyle?: boolean;
 }) {
   return (
-    <div className={`overflow-hidden rounded-lg border border-cu-border ${className}`}>
-      <div className={scrollClassName}>
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-cu-border bg-cu-panel-soft text-xs uppercase tracking-wide text-cu-muted">
+    <div className={`${creativeReportStyle ? "flex min-h-0 flex-1 flex-col overflow-hidden rounded-b-xl border border-[#c9bbfc] bg-white" : "overflow-hidden rounded-lg border border-cu-border"} ${className}`}>
+      <div className={`${creativeReportStyle ? "min-h-0 flex-1" : ""} ${scrollClassName}`}>
+        <table className={`${creativeReportStyle ? "w-full table-fixed border-collapse text-left" : "min-w-full text-left text-sm"}`}>
+          <thead className={creativeReportStyle ? "sticky top-0 z-10 border-b border-[#ded7fb] bg-[#f7f5ff] text-xs font-semibold text-[#3b4446]" : "border-b border-cu-border bg-cu-panel-soft text-xs uppercase tracking-wide text-cu-muted"}>
             <tr>
-              {headers.map((header) => (
-                <th key={header} className="px-3 py-3">{header}</th>
+              {headers.map((header, index) => (
+                <th key={header} className={creativeReportStyle ? `border-b border-r border-[#ded7fb] px-2 py-3 text-center text-xs font-semibold last:border-r-0 ${index === 0 ? "w-[26%]" : index === 1 ? "w-[96px]" : index === 2 ? "w-[92px]" : index === headers.length - 1 ? "w-[72px]" : ""}` : "px-3 py-3"}>{header}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-cu-border">
+          <tbody className={creativeReportStyle ? "divide-y divide-[#ded7fb]" : "divide-y divide-cu-border"}>
             {loading ? (
               <tr>
                 <td className="px-3 py-8 text-center text-cu-muted" colSpan={headers.length}>Memuat...</td>
@@ -5745,9 +5795,9 @@ function DataTable({
               </tr>
             ) : (
               rows.map((row, rowIndex) => (
-                <tr key={rowIndex} className="align-top hover:bg-cu-panel-soft/60">
+                <tr key={rowIndex} className={creativeReportStyle ? "align-middle hover:bg-[#faf9ff]" : "align-top hover:bg-cu-panel-soft/60"}>
                   {row.map((cell, cellIndex) => (
-                    <td key={cellIndex} className="max-w-72 px-3 py-3 text-cu-muted">
+                    <td key={cellIndex} className={creativeReportStyle ? `max-w-72 border-r border-[#eeeafd] px-2 py-2 text-xs text-cu-muted last:border-r-0 ${cellIndex === 0 || cellIndex === 3 ? "text-left" : "text-center"}` : "max-w-72 px-3 py-3 text-cu-muted"}>
                       {cell}
                     </td>
                   ))}

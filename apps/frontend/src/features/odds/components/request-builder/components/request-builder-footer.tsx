@@ -30,9 +30,9 @@ export function RequestBuilderFooter({
     <footer className="mt-auto flex justify-between border-t border-black/5 pt-4 dark:border-white/5">
       <div className="flex items-center gap-2">
         {currentStep > 1 ? (
-          <button type="button" onClick={onPrevious} className={`${theme.secondaryButtonClass} h-[58px] px-6`}>
+          <button type="button" onClick={onPrevious} aria-label="Sebelumnya" title="Sebelumnya" className={`${theme.secondaryButtonClass} h-[58px] w-[58px] px-0 sm:w-auto sm:px-6`}>
             <MaterialIcon name="chevron_left" size="auto" className="text-lg" />
-            <span>Sebelumnya</span>
+            <span className="hidden sm:inline">Sebelumnya</span>
           </button>
         ) : (
           <div />
@@ -54,14 +54,14 @@ export function RequestBuilderFooter({
         )}
 
         {currentStep < 5 ? (
-          <button key="btn-next" type="button" disabled={!canContinue} onClick={onNext} className={`${theme.primaryButtonClass} h-[58px] px-6`}>
-            <span>Lanjutkan</span>
+          <button key="btn-next" type="button" disabled={!canContinue} onClick={onNext} aria-label="Lanjutkan" title="Lanjutkan" className={`${theme.primaryButtonClass} h-[58px] w-[58px] px-0 sm:w-auto sm:px-6`}>
+            <span className="hidden sm:inline">Lanjutkan</span>
             <MaterialIcon name="chevron_right" size="auto" className="text-lg" />
           </button>
         ) : (
-          <button key="btn-submit" type="submit" disabled={loading || initializing || uploadingAttachments} className={`${theme.primaryButtonClass} h-[58px] px-6`}>
+          <button key="btn-submit" type="submit" disabled={loading || initializing || uploadingAttachments} aria-label={loading ? "Mengirim" : "Kirim Request"} title={loading ? "Mengirim" : "Kirim Request"} className={`${theme.primaryButtonClass} h-[58px] w-[58px] px-0 sm:w-auto sm:px-6`}>
             <MaterialIcon name="send" size="auto" className="text-lg" />
-            <span>{loading ? "Mengirim..." : "Kirim Request"}</span>
+            <span className="hidden sm:inline">{loading ? "Mengirim..." : "Kirim Request"}</span>
           </button>
         )}
       </div>

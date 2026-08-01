@@ -71,6 +71,7 @@ export interface CreativeReportUpdateInput {
 
 export interface CreativeMember {
   id: number;
+  user_id?: number | null;
   name: string;
   position_name: "Manajer" | "SPV" | "Designer" | "Videographer" | "Content Creator";
   status: "pending" | "active" | "resigned";

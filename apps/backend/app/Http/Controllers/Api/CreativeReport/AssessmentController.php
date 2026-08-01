@@ -262,7 +262,7 @@ class AssessmentController extends BaseApiController
         $categoryNames = Category::query()->whereIn('id', $categoryIds)->pluck('name')->all();
         $legacyNames = collect($specializations)->filter(fn ($value) => is_string($value) && !is_numeric($value))->values()->all();
 
-        return ['id' => $member->id, 'name' => $member->user?->name ?? $member->name, 'email' => $member->user?->email, 'whatsapp_number' => $member->user?->whatsapp_number, 'roles' => $member->user?->getRoleNames()->values()->all() ?? [], 'position_name' => $member->position_name, 'status' => $member->status, 'card_image_path' => $member->card_image_path, 'profile_metrics' => $member->profile_metrics ?? [], 'joined_at' => $member->joined_at?->toDateString(), 'resigned_at' => $member->resigned_at?->toDateString(), 'specialties' => array_values(array_unique([...$categoryNames, ...$legacyNames])), 'odds_metrics' => $this->oddsMetrics($member->user_id)];
+        return ['id' => $member->id, 'user_id' => $member->user_id, 'name' => $member->user?->name ?? $member->name, 'email' => $member->user?->email, 'whatsapp_number' => $member->user?->whatsapp_number, 'roles' => $member->user?->getRoleNames()->values()->all() ?? [], 'position_name' => $member->position_name, 'status' => $member->status, 'card_image_path' => $member->card_image_path, 'profile_metrics' => $member->profile_metrics ?? [], 'joined_at' => $member->joined_at?->toDateString(), 'resigned_at' => $member->resigned_at?->toDateString(), 'specialties' => array_values(array_unique([...$categoryNames, ...$legacyNames])), 'odds_metrics' => $this->oddsMetrics($member->user_id)];
     }
 
     private function oddsMetrics(?int $userId): array

@@ -194,7 +194,7 @@ export default function Card({
           className={`relative shrink-0 overflow-hidden rounded-lg border-0 ${cardImage ? "bg-white" : "bg-[#3b4446]"} outline-none ring-0 ${compact ? "size-14" : "size-[74px] lg:h-[154px] lg:w-[145px]"}`}
         >
           {isRecommended && (
-            <span className="absolute left-0 top-0 z-10 rounded-br bg-[#00a4ff] px-2.5 py-1.5 text-[10px] font-extrabold leading-none text-white shadow-sm uppercase tracking-wider">
+            <span className="absolute bottom-0 left-0 z-10 rounded-tr bg-[#00a4ff] px-1.5 py-1 text-[8px] font-extrabold leading-none text-white shadow-sm uppercase tracking-wider sm:px-2.5 sm:py-1.5 sm:text-[10px]">
               {compact ? "★" : "Rekomendasi"}
             </span>
           )}

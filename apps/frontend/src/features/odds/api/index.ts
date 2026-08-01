@@ -16,6 +16,7 @@ export interface OddsUser {
   avatar?: string | null;
   avatar_path?: string | null;
   card_image_path?: string | null;
+  card_image_url?: string | null;
   roles?: string[];
 }
 

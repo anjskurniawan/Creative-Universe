@@ -23,7 +23,7 @@ export function DesignerSelectionStep({
   return (
     <section className="flex min-h-0 flex-1 flex-col space-y-5">
       <header>
-        <h2 className={`text-4xl font-bold tracking-tight ${theme.textTitle}`}>Pilih Desainer</h2>
+        <h2 className={`text-2xl font-bold tracking-tight sm:text-4xl ${theme.textTitle}`}>Pilih Desainer</h2>
       </header>
 
       {designers.length === 0 ? (

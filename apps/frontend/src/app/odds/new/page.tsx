@@ -137,10 +137,11 @@ export default function NewOddsTaskPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [categoryData, designerData, rulesRes] = await Promise.all([
+        const [categoryData, designerData, rulesRes, productCatalogData] = await Promise.all([
           getOddsCategories(),
           getOddsDesignerProfiles(),
           getOddsSystemRules(),
+          getOddsProductCatalog(),
         ]);
         const activeDesigners = designerData.filter((profile) => profile.is_active);
 
@@ -163,6 +164,7 @@ export default function NewOddsTaskPage() {
         setTodayCapacity(todayCap);
         setCategories(categoryData);
         setDesignerProfiles(activeDesigners);
+        setProductCatalog(productCatalogData);
       } catch (err) {
         setError(oddsError(err));
       } finally {
@@ -300,6 +302,18 @@ export default function NewOddsTaskPage() {
     setLaunchSequence("transmitting");
 
     try {
+      const extractTableBriefValue = (label: string) => {
+        const match = form.brief_text.match(new RegExp(`<th>${label}<\\/th><td>([\\s\\S]*?)<\\/td>`, "i"));
+        if (!match) return "";
+        const element = document.createElement("div");
+        element.innerHTML = match[1];
+        return element.textContent?.trim() ?? "";
+      };
+      const tableCategory = extractTableBriefValue("Kategori");
+      const tableProduct = extractTableBriefValue("Produk");
+      if (tableCategory) await commitProductCategory(tableCategory);
+      if (tableCategory && tableProduct) await commitProduct(tableCategory, tableProduct);
+
       await createOddsTask({
         request_type: form.request_type,
         category_id: Number(form.category_id),

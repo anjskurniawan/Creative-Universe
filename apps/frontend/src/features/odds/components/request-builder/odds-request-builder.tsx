@@ -70,8 +70,13 @@ export function OddsRequestBuilder({
   const [uploadingIllustrationId, setUploadingIllustrationId] = useState<string | null>(null);
   const hasAppliedDraft = useRef(false);
   const briefFormat = String(selectedCategory?.brief_format ?? "").trim().toLowerCase().replace(/[\s-]+/g, "_");
-  const usesTableBrief = ["table", "deskripsi_produk", "product_description"].includes(briefFormat)
-    || /<table\b/i.test(form.brief_text ?? "");
+  const usesTableBrief = ["table", "deskripsi_produk", "product_description"].includes(briefFormat);
+
+  useEffect(() => {
+    if (!usesTableBrief && /<table\b/i.test(form.brief_text ?? "")) {
+      update("brief_text", "");
+    }
+  }, [usesTableBrief, form.brief_text, update]);
 
   useEffect(() => {
     if (!initialDraftState || hasAppliedDraft.current) return;
@@ -104,6 +109,7 @@ export function OddsRequestBuilder({
     if (currentStep === 2) return !!form.category_id;
     if (currentStep === 3) return !!form.preferred_designer_id;
     if (currentStep === 4) {
+      if (!usesTableBrief) return !!stripRichText(form.brief_text).trim();
       if (miniStep === 1) return !!form.design_purpose.trim();
       if (miniStep === 2) return usesTableBrief
         ? Boolean(tableBriefProduct.trim()) || tableBriefRows.some((row) => [row.image_description, row.image_illustration, row.additional_notes].some((value) => value.trim()))
@@ -113,7 +119,7 @@ export function OddsRequestBuilder({
     return true;
   }, [currentStep, miniStep, form, tableBriefProduct, tableBriefRows, usesTableBrief]);
 
-  const buildTableBriefMarkup = useCallback((category: string, product: string, packagingImageName: string, packagingImageId: number | null, rows: TableBriefRow[]) => `<table><tbody><tr><th>Gambar Packaging</th><td>${packagingImageId ? `<a href="/api/v1/odds/uploads/${packagingImageId}/content" target="_blank" rel="noopener noreferrer">Buka Gambar</a>` : escapeBriefTableCell(packagingImageName) || "-"}</td></tr></tbody></table><table><thead><tr><th>No</th><th>Deskripsi</th><th>Referensi</th><th>Keterangan</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td>${row.image_description || "-"}</td><td>${row.image_illustration_id ? `<a href="/api/v1/odds/uploads/${row.image_illustration_id}/content" target="_blank" rel="noopener noreferrer">Buka Gambar</a>` : escapeBriefTableCell(row.image_illustration) || "-"}</td><td>${row.additional_notes || "-"}</td></tr>`).join("")}</tbody></table>`, []);
+  const buildTableBriefMarkup = useCallback((category: string, product: string, packagingImageName: string, packagingImageId: number | null, rows: TableBriefRow[]) => `<table><tbody><tr><th>Kategori</th><td>${escapeBriefTableCell(category) || "-"}</td></tr><tr><th>Produk</th><td>${escapeBriefTableCell(product) || "-"}</td></tr><tr><th>Gambar Packaging</th><td>${packagingImageId ? `<a href="/api/v1/odds/uploads/${packagingImageId}/content" target="_blank" rel="noopener noreferrer">Buka Gambar</a>` : escapeBriefTableCell(packagingImageName) || "-"}</td></tr></tbody></table><table><thead><tr><th>No</th><th>Deskripsi</th><th>Referensi</th><th>Keterangan</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td>${row.image_description || "-"}</td><td>${row.image_illustration_id ? `<a href="/api/v1/odds/uploads/${row.image_illustration_id}/content" target="_blank" rel="noopener noreferrer">Buka Gambar</a>` : escapeBriefTableCell(row.image_illustration) || "-"}</td><td>${row.additional_notes || "-"}</td></tr>`).join("")}</tbody></table>`, []);
 
   const syncTableBrief = useCallback((category: string, product: string, packagingImageName: string, packagingImageId: number | null, rows: TableBriefRow[]) => {
     update("brief_text", buildTableBriefMarkup(category, product, packagingImageName, packagingImageId, rows));
@@ -204,13 +210,7 @@ export function OddsRequestBuilder({
       update("preferred_designer_id", recommendedDesignerId);
     }
     if (currentStep === 4) {
-      if (usesTableBrief) {
-        setCurrentStep(5);
-      } else if (miniStep < 4) {
-        setMiniStep(miniStep + 1);
-      } else {
-        setCurrentStep(5);
-      }
+      setCurrentStep(5);
     } else {
       if (currentStep === 3 && usesTableBrief) setMiniStep(2);
       setCurrentStep(currentStep + 1);

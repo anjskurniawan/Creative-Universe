@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { type OddsTask, statusLabel } from "@/features/odds/api";
 import { TaskCardActionBar } from "./task-card-action-bar";
-import { TaskCardCompactDate, TaskCardMobileDate, TaskCardWideDate } from "./task-card-date";
+import { TaskCardMobileDate, TaskCardWideDate } from "./task-card-date";
 import { TaskCardPeople, TaskCardPerson, TaskCardWidePeople } from "./task-card-people";
 import { TaskCardStatusBlock, TaskCardWideStatusPanel } from "./task-card-status-panel";
-import { TaskCardCompactLayout, TaskCardMobileLayout, TaskCardWideLayout } from "./task-card-layouts";
+import { TaskCardMobileLayout, TaskCardWideLayout } from "./task-card-layouts";
 
 export type OddsTaskCardAction = "pause" | "chat" | "brief" | "file" | "check" | "delete" | "start" | "done";
 
@@ -84,6 +85,7 @@ export function OddsTaskCard({
   actionOverlay,
   children,
 }: OddsTaskCardProps) {
+  const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<OddsTaskCardAction | null>(null);
   const [showDeadlineCountdown, setShowDeadlineCountdown] = useState(false);
@@ -284,9 +286,10 @@ export function OddsTaskCard({
   );
 
   const renderActions = (mobile = false, fillHeight = false) => (
-    <TaskCardActionBar mobile={mobile} fillHeight={fillHeight} overlay={actionOverlayOpen ? actionOverlay : undefined}>
-      {renderIconButton({ action: "brief", icon: "description", label: "Detail brief", active: activeTab === "brief", disabled: isActionDisabled("brief") })}
-      {chatAvailable && renderIconButton({ action: "chat", icon: "chat", label: "Diskusi task", active: chatOpen, disabled: isActionDisabled("chat") })}
+    <TaskCardActionBar mobile={mobile} fillHeight={fillHeight} minButtonWidth={mobile ? 60 : 250} overlay={actionOverlayOpen ? actionOverlay : undefined}>
+      <div className="flex min-w-[250px] shrink-0 gap-2">
+        {renderIconButton({ action: "brief", icon: "description", label: "Detail brief", active: activeTab === "brief", disabled: isActionDisabled("brief") })}
+        {chatAvailable && renderIconButton({ action: "chat", icon: "chat", label: "Diskusi task", active: chatOpen, disabled: isActionDisabled("chat") })}
       <div className="flex flex-col items-center gap-1 select-none">
         <Link href={`/odds/detail?id=${task.id}`} title="Buka detail task" aria-label="Buka detail task" aria-disabled={disableOpen} tabIndex={disableOpen ? -1 : undefined} className={`flex size-11 shrink-0 items-center justify-center rounded-lg transition ${disableOpen ? "pointer-events-none bg-slate-100 text-slate-400 opacity-40" : buttonClass()} ${disableOpen ? "" : "hover:brightness-95 active:scale-95"}`}><MaterialIcon name="open_in_new" size="sm" /></Link>
         <span className={`text-[9px] font-bold tracking-wider uppercase ${dark ? "text-slate-500" : "text-[#7d7c7c]/80"}`}>
@@ -303,14 +306,14 @@ export function OddsTaskCard({
       {showDone && !showAllActions && workAction !== "done" && renderIconButton({ action: "done", icon: "check_circle", label: "Selesaikan task", disabled: isActionDisabled("done") })}
       {fileEnabled && renderIconButton({ action: outputAction, icon: outputIcon, label: outputLabel, active: (outputAction === "file" ? fileOpen : outputAction === "check" ? checkOpen : outputOpen) || activeTab === outputAction, disabled: isActionDisabled(outputAction) })}
       {(!hideDelete && !isDone) && renderIconButton({ action: "delete", icon: "delete", label: "Hapus atau batalkan task", active: activeTab === "delete", danger: true, disabled: isActionDisabled("delete") })}
+      </div>
     </TaskCardActionBar>
   );
 
   return (
     <article className={`overflow-hidden rounded-lg border transition-shadow hover:shadow-md ${palette.shell}`}>
-      <TaskCardMobileLayout surfaceClass={palette.surface} lineClass={palette.line} isOpen={isOpen} onToggle={() => { setExpanded((value) => !value); setActiveTab(null); }} dateBlock={<TaskCardMobileDate quadrant={rawQuadrant} date={date} monthYear={monthYear} isDone={isDone} />} heading={<div className="flex items-start justify-between gap-2"><div className="min-w-0"><h3 className={`line-clamp-2 text-[15px] font-semibold leading-snug ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-[11px] ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><span className={`mt-1 block text-[11px] ${palette.accent}`}>Lihat detail brief</span></div><MaterialIcon name={isOpen ? "expand_less" : "expand_more"} size="xs" className={palette.secondary} /></div>} people={renderPeople(true)} meta={<><span className={`truncate ${palette.secondary}`}>Deadline: {deadlineText}</span>{showTimer && <span className={`shrink-0 font-mono font-semibold ${isOverdue ? "text-rose-500" : palette.accent}`}>{isReview ? "--:--:--" : timerText}</span>}</>} actions={renderActions(true)} />
-      <TaskCardCompactLayout surfaceClass={palette.surface} lineClass={palette.line} dateBlock={<TaskCardCompactDate quadrant={quadrant} date={date} day={day} monthYear={monthYear} time={time} isDone={isDone} accentClass={palette.accent} primaryClass={palette.primary} secondaryClass={palette.secondary} />} taskInfo={<div><h3 className={`truncate text-base font-semibold ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-xs ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><button type="button" onClick={openBrief} className={`mt-1 text-xs ${palette.accent}`}>Lihat detail brief</button></div>} people={renderPeople(true)} actions={renderActions()} sidePanel={<div className={`flex w-[230px] shrink-0 flex-col justify-between border-l pl-4 ${palette.line}`}><div><p className={`border-b pb-2 text-sm font-medium ${palette.secondary}`}>DEADLINE: <span className={palette.primary}>{deadlineText}</span></p><div className="pt-3">{renderStatusBlock()}</div></div>{!isActionDisabled(outputAction) && <button type="button" onClick={() => toggle(outputAction)} className={`h-11 rounded-lg text-sm font-semibold ${buttonClass(activeTab === outputAction)}`}>{outputLabel}</button>}</div>} />
-      <TaskCardWideLayout surfaceClass={palette.surface} dateBlock={<TaskCardWideDate quadrant={quadrant} date={date} day={day} monthYear={monthYear} time={time} isDone={isDone} />} taskInfo={<div className="flex w-[240px] shrink-0 flex-col justify-center px-5"><h3 className={`truncate text-xl font-medium ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-xs ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><button type="button" onClick={openBrief} className={`mt-1 w-max text-xs ${palette.accent}`}>Lihat detail brief</button></div>} people={<div className={`flex w-[180px] shrink-0 items-center border-l ${palette.line}`}>{renderWidePeople()}</div>} deadline={<div className={`flex w-[130px] shrink-0 items-center px-4 text-white ${isDone ? "bg-[#238653]" : isOverdue ? "bg-rose-600" : "bg-[#00a4ff]"}`}><div className="w-full"><p key={isDone ? "done" : showDeadlineCountdown ? "countdown" : "deadline"} className="min-h-4 animate-fade-in text-[10px] font-medium leading-tight">{isDone ? "SELESAI" : showDeadlineCountdown ? deadlineCountdownLabel : "DEADLINE"}</p><p className="mt-1 text-sm">{deadlineText}</p></div></div>} actions={<div className="flex min-w-[180px] flex-1 items-center justify-start px-8">{renderActions(false, true)}</div>} status={<TaskCardWideStatusPanel isDone={isDone} isReview={isReview} status={status} statusDescription={statusDescription} feedbackHref={feedbackHref} highlightLabel={wideHighlightLabel} highlightValue={wideHighlightValue} rating={isDone ? doneRating : wideRating} timerText={isReview || isBriefCheck ? "--:--:--" : timerText} onRecommendation={handleWideRecommendation} recommendationDisabled={wideHighlightLabel === "Proses" && startDisabled} />} />
+      <TaskCardMobileLayout surfaceClass={palette.surface} lineClass={palette.line} isOpen={false} onToggle={() => router.push(`/odds/detail?id=${task.id}`)} dateBlock={<TaskCardMobileDate quadrant={rawQuadrant} date={date} monthYear={monthYear} isDone={isDone} />} heading={<div className="flex items-start justify-between gap-2"><div className="min-w-0"><h3 className={`line-clamp-2 text-[15px] font-semibold leading-snug ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-[11px] ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><span className={`mt-1 block text-[11px] ${palette.accent}`}>{status}</span></div><MaterialIcon name="open_in_new" size="xs" className={palette.secondary} /></div>} people={renderPeople(true)} meta={<><span className={`truncate ${palette.secondary}`}>Deadline: {deadlineText}</span>{showTimer && <span className={`shrink-0 font-mono font-semibold ${isOverdue ? "text-rose-500" : palette.accent}`}>{isReview ? "--:--:--" : timerText}</span>}</>} actions={renderActions(true)} />
+      <TaskCardWideLayout surfaceClass={palette.surface} dateBlock={<TaskCardWideDate quadrant={quadrant} date={date} day={day} monthYear={monthYear} time={time} isDone={isDone} />} taskInfo={<div className="flex w-[240px] shrink-0 flex-col justify-center px-5"><h3 className={`truncate text-xl font-medium ${palette.primary}`}>{task.design_purpose}</h3><p className={`mt-0.5 truncate text-xs ${palette.secondary}`}>{task.category?.name ?? task.category_snapshot?.name ?? "Tanpa kategori"}</p><button type="button" onClick={openBrief} className={`mt-1 w-max text-xs ${palette.accent}`}>Lihat detail brief</button></div>} people={<div className={`flex w-[180px] shrink-0 items-center border-l ${palette.line}`}>{renderWidePeople()}</div>} deadline={<div className={`flex w-[130px] shrink-0 items-center px-4 text-white ${isDone ? "bg-[#238653]" : isOverdue ? "bg-rose-600" : "bg-[#00a4ff]"}`}><div className="w-full"><p key={isDone ? "done" : showDeadlineCountdown ? deadlineCountdownLabel : "deadline"} className="min-h-4 animate-fade-in text-[10px] font-medium leading-tight">{isDone ? "SELESAI" : showDeadlineCountdown ? deadlineCountdownLabel : "DEADLINE"}</p><p className="mt-1 text-sm">{deadlineText}</p></div></div>} actions={<div className="box-border flex min-w-0 flex-1 items-center justify-start overflow-hidden px-2">{renderActions(false, true)}</div>} status={<TaskCardWideStatusPanel isDone={isDone} isReview={isReview} status={status} statusDescription={statusDescription} feedbackHref={feedbackHref} highlightLabel={wideHighlightLabel} highlightValue={wideHighlightValue} rating={isDone ? doneRating : wideRating} timerText={isReview || isBriefCheck ? "--:--:--" : timerText} onRecommendation={handleWideRecommendation} recommendationDisabled={wideHighlightLabel === "Proses" && startDisabled} />} />
       {isOpen && <div className={`border-t p-3 lg:p-4 ${palette.line} ${palette.surface}`}>{panel}</div>}
     </article>
   );

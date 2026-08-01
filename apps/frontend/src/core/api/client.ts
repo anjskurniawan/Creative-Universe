@@ -91,7 +91,9 @@ export function resolveStorageUrl(path: string | null | undefined): string | nul
   if (/^(https?:)?\/\//i.test(path) || path.startsWith("blob:") || path.startsWith("data:")) {
     return path;
   }
-  return resolveBackendUrl(path.startsWith("/storage/") ? path : `/storage/${path.replace(/^\/+/, "")}`);
+  const storagePath = path.startsWith("/storage/") ? path : `/storage/${path.replace(/^\/+/, "")}`;
+  const storageHost = API_HOST || "http://creativeuniverse.test";
+  return `${storageHost}${storagePath}`;
 }
 
 export async function openProtectedAttachment(attachmentId: number | string): Promise<void> {

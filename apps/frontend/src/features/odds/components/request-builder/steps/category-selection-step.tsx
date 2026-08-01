@@ -25,7 +25,7 @@ export function CategorySelectionStep({
     <section className="flex min-h-0 flex-1 flex-col space-y-5">
       <header className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
         <div className="shrink-0">
-          <h2 className={`text-4xl font-bold tracking-tight ${textTitle}`}>Kategori Desain</h2>
+          <h2 className={`text-2xl font-bold tracking-tight sm:text-4xl ${textTitle}`}>Kategori Desain</h2>
         </div>
         <div className="relative w-full flex-1">
           <MaterialIcon name="search" size="xs" className="absolute left-3.5 top-3 text-slate-400" />
