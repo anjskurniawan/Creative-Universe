@@ -25,8 +25,8 @@ class CreativeReportDemoSeeder extends Seeder
         $staffGroups = [
             ['Supervisor Creative Production', 'SPV', ['Raka Pradana']],
             ['Creative Video Production', 'Videographer', ['Bagas Pratama', 'Dimas Saputra', 'Fajar Nugroho', 'Galang Mahendra', 'Yoga Firmansyah']],
-            ['Creative Design Production', 'Designer', ['Alya Putri', 'Citra Lestari', 'Dinda Maharani', 'Farhan Akbar', 'Gita Savitri', 'Hanif Ramadhan', 'Intan Permata', 'Kevin Aditya', 'Laras Wulandari', 'Nadia Prameswari', 'Rafi Kurniawan', 'Salsa Azzahra', 'Tio Prasetyo']],
-            ['Creative Content Production', 'Content Creator', []],
+            ['Creative Design Production', 'Designer', ['Alya Putri', 'Citra Lestari', 'Dinda Maharani', 'Farhan Akbar', 'Gita Savitri', 'Hanif Ramadhan', 'Intan Permata', 'Kevin Aditya', 'Laras Wulandari', 'Rafi Kurniawan']],
+            ['Creative Content Production', 'Content Creator', ['Nadia Prameswari', 'Salsa Azzahra', 'Tio Prasetyo']],
         ];
         $groups = collect($staffGroups)->mapWithKeys(fn ($item, $index) => [$item[0] => ReportGroup::updateOrCreate(['name' => $item[0]], ['sort_order' => $index + 1])]);
         $periods = collect(range(0, 2))->map(fn (int $monthsAgo) => now()->startOfMonth()->subMonths($monthsAgo));
