@@ -48,6 +48,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
   const canViewRankings = hasPermission("view-odds-rankings");
   const canCreateTask = hasPermission("create-odds-tasks");
   const canViewAssignedTasks = hasPermission("view-assigned-odds-tasks");
+  const isRoot = user?.roles.some((role) => role.trim().toLowerCase() === "root") ?? false;
 
   // State to hold counts
   const [counts, setCounts] = useState<Record<string, number>>({});
@@ -188,6 +189,9 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
       if (canViewRankings) {
         items.push({ id: "rankings", label: "Ranking", icon: "leaderboard", href: "/odds?section=rankings", group: "reports" });
       }
+      if (isRoot) {
+        items.push({ id: "option", label: "Pengaturan", icon: "settings", href: "/odds/option", group: "manage" });
+      }
       if (canViewAllTasks || canReviewSpv) {
         items.push({ id: "all_tasks", label: "Semua Tugas", icon: "assignment", href: "/odds?section=all_tasks", group: "tasks" });
       }
@@ -205,15 +209,18 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     canViewReports,
     canViewRankings,
     canViewAssignedTasks,
+    isRoot,
   ]);
 
   const isSectionActive = useCallback((item: typeof menuItems[0]) => {
     if (normalizedPathname === "/odds/new" || normalizedPathname === "/odds/detail") {
       return false;
     }
+    if (item.href === normalizedPathname) return true;
     if (activeSection) {
       return item.id === activeSection;
     }
+    if (normalizedPathname !== "/odds") return false;
 
     const defaultItem = menuItems.find((menuItem) => menuItem.id === "all_tasks") ?? menuItems[0];
     return item.id === defaultItem?.id;
