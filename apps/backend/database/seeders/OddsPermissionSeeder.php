@@ -19,6 +19,7 @@ class OddsPermissionSeeder extends Seeder
         'review-odds-briefs',
         'manage-odds-queue',
         'request-odds-queue-skip',
+        'request-odds-queue-priority',
         'review-odds-queue-skip',
         'start-odds-tasks',
         'submit-odds-results',
@@ -84,6 +85,7 @@ class OddsPermissionSeeder extends Seeder
             'review-odds-client',
             'request-odds-revisions',
             'cancel-odds-tasks',
+            'request-odds-queue-priority',
         ]);
     }
 }

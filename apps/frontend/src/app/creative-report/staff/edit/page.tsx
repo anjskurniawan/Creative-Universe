@@ -57,9 +57,17 @@ export default function EditCreativeMemberPage() {
     setSaving(true);
     setError(null);
     const body = new FormData();
+    const whatsappDigits = (member.whatsapp_number ?? "").replace(/\D/g, "");
+    const whatsappNumber = whatsappDigits.startsWith("62")
+      ? whatsappDigits
+      : whatsappDigits.startsWith("0")
+        ? `62${whatsappDigits.slice(1)}`
+        : whatsappDigits.startsWith("8")
+          ? `62${whatsappDigits}`
+          : whatsappDigits;
     body.set("name", member.name);
     body.set("email", member.email ?? "");
-    body.set("whatsapp_number", member.whatsapp_number ?? "");
+    body.set("whatsapp_number", whatsappNumber);
     body.set("roles", JSON.stringify(member.roles ?? []));
     body.set("position_name", member.position_name);
     body.set("joined_at", member.joined_at ?? "");
@@ -69,6 +77,7 @@ export default function EditCreativeMemberPage() {
       JSON.stringify(member.odds_profile?.specializations ?? []),
     );
     body.set("odds_status", member.odds_profile?.status ?? "available");
+    body.set("odds_is_active", member.odds_profile?.is_active ? "1" : "0");
     if (image) body.set("card_image", image);
     try {
       await creativeReportApi.members.update(member.id, body);
@@ -196,6 +205,7 @@ export default function EditCreativeMemberPage() {
                       odds_profile: {
                         id: member.odds_profile?.id ?? 0,
                         status: member.odds_profile?.status ?? "available",
+                        is_active: member.odds_profile?.is_active ?? true,
                         specializations: Array.from(next),
                       },
                     });
@@ -205,6 +215,26 @@ export default function EditCreativeMemberPage() {
               </label>
             ))}
           </div>
+          <label className={`mt-5 flex cursor-pointer items-center justify-between rounded-xl border px-4 py-3 text-sm ${dark ? "border-white/10 bg-white/[0.03] text-white" : "border-[#edf0f2] bg-[#fbfcfd] text-[#3b4446]"}`}>
+            <span>
+              <span className="block font-semibold">Aktif di ODDS</span>
+              <span className={`mt-0.5 block text-xs ${mutedTextClass}`}>Tampilkan dan izinkan agent masuk antrean tugas ODDS.</span>
+            </span>
+            <input
+              type="checkbox"
+              checked={member.odds_profile?.is_active ?? true}
+              onChange={(event) => setMember({
+                ...member,
+                odds_profile: {
+                  id: member.odds_profile?.id ?? 0,
+                  status: member.odds_profile?.status ?? "available",
+                  is_active: event.target.checked,
+                  specializations: member.odds_profile?.specializations ?? [],
+                },
+              })}
+              className="size-4 accent-[#6d46eb]"
+            />
+          </label>
           <div className="mt-6 flex justify-end border-t border-[#edf0f2] pt-4"><button type="button" onClick={() => void save()} disabled={saving} className={`inline-flex h-10 items-center gap-2 rounded-xl px-4 text-sm font-semibold shadow-sm disabled:opacity-50 ${theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#6d46eb] text-white"}`}><MaterialIcon name="save" size="sm" />Simpan</button></div>
         </section>}
         </div>

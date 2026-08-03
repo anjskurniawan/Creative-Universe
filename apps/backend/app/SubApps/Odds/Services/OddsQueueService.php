@@ -8,6 +8,7 @@ use App\Enums\Odds\TaskTypeEnum;
 use App\SubApps\Odds\Models\DesignerProfile;
 use App\SubApps\Odds\Models\Task;
 use App\SubApps\Odds\Models\TaskQueue;
+use App\SubApps\Odds\Models\TaskPriorityRequest;
 use App\SubApps\Odds\Models\TaskSkipRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class OddsQueueService
 {
+    private const MONTHLY_PRIORITY_REQUEST_LIMIT = 5;
     public function __construct(
         private OddsPriorityService $priority,
         private OddsNotificationService $notifications
@@ -327,6 +329,91 @@ class OddsQueueService
                     'skipped_at' => now(),
                 ]);
                 $this->enqueue($request->task, $request->task->task_type);
+            }
+
+            return $request->refresh();
+        });
+    }
+
+    public function requestPriority(Task $task, int $requesterId, string $reason): TaskPriorityRequest
+    {
+        if ($task->requester_id !== $requesterId) {
+            throw ValidationException::withMessages([
+                'task_id' => 'Prioritas antrean hanya dapat diajukan oleh Client pemilik task.',
+            ]);
+        }
+
+        if (! in_array($task->status, [TaskStatusEnum::QUEUED->value, TaskStatusEnum::READY_TO_START->value], true)) {
+            throw ValidationException::withMessages([
+                'task_id' => 'Prioritas antrean hanya tersedia saat task berada dalam antrean.',
+            ]);
+        }
+
+        if ($task->priorityRequests()->where('status', 'pending')->exists()) {
+            throw ValidationException::withMessages([
+                'task_id' => 'Permintaan prioritas untuk task ini masih menunggu approval Leader.',
+            ]);
+        }
+
+        $usedThisMonth = TaskPriorityRequest::query()
+            ->where('requested_by', $requesterId)
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->count();
+
+        if ($usedThisMonth >= self::MONTHLY_PRIORITY_REQUEST_LIMIT) {
+            throw ValidationException::withMessages([
+                'priority' => 'Kuota prioritas antrean bulan ini sudah habis (maksimal 5 pengajuan).',
+            ]);
+        }
+
+        $request = $task->priorityRequests()->create([
+            'requested_by' => $requesterId,
+            'reason' => $reason,
+            'status' => 'pending',
+        ]);
+
+        $this->notifications->sendToRoles(['Manajer', 'Supervisor', 'SPV'], 'priority_requested', 'Prioritas antrean perlu approval Leader', $reason, $task);
+        activity('odds')->performedOn($task)->event('priority_requested')->log($reason);
+
+        return $request;
+    }
+
+    public function reviewPriority(TaskPriorityRequest $request, int $reviewerId, string $decision, ?string $note = null): TaskPriorityRequest
+    {
+        if ($request->status !== 'pending') {
+            throw ValidationException::withMessages([
+                'priority_request_id' => 'Permintaan prioritas ini sudah ditinjau.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($request, $reviewerId, $decision, $note) {
+            $request->update([
+                'status' => $decision,
+                'reviewed_by' => $reviewerId,
+                'reviewed_at' => now(),
+                'review_note' => $note,
+            ]);
+
+            $task = $request->task->refresh();
+            if ($decision === 'approved') {
+                $queue = $task->currentQueue;
+                if ($queue) {
+                    $highestScore = TaskQueue::query()
+                        ->where('designer_id', $queue->designer_id)
+                        ->whereIn('queue_status', ['queued', 'ready_to_start'])
+                        ->max('priority_score') ?? 0;
+
+                    $queue->update(['priority_score' => $highestScore + 1]);
+                    $task->update(['priority_score' => $highestScore + 1]);
+                    $this->refreshEstimates($queue->designer_id);
+                }
+
+                activity('odds')->performedOn($task)->event('priority_approved')->log($request->reason);
+                $this->notifications->send($task->requester, 'priority_approved', 'Prioritas antrean disetujui', $request->reason, $task);
+                $this->notifications->send($task->assignedDesigner, 'priority_approved', 'Task diprioritaskan dalam antrean', $request->reason, $task);
+            } else {
+                activity('odds')->performedOn($task)->event('priority_rejected')->log($note ?? 'Priority request rejected');
+                $this->notifications->send($task->requester, 'priority_rejected', 'Prioritas antrean ditolak', $note ?? 'Permintaan prioritas ditolak Leader.', $task);
             }
 
             return $request->refresh();

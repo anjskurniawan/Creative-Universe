@@ -14,7 +14,7 @@ class OddsTaskRealtimeService
     {
         $snapshot = $task->fresh([
             'category', 'requester', 'assignedDesigner', 'currentQueue', 'results.assetLinks',
-            'revisions', 'skipRequests', 'cancelRequests', 'reviews', 'timeLogs',
+            'revisions', 'skipRequests', 'priorityRequests', 'cancelRequests', 'reviews', 'timeLogs',
         ]);
 
         if (! $snapshot) {

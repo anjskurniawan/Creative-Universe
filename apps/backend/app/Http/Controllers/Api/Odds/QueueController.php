@@ -8,6 +8,7 @@ use App\Http\Requests\Odds\ReviewDecisionRequest;
 use App\SubApps\Odds\Models\Task;
 use App\SubApps\Odds\Models\TaskQueue;
 use App\SubApps\Odds\Models\TaskSkipRequest;
+use App\SubApps\Odds\Models\TaskPriorityRequest;
 use App\SubApps\Odds\Services\OddsQueueService;
 use App\SubApps\Odds\Services\OddsTaskRealtimeService;
 use Illuminate\Http\JsonResponse;
@@ -54,5 +55,22 @@ class QueueController extends BaseApiController
         $this->realtime->publishUpdated(Task::findOrFail($skipRequest->task_id));
 
         return $this->sendResponse($skip, 'Review skip ODDS berhasil disimpan.');
+    }
+
+    public function requestPriority(ReasonRequest $request, Task $task): JsonResponse
+    {
+        $priority = $this->queue->requestPriority($task, $request->user()->id, $request->string('reason')->toString());
+        $this->realtime->publishUpdated($task);
+
+        return $this->sendResponse($priority, 'Permintaan prioritas antrean berhasil dikirim.', 201);
+    }
+
+    public function reviewPriority(ReviewDecisionRequest $request, TaskPriorityRequest $priorityRequest): JsonResponse
+    {
+        $data = $request->validated();
+        $priority = $this->queue->reviewPriority($priorityRequest, $request->user()->id, $data['decision'], $data['note'] ?? null);
+        $this->realtime->publishUpdated(Task::findOrFail($priorityRequest->task_id));
+
+        return $this->sendResponse($priority, 'Review prioritas antrean berhasil disimpan.');
     }
 }

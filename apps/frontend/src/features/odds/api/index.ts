@@ -153,6 +153,18 @@ export interface OddsTaskSkipRequest {
   task?: OddsTask;
 }
 
+export interface OddsTaskPriorityRequest {
+  id: number;
+  task_id: number;
+  requested_by: number;
+  reason: string;
+  status: "pending" | "approved" | "rejected";
+  reviewed_by: number | null;
+  reviewed_at: string | null;
+  review_note: string | null;
+  task?: OddsTask;
+}
+
 export interface OddsTaskTimeLog {
   id: number;
   task_id: number;
@@ -219,6 +231,8 @@ export interface OddsTask {
   cancelRequests?: OddsTaskCancelRequest[];
   skip_requests?: OddsTaskSkipRequest[];
   skipRequests?: OddsTaskSkipRequest[];
+  priority_requests?: OddsTaskPriorityRequest[];
+  priorityRequests?: OddsTaskPriorityRequest[];
   time_logs?: OddsTaskTimeLog[];
   timeLogs?: OddsTaskTimeLog[];
   rating?: number | null;
@@ -716,6 +730,24 @@ export async function requestOddsQueueSkip(id: string | number, reason: string):
   return apiFetch<OddsTaskSkipRequest>(`/odds/tasks/${id}/skip-requests`, {
     method: "POST",
     body: JSON.stringify({ reason }),
+  });
+}
+
+export async function requestOddsQueuePriority(id: string | number, reason: string): Promise<OddsTaskPriorityRequest> {
+  return apiFetch<OddsTaskPriorityRequest>(`/odds/tasks/${id}/priority-requests`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export async function reviewOddsQueuePriority(
+  id: string | number,
+  decision: "approved" | "rejected",
+  note?: string
+): Promise<OddsTaskPriorityRequest> {
+  return apiFetch<OddsTaskPriorityRequest>(`/odds/priority-requests/${id}/review`, {
+    method: "POST",
+    body: JSON.stringify({ decision, note }),
   });
 }
 

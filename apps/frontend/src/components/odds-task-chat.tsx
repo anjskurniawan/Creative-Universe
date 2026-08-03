@@ -232,13 +232,16 @@ export function OddsTaskChat({
       {loading ? (
         compact ? <MessageActionSkeleton /> : <p className="rounded-lg border border-dashed border-cu-border px-3 py-4 text-sm text-cu-muted">Memuat chat task...</p>
       ) : !conversation ? (
-        <div className={`${compact ? "px-3 py-4" : "rounded-lg border border-dashed border-cu-border px-3 py-4"}`}>
+        <div className={`${compact ? "flex h-full min-h-0 flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-cu-border bg-cu-panel-soft/30 px-4 py-6 text-center" : "rounded-lg border border-dashed border-cu-border px-3 py-4"}`}>
           {error ? (
             <p className="text-sm text-cu-danger">{error}</p>
           ) : (
-            <p className="text-sm text-cu-muted">
-              Room chat dibuat otomatis setelah brief diterima dan task masuk antrean.
-            </p>
+            <>
+              {compact && <span className="text-3xl" role="img" aria-label="Love">❤️</span>}
+              <p className={`${compact ? "mt-2 font-medium" : ""} text-sm text-cu-muted`}>
+              Tunggu sampai brief di approve dulu ya
+              </p>
+            </>
           )}
           {!compact && (
             <button

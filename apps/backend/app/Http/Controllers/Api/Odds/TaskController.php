@@ -48,7 +48,7 @@ class TaskController extends BaseApiController
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'results.assetLinks', 'revisions', 'skipRequests', 'cancelRequests', 'reviews', 'timeLogs']);
+        $query = Task::query()->with(['category', 'requester', 'assignedDesigner', 'currentQueue', 'results.assetLinks', 'revisions', 'skipRequests', 'priorityRequests', 'cancelRequests', 'reviews', 'timeLogs']);
 
         if (! $user->can('view-all-odds-tasks')) {
             $query->where(function ($inner) use ($user) {
@@ -144,7 +144,7 @@ class TaskController extends BaseApiController
         return $this->sendResponse(
             TaskResource::make($task->load([
                 'category', 'requester', 'assignedDesigner', 'brief', 'currentQueue',
-                'results.assetLinks', 'reviews', 'revisions', 'timeLogs', 'skipRequests', 'cancelRequests', 'assetLinks', 'activities',
+                'results.assetLinks', 'reviews', 'revisions', 'timeLogs', 'skipRequests', 'priorityRequests', 'cancelRequests', 'assetLinks', 'activities',
             ]))->resolve($request),
             'Detail task ODDS berhasil diambil.'
         );

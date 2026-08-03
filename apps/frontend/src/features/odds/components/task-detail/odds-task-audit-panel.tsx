@@ -9,6 +9,16 @@ type OddsTaskAuditPanelProps = Omit<ComponentPropsWithoutRef<"section">, "childr
 export function OddsTaskAuditPanel({ task, timerTotals, isSlaOverdue, slaMinutes, formatDuration, className = "", ...props }: OddsTaskAuditPanelProps) {
   const totalWorkDuration = timerTotals.work + timerTotals.revision;
   const totalDuration = totalWorkDuration + timerTotals.spv_review + timerTotals.client_review;
+  const hasAuditData = totalDuration > 0 || isSlaOverdue || Boolean(task.quality_issue_flag);
+
+  if (!hasAuditData) {
+    return <section {...props} className={`${className} flex h-full min-h-0 w-full`}>
+      <div className="flex h-full min-h-0 w-full flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-cu-border bg-cu-panel-soft/30 px-4 py-6 text-center">
+        <span className="text-3xl" role="img" aria-label="Menunggu pengerjaan">⌛</span>
+        <p className="mt-2 text-sm font-medium text-cu-muted">Belum ada data, karena tugas belum dikerjakan</p>
+      </div>
+    </section>;
+  }
 
   return <section {...props} className={`${className} overflow-y-auto`}>
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

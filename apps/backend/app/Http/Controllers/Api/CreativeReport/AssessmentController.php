@@ -175,7 +175,7 @@ class AssessmentController extends BaseApiController
             'resigned_at' => $member->resigned_at?->toDateString(),
             'card_image_path' => $member->card_image_path,
             'profile_metrics' => $member->profile_metrics ?? [],
-            'odds_profile' => $profile ? ['id' => $profile->id, 'status' => $profile->status, 'specializations' => $profile->specializations ?? []] : null,
+            'odds_profile' => $profile ? ['id' => $profile->id, 'status' => $profile->status, 'is_active' => $profile->is_active, 'specializations' => $profile->specializations ?? []] : null,
         ]), 'Profil anggota Creative berhasil diambil.');
     }
 
@@ -206,6 +206,7 @@ class AssessmentController extends BaseApiController
             'specializations' => 'sometimes|array',
             'specializations.*' => 'integer|exists:odds_categories,id',
             'odds_status' => 'sometimes|in:available,off',
+            'odds_is_active' => 'sometimes|boolean',
             'card_image' => 'nullable|file|max:10240|mimetypes:image/jpeg,image/png,image/webp,video/mp4,video/webm,video/ogg',
             'remove_card_image' => 'nullable|boolean',
         ]);
@@ -219,7 +220,7 @@ class AssessmentController extends BaseApiController
                 if ($member->card_image_path) $files->deleteByPath($member->card_image_path, 'public');
                 $data['card_image_path'] = $stored->path;
             }
-            unset($data['card_image'], $data['remove_card_image'], $data['specializations'], $data['odds_status']);
+            unset($data['card_image'], $data['remove_card_image'], $data['specializations'], $data['odds_status'], $data['odds_is_active']);
             $member->update($data);
             if ($member->user_id && (array_key_exists('name', $data) || array_key_exists('email', $data) || array_key_exists('whatsapp_number', $data))) {
                 $member->user()->update(array_intersect_key($data, array_flip(['name', 'email', 'whatsapp_number'])));
@@ -228,7 +229,7 @@ class AssessmentController extends BaseApiController
                 $member->user->syncRoles($data['roles']);
             }
             unset($data['email'], $data['whatsapp_number'], $data['roles']);
-            if ($member->user_id && (array_key_exists('specializations', $request->all()) || array_key_exists('odds_status', $request->all()))) {
+            if ($member->user_id && (array_key_exists('specializations', $request->all()) || array_key_exists('odds_status', $request->all()) || array_key_exists('odds_is_active', $request->all()))) {
                 // The user_id is unique even when a profile was soft-deleted. Reuse and
                 // restore that row instead of firstOrCreate() attempting a duplicate insert.
                 $profile = DesignerProfile::withTrashed()->firstOrNew(['user_id' => $member->user_id]);
@@ -243,7 +244,11 @@ class AssessmentController extends BaseApiController
                         'created_by' => $request->user()->id,
                     ]);
                 }
-                $profile->update(array_filter(['specializations' => $request->input('specializations'), 'status' => $request->input('odds_status')], fn ($value) => $value !== null));
+                $profile->update(array_filter([
+                    'specializations' => $request->input('specializations'),
+                    'status' => $request->input('odds_status'),
+                    'is_active' => $request->input('odds_is_active'),
+                ], fn ($value) => $value !== null));
             }
         });
         return $this->member($request, $member->fresh());

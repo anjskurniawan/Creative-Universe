@@ -9,12 +9,10 @@ type TaskDiscussionPanelProps = Omit<ComponentPropsWithoutRef<"section">, "child
 
 export function TaskDiscussionPanel({ taskId, userId, taskStatus, preview = false, unavailable = false, title, onClose, className = "", ...props }: TaskDiscussionPanelProps) {
   if (unavailable) {
-    return <section {...props} className={`flex w-full flex-col gap-4 ${className}`} aria-label="Diskusi task">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="truncate text-base font-semibold leading-6 text-[#3b4446]">Diskusi Project{title ? ` - ${title}` : ""}</h3>
-      </div>
-      <div className="rounded-lg border border-dashed border-cu-border px-3 py-4">
-        <p className="text-sm text-cu-muted">Room chat dibuat otomatis setelah brief diterima dan task masuk antrean.</p>
+    return <section {...props} className={`flex h-full min-h-0 w-full ${className}`} aria-label="Diskusi task">
+      <div className="flex h-full min-h-0 w-full flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-cu-border bg-cu-panel-soft/30 px-4 py-6 text-center">
+        <span className="text-3xl" role="img" aria-label="Love">❤️</span>
+        <p className="mt-2 text-sm font-medium text-cu-muted">Tunggu sampai brief di approve dulu ya</p>
       </div>
     </section>;
   }

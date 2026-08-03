@@ -2282,7 +2282,7 @@ function OddsPageContent() {
 
         let sortedTasks = assignedDesignerTasks
           .filter((task) => {
-            if (effectiveActiveSection === "all_tasks") return true;
+            if (effectiveActiveSection === "all_tasks") return !["cancelled", "cancelled_by_spv", "cancelled_by_leader"].includes(task.status);
             if (effectiveActiveSection === "spv_review") return task.status === "spv_review";
             if (effectiveActiveSection === "client_review") return task.status === "client_review";
             if (effectiveActiveSection === "special_revisions") return specialRevisionTaskIds.has(task.id);
@@ -2297,7 +2297,7 @@ function OddsPageContent() {
               return revisionTaskTypes.includes(task.task_type)
                 && !["done", "cancelled", "cancelled_by_spv", "revision_rejected_by_spv"].includes(task.status);
             }
-            return task.status !== "done";
+            return !["done", "cancelled", "cancelled_by_spv", "cancelled_by_leader"].includes(task.status);
           })
           .sort((a, b) => {
             if (isControlTaskSection) {

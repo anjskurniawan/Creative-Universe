@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import { stripRichText } from "@/components/odds-rich-text-editor";
 import type { OddsTaskAttachment } from "@/features/odds/api";
 
 export function RequestBriefEditor({
@@ -25,7 +24,6 @@ export function RequestBriefEditor({
   const [linkPanelOpen, setLinkPanelOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
-  const isEmpty = !stripRichText(value);
 
   // Sync value with contenteditable div
   useEffect(() => {
@@ -248,14 +246,14 @@ export function RequestBriefEditor({
       )}
 
       {/* Editor Input Area */}
-      <div className="relative flex-1 min-h-0">
-        {isEmpty && (
-          <span className={`pointer-events-none absolute left-3 top-3 z-10 text-sm font-normal select-none ${
-            dark ? "text-slate-500" : "text-slate-400"
-          }`}>
-            Tulis kebutuhan desain, ukuran, copy teks, channel, dan output final...
-          </span>
-        )}
+      <div
+        className="relative flex-1 min-h-0"
+        onMouseDown={(event) => {
+          if (event.target === event.currentTarget) {
+            editorRef.current?.focus();
+          }
+        }}
+      >
         <div
           ref={editorRef}
           contentEditable
@@ -263,6 +261,12 @@ export function RequestBriefEditor({
           role="textbox"
           aria-multiline="true"
           aria-label="Mission brief editor"
+          data-placeholder="Tulis kebutuhan desain, ukuran, copy teks, channel, dan output final..."
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              editorRef.current?.focus();
+            }
+          }}
           onInput={(event) => {
             onChange(event.currentTarget.innerHTML);
             syncActiveTools();
@@ -295,10 +299,10 @@ export function RequestBriefEditor({
             event.preventDefault();
             pastePlainTextAsParagraphs(event.clipboardData.getData("text/plain"));
           }}
-          className={`h-full overflow-y-auto p-3 text-sm leading-6 outline-none transition [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+          className={`h-full overflow-y-auto p-3 text-sm leading-6 outline-none transition [scrollbar-width:none] [&::-webkit-scrollbar]:hidden empty:before:pointer-events-none empty:before:select-none empty:before:content-[attr(data-placeholder)] ${
             dark
-              ? "bg-[#0E0E0E] text-white [caret-color:#B0FF5E] focus:bg-[#0a0a0a]"
-              : "bg-white text-[#04044A] [caret-color:#00A4FF] focus:bg-white"
+              ? "bg-[#0E0E0E] text-white [caret-color:#B0FF5E] focus:bg-[#0a0a0a] empty:before:text-slate-500"
+              : "bg-white text-[#04044A] [caret-color:#00A4FF] focus:bg-white empty:before:text-slate-400"
           } [&_a]:font-bold [&_a]:text-[#00A4FF] dark:[&_a]:text-[#B0FF5E] [&_a]:underline [&_figcaption]:bg-black/20 dark:[&_figcaption]:bg-white/5 [&_figcaption]:px-3 [&_figcaption]:py-1 [&_figcaption]:text-[9px] [&_figcaption]:font-bold [&_figure]:my-4 [&_figure]:inline-block [&_figure]:max-w-md [&_figure]:align-top [&_img]:max-h-64 [&_img]:w-auto [&_img]:rounded-xl [&_img]:border [&_img]:border-black/10 dark:[&_img]:border-white/5 [&_img]:object-contain [&_li]:ml-6 [&_ol]:list-decimal [&_p]:mb-3 [&_ul]:list-disc`}
         />
       </div>

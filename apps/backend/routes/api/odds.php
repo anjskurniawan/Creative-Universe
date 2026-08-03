@@ -48,6 +48,8 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::get('/queue/next', [QueueController::class, 'next'])->middleware('can:manage-odds-queue');
     Route::post('/tasks/{task}/skip-requests', [QueueController::class, 'requestSkip'])->middleware('can:request-odds-queue-skip');
     Route::post('/skip-requests/{skipRequest}/review', [QueueController::class, 'reviewSkip'])->middleware('can:review-odds-queue-skip');
+    Route::post('/tasks/{task}/priority-requests', [QueueController::class, 'requestPriority'])->middleware('can:request-odds-queue-priority');
+    Route::post('/priority-requests/{priorityRequest}/review', [QueueController::class, 'reviewPriority'])->middleware('can:review-odds-leader');
     Route::post('/tasks/{task}/start', [TaskController::class, 'start'])->middleware('can:start-odds-tasks');
     Route::post('/tasks/{task}/pause', [TaskController::class, 'pause'])->middleware('can:review-odds-leader');
     Route::post('/tasks/{task}/results', [TaskController::class, 'submitResult'])->middleware('can:submit-odds-results');

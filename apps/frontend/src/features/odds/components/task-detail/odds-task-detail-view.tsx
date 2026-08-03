@@ -24,7 +24,9 @@ import {
   rateOddsTask,
   reassignOddsTask,
   requestOddsCancel,
+  requestOddsQueuePriority,
   requestOddsQueueSkip,
+  reviewOddsQueuePriority,
   returnOddsBrief,
   leaderReviewOddsTask,
   startOddsTask,
@@ -164,6 +166,7 @@ function DetailContent() {
   const [mobileTabOpen, setMobileTabOpen] = useState(false);
   const [selectedRevisionId, setSelectedRevisionId] = useState<number | null>(null);
   const [isBriefRevisionEditing, setIsBriefRevisionEditing] = useState(false);
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
   useEffect(() => {
     if (!preview) return;
     setTask(preview.task);
@@ -180,6 +183,7 @@ function DetailContent() {
   const canClientReview = hasPermission("review-odds-client");
   const canManageEscalations = hasPermission("manage-odds-escalations");
   const canRequestQueueSkip = hasPermission("request-odds-queue-skip");
+  const canRequestQueuePriority = hasPermission("request-odds-queue-priority");
 
   const latestResult = useMemo(() => {
     return [...(task?.results ?? [])].sort((a, b) => b.version_number - a.version_number)[0];
@@ -330,11 +334,6 @@ function DetailContent() {
   const slaSeconds = slaMinutes * 60;
   const isSlaOverdue = slaSeconds > 0 && timerTotals.work > slaSeconds;
   const outputTitle = isVisibleLeaderRevisionTask ? "Output Revisi Leader Creative" : isClientRevisionTask ? "Output Revisi Client" : "Output";
-  const outputNotice = isVisibleLeaderRevisionTask
-    ? "Task sedang dalam revisi Leader Creative. Setelah disubmit, hasil revisi kembali masuk review Leader Creative."
-    : isClientRevisionTask
-      ? "Task sedang dalam revisi client. Kirim hasil revisi melalui form Output di sisi kiri."
-      : "Task sedang dikerjakan. Kirim output melalui form Output di sisi kiri.";
   const submitButtonLabel = isVisibleLeaderRevisionTask || isClientRevisionTask ? "Submit Revisi" : "Submit";
   const submitResultMessage = isVisibleLeaderRevisionTask
     ? "Revisi dikirim ke Leader Creative."
@@ -358,6 +357,13 @@ function DetailContent() {
     && isAssignedDesigner
     && ["queued", "ready_to_start"].includes(task.status)
     && !pendingSkipRequest;
+  const pendingPriorityRequest = (task.priority_requests ?? task.priorityRequests ?? []).find((request) => request.status === "pending");
+  const canRequestPriority = canRequestQueuePriority
+    && canClientReview
+    && isRequester
+    && ["queued", "ready_to_start"].includes(task.status)
+    && !pendingPriorityRequest;
+  const canReviewPriority = canSpvReview && Boolean(pendingPriorityRequest);
   const canExtendDeadline = canManageEscalations && !["done", "cancelled", "cancelled_by_spv"].includes(task.status);
   const reassignTargets = designerProfiles.filter((profile) => profile.status !== "off" && profile.user_id !== assignedDesigner?.id);
   const normalRevisionLimit = task.category?.normal_revision_limit ?? 2;
@@ -367,7 +373,7 @@ function DetailContent() {
   const isUrgentFinalRevisionChance = canClientResultReview
     && Boolean(task.extra_revision_used_at)
     && !task.urgent_revision_used_at;
-  const canShowNoteInput = canReturnBrief || canSpvBriefAction || canSpvResultReview || canClientResultReview || canRequestCancel || canRequestSkip || canExtendDeadline;
+  const canShowNoteInput = canReturnBrief || canSpvBriefAction || canSpvResultReview || canClientResultReview || canRequestCancel || canRequestSkip || canRequestPriority || canReviewPriority || canExtendDeadline;
   const showOutputSection = true;
   const showRevisionSection = visibleRevisions.length > 0;
 
@@ -464,7 +470,7 @@ function DetailContent() {
                       null
                     )}
                    </form>
-                   {(isPreview ? qaPov === "designer" && qaScenario === "brief_submitted" : isAssignedDesigner && task.status === "submitted") && <QaComponentBoundary label="GroupButton" tone="nested" wrap className="mt-3"><GroupButton onButtonA={isBriefRevisionEditing ? submitBriefRevision : undefined} onButtonB={() => { setBriefRevisionText(""); setIsBriefRevisionEditing((editing) => !editing); }} primaryLabel={isBriefRevisionEditing ? "Kirim Revisi" : "Approve Brief"} secondaryLabel={isBriefRevisionEditing ? "Kembali" : "Revision Brief"} primaryIcon={isBriefRevisionEditing ? "send" : "check_circle"} secondaryIcon={isBriefRevisionEditing ? "arrow_back" : "edit_note"} secondaryDisabled={false} primaryVariant="blue" secondaryVariant={isBriefRevisionEditing ? "default" : "red"} /></QaComponentBoundary>}
+                   {(isPreview ? qaPov === "designer" && qaScenario === "brief_submitted" : isAssignedDesigner && task.status === "submitted") && <QaComponentBoundary label="GroupButton" tone="nested" wrap className="mt-3"><GroupButton onButtonA={isBriefRevisionEditing ? submitBriefRevision : () => void run("accept", () => acceptOddsBrief(task.id), "Brief diterima dan masuk antrean.")} onButtonB={() => { setBriefRevisionText(""); setIsBriefRevisionEditing((editing) => !editing); }} primaryLabel={isBriefRevisionEditing ? "Kirim Revisi" : "Approve Brief"} secondaryLabel={isBriefRevisionEditing ? "Kembali" : "Revision Brief"} primaryIcon={isBriefRevisionEditing ? "send" : "check_circle"} secondaryIcon={isBriefRevisionEditing ? "arrow_back" : "edit_note"} secondaryDisabled={false} primaryVariant="blue" secondaryVariant={isBriefRevisionEditing ? "default" : "red"} /></QaComponentBoundary>}
                 </section>
                 </QaComponentBoundary>
               )}
@@ -517,7 +523,7 @@ function DetailContent() {
                 <QaComponentBoundary label="OddsTaskDiscussionPanel" className={cardClass}>
                   <section className={cardClass}>
                     <QaComponentBoundary label="TaskDiscussionPanel" tone="nested">
-                      <TaskDiscussionPanel taskId={task.id} userId={user?.id} taskStatus={task.status} preview={isPreview && qaScenario !== "brief_submitted"} unavailable={isPreview && qaScenario === "brief_submitted"} />
+                      <TaskDiscussionPanel taskId={task.id} userId={user?.id} taskStatus={task.status} preview={isPreview && qaScenario !== "brief_submitted"} unavailable={task.status === "submitted" || (isPreview && qaScenario === "brief_submitted")} />
                     </QaComponentBoundary>
                   </section>
                 </QaComponentBoundary>
@@ -531,20 +537,18 @@ function DetailContent() {
               {activeTab === "history" && (
                 <QaComponentBoundary label="OddsTaskHistoryPanel">
                 <OddsTaskHistoryPanel className={cardClass}>
-                  <div className="space-y-4 flex-1 overflow-y-auto pr-1">
+                  <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                     {(() => {
                       const backendHistory = task.history ?? [];
                       if (backendHistory.length > 0) {
                         return (
-                          <div className="space-y-2">
+                          <div className="relative space-y-3 pl-5 before:absolute before:bottom-2 before:left-1 before:top-2 before:w-px before:bg-cu-border/70">
                             {backendHistory.map((event) => (
-                              <div key={event.sequence} className="flex items-baseline gap-2 text-xs">
-                                <span className="font-semibold text-cu-ink">{event.text}</span>
-                                <span className="text-cu-muted">|</span>
-                                <span className={`shrink-0 text-[10px] font-medium ${dark ? "text-slate-500" : "text-[#7d7c7c]/80"}`}>
-                                  {formatLogDate(event.occurred_at)}
-                                </span>
-                              </div>
+                              <article key={event.sequence} className="relative rounded-xl border border-cu-border/70 bg-cu-panel-soft/30 px-3 py-2.5 shadow-sm">
+                                <span className="absolute -left-[1.35rem] top-3 flex size-3 items-center justify-center rounded-full border-2 border-white bg-cu-info shadow-sm" aria-hidden="true" />
+                                <p className="text-xs font-semibold text-cu-ink">{event.text}</p>
+                                <p className="mt-1 text-[10px] font-medium text-cu-muted">{formatLogDate(event.occurred_at)}</p>
+                              </article>
                             ))}
                           </div>
                         );
@@ -706,19 +710,17 @@ function DetailContent() {
                       });
 
                       if (sortedEvents.length === 0) {
-                        return <p className="text-sm text-cu-muted">Belum ada riwayat aktivitas.</p>;
+                        return <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-2xl border border-dashed border-cu-border bg-cu-panel-soft/30 px-4 py-6 text-center"><span className="text-3xl" role="img" aria-label="Belum ada aktivitas">🕘</span><p className="mt-2 text-sm font-medium text-cu-muted">Belum ada riwayat aktivitas.</p></div>;
                       }
 
                       return (
-                        <div className="space-y-2">
+                        <div className="relative space-y-3 pl-5 before:absolute before:bottom-2 before:left-1 before:top-2 before:w-px before:bg-cu-border/70">
                           {sortedEvents.map((event, idx) => (
-                            <div key={idx} className="flex items-baseline gap-2 text-xs">
-                                <h4 className="font-semibold text-cu-ink">{event.label}</h4>
-                                <span className="text-cu-muted">|</span>
-                                <span className={`shrink-0 text-[10px] font-medium ${dark ? "text-slate-500" : "text-[#7d7c7c]/80"}`}>
-                                  {formatLogDate(event.date)}
-                                </span>
-                            </div>
+                            <article key={idx} className="relative rounded-xl border border-cu-border/70 bg-cu-panel-soft/30 px-3 py-2.5 shadow-sm">
+                              <span className="absolute -left-[1.35rem] top-3 flex size-3 items-center justify-center rounded-full border-2 border-white bg-cu-info shadow-sm" aria-hidden="true" />
+                              <h4 className="text-xs font-semibold text-cu-ink">{event.label}</h4>
+                              <p className="mt-1 text-[10px] font-medium text-cu-muted">{formatLogDate(event.date)}</p>
+                            </article>
                           ))}
                         </div>
                       );
@@ -731,21 +733,16 @@ function DetailContent() {
               {activeTab === "actions" && (
                 <QaComponentBoundary label="OddsTaskActionsPanel">
                 <OddsTaskActionsPanel className={cardClass}>
-                  {!canEditBrief && !canReturnBrief && !canAcceptBrief && !canSpvBriefAction && !canStartTask && !canRequestSkip && !canSubmitOutput && !canSpvResultReview && !canClientResultReview && !canRequestCancel && !canReassignTask && !canExtendDeadline ? (
-                    <p className="rounded-lg border border-dashed border-cu-border px-3 py-3 text-sm text-cu-muted">
-                      Belum ada aksi untuk role ini pada status task sekarang.
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch flex-1 min-h-0 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="grid flex-1 min-h-0 grid-cols-1 items-stretch gap-4 overflow-y-auto pr-1 lg:grid-cols-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       {/* Column 1: Main State Actions */}
-                      <div className="h-full flex flex-col">
+                      <div className={`${selectedAction ? "" : "hidden"} order-2 h-full flex flex-col lg:col-span-3 lg:order-2`}>
                         <div className="space-y-3 flex-grow flex flex-col justify-between h-full">
                             <div className="space-y-3 flex-grow flex flex-col min-h-0">
-                              {canShowNoteInput && !canRichTextOutputReview && (
+                              {canShowNoteInput && (!canRichTextOutputReview || selectedAction === "Review") && (
                                 <textarea
                                   value={note}
                                   onChange={(event) => setNote(event.target.value)}
-                                  placeholder="Catatan aksi"
+                                  placeholder={selectedAction === "Cancel Task" ? "Alasan membatalkan request tugas" : selectedAction === "Prioritas" ? (canReviewPriority ? "Catatan review prioritas antrean" : "Alasan mengajukan prioritas antrean") : selectedAction === "Review" ? (canClientResultReview ? "Alasan review Client" : "Alasan revisi Leader") : "Catatan aksi"}
                                   className={`w-full flex-grow resize-none rounded-lg border px-3 py-2 text-sm outline-none min-h-[140px] ${dark ? "bg-[#0e0e0e] border-white/10 text-white focus:border-cu-info" : "border-cu-border focus:border-cu-info"}`}
                                 />
                               )}
@@ -753,12 +750,6 @@ function DetailContent() {
                               {pendingSkipRequest && isAssignedDesigner && (
                                 <p className="rounded-lg border border-cu-warning/30 bg-cu-warning/10 px-3 py-2 text-sm text-cu-warning">
                                   Permintaan skip antrean sedang menunggu review SPV/Manajer.
-                                </p>
-                              )}
-
-                              {canSubmitOutput && (
-                                <p className="rounded-lg border border-cu-info/20 bg-cu-info/10 px-3 py-2 text-sm text-cu-info">
-                                  {outputNotice}
                                 </p>
                               )}
 
@@ -819,6 +810,23 @@ function DetailContent() {
                                 />
                               )}
 
+                              {canRequestPriority && (
+                                <ActionButton
+                                  icon="priority_high"
+                                  label="Ajukan Prioritas Antrean"
+                                  disabled={!note || !!busy}
+                                  onClick={() => run("queuePriority", () => requestOddsQueuePriority(task.id, note), "Permintaan prioritas dikirim untuk approval Leader.")}
+                                />
+                              )}
+
+                              {canReviewPriority && pendingPriorityRequest && (
+                                <div className="flex flex-col gap-2">
+                                  <p className="rounded-lg border border-cu-warning/20 bg-cu-warning/10 px-3 py-2 text-sm text-cu-warning">Alasan Client: {pendingPriorityRequest.reason}</p>
+                                  <ActionButton icon="check" label="Approve Prioritas" disabled={!!busy} onClick={() => run("priorityApprove", () => reviewOddsQueuePriority(pendingPriorityRequest.id, "approved", note || undefined), "Prioritas antrean disetujui.")} />
+                                  <ActionButton icon="close" label="Tolak Prioritas" danger disabled={!note || !!busy} onClick={() => run("priorityReject", () => reviewOddsQueuePriority(pendingPriorityRequest.id, "rejected", note), "Prioritas antrean ditolak.")} />
+                                </div>
+                              )}
+
                               {canSpvResultReview && (
                                 <div className="flex flex-col gap-2">
                                   <ActionButton icon="check" label="Leader ACC" disabled={!!busy} onClick={() => run("spvOk", () => leaderReviewOddsTask(task.id, "approved", note || undefined), "Leader approve.")} />
@@ -867,19 +875,41 @@ function DetailContent() {
                               )}
                             </div>
                           </div>
-                          <p title="Aksi utama digunakan untuk menjalankan, mengembalikan, menyetujui, merevisi, atau membatalkan proses tugas sesuai statusnya." className="mt-4 line-clamp-2 border-t border-cu-border pt-3 text-xs leading-5 text-cu-muted">
-                            Aksi utama digunakan untuk menjalankan, mengembalikan, menyetujui, merevisi, atau membatalkan proses tugas sesuai statusnya.
-                          </p>
                       </div>
 
+                      <div className="order-1 flex min-h-0 flex-col gap-4 lg:col-span-1 lg:order-1">
+                      <div className="grid min-w-0 grid-cols-3 gap-x-1 gap-y-3 pt-3">
+                        {[
+                          { icon: "cancel", label: "Cancel Task", color: "text-cu-danger", surface: "border-cu-danger/20 bg-cu-danger/10", enabled: canRequestCancel, visible: true },
+                          { icon: "fact_check", label: "Check Brief", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canReturnBrief || canAcceptBrief, visible: true },
+                          { icon: "rate_review", label: "Review", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canSpvResultReview || canClientResultReview, visible: true },
+                          { icon: "play_arrow", label: "Mulai / Skip", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canStartTask || canRequestSkip, visible: canStartTask || canRequestSkip },
+                          { icon: "priority_high", label: "Prioritas", color: "text-cu-warning", surface: "border-cu-warning/20 bg-cu-warning/10", enabled: canRequestPriority || canReviewPriority, visible: true },
+                          { icon: "upload", label: "Kumpulkan", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canSubmitOutput, visible: canSubmitOutput },
+                          { icon: "swap_horiz", label: "Reassign", color: "text-cu-muted", surface: "border-cu-border bg-cu-panel-soft", enabled: canReassignTask && !isAssignedDesigner, visible: true },
+                          { icon: "event_repeat", label: "Deadline", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canExtendDeadline && !isAssignedDesigner, visible: true },
+                          { icon: "task_alt", label: "Selesai", color: "text-cu-success", surface: "border-cu-success/20 bg-cu-success/10", enabled: false, visible: true },
+                        ].filter(({ visible }) => visible).map(({ icon, label, color, surface, enabled }) => (
+                          <button key={label} type="button" disabled={!enabled || !!busy} onClick={() => {
+                            if (label === "Kumpulkan") {
+                              setActiveTab("output");
+                              setSelectedAction(null);
+                              return;
+                            }
+                            setSelectedAction((current) => current === label ? null : label);
+                          }} className={`flex w-16 min-w-0 flex-col items-center gap-2 text-center text-[10px] font-semibold leading-3 text-cu-ink disabled:cursor-not-allowed disabled:opacity-40 ${selectedAction === label ? "opacity-100" : ""}`}>
+                            <span className={`flex size-12 shrink-0 items-center justify-center rounded-xl border transition hover:brightness-95 ${color} ${surface} ${selectedAction === label ? "ring-2 ring-cu-info ring-offset-1 ring-offset-white" : ""}`}><MaterialIcon name={icon} size="sm" /></span>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
                       {/* Column 2: Reassign Designer */}
-                      <div className="h-full flex flex-col">
+                      {selectedAction === "Reassign" && canReassignTask && <div className="h-full flex flex-1 flex-col">
                         <div className="space-y-3 flex-grow flex flex-col justify-between h-full">
                           <div className="flex items-center gap-2 text-sm font-semibold text-cu-ink mb-3">
                             <MaterialIcon name="swap_horiz" size="sm" />
                             Reassign Designer
                           </div>
-                           {canReassignTask ? (
                             <div className="space-y-3 flex-1 flex flex-col justify-end">
                               <div className="relative">
                                 <button
@@ -936,7 +966,7 @@ function DetailContent() {
                                         );
                                       })
                                     )}
-                                  </div>
+                      </div>
                                 )}
                               </div>
                               <ActionButton
@@ -946,25 +976,16 @@ function DetailContent() {
                                 onClick={() => run("reassign", () => reassignOddsTask(task.id, Number(reassignDesignerId)), "Task berhasil direassign.")}
                               />
                             </div>
-                          ) : (
-                            <div className="flex-1 flex items-center justify-center">
-                              <p className="text-sm text-cu-muted text-center italic">Aksi Reassign tidak tersedia.</p>
-                            </div>
-                          )}
                           </div>
-                          <p title="Reassign Designer digunakan untuk mengganti desainer yang bertanggung jawab atas tugas ini." className="mt-4 line-clamp-2 border-t border-cu-border pt-3 text-xs leading-5 text-cu-muted">
-                            Reassign Designer digunakan untuk mengganti desainer yang bertanggung jawab atas tugas ini.
-                          </p>
-                        </div>
+                        </div>}
 
                       {/* Column 3: Perpanjang Deadline */}
-                      <div className="h-full flex flex-col">
+                      {selectedAction === "Deadline" && canExtendDeadline && <div className="h-full flex flex-1 flex-col">
                         <div className="space-y-3 flex-grow flex flex-col justify-between h-full">
                           <div className="flex items-center gap-2 text-sm font-semibold text-cu-ink mb-3">
                             <MaterialIcon name="event_repeat" size="sm" />
                             Perpanjang Deadline
                           </div>
-                          {canExtendDeadline ? (
                             <div className="space-y-3 flex-1 flex flex-col justify-end">
                               <div className="relative">
                                 <div
@@ -992,18 +1013,10 @@ function DetailContent() {
                                 onClick={() => run("deadline", () => extendOddsTaskDeadline(task.id, extendedDeadline, note || undefined), "Deadline task diperpanjang.")}
                               />
                             </div>
-                          ) : (
-                            <div className="flex-1 flex items-center justify-center">
-                              <p className="text-sm text-cu-muted text-center italic">Perpanjang deadline tidak tersedia.</p>
-                            </div>
-                          )}
                           </div>
-                          <p title="Perpanjang Deadline digunakan untuk mengubah batas waktu pengerjaan tugas." className="mt-4 line-clamp-2 border-t border-cu-border pt-3 text-xs leading-5 text-cu-muted">
-                            Perpanjang Deadline digunakan untuk mengubah batas waktu pengerjaan tugas.
-                          </p>
-                        </div>
+                      </div>}
+                      </div>
                     </div>
-                  )}
                 </OddsTaskActionsPanel>
                 </QaComponentBoundary>
               )}

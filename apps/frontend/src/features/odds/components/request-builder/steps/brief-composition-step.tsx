@@ -52,7 +52,6 @@ export function BriefCompositionStep({
 
   return (
     <StandardBriefDetails>
-        {!usesTableBrief && <h2 className={`mb-4 text-2xl font-bold tracking-tight sm:text-4xl ${textTitle}`}>Detail Brief</h2>}
         {miniStep === 3 && <BriefImportantMatrixStep form={form} selectedCategory={selectedCategory} theme={theme} />}
         {miniStep === 4 && <BriefDeadlineStep form={form} update={update} selectedCategory={selectedCategory} todayDate={todayDate} tomorrowDate={tomorrowDate} threeDaysDate={threeDaysDate} theme={theme} />}
 
@@ -87,15 +86,16 @@ export function BriefCompositionStep({
                 tomorrowDate={tomorrowDate}
                 threeDaysDate={threeDaysDate}
               />
-            ) : (
-              <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-0 xl:grid xl:gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(220px,1fr)]">
-                <div className={`${isDefaultFullscreen ? "hidden" : ""} relative order-2 mt-4 flex min-h-0 min-w-0 flex-none flex-col overflow-hidden xl:order-1 xl:mt-0 xl:flex-1 ${dark ? "bg-[#171717]" : "bg-white"}`}>
-                  <div className="sm:relative mb-0 flex h-0 shrink-0 items-center justify-center px-0 py-0 sm:mb-4 sm:h-auto sm:justify-between">
+              ) : (
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-0 xl:grid xl:gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(220px,1fr)]">
+                  <div className={`${isDefaultFullscreen ? "hidden" : ""} relative order-2 mt-4 flex min-h-0 min-w-0 flex-none flex-col overflow-hidden xl:order-1 xl:mt-0 xl:flex-1 ${dark ? "bg-[#171717]" : "bg-white"}`}>
+                    <div className="relative mb-4 flex h-auto shrink-0 items-center justify-between px-0 py-0">
+                      <h2 className={`text-2xl font-bold tracking-tight sm:text-4xl ${textTitle}`}>Detail Brief</h2>
                     <button
                       type="button"
                       onClick={() => setIsDefaultFullscreen((current) => !current)}
                       title={isDefaultFullscreen ? "Tutup layar penuh" : "Perluas ke layar penuh"}
-                      className={`absolute bottom-2 right-2 top-auto z-20 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition sm:static ${dark ? "text-[#B9B9B9] hover:bg-white/10 hover:text-white" : "text-[#04044A]/60 hover:bg-[#BDEAFF]/40 hover:text-[#04044A]"}`}
+                      className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition ${dark ? "text-[#B9B9B9] hover:bg-white/10 hover:text-white" : "text-[#04044A]/60 hover:bg-[#BDEAFF]/40 hover:text-[#04044A]"}`}
                     >
                       <MaterialIcon name={isDefaultFullscreen ? "close_fullscreen" : "open_in_full"} size="sm" />
                       {isDefaultFullscreen ? "Tutup" : "Layar Penuh"}

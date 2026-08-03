@@ -58,6 +58,7 @@ class ApplicationRegistrySeeder extends Seeder
             $displayNames = [
                 'request-odds-queue-skip' => 'Mengajukan Skip Antrean ODDS',
                 'review-odds-queue-skip' => 'Meninjau Skip Antrean ODDS',
+                'request-odds-queue-priority' => 'Mengajukan Prioritas Antrean ODDS',
             ];
             $aliases[$permissionName] = [
                 'odds',

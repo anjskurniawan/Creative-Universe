@@ -144,6 +144,11 @@ class Task extends OddsModel
         return $this->hasMany(TaskSkipRequest::class, 'task_id');
     }
 
+    public function priorityRequests(): HasMany
+    {
+        return $this->hasMany(TaskPriorityRequest::class, 'task_id');
+    }
+
     public function cancelRequests(): HasMany
     {
         return $this->hasMany(TaskCancelRequest::class, 'task_id');

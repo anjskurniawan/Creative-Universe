@@ -86,7 +86,7 @@ export interface CreativeMemberProfile extends CreativeMember {
   card_image_path: string | null;
   specialties?: string[];
   profile_metrics: Record<string, number>;
-  odds_profile: { id: number; status: "available" | "off"; specializations: Array<number | string> } | null;
+  odds_profile: { id: number; status: "available" | "off"; is_active: boolean; specializations: Array<number | string> } | null;
   odds_metrics?: { avg_response_minutes: number | null; on_time_rate: number | null; user_rating: number | null; rating_count: number; capacity_percent: number | null; average_score: number | null };
 }
 
