@@ -420,7 +420,13 @@ function DetailContent() {
             Kembali
           </Link>
         </span>
-        <span className="hidden lg:inline">{task.design_purpose}</span>
+        <span className="hidden w-full items-center justify-between gap-3 lg:inline-flex">
+          <span>{task.design_purpose}</span>
+          <Link href="/odds" className="group inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-[#cfeaf7] bg-white/90 px-3.5 text-xs font-semibold text-[#526677] shadow-[0_4px_12px_rgba(0,116,180,0.08)] transition-all hover:-translate-x-0.5 hover:border-[#8bd5f5] hover:bg-[#f1faff] hover:text-[#0077bf] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00a4ff]/30 focus-visible:ring-offset-2">
+            <span className="flex size-5 items-center justify-center rounded-full bg-[#e9f7ff] text-[#0077bf] transition-colors group-hover:bg-[#d8f1ff]"><MaterialIcon name="arrow_back" size="xs" /></span>
+            <span>Kembali</span>
+          </Link>
+        </span>
       </HeaderTitle>
       </QaComponentBoundary>
 
@@ -735,7 +741,7 @@ function DetailContent() {
                 <OddsTaskActionsPanel className={cardClass}>
                   <div className="grid flex-1 min-h-0 grid-cols-1 items-stretch gap-4 overflow-y-auto pr-1 lg:grid-cols-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       {/* Column 1: Main State Actions */}
-                      <div className={`${selectedAction ? "" : "hidden"} order-2 h-full flex flex-col lg:col-span-3 lg:order-2`}>
+                      <div className={`${selectedAction && !["Reassign", "Deadline"].includes(selectedAction) ? "" : "hidden"} order-2 h-full flex flex-col lg:col-span-3 lg:order-2`}>
                         <div className="space-y-3 flex-grow flex flex-col justify-between h-full">
                             <div className="space-y-3 flex-grow flex flex-col min-h-0">
                               {canShowNoteInput && (!canRichTextOutputReview || selectedAction === "Review") && (
@@ -877,8 +883,8 @@ function DetailContent() {
                           </div>
                       </div>
 
-                      <div className="order-1 flex min-h-0 flex-col gap-4 lg:col-span-1 lg:order-1">
-                      <div className="grid min-w-0 grid-cols-3 gap-x-1 gap-y-3 pt-3">
+                      <div className="order-1 flex min-h-0 flex-col gap-4 lg:contents">
+                      <div className="grid h-fit w-full min-w-0 grid-cols-3 content-start gap-x-1 gap-y-3 pt-3 lg:col-span-1 lg:order-1 lg:justify-self-stretch lg:self-start">
                         {[
                           { icon: "cancel", label: "Cancel Task", color: "text-cu-danger", surface: "border-cu-danger/20 bg-cu-danger/10", enabled: canRequestCancel, visible: true },
                           { icon: "fact_check", label: "Check Brief", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canReturnBrief || canAcceptBrief, visible: true },
@@ -886,8 +892,8 @@ function DetailContent() {
                           { icon: "play_arrow", label: "Mulai / Skip", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canStartTask || canRequestSkip, visible: canStartTask || canRequestSkip },
                           { icon: "priority_high", label: "Prioritas", color: "text-cu-warning", surface: "border-cu-warning/20 bg-cu-warning/10", enabled: canRequestPriority || canReviewPriority, visible: true },
                           { icon: "upload", label: "Kumpulkan", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canSubmitOutput, visible: canSubmitOutput },
-                          { icon: "swap_horiz", label: "Reassign", color: "text-cu-muted", surface: "border-cu-border bg-cu-panel-soft", enabled: canReassignTask && !isAssignedDesigner, visible: true },
-                          { icon: "event_repeat", label: "Deadline", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canExtendDeadline && !isAssignedDesigner, visible: true },
+                          { icon: "swap_horiz", label: "Reassign", color: "text-cu-muted", surface: "border-cu-border bg-cu-panel-soft", enabled: canReassignTask, visible: true },
+                          { icon: "event_repeat", label: "Deadline", color: "text-cu-info", surface: "border-cu-info/20 bg-cu-info/10", enabled: canExtendDeadline, visible: true },
                           { icon: "task_alt", label: "Selesai", color: "text-cu-success", surface: "border-cu-success/20 bg-cu-success/10", enabled: false, visible: true },
                         ].filter(({ visible }) => visible).map(({ icon, label, color, surface, enabled }) => (
                           <button key={label} type="button" disabled={!enabled || !!busy} onClick={() => {
@@ -904,7 +910,7 @@ function DetailContent() {
                         ))}
                       </div>
                       {/* Column 2: Reassign Designer */}
-                      {selectedAction === "Reassign" && canReassignTask && <div className="h-full flex flex-1 flex-col">
+                      {selectedAction === "Reassign" && canReassignTask && <div className="h-full flex flex-1 flex-col lg:col-span-3 lg:order-2">
                         <div className="space-y-3 flex-grow flex flex-col justify-between h-full">
                           <div className="flex items-center gap-2 text-sm font-semibold text-cu-ink mb-3">
                             <MaterialIcon name="swap_horiz" size="sm" />
@@ -980,7 +986,7 @@ function DetailContent() {
                         </div>}
 
                       {/* Column 3: Perpanjang Deadline */}
-                      {selectedAction === "Deadline" && canExtendDeadline && <div className="h-full flex flex-1 flex-col">
+                      {selectedAction === "Deadline" && canExtendDeadline && <div className="h-full flex flex-1 flex-col lg:col-span-3 lg:order-2">
                         <div className="space-y-3 flex-grow flex flex-col justify-between h-full">
                           <div className="flex items-center gap-2 text-sm font-semibold text-cu-ink mb-3">
                             <MaterialIcon name="event_repeat" size="sm" />
