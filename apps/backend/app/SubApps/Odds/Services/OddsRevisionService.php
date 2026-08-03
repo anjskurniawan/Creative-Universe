@@ -29,7 +29,7 @@ class OddsRevisionService
             }
 
             $status = in_array($type, [RevisionTypeEnum::EXTRA->value, RevisionTypeEnum::URGENT_FINAL->value], true)
-                ? 'pending_spv'
+                ? 'pending_leader'
                 : 'queued';
 
             $revision = $task->revisions()->create([
@@ -44,17 +44,21 @@ class OddsRevisionService
 
             if ($type === RevisionTypeEnum::NORMAL->value) {
                 $task->increment('normal_revision_count');
-                $this->queue->enqueue($task, TaskTypeEnum::CLIENT_REVISION->value, $task->assigned_designer_id);
                 $this->notifications->send($task->assignedDesigner, 'client_revision_requested', 'Revisi dari Client', $data['notes'], $task);
             } elseif ($type === RevisionTypeEnum::LEADER->value) {
                 $task->increment('leader_revision_count');
-                $this->queue->enqueue($task, TaskTypeEnum::LEADER_REVISION->value, $task->assigned_designer_id);
                 $this->notifications->send($task->assignedDesigner, 'leader_revision_requested', 'Revisi dari Leader Creative', $data['notes'], $task);
             } else {
-                $this->notifications->sendToRoles(['Manajer', 'SPV'], $type.'_requested', 'Revision ODDS butuh review SPV', $data['notes'], $task);
+                $this->notifications->sendToRoles(['Manajer', 'SPV'], $type.'_requested', 'Revision ODDS butuh review Leader', $data['notes'], $task);
             }
 
             activity('odds')->performedOn($task)->event($type.'_revision_requested')->log($data['notes']);
+
+            if ($type === RevisionTypeEnum::NORMAL->value) {
+                $this->queue->enqueue($task, TaskTypeEnum::CLIENT_REVISION->value, $task->assigned_designer_id);
+            } elseif ($type === RevisionTypeEnum::LEADER->value) {
+                $this->queue->enqueue($task, TaskTypeEnum::LEADER_REVISION->value, $task->assigned_designer_id);
+            }
 
             return $revision->refresh();
         });
@@ -99,13 +103,13 @@ class OddsRevisionService
                 }
             } elseif ($urgent) {
                 $revision->update(['status' => 'rejected', 'approved_by' => $reviewerId, 'approved_at' => now()]);
-                $this->notifications->send($task->requester, 'urgent_revision_rejected', 'Urgent revision ditolak', $note ?? 'Urgent revision ditolak SPV.', $task);
+                $this->notifications->send($task->requester, 'urgent_revision_rejected', 'Urgent revision ditolak', $note ?? 'Urgent revision ditolak Leader.', $task);
                 activity('odds')->performedOn($task)->event('urgent_revision_rejected')->log($note ?? 'Urgent revision rejected');
                 $this->autoDone($task, 'Urgent revision rejected. Task auto done.');
             } else {
                 $revision->update(['status' => 'rejected', 'approved_by' => $reviewerId, 'approved_at' => now()]);
-                $task->update(['status' => TaskStatusEnum::REVISION_REJECTED_BY_SPV->value]);
-                $this->notifications->send($task->requester, 'extra_revision_rejected', 'Extra revision ditolak', $note ?? 'Extra revision ditolak SPV.', $task);
+                $task->update(['status' => TaskStatusEnum::REVISION_REJECTED_BY_LEADER->value]);
+                $this->notifications->send($task->requester, 'extra_revision_rejected', 'Extra revision ditolak', $note ?? 'Extra revision ditolak Leader.', $task);
                 activity('odds')->performedOn($task)->event('extra_revision_rejected')->log($note ?? 'Extra revision rejected');
             }
 

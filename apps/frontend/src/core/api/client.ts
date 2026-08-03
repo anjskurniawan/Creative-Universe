@@ -110,6 +110,16 @@ export async function openProtectedAttachment(attachmentId: number | string): Pr
   }
 }
 
+export async function downloadProtectedAttachment(attachmentId: number | string, filename = "referensi-odds") : Promise<void> {
+  const blob = await apiFetch<Blob>(`/odds/uploads/${attachmentId}/content`, { responseType: "blob" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
 export function getCookie(name: string): string | undefined {
   if (typeof document === "undefined") return undefined;
   const encodedName = encodeURIComponent(name);
@@ -179,11 +189,12 @@ export async function apiFetch<T = unknown>(
         continue;
       }
 
-      return await handleResponse<T>(response, {
+      const result = await handleResponse<T>(response, {
         responseType,
         skipAuthRedirect,
         isCanonicalSessionRequest: path === "/auth/me",
       });
+      return (path.startsWith("/odds") ? normalizeOddsResponse(result) : result) as T;
     } catch (error) {
       if (error instanceof ApiError) throw error;
       if (didTimeout()) throw new RequestTimeoutError(timeoutMs);
@@ -201,6 +212,32 @@ export async function apiFetch<T = unknown>(
       cleanup();
     }
   }
+}
+
+function normalizeOddsResponse<T>(payload: T): T {
+  if (Array.isArray(payload)) return payload.map(normalizeOddsResponse) as T;
+  if (!payload || typeof payload !== "object") return payload;
+
+  const value = payload as Record<string, unknown>;
+  const normalized: Record<string, unknown> = { ...value };
+  const statusMap: Record<string, string> = {
+    leader_review: "spv_review",
+    pending_leader: "pending_spv",
+    approved_by_leader: "approved_by_spv",
+    cancelled_by_leader: "cancelled_by_spv",
+    revision_rejected_by_leader: "revision_rejected_by_spv",
+    leader: "spv",
+  };
+
+  for (const key of ["status", "queue_status", "log_type", "review_type"]) {
+    if (typeof normalized[key] === "string") normalized[key] = statusMap[normalized[key] as string] ?? normalized[key];
+  }
+
+  for (const [key, child] of Object.entries(normalized)) {
+    if (child && typeof child === "object") normalized[key] = normalizeOddsResponse(child);
+  }
+
+  return normalized as T;
 }
 
 export function apiBlob(path: string, options: ApiRequestOptions = {}): Promise<Blob> {

@@ -41,7 +41,7 @@ export default function TaskCardTitleTask({
   };
 
   return (
-    <div className={["flex items-start p-2.5", className].filter(Boolean).join(" ")}>
+    <div className={["flex items-start", className].filter(Boolean).join(" ")}>
       {isEditing ? (
         <input
           autoFocus

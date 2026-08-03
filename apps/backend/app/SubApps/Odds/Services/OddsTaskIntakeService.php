@@ -150,6 +150,8 @@ class OddsTaskIntakeService
             ]
         );
 
+        activity('odds')->performedOn($task)->event('brief_updated')->log('Client memperbarui brief task.');
+
         $this->notifications->send($task->assignedDesigner, 'brief_updated', 'Brief ODDS diperbarui', 'Client memperbarui brief task.', $task);
 
         return $task->refresh()->load(['brief', 'category']);

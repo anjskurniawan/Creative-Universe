@@ -314,7 +314,7 @@ export default function NewOddsTaskPage() {
       if (tableCategory) await commitProductCategory(tableCategory);
       if (tableCategory && tableProduct) await commitProduct(tableCategory, tableProduct);
 
-      await createOddsTask({
+      const createdTask = await createOddsTask({
         request_type: form.request_type,
         category_id: Number(form.category_id),
         preferred_designer_id: Number(form.preferred_designer_id),
@@ -329,7 +329,7 @@ export default function NewOddsTaskPage() {
       if (draftId) await deleteOddsTaskDraft(draftId);
       setLaunchSequence("success");
       await new Promise((resolve) => window.setTimeout(resolve, 1600));
-      router.push("/odds/?section=all_tasks");
+      router.push(`/odds/detail?id=${createdTask.id}`);
     } catch (err) {
       setError(oddsError(err));
       setLaunchSequence("idle");

@@ -18,12 +18,12 @@ const STATUS_LABELS: Record<string, string> = {
   client_review: "Menunggu Review Client",
   done: "Selesai",
   cancelled: "Dibatalkan",
-  cancelled_by_spv: "Dibatalkan SPV",
+  cancelled_by_spv: "Dibatalkan Leader",
 };
 
 const TASK_TYPE_LABELS: Record<string, string> = {
   new_task: "Task baru",
-  leader_revision: "Revisi SPV",
+  leader_revision: "Revisi Leader",
   client_revision: "Revisi client",
   extra_revision: "Extra revision",
   urgent_revision: "Urgent final",

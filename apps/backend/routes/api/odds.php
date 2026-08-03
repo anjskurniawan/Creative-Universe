@@ -41,17 +41,17 @@ Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds
     Route::patch('/tasks/{task}/brief', [TaskController::class, 'updateBrief'])->middleware('can:create-odds-tasks');
     Route::post('/tasks/{task}/brief/return', [TaskController::class, 'returnBrief'])->middleware('can:review-odds-briefs');
     Route::post('/tasks/{task}/brief/accept', [TaskController::class, 'acceptBrief'])->middleware('can:review-odds-briefs');
-    Route::post('/tasks/{task}/brief/force-continue', [TaskController::class, 'forceContinue'])->middleware('can:review-odds-spv');
-    Route::post('/tasks/{task}/brief/cancel', [TaskController::class, 'cancelBrief'])->middleware('can:review-odds-spv');
+    Route::post('/tasks/{task}/brief/force-continue', [TaskController::class, 'forceContinue'])->middleware('can:review-odds-leader');
+    Route::post('/tasks/{task}/brief/cancel', [TaskController::class, 'cancelBrief'])->middleware('can:review-odds-leader');
 
     Route::get('/queue', [QueueController::class, 'index'])->middleware('can:manage-odds-queue');
     Route::get('/queue/next', [QueueController::class, 'next'])->middleware('can:manage-odds-queue');
     Route::post('/tasks/{task}/skip-requests', [QueueController::class, 'requestSkip'])->middleware('can:request-odds-queue-skip');
     Route::post('/skip-requests/{skipRequest}/review', [QueueController::class, 'reviewSkip'])->middleware('can:review-odds-queue-skip');
     Route::post('/tasks/{task}/start', [TaskController::class, 'start'])->middleware('can:start-odds-tasks');
-    Route::post('/tasks/{task}/pause', [TaskController::class, 'pause'])->middleware('can:review-odds-spv');
+    Route::post('/tasks/{task}/pause', [TaskController::class, 'pause'])->middleware('can:review-odds-leader');
     Route::post('/tasks/{task}/results', [TaskController::class, 'submitResult'])->middleware('can:submit-odds-results');
-    Route::post('/tasks/{task}/spv-review', [TaskController::class, 'spvReview'])->middleware('can:review-odds-spv');
+    Route::post('/tasks/{task}/leader-review', [TaskController::class, 'leaderReview'])->middleware('can:review-odds-leader');
     Route::post('/tasks/{task}/client-review', [TaskController::class, 'clientReview'])->middleware('can:review-odds-client');
     Route::post('/tasks/{task}/rating', [TaskController::class, 'rate'])->middleware('can:review-odds-client');
     Route::post('/tasks/{task}/revisions', [RevisionController::class, 'requestRevision'])->middleware('can:request-odds-revisions');

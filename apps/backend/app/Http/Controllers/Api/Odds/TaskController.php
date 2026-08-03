@@ -10,7 +10,7 @@ use App\Http\Requests\Odds\NoteRequest;
 use App\Http\Requests\Odds\RateTaskRequest;
 use App\Http\Requests\Odds\ReasonRequest;
 use App\Http\Requests\Odds\ReassignTaskRequest;
-use App\Http\Requests\Odds\SpvReviewRequest;
+use App\Http\Requests\Odds\LeaderReviewRequest;
 use App\Http\Requests\Odds\StoreTaskRequest;
 use App\Http\Requests\Odds\SubmitResultRequest;
 use App\Http\Requests\Odds\UpdateBriefRequest;
@@ -114,8 +114,15 @@ class TaskController extends BaseApiController
         abort_unless($storedFile->application_key === 'odds', 404);
 
         if ($storedFile->uploaded_by !== $request->user()->id) {
-            abort_unless($storedFile->context_type === 'task' && $storedFile->context_id, 403);
-            $this->authorizeTaskView($request, Task::findOrFail($storedFile->context_id));
+            if ($storedFile->context_type === 'task' && $storedFile->context_id) {
+                $this->authorizeTaskView($request, Task::findOrFail($storedFile->context_id));
+            } else {
+                $referencingTask = Task::query()
+                    ->where('brief_text', 'like', '%/uploads/'.$storedFile->id.'/content%')
+                    ->first();
+                abort_unless($referencingTask, 403);
+                $this->authorizeTaskView($request, $referencingTask);
+            }
         }
 
         abort_unless(Storage::disk($storedFile->disk)->exists($storedFile->path), 404);
@@ -137,7 +144,7 @@ class TaskController extends BaseApiController
         return $this->sendResponse(
             TaskResource::make($task->load([
                 'category', 'requester', 'assignedDesigner', 'brief', 'currentQueue',
-                'results.assetLinks', 'reviews', 'revisions', 'timeLogs', 'skipRequests', 'cancelRequests', 'assetLinks',
+                'results.assetLinks', 'reviews', 'revisions', 'timeLogs', 'skipRequests', 'cancelRequests', 'assetLinks', 'activities',
             ]))->resolve($request),
             'Detail task ODDS berhasil diambil.'
         );
@@ -246,10 +253,10 @@ class TaskController extends BaseApiController
 
     public function cancelBrief(ReasonRequest $request, Task $task): JsonResponse
     {
-        $task = $this->briefs->cancelBySpv($task, $request->string('reason')->toString(), $request->user()->id);
+        $task = $this->briefs->cancelByLeader($task, $request->string('reason')->toString(), $request->user()->id);
         $this->realtime->publishUpdated($task);
 
-        return $this->sendResponse($task, 'Task ODDS dibatalkan SPV.');
+        return $this->sendResponse($task, 'Task ODDS dibatalkan Leader.');
     }
 
     public function start(Request $request, Task $task): JsonResponse
@@ -273,15 +280,15 @@ class TaskController extends BaseApiController
         $result = $this->workReviews->submitResult($task, $request->validated(), $request->user()->id);
         $this->realtime->publishUpdated($task);
 
-        return $this->sendResponse($result, 'Hasil ODDS berhasil dikirim ke SPV.', 201);
+        return $this->sendResponse($result, 'Hasil ODDS berhasil dikirim ke Leader.', 201);
     }
 
-    public function spvReview(SpvReviewRequest $request, Task $task): JsonResponse
+    public function leaderReview(LeaderReviewRequest $request, Task $task): JsonResponse
     {
-        $task = $this->workReviews->spvReview($task, $request->validated(), $request->user()->id);
+        $task = $this->workReviews->leaderReview($task, $request->validated(), $request->user()->id);
         $this->realtime->publishUpdated($task);
 
-        return $this->sendResponse($task, 'Review SPV ODDS berhasil disimpan.');
+        return $this->sendResponse($task, 'Review Leader ODDS berhasil disimpan.');
     }
 
     public function clientReview(ClientReviewRequest $request, Task $task): JsonResponse

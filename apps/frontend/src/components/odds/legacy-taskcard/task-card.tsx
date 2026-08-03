@@ -565,15 +565,15 @@ export default function TaskCard({
         <div className={`flex ${isCompactDesktop ? "min-w-0 flex-1 items-stretch" : "flex-col xl:flex-row flex-1 items-stretch xl:items-center"} self-stretch`}>
           <div
             className={[
-              isCompactDesktop ? "flex min-w-0 flex-1 items-center justify-between rounded-r-2xl px-4 py-3" : "flex flex-col xl:flex-row flex-1 items-stretch xl:items-center justify-between px-5 py-5 xl:px-[32px] xl:py-0 xl:h-full rounded-b-2xl xl:rounded-b-none xl:rounded-r-[16px] xl:rounded-br-2xl xl:rounded-tr-2xl",
+              isCompactDesktop ? "flex min-w-0 flex-1 items-center justify-between rounded-r-2xl px-4 py-3" : "flex flex-col xl:flex-row flex-1 items-stretch xl:items-center justify-between px-5 py-5 xl:px-[16px] xl:py-0 xl:h-full rounded-b-2xl xl:rounded-b-none xl:rounded-r-[16px] xl:rounded-br-2xl xl:rounded-tr-2xl",
               theme === "dark" ? "bg-[#171717]" : theme === "retro" ? "bg-[#eceee6]" : isDone ? "bg-[#e8faea]" : "bg-white",
             ].join(" ")}
           >
             {/* Task Info Container */}
             <div className={`flex ${isCompactDesktop ? "min-w-0 flex-1 items-center gap-2" : "flex-col sm:flex-row gap-4 xl:gap-4 2xl:gap-6 items-stretch sm:items-center relative min-w-0 xl:flex-none xl:mr-6"}`}>
               {/* Title */}
-              <div className={`flex min-w-0 flex-1 ${isCompactDesktop ? "flex-row items-center justify-between gap-3" : "flex-col items-start relative xl:w-[420px] xl:flex-none"}`}>
-                <TaskCardTitleTask title={title} editable={canManageTask} onSave={onTitleSave} theme={theme} className={`${isCompactDesktop ? "min-w-0 flex-1" : "w-full"} px-0 py-0 xl:p-[10px]`} />
+                <div className={`flex min-w-0 flex-1 ${isCompactDesktop ? "flex-row items-center justify-between gap-3" : "flex-col items-start relative xl:w-[350px] xl:flex-none"}`}>
+                <TaskCardTitleTask title={title} editable={canManageTask} onSave={onTitleSave} theme={theme} className={`${isCompactDesktop ? "min-w-0 flex-1" : "w-full"} p-0`} />
                 {isDone && isLate && (
                   <span className="mt-1 rounded-full bg-[#fee2e2] px-2 py-1 text-xs font-semibold text-[#b91c1c]">Terlambat</span>
                 )}
@@ -685,12 +685,13 @@ export default function TaskCard({
             {/* Progress Info */}
             <div className={`${isCompactDesktop ? "hidden" : "flex"} flex-col lg:flex-row gap-4 xl:gap-3 2xl:gap-8 items-stretch lg:items-center relative mt-6 xl:mt-0 w-full lg:w-auto shrink-0`}>
               {/* Progress Details */}
-              <div className={`flex flex-col gap-[12px] items-start relative w-full ${isCompactDesktop ? "!w-full" : "xl:w-[410px]"}`}>
-                <div className={`grid grid-cols-2 sm:grid-cols-4 ${isCompactDesktop ? "!grid" : "xl:flex xl:items-center xl:justify-between"} w-full gap-2`}>
-                  <div className="relative flex-1 xl:flex-none w-full xl:w-[95px] pt-3.5">
+              <div className={`flex flex-col gap-[12px] items-start relative w-full ${isCompactDesktop ? "!w-full" : "xl:w-fit"}`}>
+                <div className={`grid grid-cols-2 sm:grid-cols-4 ${isCompactDesktop ? "!grid" : "xl:flex xl:items-center xl:justify-between xl:w-fit"} w-full gap-1.5`}>
+                  <div className="relative flex-1 xl:flex-none w-full xl:w-[56px] pt-5">
                     {internalTimestamps["ACC Draft"] && (
-                      <span className={`absolute top-0 right-0 text-[8px] font-medium leading-none whitespace-nowrap ${getTimestampColorClass("ACC Draft")}`}>
-                        {internalTimestamps["ACC Draft"]}
+                      <span className={`absolute top-0 left-0 right-0 text-center text-[8px] font-medium leading-[10px] whitespace-nowrap ${getTimestampColorClass("ACC Draft")}`}>
+                        <span className="block">{internalTimestamps["ACC Draft"].split(" ")[0]}</span>
+                        <span className="block">{internalTimestamps["ACC Draft"].split(" ").slice(1).join(" ")}</span>
                       </span>
                     )}
                     <TaskCardButtonStatus
@@ -703,10 +704,11 @@ export default function TaskCard({
                     />
                   </div>
 
-                  <div className="relative flex-1 xl:flex-none w-full xl:w-[100px] pt-3.5">
+                  <div className="relative flex-1 xl:flex-none w-full xl:w-[56px] pt-5">
                     {internalTimestamps["Progress"] && (
-                      <span className={`absolute top-0 right-0 text-[8px] font-medium leading-none whitespace-nowrap ${getTimestampColorClass("Progress")}`}>
-                        {internalTimestamps["Progress"]}
+                      <span className={`absolute top-0 left-0 right-0 text-center text-[8px] font-medium leading-[10px] whitespace-nowrap ${getTimestampColorClass("Progress")}`}>
+                        <span className="block">{internalTimestamps["Progress"].split(" ")[0]}</span>
+                        <span className="block">{internalTimestamps["Progress"].split(" ").slice(1).join(" ")}</span>
                       </span>
                     )}
                     <TaskCardButtonStatus
@@ -719,10 +721,11 @@ export default function TaskCard({
                     />
                   </div>
 
-                  <div className="relative flex-1 xl:flex-none w-full xl:w-[100px] pt-3.5">
+                  <div className="relative flex-1 xl:flex-none w-full xl:w-[56px] pt-5">
                     {internalTimestamps["Approve"] && (
-                      <span className={`absolute top-0 right-0 text-[8px] font-medium leading-none whitespace-nowrap ${getTimestampColorClass("Approve")}`}>
-                        {internalTimestamps["Approve"]}
+                      <span className={`absolute top-0 left-0 right-0 text-center text-[8px] font-medium leading-[10px] whitespace-nowrap ${getTimestampColorClass("Approve")}`}>
+                        <span className="block">{internalTimestamps["Approve"].split(" ")[0]}</span>
+                        <span className="block">{internalTimestamps["Approve"].split(" ").slice(1).join(" ")}</span>
                       </span>
                     )}
                     <TaskCardButtonStatus
@@ -735,10 +738,11 @@ export default function TaskCard({
                     />
                   </div>
 
-                  <div className="relative flex-1 xl:flex-none w-full xl:w-[100px] pt-3.5">
+                  <div className="relative flex-1 xl:flex-none w-full xl:w-[56px] pt-5">
                     {internalTimestamps["Email"] && (
-                      <span className={`absolute top-0 right-0 text-[8px] font-medium leading-none whitespace-nowrap ${getTimestampColorClass("Email")}`}>
-                        {internalTimestamps["Email"]}
+                      <span className={`absolute top-0 left-0 right-0 text-center text-[8px] font-medium leading-[10px] whitespace-nowrap ${getTimestampColorClass("Email")}`}>
+                        <span className="block">{internalTimestamps["Email"].split(" ")[0]}</span>
+                        <span className="block">{internalTimestamps["Email"].split(" ").slice(1).join(" ")}</span>
                       </span>
                     )}
                     <TaskCardButtonStatus

@@ -12,6 +12,7 @@ import { OddsDesignerTaskRowCard } from "@/components/odds-designer-task-row-car
 import { OddsTaskCard, OutputFilesPanel, OutputReviewPanel, TaskDiscussionPanel, TaskSubmissionPanel, publishTaskFeedbackToast } from "@/components/odds/TaskCard";
 import { useAuth } from "@/providers/auth-provider";
 import { useOddsTheme } from "./odds-theme-context";
+import { shouldHideOddsCancelSkipMenus } from "@/features/odds/menu-visibility";
 import { resolveStorageUrl } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import { CustomDatePicker } from "@/components/ui/custom-date-picker";
@@ -509,10 +510,11 @@ function DesignerMetric({
 function OddsPageContent() {
   const { hasPermission, user } = useAuth();
   const { theme } = useOddsTheme();
+  const hideCancelSkipMenus = shouldHideOddsCancelSkipMenus(user);
   const canManageConfig = hasPermission("manage-odds-config");
   const canManageUsers = hasPermission("manage-users");
   const canShowConfigSections = canManageConfig && canManageUsers;
-  const canReviewSpv = hasPermission("review-odds-spv");
+  const canReviewSpv = hasPermission("review-odds-leader");
   const canViewAllTasks = hasPermission("view-all-odds-tasks");
   const canApproveExtra = hasPermission("approve-odds-extra-revisions");
   const canApproveUrgent = hasPermission("approve-odds-urgent-revisions");
@@ -651,15 +653,15 @@ function OddsPageContent() {
       if (section.id === "spv_review") return canReviewSpv;
       if (section.id === "client_review") return canReviewSpv || canViewAllTasks;
       if (section.id === "special_revisions") return canApproveExtra || canApproveUrgent;
-      if (section.id === "cancel_requests") return canManageEscalations;
-      if (section.id === "skip_requests") return canReviewQueueSkip;
+      if (section.id === "cancel_requests") return canManageEscalations && !hideCancelSkipMenus;
+      if (section.id === "skip_requests") return canReviewQueueSkip && !hideCancelSkipMenus;
       if (section.id === "reports") return canViewReports;
       if (section.id === "rankings") return canViewRankings;
       if (["designer_today_tasks", "designer_queue", "designer_all_tasks", "designer_review", "designer_spv_review", "designer_client_review", "designer_revisions", "designer_done", "designer_report", "designer_settings"].includes(section.id)) return canViewAssignedTasks && !canUseControl;
       if (["client_drafts", "client_all_requests", "client_queue", "client_working", "client_action_required", "client_revisions", "client_archive"].includes(section.id)) return !canViewAssignedTasks && !canUseControl;
       return canViewAllTasks || canReviewSpv;
     });
-  }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewQueueSkip, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports, canViewAssignedTasks, canUseControl]);
+  }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewQueueSkip, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports, canViewAssignedTasks, canUseControl, hideCancelSkipMenus]);
 
   const searchParams = useSearchParams();
   const activeSectionParam = searchParams.get("section") as ConfigSection | null;
@@ -2465,11 +2467,11 @@ function OddsPageContent() {
             <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
               <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
                   {loading ? (
-                  <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-8 text-center text-sm text-cu-muted">Memuat...</div>
+                  <AllTasksMenuSkeleton />
                   ) : myTasks.length === 0 ? (
                   <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-8 text-center text-sm text-cu-muted">Belum ada riwayat tugas.</div>
                   ) : (
-                    <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-3 lg:gap-4 overflow-auto pb-1 pr-1">
+                    <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-3 lg:gap-2 overflow-auto pb-1 pr-1">
                       {/* Mobile: use mobileFilteredTasks */}
                       {mobileFilteredTasks.map((task) => {
                         const isClientForTask = Boolean(String(user?.id) === String((task as any).requester_id) || (task.requester?.id && String(user?.id) === String(task.requester.id)));
@@ -2626,7 +2628,7 @@ function OddsPageContent() {
                           </div>
 
                           {/* ── Desktop Card ── */}
-                          <div className="hidden min-w-[900px] flex-col gap-3 lg:flex">
+                          <div className="hidden min-w-[900px] flex-col gap-2 lg:flex">
                             <OddsTaskCard
                               task={task}
                               theme={theme}
@@ -3010,7 +3012,7 @@ function OddsPageContent() {
             ) : clientTasks.length === 0 ? (
               <div className="rounded-lg border border-cu-border bg-cu-panel-soft px-4 py-8 text-center text-sm text-cu-muted">{emptyText}</div>
             ) : (
-              <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-5 overflow-auto pb-1 pr-1">
+              <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-5 lg:gap-2 overflow-auto pb-1 pr-1">
                 {clientTasks.map((task) => {
                   const canCheckThisTask = task.status === "client_review";
                   const hideClientDelete = task.status === "done";
@@ -3031,7 +3033,7 @@ function OddsPageContent() {
                     }
                   };
                   return (
-                    <div key={task.id} className="flex flex-col gap-3">
+                    <div key={task.id} className="flex flex-col gap-3 lg:gap-2">
                       {/* ── Mobile Card ── */}
                       <div className="lg:hidden">
                         <OddsTaskCard
@@ -3078,7 +3080,7 @@ function OddsPageContent() {
                       </div>
 
                       {/* ── Desktop Card ── */}
-                      <div className="hidden min-w-[900px] flex-col gap-3 lg:flex">
+                      <div className="hidden min-w-[900px] flex-col gap-2 lg:flex">
                         <OddsTaskCard
                           task={task}
                           theme={theme}
@@ -3134,6 +3136,54 @@ function OddsPageContent() {
       })()}
 
       </div>
+    </div>
+  );
+}
+
+function AllTasksMenuSkeleton() {
+  return (
+    <div className="odds-scroll-hidden flex min-h-0 flex-1 flex-col gap-3 overflow-hidden" aria-label="Memuat semua tugas" role="status">
+      {["one", "two", "three", "four", "five", "six"].map((key) => (
+        <div key={key} className="animate-pulse overflow-hidden rounded-xl border border-cu-border bg-white shadow-sm">
+          <div className="flex min-[988px]:hidden">
+            <div className="h-24 w-16 shrink-0 bg-cu-border/60" />
+            <div className="min-w-0 flex-1 space-y-2 p-4">
+              <div className="h-3.5 w-3/4 rounded bg-cu-border/80" />
+              <div className="h-3 w-1/2 rounded bg-cu-border/60" />
+              <div className="h-3 w-2/3 rounded bg-cu-border/50" />
+            </div>
+          </div>
+          <div className="hidden min-h-[96px] min-[988px]:flex">
+            <div className="w-[92px] shrink-0 border-r border-cu-border bg-cu-panel-soft p-3">
+              <div className="text-[9px] font-bold text-cu-panel-soft">Senin</div>
+              <div className="mx-auto mt-1 text-3xl font-black leading-none text-cu-panel-soft">12</div>
+              <div className="mx-auto mt-2 text-[9px] font-bold text-cu-panel-soft">AGU 2026</div>
+            </div>
+            <div className="min-w-[230px] flex-1 space-y-3 p-4">
+              <p className="truncate text-sm font-bold text-cu-panel-soft">Layout Default Display Rak Aksesoris JETE - In progress #1</p>
+              <p className="text-[10px] text-cu-panel-soft">Layout Popup Store Gramedia · Q1</p>
+              <p className="text-[10px] text-cu-panel-soft">Brief · Output · Diskusi</p>
+            </div>
+            <div className="w-[190px] space-y-2 border-l border-cu-border p-4">
+              <p className="text-[9px] font-bold text-cu-panel-soft">CLIENT</p>
+              <p className="truncate text-[10px] text-cu-panel-soft">System Admin</p>
+              <p className="truncate text-[10px] text-cu-panel-soft">Bagus Child A Rahman</p>
+            </div>
+            <div className="w-[150px] space-y-2 border-l border-cu-border p-4">
+              <p className="text-[10px] text-cu-panel-soft">01:35:20</p>
+              <p className="text-[10px] text-cu-panel-soft">02 Agu 2026</p>
+            </div>
+            <div className="flex w-[230px] items-center gap-2 border-l border-cu-border p-4">
+              <span className="flex size-8 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-panel-soft">chat</span>
+              <span className="flex size-8 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-panel-soft">file</span>
+              <span className="flex size-8 items-center justify-center rounded-lg bg-cu-panel-soft text-cu-panel-soft">more</span>
+            </div>
+            <div className="flex w-[130px] items-center justify-center border-l border-cu-border p-4">
+              <span className="rounded-full bg-cu-panel-soft px-3 py-1 text-[10px] font-bold text-cu-panel-soft">In progress</span>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -3845,18 +3895,11 @@ function AdminKvRetailTaskCard({
 
         {/* Main Content Area */}
         <div className={`flex flex-1 items-stretch justify-start p-4 ${innerBgClass}`}>
-          {/* Title & Brief Link */}
+          {/* Title */}
           <div className={`w-[315px] shrink-0 border-r ${groupDividerClass} pr-4 flex flex-col justify-center`}>
             <h3 className={`line-clamp-2 text-[20px] font-semibold leading-normal ${primaryTextClass}`} title={task.design_purpose}>
               {task.design_purpose}
             </h3>
-            <button
-              type="button"
-              onClick={() => toggleTab("brief")}
-              className={`mt-1 inline-flex items-center text-xs font-bold hover:underline w-max ${accentTextClass}`}
-            >
-              Lihat Detail Brief
-            </button>
           </div>
 
           {/* Client Info */}
@@ -4424,11 +4467,6 @@ function DesignerTaskQueueCard({ task, theme, nowMs, controlView = false, select
                   <p className={`mt-1 text-sm font-medium leading-none ${primaryTextClass} ${retroSmallTextClass}`}>Designer</p>
                 </div>
               )}
-              <div className={`flex h-full min-h-[54px] shrink-0 items-center border-l px-4 ${dividerClass}`}>
-                <button type="button" onClick={() => setBriefOpen(true)} className={`whitespace-nowrap text-sm font-medium leading-none hover:opacity-80 ${retroSmallTextClass}`} style={{ color: detailColor }}>
-                  Lihat Detail Brief
-                </button>
-              </div>
               <div className={`flex h-full min-h-[54px] shrink-0 flex-col justify-center border-l px-4 ${dividerClass}`}>
                 <p className={`text-sm font-medium leading-none ${primaryTextClass} ${retroSmallTextClass}`}>{deadline.day}</p>
                 <p className={`mt-0.5 text-sm font-medium leading-none ${primaryTextClass} ${retroSmallTextClass}`}>{deadline.date}</p>
@@ -5941,12 +5979,7 @@ function LightAllTasksSection({ loading, tasks }: { loading: boolean; tasks: Odd
       </div>
       <div className="odds-scroll-hidden flex-1 min-h-0 overflow-y-auto px-6 py-5">
         {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="flex flex-col items-center gap-3 text-slate-400">
-              <MaterialIcon name="autorenew" size="lg" className="animate-spin" />
-              <p className="text-xs font-medium">Memuat data...</p>
-            </div>
-          </div>
+          <LightAllTasksSkeleton />
         ) : tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 py-16 text-center">
             <MaterialIcon name="assignment" size="lg" className="text-slate-300" />
@@ -5958,6 +5991,26 @@ function LightAllTasksSection({ loading, tasks }: { loading: boolean; tasks: Odd
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function LightAllTasksSkeleton() {
+  return (
+    <div className="space-y-3" aria-label="Memuat semua tugas" role="status">
+      {["one", "two", "three", "four"].map((key) => (
+        <div key={key} className="animate-pulse rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="h-3 w-8 rounded bg-slate-200" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-4 w-3/4 rounded bg-slate-200" />
+              <div className="h-3 w-1/2 rounded bg-slate-100" />
+            </div>
+            <div className="hidden h-5 w-20 rounded-full bg-slate-100 sm:block" />
+            <div className="size-8 rounded-lg bg-slate-100" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -6069,12 +6122,7 @@ function DarkAllTasksSection({ loading, tasks }: { loading: boolean; tasks: Odds
       </div>
       <div className="odds-scroll-hidden flex-1 min-h-0 overflow-y-auto px-6 py-5">
         {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="flex flex-col items-center gap-3 text-white/20">
-              <MaterialIcon name="autorenew" size="lg" className="animate-spin" />
-              <p className="text-xs font-medium">Syncing data...</p>
-            </div>
-          </div>
+          <DarkAllTasksSkeleton />
         ) : tasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-white/5 py-16 text-center">
             <MaterialIcon name="assignment" size="lg" className="text-white/10" />
@@ -6086,6 +6134,26 @@ function DarkAllTasksSection({ loading, tasks }: { loading: boolean; tasks: Odds
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function DarkAllTasksSkeleton() {
+  return (
+    <div className="space-y-2" aria-label="Memuat semua tugas" role="status">
+      {["one", "two", "three", "four", "five"].map((key) => (
+        <div key={key} className="animate-pulse rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3.5">
+          <div className="flex items-center gap-4">
+            <div className="h-3 w-8 rounded bg-white/10" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-3.5 w-3/4 rounded bg-white/10" />
+              <div className="h-2.5 w-1/2 rounded bg-white/[0.06]" />
+            </div>
+            <div className="hidden h-4 w-8 rounded bg-white/[0.06] sm:block" />
+            <div className="size-7 rounded-lg bg-white/[0.06]" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

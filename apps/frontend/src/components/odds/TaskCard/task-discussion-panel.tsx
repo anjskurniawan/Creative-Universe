@@ -1,10 +1,24 @@
 "use client";
 
+import type { ComponentPropsWithoutRef } from "react";
 import { OddsTaskChat } from "@/components/odds-task-chat";
 import { MaterialIcon } from "@/components/ui/material-icon";
 
 /** Panel diskusi task yang dipakai oleh action `Diskusi Task`. */
-export function TaskDiscussionPanel({ taskId, userId, taskStatus, preview = false, title, onClose }: { taskId: string | number; userId?: number | null; taskStatus?: string | null; preview?: boolean; title?: string; onClose?: () => void }) {
+type TaskDiscussionPanelProps = Omit<ComponentPropsWithoutRef<"section">, "children"> & { taskId: string | number; userId?: number | null; taskStatus?: string | null; preview?: boolean; unavailable?: boolean; title?: string; onClose?: () => void };
+
+export function TaskDiscussionPanel({ taskId, userId, taskStatus, preview = false, unavailable = false, title, onClose, className = "", ...props }: TaskDiscussionPanelProps) {
+  if (unavailable) {
+    return <section {...props} className={`flex w-full flex-col gap-4 ${className}`} aria-label="Diskusi task">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="truncate text-base font-semibold leading-6 text-[#3b4446]">Diskusi Project{title ? ` - ${title}` : ""}</h3>
+      </div>
+      <div className="rounded-lg border border-dashed border-cu-border px-3 py-4">
+        <p className="text-sm text-cu-muted">Room chat dibuat otomatis setelah brief diterima dan task masuk antrean.</p>
+      </div>
+    </section>;
+  }
+
   if (preview) {
     const messages = [
       { name: "Client Test", body: "Mohon pastikan visual dan copy sudah sesuai dengan brief sebelum dikirim untuk review.", time: "12:17", accent: "text-[#0077bf]", surface: "bg-[#f3fbff]", initials: "CT" },
@@ -25,7 +39,7 @@ export function TaskDiscussionPanel({ taskId, userId, taskStatus, preview = fals
     </section>;
   }
 
-  return <section className="flex w-full flex-col gap-4" aria-label="Diskusi task">
+  return <section {...props} className={`flex w-full flex-col gap-4 ${className}`} aria-label="Diskusi task">
     <div className="flex items-center justify-between gap-3">
       <h3 className="truncate text-base font-semibold leading-6 text-[#3b4446]">Diskusi Project{title ? ` - ${title}` : ""}</h3>
       {onClose && <button type="button" onClick={onClose} aria-label="Tutup diskusi" className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-[#d9e1e6] text-[#3b4446] transition hover:bg-[#f3fbff]"><MaterialIcon name="close" size="sm" /></button>}

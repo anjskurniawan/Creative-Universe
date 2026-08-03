@@ -11,6 +11,7 @@ import {
 import { TaskFeedbackToast, TaskFeedbackToastHost } from "@/components/odds/TaskCard";
 import { OddsThemeContext } from "./odds-theme-context";
 import { getEchoClient } from "@/core/realtime/client";
+import { shouldHideOddsCancelSkipMenus } from "@/features/odds/menu-visibility";
 
 type OddsMenuItem = {
   id: string;
@@ -30,13 +31,14 @@ const ODDS_GROUP_ORDER: OddsMenuItem["group"][] = ["tasks", "manage", "reports"]
 
 export default function OddsLayout({ children }: { children: ReactNode }) {
   const { hasPermission, user } = useAuth();
+  const hideCancelSkipMenus = shouldHideOddsCancelSkipMenus(user);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const canManageConfig = hasPermission("manage-odds-config");
   const canManageUsers = hasPermission("manage-users");
   const canShowConfigSections = canManageConfig && canManageUsers;
-  const canReviewSpv = hasPermission("review-odds-spv");
+  const canReviewSpv = hasPermission("review-odds-leader");
   const canViewAllTasks = hasPermission("view-all-odds-tasks");
   const canApproveExtra = hasPermission("approve-odds-extra-revisions");
   const canApproveUrgent = hasPermission("approve-odds-urgent-revisions");
@@ -174,10 +176,10 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
       if (canApproveExtra || canApproveUrgent) {
         items.push({ id: "special_revisions", label: "Extra / Urgent", icon: "priority_high", href: "/odds?section=special_revisions", group: "tasks" });
       }
-      if (canManageEscalations) {
+      if (canManageEscalations && !hideCancelSkipMenus) {
         items.push({ id: "cancel_requests", label: "Cancel", icon: "cancel", href: "/odds?section=cancel_requests", group: "tasks" });
       }
-      if (canReviewQueueSkip) {
+      if (canReviewQueueSkip && !hideCancelSkipMenus) {
         items.push({ id: "skip_requests", label: "Skip Antrean", icon: "skip_next", href: "/odds?section=skip_requests", group: "tasks" });
       }
       if (canViewReports) {
@@ -199,6 +201,7 @@ export default function OddsLayout({ children }: { children: ReactNode }) {
     canApproveUrgent,
     canManageEscalations,
     canReviewQueueSkip,
+    hideCancelSkipMenus,
     canViewReports,
     canViewRankings,
     canViewAssignedTasks,

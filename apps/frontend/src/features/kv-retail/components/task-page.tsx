@@ -3,22 +3,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { type SideMenuItem } from "@/components/navigation/side-menu";
+import { TaskPageTitle } from "@/features/kv-retail/components/task-page-title";
 import { TaskDesktopPageTransition } from "@/components/ui/task-desktop-page-transition";
 import { type TaskcardMobileChange, type TaskcardMobileTone } from "@/components/odds/taskcard-mobile";
 import { TaskCardMobile, type TaskCardConfig } from "@/components/odds/legacy-taskcard";
 import { TaskCard, type TaskCardState } from "@/components/odds/task-card";
 import { TaskFormModal } from "@/components/odds/task-form-modal";
 import { PerformanceNavbar } from "@/features/kv-retail/components/performance-navbar";
-import { PerformanceSidebar } from "@/features/kv-retail/components/performance-sidebar";
+import Container from "@/components/layout/container";
 import { resolveStorageUrl } from "@/core/api/client";
 import { coreApi } from "@/core/api";
 import { kvRetailApi, type KvRetailTask, type KvRetailTaskDeletedEvent, type KvRetailTaskEvent } from "@/features/kv-retail/api";
 import { useKvRetailDesktopSidebar, useKvRetailTasks } from "@/features/kv-retail/hooks";
 import { getEchoClient } from "@/core/realtime";
 import { useAuth } from "@/providers/auth-provider";
-
-type MetricState = "Total" | "Progress" | "OnTrack" | "Terlambat" | "Done";
-type DesktopTheme = "light" | "dark" | "retro";
+import { TaskKpiMetrics, type TaskMetricState } from "@/features/kv-retail/components/task-kpi-metrics";
+import { TaskSearchBar } from "@/features/kv-retail/components/task-search-bar";
+import { TaskFilterDropdown } from "@/features/kv-retail/components/task-filter-dropdown";
 
 export type TaskPageScope = "all" | "unfinished" | "current-month";
 
@@ -167,170 +168,6 @@ const PRIMARY_MENU: SideMenuItem[] = [
     href: "/kv-retail/option",
   },
 ];
-
-const metricToneClasses: Record<MetricState, { iconBox: string; icon: string }> = {
-  Total: {
-    iconBox: "bg-[#eef2ff]",
-    icon: "text-[#8474f9]",
-  },
-  Progress: {
-    iconBox: "bg-[#fff8ee]",
-    icon: "text-[#f18728]",
-  },
-  OnTrack: {
-    iconBox: "bg-[#e5f6fd]",
-    icon: "text-[#0288d1]",
-  },
-  Terlambat: {
-    iconBox: "bg-[#ffe2dd]",
-    icon: "text-[#ff5b55]",
-  },
-  Done: {
-    iconBox: "bg-[#efffee]",
-    icon: "text-[#2b9915]",
-  },
-};
-
-function CombinedMetricCard({ 
-  metrics,
-  actionButton,
-  theme,
-  fill = false,
-}: { 
-  metrics: { title: string; value: number; icon: string; state: MetricState }[];
-  actionButton?: React.ReactNode;
-  theme: DesktopTheme;
-  fill?: boolean;
-}) {
-  if (metrics.length === 0 && !actionButton) return null;
-  const isDark = theme === "dark";
-  const isRetro = theme === "retro";
-  return (
-    <div className={`flex ${fill ? "w-full" : "w-full"} min-w-0 items-stretch overflow-hidden rounded-2xl ${isDark ? "border border-white/10 bg-[#171717] shadow-[0_10px_26px_rgba(0,0,0,0.2)]" : isRetro ? "border-2 border-[#24252b] bg-[#eceee6] shadow-[3px_3px_0_#24252b]" : "border border-[#e5e7eb] bg-white shadow-sm"}`}>
-      {actionButton && (
-        <div className={`z-[1] flex shrink-0 items-center justify-center ${isDark ? "border-r border-white/10" : isRetro ? "border-r-2 border-[#24252b]" : "border-r border-[#e5e7eb]"}`}>
-          {actionButton}
-        </div>
-      )}
-      <div className={`kv-retail-kpi-scroll flex min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${isDark ? "divide-x divide-white/10" : isRetro ? "divide-x divide-[#24252b]/20" : "divide-x divide-[#e5e7eb]"}`}>
-      {metrics.map((metric) => {
-        const tone = metricToneClasses[metric.state];
-        return (
-          <div key={metric.state} className={`flex h-[76px] items-center gap-4 px-5 py-3 min-w-[150px] shrink-0 ${fill ? "flex-1 justify-start" : ""}`}>
-            <div
-              className={[
-                "flex size-11 shrink-0 items-center justify-center rounded-xl",
-                isDark ? "bg-[#202820]" : isRetro ? "bg-[#dfe2d3]" : tone.iconBox,
-              ].join(" ")}
-            >
-              <MaterialIcon
-                name={metric.icon}
-                size="auto"
-                weight={400}
-                filled={false}
-                className={["text-[22px] leading-none", isDark ? "text-[#b0ff5e]" : isRetro ? "text-[#24252b]" : tone.icon].join(" ")}
-              />
-            </div>
-            <div className="flex flex-col">
-              <p className={`text-[22px] font-bold leading-none ${isDark ? "text-[#f1f1f1]" : "text-[#111827]"}`}>
-                {metric.value}
-              </p>
-              <p className={`mt-1.5 whitespace-nowrap text-[12px] font-medium ${isDark ? "text-[#b9b9b9]" : "text-[#6b7280]"}`}>
-                {metric.title}
-              </p>
-            </div>
-          </div>
-        );
-      })}
-      </div>
-    </div>
-  );
-}
-
-function AddTaskButton({ onClick, theme }: { onClick?: () => void; theme: DesktopTheme }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label="Add Button"
-      className={`flex h-[76px] w-[76px] shrink-0 items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 ${theme === "dark" ? "bg-[#b0ff5e] text-[#181818] hover:bg-[#c6ff89] focus-visible:ring-[#b0ff5e]/40" : theme === "retro" ? "bg-[#ba0dcb] text-white hover:bg-[#9c0bac] focus-visible:ring-[#ba0dcb]/40" : "bg-[#ec4899] text-white hover:bg-[#db2777] focus-visible:ring-[#ec4899]/40"}`}
-    >
-      <MaterialIcon
-        name="add"
-        size="auto"
-        weight={300}
-        filled={false}
-        className="text-[48px] leading-none"
-      />
-    </button>
-  );
-}
-
-function ToolbarDropdown({
-  icon,
-  label,
-  options,
-  value,
-  onChange,
-  theme,
-  compact = false,
-}: {
-  icon: string;
-  label: string;
-  options: string[];
-  value: string;
-  onChange: (val: string) => void;
-  theme: DesktopTheme;
-  compact?: boolean;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const isDark = theme === "dark";
-  const isRetro = theme === "retro";
-
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label={`${label}: ${value === options[0] ? label : value}`}
-        className={`flex shrink-0 items-center justify-center gap-2.5 rounded-xl px-4 tracking-[0.32px] transition-colors focus-visible:outline-none focus-visible:ring-2 ${compact ? "size-12 px-0 text-sm" : "h-[76px] text-base"} ${isDark ? "border border-white/10 bg-[#171717] text-[#f1f1f1] hover:bg-[#202820] focus-visible:ring-[#b0ff5e]/30" : isRetro ? "border-2 border-[#24252b] bg-[#eceee6] text-[#24252b] hover:bg-[#dfe2d3] focus-visible:ring-[#ba0dcb]/30" : "border border-[#d7dcdd] bg-white text-[#525e61] hover:border-[#bfc7c9] hover:bg-[#fbfdff] focus-visible:ring-[#8474f9]/25"}`}
-      >
-        <MaterialIcon
-          name={icon}
-          size="auto"
-          weight={300}
-          filled={false}
-          className="text-[24px] leading-none"
-        />
-        {!compact && <span className="hidden max-w-[120px] truncate 2xl:inline">{value === options[0] ? label : value}</span>}
-      </button>
-
-      {isOpen && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)}></div>
-          <div className={`absolute left-0 top-[110%] z-20 flex w-48 flex-col rounded-xl p-1 ${isDark ? "border border-white/10 bg-[#171717] shadow-[0_12px_30px_rgba(0,0,0,0.36)]" : isRetro ? "border-2 border-[#24252b] bg-[#eceee6] shadow-[3px_3px_0_#24252b]" : "border border-[#e5e7eb] bg-white shadow-lg"}`}>
-            {options.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => {
-                  onChange(opt);
-                  setIsOpen(false);
-                }}
-                className={`flex w-full items-center justify-start rounded-lg px-3 py-2 text-sm transition-colors ${
-                  value === opt
-                    ? isDark ? "bg-[#b0ff5e] font-medium text-[#181818]" : isRetro ? "bg-[#ba0dcb] font-medium text-white" : "bg-violet-50 font-medium text-[#8474f9]"
-                    : isDark ? "text-[#f1f1f1] hover:bg-[#202820]" : isRetro ? "text-[#24252b] hover:bg-[#dfe2d3]" : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
 
 export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
   const [desktopTheme, setDesktopTheme] = useState<"light" | "dark" | "retro">("light");
@@ -558,11 +395,11 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
   const selesai = scopedTasks.filter(t => t.status === "Done").length;
 
   const dynamicMetrics = [
-    { state: "Total" as MetricState, title: "Total Tugas", value: totalTasks, icon: "assignment" },
-    { state: "Progress" as MetricState, title: "In Progress", value: inProgress, icon: "hourglass_bottom" },
-    { state: "OnTrack" as MetricState, title: "On Track", value: onTrack, icon: "track_changes" },
-    { state: "Terlambat" as MetricState, title: "Terlambat", value: terlambat, icon: "warning_amber" },
-    { state: "Done" as MetricState, title: "Selesai", value: selesai, icon: "check_circle" },
+    { state: "Total" as TaskMetricState, title: "Total Tugas", value: totalTasks, icon: "assignment" },
+    { state: "Progress" as TaskMetricState, title: "In Progress", value: inProgress, icon: "hourglass_bottom" },
+    { state: "OnTrack" as TaskMetricState, title: "On Track", value: onTrack, icon: "track_changes" },
+    { state: "Terlambat" as TaskMetricState, title: "Terlambat", value: terlambat, icon: "warning_amber" },
+    { state: "Done" as TaskMetricState, title: "Selesai", value: selesai, icon: "check_circle" },
   ];
 
   const desktopMetrics = scope === "unfinished"
@@ -663,9 +500,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
             compactMenuItems={compactMobileMenuItems}
           />
           <main aria-label={`${scopedPageTitle} mobile`} className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6 pt-6">
-            <h1 className={`shrink-0 text-4xl font-medium leading-none tracking-[-0.05em] ${desktopTheme === "dark" ? "text-[#f1f1f1]" : "text-[#181818]"}`}>
-              {scopedPageTitle}
-            </h1>
+            <TaskPageTitle theme={desktopTheme} mobile>{scopedPageTitle}</TaskPageTitle>
             <div className="mt-5 flex shrink-0 min-w-0 items-stretch gap-2">
               {scope === "all" && !isMentionOnlyUser && (
                 <button
@@ -678,29 +513,14 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
                 </button>
               )}
               <div className="relative min-w-0 flex-1">
-                <CombinedMetricCard metrics={desktopMetrics} theme={desktopTheme} fill={scope === "unfinished"} />
+                <TaskKpiMetrics metrics={desktopMetrics} theme={desktopTheme} fill={scope === "unfinished"} />
                 {desktopMetrics.length > 1 && <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 right-0 w-10 rounded-r-2xl bg-gradient-to-l ${desktopTheme === "dark" ? "from-[#171717] via-[#171717]/55 to-transparent" : desktopTheme === "retro" ? "from-[#eceee6] via-[#eceee6]/55 to-transparent" : "from-white via-white/55 to-transparent"}`} />}
               </div>
             </div>
             <section aria-label="Cari dan filter tugas" className="mt-3 flex shrink-0 items-center gap-2">
-              <label className="relative min-w-0 flex-1">
-                <span className="sr-only">Cari tugas, proyek, atau lokasi</span>
-                <MaterialIcon
-                  name="search"
-                  size="auto"
-                  weight={400}
-                  className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl ${desktopTheme === "dark" ? "text-[#b0ff5e]" : desktopTheme === "retro" ? "text-[#24252b]" : "text-[#525e61]"}`}
-                />
-                <input
-                  type="search"
-                  placeholder="Cari tugas..."
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  className={`h-12 w-full rounded-xl py-3 pl-11 pr-3 text-sm outline-none ${desktopTheme === "dark" ? "border border-white/10 bg-[#171717] text-[#f1f1f1] placeholder:text-[#7d827f] focus:border-[#b0ff5e]" : desktopTheme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6] text-[#24252b] placeholder:text-[#687065] focus:border-[#ba0dcb]" : "border border-[#d7dcdd] bg-white text-[#222] placeholder:text-[#aeb6b8] focus:border-[#8474f9]"}`}
-                />
-              </label>
-              <ToolbarDropdown icon="storefront" label="Vendor" options={vendorOptions} value={filterVendor} onChange={setFilterVendor} theme={desktopTheme} compact />
-              <ToolbarDropdown icon="sort" label="Urutkan" options={sortOptions} value={sortOption} onChange={setSortOption} theme={desktopTheme} compact />
+               <TaskSearchBar value={searchQuery} onChange={setSearchQuery} theme={desktopTheme} compact placeholder="Cari tugas..." />
+              <TaskFilterDropdown icon="storefront" label="Vendor" options={vendorOptions} value={filterVendor} onChange={setFilterVendor} theme={desktopTheme} compact />
+              <TaskFilterDropdown icon="sort" label="Urutkan" options={sortOptions} value={sortOption} onChange={setSortOption} theme={desktopTheme} compact />
             </section>
             <div className="relative mt-4 min-h-0 flex-1">
             <section
@@ -774,56 +594,46 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
 
 
 
-      <div className={`hidden h-screen min-h-0 flex-col text-[#222] lg:flex ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)] p-6" : desktopTheme === "retro" ? "bg-[#dfe2d3] p-6" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)] p-6"}`}>
-
-
-      <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${desktopTheme === "light" ? "rounded-[26px] border border-white/80 bg-white/80 shadow-[0_14px_42px_rgba(44,42,39,0.16)] backdrop-blur-md" : desktopTheme === "dark" ? "rounded-[26px] border border-white/10 bg-[#111413]/90 shadow-[0_14px_42px_rgba(0,0,0,0.45)] backdrop-blur-md" : "rounded-[30px] border-[3px] border-[#24252b] bg-[#c9ccc0] font-mono shadow-[0_8px_0_#24252b]"}`}>
-      <PerformanceNavbar theme={desktopTheme} title={desktopNavigationTitle} />
-      <div className="flex min-h-0 flex-1">
-      <PerformanceSidebar theme={desktopTheme} activeHref={desktopTaskRoute} ariaLabel={`Navigasi ${desktopNavigationTitle}`} onToggleTheme={() => setDesktopTheme((theme) => theme === "dark" ? "light" : "dark")} onToggleRetro={() => setDesktopTheme((theme) => theme === "retro" ? "light" : "retro")} expanded={desktopShellExpanded} onToggleExpanded={toggleDesktopShellExpanded} />
-
-      <TaskDesktopPageTransition className="relative m-4 min-w-0 flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className={`hidden h-screen w-screen overflow-hidden lg:block ${desktopTheme === "dark" ? "bg-[#111413]" : desktopTheme === "retro" ? "bg-[#dfe2d3]" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}>
+      <Container
+        viewport="Desktop"
+        contentProps={{
+          className: `flex h-full w-full flex-col overflow-hidden rounded-[16px] shadow-[0px_14px_42px_0px_rgba(44,42,39,0.16)] ${desktopTheme === "dark" ? "bg-[#111413] text-white" : desktopTheme === "retro" ? "bg-[#c9ccc0] font-mono" : "bg-[#f3fbff]"}`,
+          sidebarTheme: desktopTheme,
+          sidebarExpanded: desktopShellExpanded,
+          onToggleSidebarExpanded: toggleDesktopShellExpanded,
+          onToggleSidebarTheme: () => setDesktopTheme((theme) => theme === "dark" ? "light" : "dark"),
+          onToggleSidebarRetro: () => setDesktopTheme((theme) => theme === "retro" ? "light" : "retro"),
+          contentProps: { className: "flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden p-4" },
+        }}
+        menuItems={PRIMARY_MENU.filter((item) => !isMentionOnlyUser || item.label === "Daftar Tugas").map((item) => ({ label: item.label, icon: item.icon, href: item.href, isActive: item.href === desktopTaskRoute }))}
+        activeMenuHref={desktopTaskRoute}
+        menuTitle="KV Retail"
+      >
+      <TaskDesktopPageTransition className="relative min-w-0 flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="w-full shrink-0 pb-4">
           <header className="flex min-h-[45px] flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className={`text-4xl font-medium leading-none tracking-[-0.72px] ${desktopTheme === "dark" ? "text-[#f1f1f1]" : desktopTheme === "retro" ? "text-[#24252b]" : "text-[#181818]"}`}>
-                {desktopNavigationTitle}
-              </h1>
+              <TaskPageTitle theme={desktopTheme}>{desktopNavigationTitle}</TaskPageTitle>
             </div>
           </header>
 
           <div className="mt-4 flex min-w-0 items-center gap-3">
-            <div className="min-w-[240px] w-[min(52%,860px)]">
-              <CombinedMetricCard
+            <div className="min-w-0 flex-1">
+              <TaskKpiMetrics
                 metrics={desktopMetrics}
                 theme={desktopTheme}
-                actionButton={scope === "all" && !isMentionOnlyUser ? <AddTaskButton theme={desktopTheme} onClick={() => setIsModalOpen(true)} /> : undefined}
+                onAddTask={scope === "all" && !isMentionOnlyUser ? () => setIsModalOpen(true) : undefined}
               />
             </div>
 
             <section
               aria-label="Filter tugas"
-              className="flex min-w-0 flex-1 flex-nowrap items-center gap-[9px]"
+              className="flex shrink-0 flex-nowrap items-center gap-[9px]"
             >
-              <label className="relative block h-[76px] min-w-0 flex-1">
-                <span className="sr-only">Cari tugas, proyek, atau lokasi ...</span>
-                <MaterialIcon
-                  name="search"
-                  size="auto"
-                  weight={300}
-                  filled={false}
-                  className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[24px] leading-none ${desktopTheme === "dark" ? "text-[#b0ff5e]" : desktopTheme === "retro" ? "text-[#24252b]" : "text-[#525e61]"}`}
-                />
-                <input
-                  type="search"
-                  placeholder="Cari tugas, proyek, atau lokasi ..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`h-[76px] w-full rounded-xl py-4 pl-[50px] pr-4 text-base tracking-[0.32px] outline-none ${desktopTheme === "dark" ? "border border-white/10 bg-[#171717] text-[#f1f1f1] placeholder:text-[#7d827f] focus:border-[#b0ff5e] focus:ring-2 focus:ring-[#b0ff5e]/20" : desktopTheme === "retro" ? "border-2 border-[#24252b] bg-[#eceee6] text-[#24252b] placeholder:text-[#687065] focus:border-[#ba0dcb] focus:ring-2 focus:ring-[#ba0dcb]/20" : "border border-[#d7dcdd] bg-white text-[#222] placeholder:text-[#aeb6b8] focus:border-[#8474f9] focus:ring-2 focus:ring-[#8474f9]/15"}`}
-                />
-              </label>
+               <TaskSearchBar value={searchQuery} onChange={setSearchQuery} theme={desktopTheme} />
 
-              <ToolbarDropdown 
+              <TaskFilterDropdown 
                 icon="storefront" 
                 label="Vendor" 
                 options={vendorOptions}
@@ -831,7 +641,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
                 onChange={setFilterVendor}
                 theme={desktopTheme}
               />
-              <ToolbarDropdown 
+              <TaskFilterDropdown 
                 icon="sort" 
                 label="Urutkan" 
                 options={sortOptions}
@@ -895,8 +705,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
         </section>
       </TaskDesktopPageTransition>
 
-      </div>
-      </div>
+      </Container>
       </div>
 
       <TaskFormModal 

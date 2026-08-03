@@ -1,8 +1,8 @@
-import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import type { TableBriefRow } from "./table-brief-details";
-import { openProtectedAttachment } from "@/core/api/client";
+import { downloadProtectedAttachment, openProtectedAttachment } from "@/core/api/client";
+import { BriefPreviewFrame } from "./brief-preview-frame";
 
 type TableBriefPreviewProps = {
   packagingImageId: number | null;
@@ -15,28 +15,81 @@ type TableBriefPreviewProps = {
 
 const emptyValue = "-";
 
+function ProtectedImage({ attachmentId, alt, className }: { attachmentId: number; alt: string; className?: string }) {
+  const [src, setSrc] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    let objectUrl = "";
+    void fetch(`/api/v1/odds/uploads/${attachmentId}/content`, {
+      credentials: "include",
+      headers: { Accept: "image/*" },
+    }).then((response) => {
+      if (!response.ok) throw new Error(`Gagal memuat gambar (${response.status})`);
+      return response.blob();
+    }).then((blob) => {
+      if (!active) return;
+      objectUrl = URL.createObjectURL(blob);
+      setSrc(objectUrl);
+    }).catch(() => setSrc(null));
+    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [attachmentId]);
+  return src ? <img src={src} alt={alt} className={className} /> : <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">Memuat gambar...</div>;
+}
+
+function ImageMenu({ attachmentId, filename }: { attachmentId: number; filename: string }) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, [open]);
+  return <div ref={menuRef} className="absolute right-2 top-2 z-10">
+    <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); setOpen((value) => !value); }} className="flex size-7 items-center justify-center rounded-full bg-white/95 text-slate-600 shadow-sm ring-1 ring-slate-200 hover:bg-white" aria-label="Opsi gambar">
+      <MaterialIcon name="more_vert" size="sm" />
+    </button>
+    {open && <div className="absolute right-0 top-8 w-28 rounded-lg border border-slate-200 bg-white p-1 text-left text-xs shadow-lg">
+      <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); setOpen(false); void openProtectedAttachment(attachmentId); }} className="block w-full rounded px-2 py-1.5 text-left hover:bg-slate-50">Open</button>
+      <button type="button" onClick={(event) => { event.preventDefault(); event.stopPropagation(); setOpen(false); void downloadProtectedAttachment(attachmentId, filename || "referensi-odds"); }} className="block w-full rounded px-2 py-1.5 text-left hover:bg-slate-50">Download</button>
+    </div>}
+  </div>;
+}
+
 export function TableBriefPreview({
   packagingImageId,
   packagingImageName,
   rows,
   title,
 }: TableBriefPreviewProps) {
-  const [collapsedRows, setCollapsedRows] = useState<Record<string, boolean>>({});
+  const [collapsedRows, setCollapsedRows] = useState<Record<string, boolean>>(() => Object.fromEntries(rows.map((row) => [row.id, true])));
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [hasMoreContent, setHasMoreContent] = useState(false);
+  const updateScrollHint = useCallback(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+    setHasMoreContent(element.scrollTop + element.clientHeight < element.scrollHeight - 2);
+  }, []);
+
+  useEffect(() => {
+    updateScrollHint();
+  }, [rows, updateScrollHint]);
 
   return (
-    <div className="min-w-0 space-y-5">
-      {packagingImageId && (
-        <div className="flex">
-          <a
-            href="#"
-            onClick={(event) => { event.preventDefault(); void openProtectedAttachment(packagingImageId); }}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
-          >
-            <MaterialIcon name="visibility" size="sm" />
-            Buka Gambar
-          </a>
-        </div>
-      )}
+    <BriefPreviewFrame>
+    <div className="relative h-full min-h-0 min-w-0 flex-1">
+      <div ref={scrollRef} onScroll={updateScrollHint} className="absolute inset-0 space-y-5 overflow-y-auto pr-2">
+        {packagingImageId && (
+          <div className="w-full">
+            <h2 className="mb-3 pr-10 text-base font-bold text-[#04044A] sm:text-lg">{title || "Detail Task"}</h2>
+            <div className="relative h-40 w-full overflow-hidden rounded-xl border border-[#BDEAFF] bg-white sm:w-64">
+              <ProtectedImage attachmentId={packagingImageId} alt={packagingImageName || "Referensi produk"} className="h-full w-full object-contain p-2" />
+              <ImageMenu attachmentId={packagingImageId} filename={packagingImageName || "referensi-produk"} />
+            </div>
+          </div>
+        )}
 
       <div className="space-y-3 sm:hidden">
         {rows.map((row, index) => (
@@ -53,7 +106,7 @@ export function TableBriefPreview({
               {row.image_illustration_id && <div>
                 <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Referensi</span>
                 <a href="#" onClick={(event) => { event.preventDefault(); void openProtectedAttachment(row.image_illustration_id as number); }} className="relative block h-32 w-full overflow-hidden rounded-lg border border-[#BDEAFF] bg-white">
-                  <Image src={`/api/v1/odds/uploads/${row.image_illustration_id}/content`} alt="Ilustrasi gambar" fill unoptimized sizes="100vw" className="object-contain p-2" />
+                  <ProtectedImage attachmentId={row.image_illustration_id} alt="Ilustrasi gambar" className="h-full w-full object-contain p-2" />
                 </a>
               </div>}
               {row.additional_notes?.replace(/<[^>]*>/g, "").trim() && <div>
@@ -65,7 +118,7 @@ export function TableBriefPreview({
         ))}
       </div>
 
-      <section className="hidden min-w-0 w-full overflow-hidden rounded-xl border border-slate-200 sm:block">
+        <section className="hidden min-w-0 w-full overflow-hidden rounded-xl border border-slate-200 sm:block">
         <table className="w-full table-fixed border-collapse text-sm">
           <thead className="bg-[#F1F9FF] text-xs font-bold text-[#04044A]">
             <tr>
@@ -88,7 +141,7 @@ export function TableBriefPreview({
                 <td className="border-r border-[#BDEAFF]/60 px-4 py-4 text-center">
                   {row.image_illustration_id ? (
                     <a href="#" onClick={(event) => { event.preventDefault(); void openProtectedAttachment(row.image_illustration_id as number); }} className="group relative block h-40 w-full overflow-hidden rounded-lg border border-[#BDEAFF] bg-white">
-                      <Image src={`/api/v1/odds/uploads/${row.image_illustration_id}/content`} alt="Ilustrasi gambar" fill unoptimized sizes="(max-width: 640px) 280px, 31vw" className="object-contain p-2" />
+                      <ProtectedImage attachmentId={row.image_illustration_id} alt="Ilustrasi gambar" className="h-full w-full object-contain p-2" />
                       <span className="absolute inset-x-0 bottom-0 bg-white/90 py-1 text-center text-[10px] font-semibold text-[#00A4FF] opacity-0 transition group-hover:opacity-100">Buka Gambar</span>
                     </a>
                   ) : (
@@ -105,7 +158,10 @@ export function TableBriefPreview({
             ))}
           </tbody>
         </table>
-      </section>
+        </section>
+      </div>
+      {hasMoreContent && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white via-white/75 to-transparent" aria-hidden="true" />}
     </div>
+    </BriefPreviewFrame>
   );
 }

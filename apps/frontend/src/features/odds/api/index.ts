@@ -83,6 +83,13 @@ export interface OddsTaskBrief {
   attachments?: OddsTaskAttachment[] | null;
 }
 
+export interface OddsTaskActivity {
+  id: number;
+  event: string | null;
+  description: string;
+  created_at: string;
+}
+
 export interface OddsTaskResult {
   id: number;
   version_number: number;
@@ -115,6 +122,7 @@ export interface OddsTaskRevision {
   revision_type: "normal" | "extra" | "urgent_final" | "leader";
   notes: string;
   status: string;
+  created_at?: string | null;
   is_urgent_final: boolean;
   approved_by?: number | null;
   approved_at?: string | null;
@@ -156,6 +164,17 @@ export interface OddsTaskTimeLog {
   notes: string | null;
 }
 
+export interface OddsTaskHistoryEvent {
+  sequence: number;
+  event_type: string;
+  text: string;
+  occurred_at: string;
+  phase?: string;
+  result_id?: number;
+  review_id?: number;
+  decision?: string;
+}
+
 export interface OddsTask {
   id: number;
   task_number: string;
@@ -191,6 +210,8 @@ export interface OddsTask {
   current_queue?: OddsQueueEntry;
   currentQueue?: OddsQueueEntry;
   brief?: OddsTaskBrief;
+  activities?: OddsTaskActivity[];
+  history?: OddsTaskHistoryEvent[];
   results?: OddsTaskResult[];
   reviews?: OddsTaskReview[];
   revisions?: OddsTaskRevision[];
@@ -341,7 +362,7 @@ export function statusLabel(status: string): string {
     queued: "Dalam Antrian",
     ready_to_start: "Proses Terjeda",
     in_progress: "Proses Pengerjaan",
-    spv_review: "Review Leader Creative",
+  spv_review: "Review Leader Creative",
     client_review: "Menunggu Review Client",
     submitted: "Menunggu Pemeriksaan Brief",
     done: "Selesai",
@@ -634,16 +655,18 @@ export async function submitOddsResult(id: string | number, input: SubmitResultI
   });
 }
 
-export async function spvReviewOddsTask(
+export async function leaderReviewOddsTask(
   id: string | number,
   decision: "approved" | "revision",
   notes?: string
 ): Promise<OddsTask> {
-  return apiFetch<OddsTask>(`/odds/tasks/${id}/spv-review`, {
+  return apiFetch<OddsTask>(`/odds/tasks/${id}/leader-review`, {
     method: "POST",
     body: JSON.stringify({ decision, notes }),
   });
 }
+
+export const spvReviewOddsTask = leaderReviewOddsTask;
 
 export async function clientReviewOddsTask(
   id: string | number,

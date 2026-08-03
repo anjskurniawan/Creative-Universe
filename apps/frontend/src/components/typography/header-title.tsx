@@ -1,11 +1,10 @@
-import { ReactNode } from "react";
+import { ComponentPropsWithoutRef, ReactNode } from "react";
 
 type HeaderTitleAlign = "left" | "center";
 
-export type HeaderTitleProps = {
+export type HeaderTitleProps = Omit<ComponentPropsWithoutRef<"header">, "children"> & {
   children: ReactNode;
   align?: HeaderTitleAlign;
-  className?: string;
 };
 
 const alignClass: Record<HeaderTitleAlign, string> = {
@@ -13,10 +12,10 @@ const alignClass: Record<HeaderTitleAlign, string> = {
   center: "justify-center",
 };
 
-export function HeaderTitle({ children, align = "left", className = "" }: HeaderTitleProps) {
+export function HeaderTitle({ children, align = "left", className = "", ...props }: HeaderTitleProps) {
   return (
-    <header className={`flex items-center py-2 ${alignClass[align]} ${className}`}>
-      <h1 className="whitespace-nowrap text-[36px] font-medium leading-none tracking-[-1.08px] text-[#3B4446]">
+    <header {...props} className={`flex items-center py-2 ${alignClass[align]} ${className}`}>
+      <h1 className="w-full whitespace-nowrap text-[36px] font-medium leading-none tracking-[-1.08px] text-[#3B4446]">
         {children}
       </h1>
     </header>

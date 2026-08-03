@@ -68,7 +68,7 @@ export default function TaskCardButtonStatus({
       type="button"
       onClick={onClick}
       className={[
-        "flex h-11 w-full xl:w-[100px] items-center justify-center rounded-lg py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8474f9]/35 cursor-pointer",
+        "flex h-9 w-full xl:w-[56px] items-center justify-center rounded-md px-2 py-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8474f9]/35 cursor-pointer",
         bgClasses,
         className
       ].filter(Boolean).join(" ")}

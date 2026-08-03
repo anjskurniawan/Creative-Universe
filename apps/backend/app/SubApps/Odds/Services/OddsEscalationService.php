@@ -31,7 +31,7 @@ class OddsEscalationService
         $clientTimeoutDays = (int) data_get($this->ruleValue('client_review_timeout_days', ['days' => 3]), 'days', 3);
 
         Task::query()
-            ->whereNotIn('status', [TaskStatusEnum::DONE->value, TaskStatusEnum::CANCELLED->value, TaskStatusEnum::CANCELLED_BY_SPV->value])
+            ->whereNotIn('status', [TaskStatusEnum::DONE->value, TaskStatusEnum::CANCELLED->value, TaskStatusEnum::CANCELLED_BY_LEADER->value])
             ->where('deadline', '<', now())
             ->chunkById(50, function ($tasks) use (&$overdue) {
                 foreach ($tasks as $task) {
@@ -48,7 +48,7 @@ class OddsEscalationService
                 TaskStatusEnum::BRIEF_REVISION_REQUESTED->value,
                 TaskStatusEnum::QUEUED->value,
                 TaskStatusEnum::IN_PROGRESS->value,
-                TaskStatusEnum::SPV_REVIEW->value,
+                TaskStatusEnum::LEADER_REVIEW->value,
                 TaskStatusEnum::CLIENT_REVIEW->value,
             ])
             ->where('updated_at', '<', now()->subHours($noResponseHours))
@@ -134,7 +134,7 @@ class OddsEscalationService
             if (in_array($task->status, [
                 TaskStatusEnum::DONE->value,
                 TaskStatusEnum::CANCELLED->value,
-                TaskStatusEnum::CANCELLED_BY_SPV->value,
+                TaskStatusEnum::CANCELLED_BY_LEADER->value,
             ], true)) {
                 throw ValidationException::withMessages([
                     'task_id' => 'Task yang sudah selesai atau dibatalkan tidak bisa direassign.',
@@ -243,7 +243,7 @@ class OddsEscalationService
             TaskStatusEnum::IN_PROGRESS->value => $this->notifications->send($task->assignedDesigner, 'no_response_reminder', 'Reminder ODDS', 'Task perlu ditindaklanjuti.', $task),
             TaskStatusEnum::BRIEF_REVISION_REQUESTED->value,
             TaskStatusEnum::CLIENT_REVIEW->value => $this->notifications->send($task->requester, 'no_response_reminder', 'Reminder ODDS', 'Task perlu ditindaklanjuti.', $task),
-            TaskStatusEnum::SPV_REVIEW->value => User::role(['Manajer', 'SPV'])->get()->each(fn (User $user) => $this->notifications->send($user, 'no_response_reminder', 'Reminder review ODDS', 'Output menunggu review SPV.', $task)),
+            TaskStatusEnum::LEADER_REVIEW->value => User::role(['Manajer', 'SPV'])->get()->each(fn (User $user) => $this->notifications->send($user, 'no_response_reminder', 'Reminder review ODDS', 'Output menunggu review Leader.', $task)),
             default => null,
         };
     }

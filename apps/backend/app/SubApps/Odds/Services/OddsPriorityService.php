@@ -31,7 +31,7 @@ class OddsPriorityService
     {
         return Task::query()
             ->where('assigned_designer_id', $profile->user_id)
-            ->whereIn('status', ['queued', 'scheduled', 'ready_to_start', 'in_progress', 'spv_review', 'leader_revision_requested'])
+            ->whereIn('status', ['queued', 'scheduled', 'ready_to_start', 'in_progress', 'leader_review', 'leader_revision_requested'])
             ->count();
     }
 }

@@ -42,7 +42,7 @@ class OddsReportingService
             'total_output' => $totalOutput,
             'active_work_duration_seconds' => $activeWorkSeconds,
             'revision_duration_seconds' => $this->timeLogs->duration($task, 'revision'),
-            'review_waiting_duration_seconds' => $this->timeLogs->duration($task, 'spv_review') + $this->timeLogs->duration($task, 'client_review'),
+            'review_waiting_duration_seconds' => $this->timeLogs->duration($task, 'leader_review') + $this->timeLogs->duration($task, 'client_review'),
             'revision_count' => $task->revisions()->count(),
             'overdue' => $isSlaOverdue,
             'quality_issue_flag' => (bool) ($task->quality_issue_flag ?? false),

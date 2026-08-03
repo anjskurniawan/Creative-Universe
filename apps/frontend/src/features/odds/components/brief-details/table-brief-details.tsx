@@ -43,6 +43,7 @@ export type TableBriefDetailsProps = {
   todayDate: string;
   tomorrowDate: string;
   threeDaysDate: string;
+  hideDetailInputs?: boolean;
 };
 
 function CatalogCombobox({
@@ -282,6 +283,7 @@ export function TableBriefDetails({
   todayDate,
   tomorrowDate,
   threeDaysDate,
+  hideDetailInputs = false,
 }: TableBriefDetailsProps) {
   const [draggingRowId, setDraggingRowId] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -296,11 +298,11 @@ export function TableBriefDetails({
   return (
     <>
       {/* Normal embedded layout */}
-      <div className="flex min-h-0 flex-1 overflow-auto sm:overflow-hidden">
-        <div className="grid w-full h-auto min-h-0 grid-cols-1 gap-4 sm:h-full sm:grid-cols-4">
+      <div className="flex h-full min-h-0 flex-1 overflow-auto sm:overflow-hidden">
+        <div className={`grid w-full h-auto min-h-0 grid-cols-1 gap-4 sm:h-full ${hideDetailInputs ? "sm:grid-cols-1" : "sm:grid-cols-4"}`}>
 
           {/* Left Side (3/4): container with header + table */}
-          <div className={`order-2 flex min-h-0 flex-col overflow-visible sm:order-none sm:col-span-3 sm:overflow-hidden ${dark ? "bg-[#171717]" : "bg-white"}`}>
+          <div className={`order-2 flex min-h-0 flex-col overflow-y-auto sm:order-none ${hideDetailInputs ? "sm:col-span-1" : "sm:col-span-3"} ${dark ? "bg-[#171717]" : "bg-white"}`}>
             {/* Header bar */}
             <div className="flex shrink-0 items-center justify-between px-0 py-2 sm:px-8 sm:py-6">
               <span className={`text-2xl font-bold tracking-tight sm:text-4xl ${dark ? "text-white" : "text-[#04044A]"}`}>Tabel Brief</span>
@@ -325,7 +327,7 @@ export function TableBriefDetails({
           </div>
 
           {/* Right Side (1/4): detail inputs */}
-          <div className="order-1 flex min-w-0 flex-col space-y-4 overflow-visible sm:order-none sm:col-span-1 sm:overflow-y-auto">
+          {!hideDetailInputs && <div className="order-1 flex min-w-0 flex-col space-y-4 overflow-visible sm:order-none sm:col-span-1 sm:overflow-y-auto">
             <label className="block">
               <span className={`mb-1.5 block text-xs font-semibold ${labelClass}`}>Kategori</span>
               <CatalogCombobox value={category} placeholder="Cari/tambah kategori" options={productCatalog.map((item) => item.name)} dark={dark} onChange={onCategoryChange} onCommit={onProductCategoryCommit} />
@@ -389,7 +391,7 @@ export function TableBriefDetails({
                 </>
               );
             })()}
-          </div>
+          </div>}
 
         </div>
       </div>

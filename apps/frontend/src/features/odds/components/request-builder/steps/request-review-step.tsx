@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import type { OddsCategory, OddsDesignerProfile } from "@/features/odds/api";
-import { TableBriefPreview, type TableBriefRow } from "../../brief-details";
+import { StandardBriefPreview, TableBriefPreview, type TableBriefRow } from "../../brief-details";
 import type { OddsRequestForm, RequestBuilderTheme } from "../types";
 
 function formatSla(minutes: number | undefined): string {
@@ -106,12 +106,7 @@ export function RequestReviewStep({
                 title={form.design_purpose || "Request Tanpa Judul"}
               />
             ) : (
-              <div className="prose max-w-none text-sm leading-relaxed text-slate-800">
-                <div
-                  className="min-h-[160px] overflow-y-visible pr-1 [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_a]:font-bold [&_a]:text-[#00A4FF] [&_a]:underline [&_figure]:my-6 [&_img]:max-h-72 [&_img]:w-auto [&_img]:rounded-xl [&_img]:border [&_img]:border-slate-100 [&_img]:shadow-md [&_figcaption]:text-center [&_figcaption]:text-xs [&_figcaption]:text-slate-400 [&_figcaption]:mt-2"
-                  dangerouslySetInnerHTML={{ __html: form.brief_text || "Tidak ada rincian brief." }}
-                />
-              </div>
+              <StandardBriefPreview html={form.brief_text} />
             )}
           </div>
 

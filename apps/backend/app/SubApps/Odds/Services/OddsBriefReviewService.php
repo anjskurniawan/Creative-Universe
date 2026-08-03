@@ -45,13 +45,13 @@ class OddsBriefReviewService
         activity('odds')->performedOn($task)->event('brief_returned')->log($note);
 
         $limit = (int) data_get($this->config->ruleValue('brief_return_limit', ['count' => 2]), 'count', 2);
-        $event = $task->brief_return_count >= $limit ? 'brief_escalated_to_spv' : 'brief_update_required';
+        $event = $task->brief_return_count >= $limit ? 'brief_escalated_to_leader' : 'brief_update_required';
 
         $this->notifications->send($task->requester, $event, 'Brief ODDS perlu diperbarui', $note, $task);
 
-        if ($event === 'brief_escalated_to_spv') {
-            User::permission('review-odds-spv')->get()->each(function (User $spv) use ($note, $task) {
-                $this->notifications->send($spv, 'brief_escalated_to_spv', 'Brief ODDS perlu keputusan SPV', $note, $task);
+        if ($event === 'brief_escalated_to_leader') {
+            User::permission('review-odds-leader')->get()->each(function (User $leader) use ($note, $task) {
+                $this->notifications->send($leader, 'brief_escalated_to_leader', 'Brief ODDS perlu keputusan Leader', $note, $task);
             });
         }
 
@@ -98,18 +98,18 @@ class OddsBriefReviewService
         });
     }
 
-    public function cancelBySpv(Task $task, string $reason, int $reviewerId): Task
+    public function cancelByLeader(Task $task, string $reason, int $reviewerId): Task
     {
         $task->update([
-            'status' => TaskStatusEnum::CANCELLED_BY_SPV->value,
+            'status' => TaskStatusEnum::CANCELLED_BY_LEADER->value,
             'cancel_reason' => $reason,
             'cancelled_at' => now(),
             'updated_by' => $reviewerId,
         ]);
 
         activity('odds')->performedOn($task)->event('task_cancelled')->log($reason);
-        $this->conversations->closeForTask($task->refresh(), 'Task dibatalkan SPV.');
-        $this->notifications->send($task->requester, 'task_cancelled', 'Task ODDS dibatalkan SPV', $reason, $task);
+        $this->conversations->closeForTask($task->refresh(), 'Task dibatalkan Leader.');
+        $this->notifications->send($task->requester, 'task_cancelled', 'Task ODDS dibatalkan Leader', $reason, $task);
 
         return $task->refresh();
     }
