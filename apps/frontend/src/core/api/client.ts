@@ -92,7 +92,7 @@ export function resolveStorageUrl(path: string | null | undefined): string | nul
     return path;
   }
   const storagePath = path.startsWith("/storage/") ? path : `/storage/${path.replace(/^\/+/, "")}`;
-  const storageHost = API_HOST || "http://creativeuniverse.test";
+  const storageHost = API_HOST || (typeof window !== "undefined" && !["localhost", "127.0.0.1"].includes(window.location.hostname) ? window.location.origin : "http://creativeuniverse.test");
   return `${storageHost}${storagePath}`;
 }
 
