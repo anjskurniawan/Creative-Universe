@@ -5,7 +5,7 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 import { resolveStorageUrl, ValidationError } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportGroup } from "@/features/creative-report/types";
-import { getAspectGroupTitles, getCollabAspects, getPerfAspects } from "@/app/creative-report/settings";
+import { useCreativeReportSettings } from "@/app/creative-report/settings";
 import { HrdDateModal, type HrdDateKey, type ActiveDateAction } from "./hrd-date-modal";
 import { calculateHrdScore, type Draft } from "./assessment-table";
 
@@ -55,9 +55,10 @@ export function AssessmentMobileCards({
   const [expandedMobileAssessments, setExpandedMobileAssessments] = useState<number[]>([]);
   const [activeDateAction, setActiveDateAction] = useState<ActiveDateAction | null>(null);
 
-  const collabAspects = useMemo(() => getCollabAspects(), []);
-  const perfAspects = useMemo(() => getPerfAspects(), []);
-  const groupTitles = useMemo(() => getAspectGroupTitles(), []);
+  const { settings } = useCreativeReportSettings();
+  const collabAspects = useMemo(() => settings.collabAspects, [settings.collabAspects]);
+  const perfAspects = useMemo(() => settings.perfAspects, [settings.perfAspects]);
+  const groupTitles = useMemo(() => settings.groupTitles, [settings.groupTitles]);
   const scoreAspects = useMemo(() => [...collabAspects, ...perfAspects], [collabAspects, perfAspects]);
 
   const scoreMaxima = useMemo(() => [

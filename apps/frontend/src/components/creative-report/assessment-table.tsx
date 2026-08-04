@@ -7,7 +7,7 @@ import PopupPerson from "@/components/layout/profile/popup-person";
 import { resolveStorageUrl, ValidationError } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportGroup } from "@/features/creative-report/types";
-import { getAspectGroupTitles, getCollabAspects, getPerfAspects } from "@/app/creative-report/settings";
+import { useCreativeReportSettings } from "@/app/creative-report/settings";
 import { HrdDateModal, type HrdDateKey, type ActiveDateAction } from "./hrd-date-modal";
 
 export type Draft = {
@@ -65,9 +65,10 @@ export function AssessmentTable({
   const [activeDateAction, setActiveDateAction] = useState<ActiveDateAction | null>(null);
   const [hoveredAssessmentId, setHoveredAssessmentId] = useState<number | null>(null);
 
-  const collabAspects = useMemo(() => getCollabAspects(), []);
-  const perfAspects = useMemo(() => getPerfAspects(), []);
-  const groupTitles = useMemo(() => getAspectGroupTitles(), []);
+  const { settings } = useCreativeReportSettings();
+  const collabAspects = useMemo(() => settings.collabAspects, [settings.collabAspects]);
+  const perfAspects = useMemo(() => settings.perfAspects, [settings.perfAspects]);
+  const groupTitles = useMemo(() => settings.groupTitles, [settings.groupTitles]);
   const scoreAspects = useMemo(() => [...collabAspects, ...perfAspects], [collabAspects, perfAspects]);
 
   const scoreMaxima = useMemo(() => [

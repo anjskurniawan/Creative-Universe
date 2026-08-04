@@ -8,7 +8,7 @@ import { resolveStorageUrl } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeMemberProfile, CreativeReportAssessment } from "@/features/creative-report/types";
 import { useAuth } from "@/providers/auth-provider";
-import { getCollabAspects, getDetailCardAspectIndexes, getPerfAspects } from "../settings";
+import { useCreativeReportSettings } from "../settings";
 
 const labels = [["creativity", "Creativity"], ["speed", "Speed"], ["communication", "Communication"], ["quality", "Quality"], ["teamwork", "Teamwork"]] as const;
 
@@ -25,6 +25,7 @@ export default function CreativeReportCreativeAgentPage() {
   const router = useRouter();
   const detailCardRef = useRef<HTMLElement>(null);
   const { hasRole } = useAuth();
+  const { settings } = useCreativeReportSettings();
 
   useEffect(() => {
     const month = new Date().toISOString().slice(0, 7);
@@ -37,8 +38,8 @@ export default function CreativeReportCreativeAgentPage() {
   const member = members[selected];
   if (!member) return <p className="p-4 text-sm text-[#7b868a]">Memuat anggota Creative...</p>;
 
-  const allAspects = [...getCollabAspects(), ...getPerfAspects()];
-  const selectedAspectIndexes = getDetailCardAspectIndexes();
+  const allAspects = [...settings.collabAspects, ...settings.perfAspects];
+  const selectedAspectIndexes = settings.detailCardAspectIndexes;
   const currentAssessment = assessments.find((assessment) => assessment.user.id === member.id);
   const ratings: DetailCardRating[] = selectedAspectIndexes.map((aspectIndex, slot) => {
     const aspect = allAspects[aspectIndex];

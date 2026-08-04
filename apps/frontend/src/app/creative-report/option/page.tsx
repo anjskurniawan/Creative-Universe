@@ -6,14 +6,8 @@ import { CreativeMemberManagement } from "@/features/creative-report/creative-me
 import { useAuth } from "@/providers/auth-provider";
 import { useCreativeReportTheme } from "../theme-context";
 import {
-  getCollabAspects,
-  getDetailCardAspectIndexes,
-  getAspectGroupTitles,
-  getPerfAspects,
-  saveAspectGroupTitles,
-  saveCollabAspects,
-  saveDetailCardAspectIndexes,
-  savePerfAspects,
+  useCreativeReportSettings,
+  saveCreativeReportSettings,
   type CreativeReportAspect,
   type CreativeReportAspectGroupTitles,
 } from "../settings";
@@ -24,13 +18,14 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
   const [groupTitles, setGroupTitles] = useState<CreativeReportAspectGroupTitles>({ collab: "", perf: "" });
   const [detailAspectIndexes, setDetailAspectIndexes] = useState<number[]>([0, 1, 2, 3, 4]);
   const [success, setSuccess] = useState(false);
+  const { settings, setSettings } = useCreativeReportSettings();
 
   useEffect(() => {
-    setCollab(getCollabAspects());
-    setPerf(getPerfAspects());
-    setGroupTitles(getAspectGroupTitles());
-    setDetailAspectIndexes(getDetailCardAspectIndexes());
-  }, []);
+    setCollab(settings.collabAspects);
+    setPerf(settings.perfAspects);
+    setGroupTitles(settings.groupTitles);
+    setDetailAspectIndexes(settings.detailCardAspectIndexes);
+  }, [settings]);
 
   const totalCollab = collab.reduce((sum, item) => sum + (item.maxPoints || 0), 0);
   const totalPerf = perf.reduce((sum, item) => sum + (item.maxPoints || 0), 0);
@@ -39,12 +34,11 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
   const isPerfValid = totalPerf === 50;
   const isValid = isCollabValid && isPerfValid && Boolean(groupTitles.collab.trim()) && Boolean(groupTitles.perf.trim());
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!isValid) return;
-    saveCollabAspects(collab);
-    savePerfAspects(perf);
-    saveAspectGroupTitles(groupTitles);
-    saveDetailCardAspectIndexes(detailAspectIndexes);
+    const nextSettings = { collabAspects: collab, perfAspects: perf, groupTitles, detailCardAspectIndexes: detailAspectIndexes };
+    await saveCreativeReportSettings(nextSettings);
+    setSettings(nextSettings);
     setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
   };

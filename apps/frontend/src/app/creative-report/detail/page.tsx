@@ -7,7 +7,7 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportUserDetail } from "@/features/creative-report/types";
 import { useCreativeReportTheme } from "../theme-context";
-import { getCollabAspects, getPerfAspects } from "../settings";
+import { useCreativeReportSettings } from "../settings";
 
 function ScorePanel({
   title,
@@ -59,8 +59,9 @@ function ScorePanel({
 }
 
 function CreativeReportDetailContent() {
-  const collabAspects = useMemo(() => getCollabAspects(), []);
-  const perfAspects = useMemo(() => getPerfAspects(), []);
+  const { settings } = useCreativeReportSettings();
+  const collabAspects = useMemo(() => settings.collabAspects, [settings.collabAspects]);
+  const perfAspects = useMemo(() => settings.perfAspects, [settings.perfAspects]);
 
   const { theme } = useCreativeReportTheme();
   const router = useRouter();
