@@ -3,6 +3,7 @@
 namespace App\Http\Requests\CreativeReport;
 
 use App\SubApps\CreativeReport\Models\Assessment;
+use App\Models\AppSetting;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -10,9 +11,11 @@ class UpdateAssessmentRequest extends FormRequest
 {
     public function rules(): array
     {
+        $creativeScoreMax = $this->configuredCreativeScoreMaximum();
+
         return [
             'creative_scores' => ['required', 'array', 'size:10'],
-            'creative_scores.*' => ['integer', 'min:0', 'max:10'],
+            'creative_scores.*' => ['integer', 'min:0', "max:{$creativeScoreMax}"],
             'leave_count' => ['sometimes', 'integer', 'min:0'],
             'app_permission_count' => ['sometimes', 'integer', 'min:0'],
             'absence_count' => ['sometimes', 'integer', 'min:0'],
@@ -28,6 +31,28 @@ class UpdateAssessmentRequest extends FormRequest
             'hrd_review_history.late_dates.*' => ['date'],
             'status' => ['sometimes', Rule::in([Assessment::STATUS_DRAFT])],
         ];
+    }
+
+    private function configuredCreativeScoreMaximum(): int
+    {
+        $settings = AppSetting::query()
+            ->whereIn('key', ['creative_report_collab_aspects', 'creative_report_perf_aspects'])
+            ->pluck('value', 'key');
+
+        $maxima = [];
+        foreach ($settings as $value) {
+            $aspects = json_decode((string) $value, true);
+            if (! is_array($aspects)) {
+                continue;
+            }
+            foreach ($aspects as $aspect) {
+                if (is_array($aspect) && is_numeric($aspect['maxPoints'] ?? null)) {
+                    $maxima[] = (int) $aspect['maxPoints'];
+                }
+            }
+        }
+
+        return $maxima ? max(10, ...$maxima) : 10;
     }
 
 }
