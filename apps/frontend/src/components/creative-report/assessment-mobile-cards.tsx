@@ -4,6 +4,7 @@ import React, { useState, useMemo, Fragment } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { resolveStorageUrl } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
+import { ValidationError } from "@/core/api/client";
 import type { CreativeReportGroup } from "@/features/creative-report/types";
 import { getAspectGroupTitles, getCollabAspects, getPerfAspects } from "@/app/creative-report/settings";
 import { HrdDateModal, type HrdDateKey, type ActiveDateAction } from "./hrd-date-modal";
@@ -55,7 +56,7 @@ export function AssessmentMobileCards({
   const [expandedMobileAssessments, setExpandedMobileAssessments] = useState<number[]>([]);
   const [activeDateAction, setActiveDateAction] = useState<ActiveDateAction | null>(null);
 
-  const collabAspects = useMemo(() => getCollabAspects(), []);
+  const collabAspects = useMemo(() => getCollabAspects().map((aspect) => ({ ...aspect, maxPoints: Math.min(6, aspect.maxPoints) })), []);
   const perfAspects = useMemo(() => getPerfAspects(), []);
   const groupTitles = useMemo(() => getAspectGroupTitles(), []);
   const scoreAspects = useMemo(() => [...collabAspects, ...perfAspects], [collabAspects, perfAspects]);
@@ -70,7 +71,7 @@ export function AssessmentMobileCards({
         group.assessments.map((item) => [
           item.id,
           {
-            creative_scores: [...item.creative_scores],
+            creative_scores: item.creative_scores.map((score, index) => index < 5 ? Math.min(6, score) : score),
             leave: item.hrd_review.leave,
             appPermission: item.hrd_review.app_permission,
             absence: item.hrd_review.absence,
@@ -180,7 +181,9 @@ export function AssessmentMobileCards({
       setInputMode(false);
       await onChanged();
     } catch (cause) {
-      setSaveError(cause instanceof Error ? cause.message : "Gagal menyimpan penilaian.");
+      setSaveError(cause instanceof ValidationError
+        ? Object.values(cause.errors).flat().join(" ") || cause.message
+        : cause instanceof Error ? cause.message : "Gagal menyimpan penilaian.");
     } finally {
       setSaving(false);
     }
