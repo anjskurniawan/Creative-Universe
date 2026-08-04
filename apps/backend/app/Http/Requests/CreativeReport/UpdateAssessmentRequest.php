@@ -5,7 +5,6 @@ namespace App\Http\Requests\CreativeReport;
 use App\SubApps\CreativeReport\Models\Assessment;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator;
 
 class UpdateAssessmentRequest extends FormRequest
 {
@@ -31,15 +30,4 @@ class UpdateAssessmentRequest extends FormRequest
         ];
     }
 
-    public function after(): array
-    {
-        return [function (Validator $validator): void {
-            foreach (array_slice($this->input('creative_scores', []), 0, 5) as $score) {
-                if (is_numeric($score) && (int) $score > 6) {
-                    $validator->errors()->add('creative_scores', 'Nilai aspek 30% maksimal 6.');
-                    break;
-                }
-            }
-        }];
-    }
 }

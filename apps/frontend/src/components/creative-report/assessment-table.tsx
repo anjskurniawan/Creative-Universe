@@ -4,8 +4,7 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import PopupPerson from "@/components/layout/profile/popup-person";
-import { resolveStorageUrl } from "@/core/api/client";
-import { ValidationError } from "@/core/api/client";
+import { resolveStorageUrl, ValidationError } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportGroup } from "@/features/creative-report/types";
 import { getAspectGroupTitles, getCollabAspects, getPerfAspects } from "@/app/creative-report/settings";
@@ -66,7 +65,7 @@ export function AssessmentTable({
   const [activeDateAction, setActiveDateAction] = useState<ActiveDateAction | null>(null);
   const [hoveredAssessmentId, setHoveredAssessmentId] = useState<number | null>(null);
 
-  const collabAspects = useMemo(() => getCollabAspects().map((aspect) => ({ ...aspect, maxPoints: Math.min(6, aspect.maxPoints) })), []);
+  const collabAspects = useMemo(() => getCollabAspects(), []);
   const perfAspects = useMemo(() => getPerfAspects(), []);
   const groupTitles = useMemo(() => getAspectGroupTitles(), []);
   const scoreAspects = useMemo(() => [...collabAspects, ...perfAspects], [collabAspects, perfAspects]);
@@ -93,7 +92,7 @@ export function AssessmentTable({
         group.assessments.map((item) => [
           item.id,
           {
-            creative_scores: item.creative_scores.map((score, index) => index < 5 ? Math.min(6, score) : score),
+            creative_scores: [...item.creative_scores],
             leave: item.hrd_review.leave,
             appPermission: item.hrd_review.app_permission,
             absence: item.hrd_review.absence,
