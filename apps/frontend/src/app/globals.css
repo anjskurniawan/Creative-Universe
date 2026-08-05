@@ -1,5 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap");
 @import "tailwindcss";
+.v1-code-panel { background: #20252b; font-family: Consolas, "Courier New", monospace; }
+.v1-code-panel { scrollbar-color: #4b5563 #20252b; scrollbar-width: thin; }
+.v1-code-panel::-webkit-scrollbar { width: 10px; height: 10px; }
+.v1-code-panel::-webkit-scrollbar-track { background: #20252b; }
+.v1-code-panel::-webkit-scrollbar-thumb { border: 2px solid #20252b; border-radius: 999px; background: #4b5563; }
+.v1-code-panel::-webkit-scrollbar-thumb:hover { background: #64748b; }
+.v1-code-panel::-webkit-scrollbar-corner { background: #20252b; }
+.v1-code-panel .shiki { margin: 0; min-width: max-content; padding: 0; background: #20252b !important; font-family: inherit; font-size: 12px; line-height: 19px; }
+.v1-code-panel code { counter-reset: v1-code-line; }
+.v1-code-panel .line { display: inline; counter-increment: v1-code-line; }
+.v1-code-panel .line::before { display: inline-block; width: 2.5rem; margin-right: 1rem; color: #6e7681; content: counter(v1-code-line); user-select: none; text-align: right; }
 
 @theme {
   --font-sans: "Google Sans Flex", ui-sans-serif, system-ui, sans-serif;

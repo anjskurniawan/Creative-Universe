@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AppSettingController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Core\ChatController;
+use App\Http\Controllers\Api\Core\ComponentSourceController;
 use App\Http\Controllers\Api\Core\NotificationController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HealthController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [HealthController::class, 'index']);
+Route::get('/component-source', [ComponentSourceController::class, 'show']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/password/otp', [OtpPasswordController::class, 'requestOtp']);
 Route::post('/auth/password/otp/verify', [OtpPasswordController::class, 'verifyOtp']);

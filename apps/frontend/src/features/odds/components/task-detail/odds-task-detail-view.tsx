@@ -7,7 +7,6 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 import { OddsRichTextEditor, RichTextViewer, stripRichText } from "@/components/odds-rich-text-editor";
 import { TaskFeedbackToast, TaskDiscussionPanel } from "@/components/odds/TaskCard";
 import { useAuth } from "@/providers/auth-provider";
-import { HeaderTitle } from "@/components/typography/header-title";
 import { useOddsTheme } from "@/app/odds/odds-theme-context";
 import {
   OddsDesignerProfile,
@@ -46,7 +45,10 @@ import { OddsTaskRevisionPanel } from "@/features/odds/components/task-detail/od
 import { GroupButton } from "@/features/odds/components/task-detail/group-button";
 import { ClientTableBriefEditor as TaskDetailClientTableBriefEditor } from "@/features/odds/components/task-detail/client-table-brief-editor";
 import { QaComponentBoundary } from "@/features/odds/components/task-detail/qa-component-boundary";
-import { TaskSummary } from "@/features/odds/components/task-detail/task-summary";
+import { TaskHeader } from "@/features/odds/components/task-detail/task-header";
+import { TaskTimer } from "@/features/odds/components/task-detail/task-timer";
+import { RevisionBrief } from "@/features/odds/components/task-detail/revision-brief";
+import { RevisionMessage } from "@/features/odds/components/task-detail/revision-message";
 import { TaskDetailTabs, type TaskDetailTab } from "@/features/odds/components/task-detail/task-detail-tabs";
 import { useOddsTaskDetailPreview } from "./odds-task-detail-preview-context";
 
@@ -98,8 +100,8 @@ function DetailContent() {
   const cardClass = retro
     ? "border-2 border-[#24252b] bg-[#eceee6] shadow-[4px_4px_0px_#24252b] p-4 md:p-5 rounded-none flex-grow flex flex-col min-h-0 overflow-hidden"
     : dark
-    ? "border border-white/10 bg-[#171717]/85 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.3)] p-4 md:p-5 text-white rounded-2xl flex-grow flex flex-col min-h-0 overflow-hidden"
-    : "border border-[#BDEAFF]/60 bg-white shadow-[0_8px_30px_rgba(0,164,255,0.04)] p-4 md:p-5 text-[#04044A] rounded-2xl flex-grow flex flex-col min-h-0 overflow-hidden";
+    ? "border border-white/10 bg-[#171717]/85 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.3)] p-4 md:p-5 text-white rounded-[16px] flex-grow flex flex-col min-h-0 overflow-hidden"
+    : "border border-[#BDEAFF]/60 bg-white shadow-[0_8px_30px_rgba(0,164,255,0.04)] p-4 md:p-5 text-[#04044A] rounded-[16px] flex-grow flex flex-col min-h-0 overflow-hidden";
 
   const textLabelClass = retro
     ? "block text-[9px] font-bold uppercase tracking-wider text-[#24252b]"
@@ -341,6 +343,9 @@ function DetailContent() {
       ? "Revisi dikirim ke client."
       : "Output dikirim ke Leader Creative.";
   const canEditBrief = canClientReview && isRequester && task.status === "brief_revision_requested";
+  const isClientBriefRevision = isPreview
+    ? qaPov === "client" && qaScenario === "brief_revision"
+    : canEditBrief;
   const canReturnBrief = canReviewBrief && isAssignedDesigner && task.status === "submitted";
   const canAcceptBrief = canReviewBrief && isAssignedDesigner && task.status === "submitted";
   const canStartTask = canStart && isAssignedDesigner && ["queued", "ready_to_start"].includes(task.status);
@@ -411,32 +416,13 @@ function DetailContent() {
         toast={error ? { status: "error", message: error } : notice ? { status: "success", message: notice } : null}
         onClose={() => { setError(null); setNotice(null); }}
       />
-      <QaComponentBoundary label="HeaderTitle">
-      <HeaderTitle className="!py-0">
-        <span className="flex w-full items-center justify-between gap-3 lg:hidden">
-          <span>Detail Task</span>
-          <Link href="/odds" className="ml-auto inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-[#BDEAFF]/70 bg-white px-3 text-xs font-semibold text-[#04044A] shadow-sm transition hover:border-cu-info hover:text-cu-info">
-            <MaterialIcon name="arrow_back" size="sm" />
-            Kembali
-          </Link>
-        </span>
-        <span className="hidden w-full items-center justify-between gap-3 lg:inline-flex">
-          <span>{task.design_purpose}</span>
-          <Link href="/odds" className="group inline-flex h-9 shrink-0 items-center gap-2 rounded-full border border-[#cfeaf7] bg-white/90 px-3.5 text-xs font-semibold text-[#526677] shadow-[0_4px_12px_rgba(0,116,180,0.08)] transition-all hover:-translate-x-0.5 hover:border-[#8bd5f5] hover:bg-[#f1faff] hover:text-[#0077bf] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00a4ff]/30 focus-visible:ring-offset-2">
-            <span className="flex size-5 items-center justify-center rounded-full bg-[#e9f7ff] text-[#0077bf] transition-colors group-hover:bg-[#d8f1ff]"><MaterialIcon name="arrow_back" size="xs" /></span>
-            <span>Kembali</span>
-          </Link>
-        </span>
-      </HeaderTitle>
-      </QaComponentBoundary>
-
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-4 items-stretch flex-1 min-h-0 h-[calc(100vh-200px)] lg:h-[calc(100vh-220px)]">
-        <div className="lg:col-span-3 flex flex-col gap-5 h-full min-h-0">
-          {/* Details Box */}
-          <QaComponentBoundary label="TaskSummary">
-          <TaskSummary task={task} cardClass={cardClass} textLabelClass={textLabelClass} textValueClass={textValueClass} formatDate={formatOddsDate} statusLabel={statusLabel} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 items-stretch flex-1 min-h-0 h-[calc(100vh-200px)] lg:h-[calc(100vh-220px)]">
+        <div className="lg:col-span-3 flex flex-col gap-4 h-full min-h-0">
+          <QaComponentBoundary label="TaskHeader" wrap>
+          <TaskHeader title={task.design_purpose} />
           </QaComponentBoundary>
 
+          {/* Details Box */}
           {/* Grouped Tab + Pane Wrapper */}
           <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
           <QaComponentBoundary label="TaskDetailTabs">
@@ -446,13 +432,14 @@ function DetailContent() {
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
               {activeTab === "brief" && (
                 <QaComponentBoundary label="BriefPanel">
-                <section className={cardClass}>
+                <section className={`${cardClass} ${isClientBriefRevision ? "grid grid-cols-1 gap-4 lg:grid-cols-4" : ""}`}>
+                  <div className={isClientBriefRevision ? "flex min-h-0 flex-col lg:col-span-3" : "contents"}>
                   <form onSubmit={saveBrief} className="flex-1 flex flex-col min-h-0 space-y-3 overflow-hidden">
                     {isBriefRevisionEditing ? (
-                      <QaComponentBoundary label="OddsRichTextEditor" tone="nested" wrap className="min-h-0 flex-1"><OddsRichTextEditor value={briefRevisionText} onChange={setBriefRevisionText} /></QaComponentBoundary>
-                    ) : canEditBrief && isTableBriefTask(task) ? (
+                      <QaComponentBoundary label="OddsRichTextEditor" tone="nested" wrap className="min-h-0 flex-1"><OddsRichTextEditor value={briefRevisionText} onChange={setBriefRevisionText} placeholder="Alasan revisi atau perbaikan brief" fillHeight className="h-full" /></QaComponentBoundary>
+                    ) : (canEditBrief || isClientBriefRevision) && isTableBriefTask(task) ? (
                       <QaComponentBoundary label="ClientTableBriefEditor" tone="nested" wrap className="min-h-0 flex-1 overflow-hidden">
-                        <TaskDetailClientTableBriefEditor task={task} briefText={briefText} theme={theme} returnNote={task.brief?.last_return_note ?? ""} onChange={setBriefText} />
+                        <TaskDetailClientTableBriefEditor task={task} briefText={briefText} theme={theme} returnNote={task.brief?.last_return_note ?? ""} onChange={setBriefText} hideReturnNote={isClientBriefRevision} />
                       </QaComponentBoundary>
                     ) : canEditBrief ? (
                       <QaComponentBoundary label="OddsRichTextEditor" tone="nested" wrap className="min-h-0 flex-1"><OddsRichTextEditor value={briefText} onChange={setBriefText} /></QaComponentBoundary>
@@ -477,6 +464,20 @@ function DetailContent() {
                     )}
                    </form>
                    {(isPreview ? qaPov === "designer" && qaScenario === "brief_submitted" : isAssignedDesigner && task.status === "submitted") && <QaComponentBoundary label="GroupButton" tone="nested" wrap className="mt-3"><GroupButton onButtonA={isBriefRevisionEditing ? submitBriefRevision : () => void run("accept", () => acceptOddsBrief(task.id), "Brief diterima dan masuk antrean.")} onButtonB={() => { setBriefRevisionText(""); setIsBriefRevisionEditing((editing) => !editing); }} primaryLabel={isBriefRevisionEditing ? "Kirim Revisi" : "Approve Brief"} secondaryLabel={isBriefRevisionEditing ? "Kembali" : "Revision Brief"} primaryIcon={isBriefRevisionEditing ? "send" : "check_circle"} secondaryIcon={isBriefRevisionEditing ? "arrow_back" : "edit_note"} secondaryDisabled={false} primaryVariant="blue" secondaryVariant={isBriefRevisionEditing ? "default" : "red"} /></QaComponentBoundary>}
+                  </div>
+                  {isClientBriefRevision && (
+                    <div className="flex h-full min-h-0 flex-col gap-3 lg:col-span-1">
+                      <QaComponentBoundary label="RevisionMessage" tone="nested"><RevisionMessage message={task.brief?.last_return_note ?? ""} /></QaComponentBoundary>
+                      <QaComponentBoundary label="GroupButton" tone="nested" wrap>
+                        <RevisionBrief
+                          editing={isBriefRevisionEditing}
+                          directSubmit={isTableBriefTask(task)}
+                          onEdit={() => { setBriefRevisionText(briefText); setIsBriefRevisionEditing(true); }}
+                          onSubmit={isTableBriefTask(task) ? () => void run("brief", () => updateOddsBrief(task.id, briefText), "Revisi brief dikirim.") : submitBriefRevision}
+                        />
+                      </QaComponentBoundary>
+                    </div>
+                  )}
                 </section>
                 </QaComponentBoundary>
               )}
@@ -1063,6 +1064,10 @@ function DetailContent() {
           </div>
           </div>
 
+        <div className="hidden lg:flex lg:col-span-1 flex-col gap-4">
+        <QaComponentBoundary label="TaskTimer" tone="primary">
+        <TaskTimer>{formatDuration(timerTotals.work)}</TaskTimer>
+        </QaComponentBoundary>
         <QaComponentBoundary label="InfoTaskDesktop">
         <section className={cardClass + " hidden lg:flex lg:col-span-1"}>
           <h2 className="mb-4 text-base font-bold text-cu-ink">Info Task</h2>
@@ -1090,6 +1095,7 @@ function DetailContent() {
           </div>
         </section>
         </QaComponentBoundary>
+        </div>
       </div>
     </div>
   );

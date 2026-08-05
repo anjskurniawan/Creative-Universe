@@ -5,6 +5,22 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 import { HeaderTitle } from "@/components/typography/header-title";
 import { InteractiveComponentPlayground } from "@/components/docs/interactive-component-playground";
 import { TaskSummary } from "@/features/odds/components/task-detail/task-summary";
+import { TaskDetailBackButton } from "@/features/odds/components/task-detail/task-detail-back-button";
+import { TaskHeader } from "@/features/odds/components/task-detail/task-header";
+import { TaskTimer } from "@/features/odds/components/task-detail/task-timer";
+import { RevisionBrief } from "@/features/odds/components/task-detail/revision-brief";
+import { RevisionMessage } from "@/features/odds/components/task-detail/revision-message";
+import { Button } from "@/features/odds/components/task-detail/button";
+import { ClientTableBriefEditor } from "@/features/odds/components/task-detail/client-table-brief-editor";
+import { DesignerRevisionStatusMessage } from "@/features/odds/components/task-detail/designer-revision-status-message";
+import { DetailActionButton, DetailInfoRow, DetailShellMessage, DetailSkeleton, DetailTimerTile } from "@/features/odds/components/task-detail/detail-ui";
+import { GroupButton } from "@/features/odds/components/task-detail/group-button";
+import { OddsTaskActionsPanel } from "@/features/odds/components/task-detail/odds-task-actions-panel";
+import { OddsTaskAuditPanel } from "@/features/odds/components/task-detail/odds-task-audit-panel";
+import { OddsTaskHistoryPanel } from "@/features/odds/components/task-detail/odds-task-history-panel";
+import { ProtectedAssetPreview } from "@/features/odds/components/task-detail/protected-asset-preview";
+import { QaComponentBoundary } from "@/features/odds/components/task-detail/qa-component-boundary";
+import { RevisionEmptyState, RevisionHistoryItem } from "@/features/odds/components/task-detail/odds-task-revision-panel";
 import type { OddsTask, OddsTaskResult } from "@/features/odds/api";
 import { TaskDetailTabs, type TaskDetailTab } from "@/features/odds/components/task-detail/task-detail-tabs";
 import { InfoTaskDesktop } from "@/features/odds/components/task-detail/info-task-desktop";
@@ -23,7 +39,7 @@ import { TaskKpiMetrics, type TaskMetricTheme } from "@/features/kv-retail/compo
 import { TaskSearchBar } from "@/features/kv-retail/components/task-search-bar";
 import { TaskFilterDropdown, type TaskFilterTheme } from "@/features/kv-retail/components/task-filter-dropdown";
 
-type MenuItem = {
+export type MenuItem = {
   id: string;
   label: string;
   children?: MenuItem[];
@@ -36,12 +52,45 @@ const exampleMenus: MenuItem[] = [
     children: [
       {
         id: "odds-detail-task",
-        label: "Detail Task",
+        label: "Task Detail",
         children: [
           { id: "odds-detail-task-header-title", label: "Header Title" },
+          { id: "odds-detail-task-back-button", label: "Back Button" },
+          { id: "odds-detail-task-header", label: "Task Header" },
+          { id: "odds-detail-task-timer", label: "Task Timer" },
+          { id: "odds-detail-task-revision-brief", label: "Revision Brief" },
+          { id: "odds-detail-task-revision-message", label: "Revision Message" },
           { id: "odds-detail-task-summary", label: "Task Summary" },
           { id: "odds-detail-task-tabs", label: "Task Detail Tabs" },
           { id: "odds-detail-task-info-desktop", label: "Info Task Desktop" },
+          {
+            id: "odds-detail-task-primitives",
+            label: "Primitives",
+            children: [
+              { id: "odds-detail-task-button", label: "Button" },
+              { id: "odds-detail-task-group-button", label: "Group Button" },
+              { id: "odds-detail-task-designer-revision-status", label: "Designer Revision Status" },
+              { id: "odds-detail-task-detail-shell-message", label: "Detail Shell Message" },
+              { id: "odds-detail-task-detail-info-row", label: "Detail Info Row" },
+              { id: "odds-detail-task-detail-timer-tile", label: "Detail Timer Tile" },
+              { id: "odds-detail-task-detail-action-button", label: "Detail Action Button" },
+              { id: "odds-detail-task-detail-skeleton", label: "Detail Skeleton" },
+              { id: "odds-detail-task-qa-boundary", label: "QA Component Boundary" },
+            ],
+          },
+          {
+            id: "odds-detail-task-surfaces",
+            label: "Surfaces",
+            children: [
+              { id: "odds-detail-task-client-table-editor", label: "Client Table Brief Editor" },
+              { id: "odds-detail-task-actions-panel", label: "Actions Panel" },
+              { id: "odds-detail-task-audit-panel", label: "Audit Panel" },
+              { id: "odds-detail-task-history-panel", label: "History Panel" },
+              { id: "odds-detail-task-revision-empty", label: "Revision Empty State" },
+              { id: "odds-detail-task-revision-history-item", label: "Revision History Item" },
+              { id: "odds-detail-task-protected-asset", label: "Protected Asset Preview" },
+            ],
+          },
           {
             id: "odds-detail-task-panel",
             label: "Panel",
@@ -90,7 +139,7 @@ const exampleMenus: MenuItem[] = [
   },
 ];
 
-function MenuList({ items, activeItem, onSelect, level = 1 }: { items: MenuItem[]; activeItem: string; onSelect: (id: string) => void; level?: number }) {
+export function MenuList({ items, activeItem, onSelect, level = 1 }: { items: MenuItem[]; activeItem: string; onSelect: (id: string) => void; level?: number }) {
   const [openItems, setOpenItems] = useState(() => new Set(items.filter((item) => item.children).map((item) => item.id)));
 
   const toggle = (id: string) => {
@@ -194,7 +243,7 @@ function TaskSummaryPlayground() {
     >
       <TaskSummary
         task={taskSummaryPreview}
-        cardClass="border border-[#BDEAFF]/60 bg-white p-4 rounded-2xl"
+        cardClass="border border-[#BDEAFF]/60 bg-white p-4 rounded-[16px]"
         textLabelClass="block text-[9px] font-bold uppercase tracking-wider text-[#04044A]/60"
         textValueClass="mt-1 block font-semibold text-xs text-[#04044A]"
         formatDate={(value) => value ? new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value)) : "-"}
@@ -203,6 +252,85 @@ function TaskSummaryPlayground() {
     </InteractiveComponentPlayground>
   );
 }
+
+function TaskDetailBackButtonPlayground() {
+  return (
+    <InteractiveComponentPlayground
+      componentName="TaskDetailBackButton"
+      componentPath="apps/frontend/src/features/odds/components/task-detail/task-detail-back-button.tsx"
+      code={`import { TaskDetailBackButton } from "@/features/odds/components/task-detail/task-detail-back-button";\n\n<TaskDetailBackButton />`}
+    >
+      <div className="flex min-h-24 items-center justify-center rounded-xl bg-[#f3fbff] p-6">
+        <TaskDetailBackButton />
+      </div>
+    </InteractiveComponentPlayground>
+  );
+}
+
+function TaskHeaderPlayground() {
+  return (
+    <InteractiveComponentPlayground
+      componentName="TaskHeader"
+      componentPath="apps/frontend/src/features/odds/components/task-detail/task-header.tsx"
+      code={`import { TaskHeader } from "@/features/odds/components/task-detail/task-header";\n\n<TaskHeader title="Banner Marketplace Agustus" />`}
+    >
+      <TaskHeader title="Banner Marketplace Agustus" />
+    </InteractiveComponentPlayground>
+  );
+}
+
+function TaskTimerPlayground() {
+  return (
+    <InteractiveComponentPlayground
+      componentName="TaskTimer"
+      componentPath="apps/frontend/src/features/odds/components/task-detail/task-timer.tsx"
+      code={`import { TaskTimer } from "@/features/odds/components/task-detail/task-timer";\n\n<TaskTimer>2j 30m</TaskTimer>`}
+    >
+      <TaskTimer>2j 30m</TaskTimer>
+    </InteractiveComponentPlayground>
+  );
+}
+
+function RevisionBriefPlayground() {
+  return (
+    <InteractiveComponentPlayground
+      componentName="RevisionBrief"
+      componentPath="apps/frontend/src/features/odds/components/task-detail/revision-brief.tsx"
+      code={`import { RevisionBrief } from "@/features/odds/components/task-detail/revision-brief";\n\n<RevisionBrief editing={false} onEdit={handleEdit} onSubmit={handleSubmit} />`}
+    >
+      <RevisionBrief editing={false} onEdit={() => undefined} onSubmit={() => undefined} />
+    </InteractiveComponentPlayground>
+  );
+}
+
+function RevisionMessagePlayground() {
+  return (
+    <InteractiveComponentPlayground
+      componentName="RevisionMessage"
+      componentPath="apps/frontend/src/features/odds/components/task-detail/revision-message.tsx"
+      code={`import { RevisionMessage } from "@/features/odds/components/task-detail/revision-message";\n\n<RevisionMessage message="Mohon perjelas headline promo." />`}
+    >
+      <RevisionMessage message="Mohon perjelas headline promo dan tambahkan referensi visual produk." />
+    </InteractiveComponentPlayground>
+  );
+}
+
+function ButtonPlayground() { return <InteractiveComponentPlayground componentName="Button" componentPath="apps/frontend/src/features/odds/components/task-detail/button.tsx" code={`<Button label="Simpan" icon="save" variant="blue" />`}><Button label="Simpan" icon="save" variant="blue" /></InteractiveComponentPlayground>; }
+function GroupButtonPlayground() { return <InteractiveComponentPlayground componentName="GroupButton" componentPath="apps/frontend/src/features/odds/components/task-detail/group-button.tsx" code={`<GroupButton primaryLabel="Simpan" secondaryLabel="Kembali" secondaryDisabled={false} />`}><GroupButton primaryLabel="Simpan" secondaryLabel="Kembali" primaryIcon="save" secondaryIcon="arrow_back" secondaryDisabled={false} primaryVariant="blue" /></InteractiveComponentPlayground>; }
+function DesignerRevisionStatusPlayground() { return <InteractiveComponentPlayground componentName="DesignerRevisionStatusMessage" componentPath="apps/frontend/src/features/odds/components/task-detail/designer-revision-status-message.tsx" code={`<DesignerRevisionStatusMessage status="Menunggu" message="Menunggu revisi brief dari client." />`}><DesignerRevisionStatusMessage status="Menunggu" message="Menunggu revisi brief dari client." /></InteractiveComponentPlayground>; }
+function DetailShellMessagePlayground() { return <InteractiveComponentPlayground componentName="DetailShellMessage" componentPath="apps/frontend/src/features/odds/components/task-detail/detail-ui.tsx" code={`<DetailShellMessage message="Task tidak ditemukan." />`}><DetailShellMessage message="Task tidak ditemukan." /></InteractiveComponentPlayground>; }
+function DetailInfoRowPlayground() { return <InteractiveComponentPlayground componentName="DetailInfoRow" componentPath="apps/frontend/src/features/odds/components/task-detail/detail-ui.tsx" code={`<DetailInfoRow label="Status" value="Dikerjakan" />`}><DetailInfoRow label="Status" value="Dikerjakan" /></InteractiveComponentPlayground>; }
+function DetailTimerTilePlayground() { return <InteractiveComponentPlayground componentName="DetailTimerTile" componentPath="apps/frontend/src/features/odds/components/task-detail/detail-ui.tsx" code={`<DetailTimerTile label="Waktu Desainer" value="2j 30m" />`}><DetailTimerTile label="Waktu Desainer" value="2j 30m" /></InteractiveComponentPlayground>; }
+function DetailActionButtonPlayground() { return <InteractiveComponentPlayground componentName="DetailActionButton" componentPath="apps/frontend/src/features/odds/components/task-detail/detail-ui.tsx" code={`<DetailActionButton icon="send" label="Kirim" onClick={handleClick} />`}><DetailActionButton icon="send" label="Kirim" onClick={() => undefined} /></InteractiveComponentPlayground>; }
+function DetailSkeletonPlayground() { return <InteractiveComponentPlayground componentName="DetailSkeleton" componentPath="apps/frontend/src/features/odds/components/task-detail/detail-ui.tsx" code={`<DetailSkeleton />`}><div className="h-[420px]"><DetailSkeleton /></div></InteractiveComponentPlayground>; }
+function QaBoundaryPlayground() { return <InteractiveComponentPlayground componentName="QaComponentBoundary" componentPath="apps/frontend/src/features/odds/components/task-detail/qa-component-boundary.tsx" code={`<QaComponentBoundary enabled label="Example"><div>Content</div></QaComponentBoundary>`}><QaComponentBoundary enabled label="Example"><div className="rounded-lg bg-slate-50 p-8 text-sm text-slate-600">Component content</div></QaComponentBoundary></InteractiveComponentPlayground>; }
+function ClientTableBriefEditorPlayground() { const [brief, setBrief] = useState("<table><tbody><tr><th>Kategori</th><td>Banner Marketplace</td></tr><tr><th>Produk</th><td>Produk Unggulan</td></tr></tbody></table><table><tbody><tr><td>1</td><td>Headline promo</td><td>Referensi visual</td><td>Tambahkan logo</td></tr></tbody></table>"); return <InteractiveComponentPlayground componentName="ClientTableBriefEditor" componentPath="apps/frontend/src/features/odds/components/task-detail/client-table-brief-editor.tsx" code={`<ClientTableBriefEditor task={task} briefText={briefText} theme="light" ... />`}><div className="h-[460px]"><ClientTableBriefEditor task={taskSummaryPreview} briefText={brief} theme="light" returnNote="Mohon perjelas headline promo." onChange={setBrief} /></div></InteractiveComponentPlayground>; }
+function ActionsPanelPlayground() { return <InteractiveComponentPlayground componentName="OddsTaskActionsPanel" componentPath="apps/frontend/src/features/odds/components/task-detail/odds-task-actions-panel.tsx" code={`<OddsTaskActionsPanel>...</OddsTaskActionsPanel>`}><OddsTaskActionsPanel className="rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm font-semibold text-slate-700">Area action task</p></OddsTaskActionsPanel></InteractiveComponentPlayground>; }
+function AuditPanelPlayground() { return <InteractiveComponentPlayground componentName="OddsTaskAuditPanel" componentPath="apps/frontend/src/features/odds/components/task-detail/odds-task-audit-panel.tsx" code={`<OddsTaskAuditPanel task={task} timerTotals={timerTotals} ... />`}><OddsTaskAuditPanel task={taskSummaryPreview} timerTotals={{ work: 5400, revision: 1200, spv_review: 600, client_review: 300 }} isSlaOverdue={false} slaMinutes={360} formatDuration={(seconds) => `${Math.floor(seconds / 3600)}j ${Math.floor((seconds % 3600) / 60)}m`} className="rounded-2xl border border-slate-200 bg-white p-4" /></InteractiveComponentPlayground>; }
+function HistoryPanelPlayground() { return <InteractiveComponentPlayground componentName="OddsTaskHistoryPanel" componentPath="apps/frontend/src/features/odds/components/task-detail/odds-task-history-panel.tsx" code={`<OddsTaskHistoryPanel>...</OddsTaskHistoryPanel>`}><OddsTaskHistoryPanel className="min-h-40 rounded-2xl border border-slate-200 bg-white p-4"><p className="text-sm text-slate-600">Riwayat task ditampilkan di sini.</p></OddsTaskHistoryPanel></InteractiveComponentPlayground>; }
+function RevisionEmptyPlayground() { return <InteractiveComponentPlayground componentName="RevisionEmptyState" componentPath="apps/frontend/src/features/odds/components/task-detail/odds-task-revision-panel.tsx" code={`<RevisionEmptyState />`}><div className="h-52"><RevisionEmptyState /></div></InteractiveComponentPlayground>; }
+function RevisionHistoryItemPlayground() { const revision: OddsTaskRevision = { id: 1, task_id: 1, revision_type: "leader", status: "open", notes: "Sesuaikan headline promo.", is_urgent_final: false, created_at: "2026-08-02T12:24:00+07:00" }; return <InteractiveComponentPlayground componentName="RevisionHistoryItem" componentPath="apps/frontend/src/features/odds/components/task-detail/odds-task-revision-panel.tsx" code={`<RevisionHistoryItem revision={revision} />`}><RevisionHistoryItem revision={revision} /></InteractiveComponentPlayground>; }
+function ProtectedAssetPreviewPlayground() { return <InteractiveComponentPlayground componentName="ProtectedAssetPreview" componentPath="apps/frontend/src/features/odds/components/task-detail/protected-asset-preview.tsx" code={`<ProtectedAssetPreview fallbackUrl={imageUrl} alt="Referensi desain" />`}><div className="h-52 overflow-hidden rounded-xl"><ProtectedAssetPreview fallbackUrl="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='100%25' height='100%25' fill='%23e5f7ff'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%230077bf' font-family='Arial' font-size='28'%3EReferensi Desain%3C/text%3E%3C/svg%3E" alt="Referensi desain" /></div></InteractiveComponentPlayground>; }
 
 function TaskDetailTabsPlayground() {
   const [activeTab, setActiveTab] = useState<TaskDetailTab>("brief");
@@ -472,12 +600,54 @@ export default function ComponentPage() {
       >
         {activeItem === "odds-detail-task-header-title" ? (
           <HeaderTitlePlayground />
+        ) : activeItem === "odds-detail-task-back-button" ? (
+          <TaskDetailBackButtonPlayground />
+        ) : activeItem === "odds-detail-task-header" ? (
+          <TaskHeaderPlayground />
+        ) : activeItem === "odds-detail-task-timer" ? (
+          <TaskTimerPlayground />
+        ) : activeItem === "odds-detail-task-revision-brief" ? (
+          <RevisionBriefPlayground />
+        ) : activeItem === "odds-detail-task-revision-message" ? (
+          <RevisionMessagePlayground />
         ) : activeItem === "odds-detail-task-summary" ? (
           <TaskSummaryPlayground />
         ) : activeItem === "odds-detail-task-tabs" ? (
           <TaskDetailTabsPlayground />
         ) : activeItem === "odds-detail-task-info-desktop" ? (
           <InfoTaskDesktopPlayground />
+        ) : activeItem === "odds-detail-task-button" ? (
+          <ButtonPlayground />
+        ) : activeItem === "odds-detail-task-group-button" ? (
+          <GroupButtonPlayground />
+        ) : activeItem === "odds-detail-task-designer-revision-status" ? (
+          <DesignerRevisionStatusPlayground />
+        ) : activeItem === "odds-detail-task-detail-shell-message" ? (
+          <DetailShellMessagePlayground />
+        ) : activeItem === "odds-detail-task-detail-info-row" ? (
+          <DetailInfoRowPlayground />
+        ) : activeItem === "odds-detail-task-detail-timer-tile" ? (
+          <DetailTimerTilePlayground />
+        ) : activeItem === "odds-detail-task-detail-action-button" ? (
+          <DetailActionButtonPlayground />
+        ) : activeItem === "odds-detail-task-detail-skeleton" ? (
+          <DetailSkeletonPlayground />
+        ) : activeItem === "odds-detail-task-qa-boundary" ? (
+          <QaBoundaryPlayground />
+        ) : activeItem === "odds-detail-task-client-table-editor" ? (
+          <ClientTableBriefEditorPlayground />
+        ) : activeItem === "odds-detail-task-actions-panel" ? (
+          <ActionsPanelPlayground />
+        ) : activeItem === "odds-detail-task-audit-panel" ? (
+          <AuditPanelPlayground />
+        ) : activeItem === "odds-detail-task-history-panel" ? (
+          <HistoryPanelPlayground />
+        ) : activeItem === "odds-detail-task-revision-empty" ? (
+          <RevisionEmptyPlayground />
+        ) : activeItem === "odds-detail-task-revision-history-item" ? (
+          <RevisionHistoryItemPlayground />
+        ) : activeItem === "odds-detail-task-protected-asset" ? (
+          <ProtectedAssetPreviewPlayground />
         ) : activeItem === "odds-detail-task-output-panel" ? (
           <TaskOutputPlayground />
         ) : activeItem === "odds-detail-task-output-result-card" ? (

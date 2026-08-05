@@ -2,13 +2,19 @@
 
 import { cloneElement, createContext, isValidElement, useContext, type ReactElement, type ReactNode } from "react";
 
-const QaModeContext = createContext(false);
+export type QaBoundaryTone = "primary" | "nested" | "deep";
+export type QaBoundaryLevels = Record<QaBoundaryTone, boolean>;
+const QaModeContext = createContext<QaBoundaryLevels>({ primary: false, nested: false, deep: false });
 
-export function QaModeProvider({ children }: { children: ReactNode }) {
-  return <QaModeContext.Provider value>{children}</QaModeContext.Provider>;
+export function QaModeProvider({ children, levels }: { children: ReactNode; levels: QaBoundaryLevels }) {
+  return <QaModeContext.Provider value={levels}>{children}</QaModeContext.Provider>;
 }
 
 export function useQaMode() {
+  return useContext(QaModeContext).primary;
+}
+
+export function useQaBoundaryLevels() {
   return useContext(QaModeContext);
 }
 
@@ -17,15 +23,15 @@ type QaComponentBoundaryProps = {
   enabled?: boolean;
   children: ReactNode;
   className?: string;
-  tone?: "primary" | "nested" | "deep";
+  tone?: QaBoundaryTone;
   wrap?: boolean;
   labelSide?: "left" | "right";
 };
 
 /** Visual-only component map for the ODDS dummy detail route. */
 export function QaComponentBoundary({ label, enabled, children, className = "", tone = "primary", wrap = false, labelSide = "left" }: QaComponentBoundaryProps) {
-  const qaModeEnabled = useContext(QaModeContext);
-  if (!(enabled ?? qaModeEnabled)) return <>{children}</>;
+  const qaLevels = useContext(QaModeContext);
+  if (!(enabled ?? qaLevels[tone])) return <>{children}</>;
 
   const labelPosition = labelSide === "right" ? "before:left-auto before:right-2" : "before:left-2";
   const boundaryClass = tone === "deep"

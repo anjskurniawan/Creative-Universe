@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { OddsTask } from "@/features/odds/api";
 import { DummyScenarioControl, type DummyBriefType, type DummyPov, type DummyScenario } from "@/features/odds/components/task-detail/dummy-scenario-control";
-import { QaModeProvider } from "@/features/odds/components/task-detail/qa-component-boundary";
+import { QaModeProvider, type QaBoundaryLevels, type QaBoundaryTone } from "@/features/odds/components/task-detail/qa-component-boundary";
 import { OddsTaskDetailPreviewProvider } from "@/features/odds/components/task-detail/odds-task-detail-preview-context";
 
 const dummyOddsTask: OddsTask = {
@@ -15,7 +15,7 @@ function getDummyOddsTask(scenario: DummyScenario, briefType: DummyBriefType): O
   const result = [{ id: 1, version_number: 1, submitted_by: 102, result_notes: "Total Output: 3\nBanner final untuk review.", status: scenario === "completed" ? "approved" : "pending_spv", submitted_at: "2026-08-02T12:00:00+07:00", asset_links: [] }];
   const base = briefType === "table" ? { ...dummyOddsTask, brief_text: "<table><tbody><tr><th>Kategori</th><td>Banner Marketplace</td></tr></tbody></table><table><tbody><tr><td>1</td><td>Produk unggulan</td><td>Referensi visual</td><td>Promo Agustus</td></tr></tbody></table>", brief: { ...dummyOddsTask.brief!, content: "<table><tbody><tr><th>Kategori</th><td>Banner Marketplace</td></tr></tbody></table><table><tbody><tr><td>1</td><td>Produk unggulan</td><td>Referensi visual</td><td>Promo Agustus</td></tr></tbody></table>" } } : dummyOddsTask;
   if (scenario === "brief_submitted") return { ...base, status: "submitted" };
-  if (scenario === "brief_revision") return { ...base, status: "brief_revision_requested", brief_return_count: 1 };
+  if (scenario === "brief_revision") return { ...base, status: "brief_revision_requested", brief_return_count: 1, brief: { ...base.brief!, last_return_note: "Mohon perjelas headline promo, tambahkan ukuran final, dan sertakan referensi visual produk." } };
   if (scenario === "queued") return { ...base, status: "queued" };
   if (scenario === "in_progress") return { ...base, status: "in_progress" };
   if (scenario === "leader_revision") return { ...base, status: "in_progress", task_type: "leader_revision", revisions: [{ id: 1, task_id: 0, revision_type: "leader", status: "open", notes: "Sesuaikan hierarki promo.", is_urgent_final: false, created_at: "2026-08-02T12:24:00+07:00" }, { id: 2, task_id: 0, revision_type: "leader", status: "approved", notes: "Perjelas headline promo.", is_urgent_final: false, created_at: "2026-08-02T11:10:00+07:00" }, { id: 3, task_id: 0, revision_type: "leader", status: "approved", notes: "Sesuaikan ukuran produk.", is_urgent_final: false, created_at: "2026-08-02T10:42:00+07:00" }] };
@@ -30,6 +30,7 @@ export function DummyOddsDetailProvider({ children }: { children: ReactNode }) {
   const [scenario, setScenario] = useState<DummyScenario>("leader_review");
   const [pov, setPov] = useState<DummyPov>("leader");
   const [briefType, setBriefType] = useState<DummyBriefType>("default");
+  const [qaLevels, setQaLevels] = useState<QaBoundaryLevels>({ primary: true, nested: true, deep: true });
 
   useEffect(() => {
     const storedScenario = window.localStorage.getItem("odds-dummy-qa-scenario") as DummyScenario | null;
@@ -38,14 +39,18 @@ export function DummyOddsDetailProvider({ children }: { children: ReactNode }) {
     if (storedScenario) setScenario(storedScenario);
     if (storedPov) setPov(storedPov);
     if (storedBriefType) setBriefType(storedBriefType);
+    const storedQaLevels = window.localStorage.getItem("odds-dummy-qa-boundary-levels");
+    if (storedQaLevels) setQaLevels(JSON.parse(storedQaLevels) as QaBoundaryLevels);
   }, []);
 
   useEffect(() => {
     window.localStorage.setItem("odds-dummy-qa-scenario", scenario);
     window.localStorage.setItem("odds-dummy-qa-pov", pov);
     window.localStorage.setItem("odds-dummy-qa-brief-type", briefType);
-  }, [briefType, pov, scenario]);
+    window.localStorage.setItem("odds-dummy-qa-boundary-levels", JSON.stringify(qaLevels));
+  }, [briefType, pov, qaLevels, scenario]);
 
   const value = useMemo(() => ({ task: getDummyOddsTask(scenario, briefType), scenario, pov }), [briefType, pov, scenario]);
-  return <OddsTaskDetailPreviewProvider value={value}><QaModeProvider>{children}</QaModeProvider><DummyScenarioControl value={scenario} onChange={setScenario} pov={pov} onPovChange={setPov} briefType={briefType} onBriefTypeChange={setBriefType} /></OddsTaskDetailPreviewProvider>;
+  const toggleQaLevel = (tone: QaBoundaryTone) => setQaLevels((current) => ({ ...current, [tone]: !current[tone] }));
+  return <OddsTaskDetailPreviewProvider value={value}><QaModeProvider levels={qaLevels}>{children}</QaModeProvider><DummyScenarioControl value={scenario} onChange={setScenario} pov={pov} onPovChange={setPov} briefType={briefType} onBriefTypeChange={setBriefType} qaLevels={qaLevels} onQaLevelToggle={toggleQaLevel} /></OddsTaskDetailPreviewProvider>;
 }

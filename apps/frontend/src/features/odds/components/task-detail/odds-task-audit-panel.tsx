@@ -9,7 +9,7 @@ type OddsTaskAuditPanelProps = Omit<ComponentPropsWithoutRef<"section">, "childr
 export function OddsTaskAuditPanel({ task, timerTotals, isSlaOverdue, slaMinutes, formatDuration, className = "", ...props }: OddsTaskAuditPanelProps) {
   const totalWorkDuration = timerTotals.work + timerTotals.revision;
   const totalDuration = totalWorkDuration + timerTotals.spv_review + timerTotals.client_review;
-  const hasAuditData = totalDuration > 0 || isSlaOverdue || Boolean(task.quality_issue_flag);
+  const hasAuditData = totalDuration > 0 || isSlaOverdue || Boolean(task.quality_issue_flag) || task.status === "in_progress";
 
   if (!hasAuditData) {
     return <section {...props} className={`${className} flex h-full min-h-0 w-full`}>

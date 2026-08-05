@@ -44,6 +44,7 @@ export type TableBriefDetailsProps = {
   tomorrowDate: string;
   threeDaysDate: string;
   hideDetailInputs?: boolean;
+  flush?: boolean;
 };
 
 function CatalogCombobox({
@@ -284,6 +285,7 @@ export function TableBriefDetails({
   tomorrowDate,
   threeDaysDate,
   hideDetailInputs = false,
+  flush = false,
 }: TableBriefDetailsProps) {
   const [draggingRowId, setDraggingRowId] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -304,7 +306,7 @@ export function TableBriefDetails({
           {/* Left Side (3/4): container with header + table */}
           <div className={`order-2 flex min-h-0 flex-col overflow-y-auto sm:order-none ${hideDetailInputs ? "sm:col-span-1" : "sm:col-span-3"} ${dark ? "bg-[#171717]" : "bg-white"}`}>
             {/* Header bar */}
-            <div className="flex shrink-0 items-center justify-between px-0 py-2 sm:px-8 sm:py-6">
+            <div className={`flex shrink-0 items-center justify-between px-0 py-2 ${flush ? "sm:px-0" : "sm:px-8"} sm:py-6`}>
               <span className={`text-2xl font-bold tracking-tight sm:text-4xl ${dark ? "text-white" : "text-[#04044A]"}`}>Tabel Brief</span>
               <button
                 type="button"
@@ -318,7 +320,7 @@ export function TableBriefDetails({
             </div>
 
             {/* Table — scrollable area below the header */}
-            <div className="flex min-h-0 flex-1 flex-col overflow-visible px-0 sm:overflow-auto sm:px-8">
+            <div className={`flex min-h-0 flex-1 flex-col overflow-visible px-0 ${flush ? "sm:px-0" : "sm:px-8"} sm:overflow-auto`}>
               <div className="min-w-0">
                 <ResponsiveBriefTable {...tableProps} />
                 <div aria-hidden="true" className="h-2" />
