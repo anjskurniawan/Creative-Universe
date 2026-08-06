@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { apiFetch } from "@/core/api/client";
 
-export function PanelSystemControl() {
+export function DashboardSystemControl() {
   const [emergencyActive, setEmergencyActive] = useState(false);
   const [isEmergencyLoading, setIsEmergencyLoading] = useState(true);
   const [isEmergencySaving, setIsEmergencySaving] = useState(false);

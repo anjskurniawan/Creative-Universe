@@ -20,7 +20,7 @@ export interface RootMetrics {
   latest_activities: ActivityItem[];
 }
 
-export interface PanelStats {
+export interface DashboardStats {
   active_users: number;
   pending_users: number | null;
   roles: string[];

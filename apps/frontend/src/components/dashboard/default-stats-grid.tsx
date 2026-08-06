@@ -1,10 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import { StatCard } from "@/components/ui/stat-card";
-import type { PanelStats } from "./panel.types";
+import type { DashboardStats } from "./dashboard.types";
 
 interface DefaultStatsGridProps {
-  stats: PanelStats;
+  stats: DashboardStats;
 }
 
 export function DefaultStatsGrid({ stats }: DefaultStatsGridProps) {

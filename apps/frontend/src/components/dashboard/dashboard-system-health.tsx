@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { apiFetch } from "@/core/api/client";
-import type { RootMetrics } from "./panel.types";
+import type { RootMetrics } from "./dashboard.types";
 
-interface PanelSystemHealthProps {
+interface DashboardSystemHealthProps {
   metrics: RootMetrics;
 }
 
-export function PanelSystemHealth({ metrics }: PanelSystemHealthProps) {
+export function DashboardSystemHealth({ metrics }: DashboardSystemHealthProps) {
   const [cpu, setCpu] = useState(15);
   const [ram, setRam] = useState(44);
   const [latency, setLatency] = useState<number | null>(null);

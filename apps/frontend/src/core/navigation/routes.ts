@@ -4,7 +4,7 @@ export const APP_ROUTES = {
   forgotPassword: "/forgot-password",
   onboarding: "/onboarding",
   forbidden: "/forbidden",
-  dashboard: "/panel/detail",
+  dashboard: "/panel/dashboard",
   profile: "/panel/profile",
   settings: "/settings",
   users: "/panel/users",

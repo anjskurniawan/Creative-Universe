@@ -1,5 +1,4 @@
-import React from "react";
-import type { RootMetrics } from "./panel.types";
+import type { RootMetrics } from "./dashboard.types";
 
 interface SystemEnvBarProps {
   metrics: RootMetrics;

@@ -93,8 +93,10 @@ Komponen-komponen spesifik yang terikat dengan logika bisnis modul tertentu.
   * `onboarding-card.tsx`, `onboarding-form.tsx`, dan langkah wizard (`steps/step-welcome.tsx`, `step-whatsapp.tsx`, `step-division.tsx`, `step-position.tsx`, `step-preparing.tsx`, `step-ready.tsx`, dsb.).
 * **`/landing` (Portal Utama):**
   * `application-universe.tsx`, `auth-portal.tsx`, `guest-portal.tsx`, `landing-text.tsx`, `media-agent.tsx`: Halaman portal perkenalan sub-aplikasi yang ditujukan bagi tamu (guest) maupun pengguna terdaftar.
-* **`/panel` (Developer & Admin Panel):**
-  * `root-stats-grid.tsx` & `default-stats-grid.tsx`: Grid statistik untuk pengguna administrator (root) dan pengguna biasa.
-  * `panel-system-control.tsx` & `panel-system-health.tsx`: Indikator kontrol dan status kesehatan sistem server.
+* **`/dashboard` (Dashboard Panel Utama):**
+  * `root-stats-grid.tsx` & `default-stats-grid.tsx`: Grid statistik untuk admin (root) dan pengguna biasa.
+  * `dashboard-system-control.tsx` & `dashboard-system-health.tsx`: Indikator kontrol sistem server dan status kesehatannya.
   * `activity-log-section.tsx` & `quick-actions-section.tsx`: Panel log aktivitas sistem dan jalan pintas aksi cepat.
-  * `system-env-bar.tsx`: Bar status konfigurasi lingkungan (*environment values*).
+  * `system-env-bar.tsx` & `dashboard.types.ts`: Konfigurasi bar variabel lingkungan dan definisi tipe data dashboard.
+* **`/panel` (Halaman Admin & Staff):**
+  * Komponen-komponen spesifik halaman admin yang dikelompokkan dalam sub-folder `/users`, `/roles`, `/profile`, dan `/maintenance`.

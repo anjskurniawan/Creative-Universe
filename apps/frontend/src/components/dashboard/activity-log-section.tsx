@@ -1,7 +1,7 @@
 import React from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { Table, type Column } from "@/components/ui/table";
-import type { ActivityItem } from "./panel.types";
+import type { ActivityItem } from "./dashboard.types";
 
 interface ActivityLogSectionProps {
   activities: ActivityItem[];

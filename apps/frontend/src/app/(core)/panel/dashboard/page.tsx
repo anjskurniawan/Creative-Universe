@@ -6,24 +6,24 @@ import { coreApi } from "@/core/api";
 
 // Import Modular Components
 import { ContentTitle } from "@/components/ui/content-title";
-import { RootStatsGrid } from "@/components/panel/root-stats-grid";
-import { ActivityLogSection } from "@/components/panel/activity-log-section";
-import { SystemEnvBar } from "@/components/panel/system-env-bar";
-import { DefaultStatsGrid } from "@/components/panel/default-stats-grid";
-import { QuickActionsSection } from "@/components/panel/quick-actions-section";
-import { PanelSystemHealth } from "@/components/panel/panel-system-health";
-import { PanelSystemControl } from "@/components/panel/panel-system-control";
-import type { PanelStats } from "@/components/panel/panel.types";
+import { RootStatsGrid } from "@/components/dashboard/root-stats-grid";
+import { ActivityLogSection } from "@/components/dashboard/activity-log-section";
+import { SystemEnvBar } from "@/components/dashboard/system-env-bar";
+import { DefaultStatsGrid } from "@/components/dashboard/default-stats-grid";
+import { QuickActionsSection } from "@/components/dashboard/quick-actions-section";
+import { DashboardSystemHealth } from "@/components/dashboard/dashboard-system-health";
+import { DashboardSystemControl } from "@/components/dashboard/dashboard-system-control";
+import type { DashboardStats } from "@/components/dashboard/dashboard.types";
 
-export default function PanelDetailPage() {
+export default function PanelDashboardPage() {
   const { user, hasPermission } = useAuth();
-  const [stats, setStats] = useState<PanelStats | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
     let active = true;
     const loadStats = async () => {
       try {
-        const data = await coreApi.dashboard<PanelStats>();
+        const data = await coreApi.dashboard<DashboardStats>();
         if (active) setStats(data);
       } catch {
         if (active) {
@@ -57,8 +57,8 @@ export default function PanelDetailPage() {
           {stats.is_root && stats.root_metrics ? (
             <>
               <RootStatsGrid stats={stats} rootMetrics={stats.root_metrics} />
-              <PanelSystemHealth metrics={stats.root_metrics} />
-              <PanelSystemControl />
+              <DashboardSystemHealth metrics={stats.root_metrics} />
+              <DashboardSystemControl />
               <ActivityLogSection activities={stats.root_metrics.latest_activities} />
               <SystemEnvBar metrics={stats.root_metrics} />
             </>

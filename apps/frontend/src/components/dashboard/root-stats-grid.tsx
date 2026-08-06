@@ -1,10 +1,10 @@
 import React from "react";
 import { StatCard } from "@/components/ui/stat-card";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import type { PanelStats, RootMetrics } from "./panel.types";
+import type { DashboardStats, RootMetrics } from "./dashboard.types";
 
 interface RootStatsGridProps {
-  stats: PanelStats;
+  stats: DashboardStats;
   rootMetrics: RootMetrics;
 }
 
