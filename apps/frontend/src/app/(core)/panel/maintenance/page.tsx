@@ -33,11 +33,10 @@ export default function MaintenancePage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       <ContentTitle
         title="Operasi & Pemeliharaan"
-        subtitle="Kelola status internal Laravel, cache, antrean queue, dan fondasi database hosting secara aman tanpa terminal SSH."
-      />
+              />
 
       <EmergencyMaintenanceCard
         emergencyActive={emergencyActive}

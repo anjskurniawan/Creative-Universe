@@ -20,15 +20,11 @@ export const APP_ROUTES = {
   generatorPricetag: "/generator/pricetag",
   creativeAi: "/creative-ai",
   designAssets: "/design-assets",
-  layoutPreview: "/layout-preview",
-  layoutPreviewGlobal: "/layout-preview/global-layout",
 } as const;
 
 export const GUEST_PATHS = [APP_ROUTES.login, APP_ROUTES.forgotPassword] as const;
 export const PUBLIC_PATHS = [
   APP_ROUTES.home,
-  APP_ROUTES.layoutPreview,
-  APP_ROUTES.layoutPreviewGlobal,
   ...GUEST_PATHS,
 ] as const;
 

@@ -5,7 +5,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import type { Components } from "react-markdown";
-import { NavbarDocumentation } from "@/components/docs/templates/navbar-documentation";
 import { HeroHeadingDocumentation } from "@/components/docs/templates/hero-heading-documentation";
 import { PrimaryActionLinkDocumentation } from "@/components/docs/templates/primary-action-link-documentation";
 import { ErrorTetrisGameDocumentation } from "@/components/docs/templates/error-tetris-game-documentation";
@@ -238,7 +237,6 @@ export default function DocsContent({ slug }: DocsContentProps) {
     };
   }, [slug]);
 
-  if (slug === "components/navbar") return <NavbarDocumentation />;
   if (slug === "components/hero-heading") return <HeroHeadingDocumentation />;
   if (slug === "components/primary-action-link") return <PrimaryActionLinkDocumentation />;
   if (slug === "components/error-tetris-game") return <ErrorTetrisGameDocumentation />;

@@ -16,6 +16,9 @@ export interface DropdownMenuProps {
   searchable?: boolean;
   searchPlaceholder?: string;
   onClose?: () => void;
+  onReset?: () => void;
+  selectedValues?: string[];
+  style?: React.CSSProperties;
 }
 
 export function DropdownMenu({
@@ -26,6 +29,9 @@ export function DropdownMenu({
   searchable = items.length > 3,
   searchPlaceholder = "Cari...",
   onClose,
+  onReset,
+  selectedValues,
+  style,
 }: DropdownMenuProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
@@ -66,6 +72,7 @@ export function DropdownMenu({
   return (
     <div
       ref={menuRef}
+      style={style}
       className={`absolute top-[84px] left-0 w-full bg-white border border-divider rounded-[12px] shadow-lg z-50 flex flex-col max-h-[260px] overflow-hidden animate-fade-in ${className}`}
     >
       {/* Search Bar Input */}
@@ -73,15 +80,24 @@ export function DropdownMenu({
         <div className="p-3 border-b border-divider bg-white shrink-0">
           <div className="flex h-12 items-center gap-2 rounded-lg border border-slate-200  px-2">
             <MaterialIcon name="search" className="text-slate-400 text-lg" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={searchPlaceholder}
-            className="w-full bg-transparent text-sm font-sans text-slate-800 placeholder-slate-400 focus:outline-none"
-            autoFocus
-          />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="w-full bg-transparent text-sm font-sans text-slate-800 placeholder-slate-400 focus:outline-none"
+              autoFocus
+            />
           </div>
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="mt-2 text-xs font-semibold text-cu-muted transition hover:text-cu-ink"
+            >
+              Reset
+            </button>
+          )}
         </div>
       )}
 
@@ -92,9 +108,17 @@ export function DropdownMenu({
             <div
               key={item.value}
               onClick={() => onSelect(item.value)}
-              className="px-4 py-3 hover:bg-slate-50 hover:text-brand text-[#232925] font-sans font-medium text-sm cursor-pointer transition-colors"
+              className="px-4 py-3 hover:bg-slate-50 hover:text-brand text-[#232925] font-sans font-medium text-sm cursor-pointer transition-colors flex items-center justify-between"
             >
-              {item.label}
+              <span>{item.label}</span>
+              {selectedValues && (
+                <input
+                  type="checkbox"
+                  checked={selectedValues.includes(item.value)}
+                  readOnly
+                  className="rounded text-brand focus:ring-brand size-4 cursor-pointer"
+                />
+              )}
             </div>
           ))
         ) : (

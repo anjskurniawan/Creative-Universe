@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Check, Copy, Code2, MonitorPlay, Accessibility, BookOpen, FileCode, CheckCircle2, Palette } from "lucide-react";
-import { HrdRulesFooter } from "@/app/creative-report/components/hrd-rules-footer";
+import { HrdRulesFooter } from "@/components/creative-report/hrd-rules-footer";
 
 export function CreativeReportHrdRulesFooterDocumentation() {
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");

@@ -7,10 +7,9 @@ interface RoleTableProps {
   roles: ManagedRole[];
   isLoading: boolean;
   onEdit: (role: ManagedRole) => void;
-  onDelete: (role: ManagedRole) => void;
 }
 
-export function RoleTable({ roles, isLoading, onEdit, onDelete }: RoleTableProps) {
+export function RoleTable({ roles, isLoading, onEdit }: RoleTableProps) {
   const columns: Column<ManagedRole>[] = [
     {
       header: "Role",
@@ -64,26 +63,16 @@ export function RoleTable({ roles, isLoading, onEdit, onDelete }: RoleTableProps
     },
     {
       header: "Aksi",
-      headerClassName: "px-6 py-4 text-right",
-      className: "px-6 py-4 align-top text-right",
+      headerClassName: "px-6 py-4 text-center",
+      className: "px-6 py-4 align-top text-center",
       render: (role) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex items-center justify-center">
           <button
             type="button"
             onClick={() => onEdit(role)}
-            aria-label={`Ubah permission ${role.name}`}
-            className="inline-flex size-8 items-center justify-center rounded-full border border-cu-line bg-cu-surface text-cu-ink transition hover:border-cu-ink hover:bg-cu-panel-soft"
+            className="rounded-full border border-cu-line bg-cu-surface px-3 py-1.5 text-xs font-semibold text-cu-ink transition hover:border-cu-ink hover:bg-cu-panel-soft"
           >
-            <MaterialIcon name="edit" size="xs" />
-          </button>
-          <button
-            type="button"
-            disabled={role.protected}
-            onClick={() => onDelete(role)}
-            aria-label={`Hapus ${role.name}`}
-            className="inline-flex size-8 items-center justify-center rounded-full border border-cu-danger/30 text-cu-danger transition hover:bg-cu-danger-soft disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <MaterialIcon name="delete" size="xs" />
+            Kelola
           </button>
         </div>
       ),

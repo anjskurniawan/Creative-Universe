@@ -1,7 +1,10 @@
 "use client";
 
-import React, { FormEvent, ReactNode } from "react";
+import React, { FormEvent, ReactNode, useState, useEffect } from "react";
 import { Modal } from "@/components/ui/modal";
+import { Input } from "@/components/ui/form/input";
+import { DropdownMenu } from "@/components/ui/form/dropdown-menu";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { ManagedUserDetail, UserManagementOptions, formatDate } from "@/core/admin";
 import type { UserFormState } from "@/app/(core)/panel/users/use-users";
 
@@ -36,6 +39,28 @@ export function UserDetailModal({
   onDeleteClick,
   onRevokeSession,
 }: UserDetailModalProps) {
+  const [rolesDropdownOpen, setRolesDropdownOpen] = useState(false);
+  const [appsDropdownOpen, setAppsDropdownOpen] = useState(false);
+  const [permsDropdownOpen, setPermsDropdownOpen] = useState(false);
+
+  // Accordion Expand/Collapse States (Single Open)
+  const [activeSection, setActiveSection] = useState<string>("profile");
+
+  useEffect(() => {
+    if (!activeSection) return;
+    const element = document.getElementById(`sec-${activeSection}`);
+    if (element) {
+      const timer = setTimeout(() => {
+        element.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 120);
+      return () => clearTimeout(timer);
+    }
+  }, [activeSection]);
+
+  const handleToggleSection = (section: string) => {
+    setActiveSection((current) => (current === section ? "" : section));
+  };
+
   const toggleArrayValue = (field: "roles" | "permissions" | "applications", value: string) => {
     setForm((current) => ({
       ...current,
@@ -45,10 +70,61 @@ export function UserDetailModal({
     }));
   };
 
+  const rolesItems = (options?.roles || []).map((role) => ({
+    value: role,
+    label: role,
+  }));
+
+  const appsItems = (options?.applications || []).map((app) => ({
+    value: app.key,
+    label: app.display_name,
+  }));
+
+  const permsItems = (options?.permissions || []).map((perm) => ({
+    value: perm,
+    label: options?.permission_aliases[perm] ?? perm,
+  }));
+
   return (
-    <Modal title="Kelola Akun Pengguna" onClose={onClose} wide={selected.can_view_audit}>
-      <form onSubmit={onSave}>
-        <div className={`grid gap-6 p-6 ${selected.can_view_audit ? "lg:grid-cols-[1.1fr_0.9fr]" : ""}`}>
+    <Modal
+      title="Kelola Akun Pengguna"
+      onClose={onClose}
+      wide={selected.can_view_audit}
+      fullHeight={true}
+      footer={
+        <div className="flex justify-end gap-3 w-full">
+          {isRoot && (
+            <button
+              type="button"
+              onClick={onDeleteClick}
+              disabled={isSaving || isDeleting}
+              className="mr-auto inline-flex items-center gap-2 btn btn-danger"
+            >
+              {isDeleting && (
+                <span
+                  aria-hidden="true"
+                  className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                />
+              )}
+              {isDeleting ? "Menghapus..." : "Hapus Akun"}
+            </button>
+          )}
+          <button type="button" onClick={onClose} className="btn btn-secondary">
+            Batal
+          </button>
+          <button
+            type="submit"
+            form="user-edit-form"
+            disabled={isSaving}
+            className="btn btn-primary"
+          >
+            {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
+          </button>
+        </div>
+      }
+    >
+      <form id="user-edit-form" onSubmit={onSave}>
+        <div className={`grid gap-6 ${selected.can_view_audit ? "lg:grid-cols-[1.1fr_0.9fr]" : ""}`}>
           <div className="min-w-0 space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-cu-ink">{selected.user.name}</h3>
@@ -63,79 +139,150 @@ export function UserDetailModal({
               </div>
             )}
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Nama lengkap">
-                <input
-                  required
-                  value={form.name || ""}
-                  onChange={(event) => setForm({ ...form, name: event.target.value })}
-                  className="form-input"
-                />
-              </Field>
-              <Field label="Email">
-                <input
-                  type="email"
-                  value={form.email || ""}
-                  onChange={(event) => setForm({ ...form, email: event.target.value })}
-                  className="form-input"
-                />
-              </Field>
-              <Field label="Nomor WhatsApp">
-                <input
-                  value={form.whatsapp_number || ""}
-                  onChange={(event) => setForm({ ...form, whatsapp_number: event.target.value })}
-                  placeholder="62812..."
-                  className="form-input"
-                />
-              </Field>
-              <Field label="Password baru">
-                <input
-                  type="password"
-                  value={form.password || ""}
-                  onChange={(event) => setForm({ ...form, password: event.target.value })}
-                  placeholder="Kosongkan jika tidak diubah"
-                  className="form-input"
-                />
-              </Field>
-              <Field label="Konfirmasi password">
-                <input
-                  type="password"
-                  value={form.password_confirmation || ""}
-                  onChange={(event) => setForm({ ...form, password_confirmation: event.target.value })}
-                  className="form-input"
-                />
-              </Field>
+            <div className="space-y-4">
+              {/* Profile Section */}
+              <AccordionSection
+                id="sec-profile"
+                title="Profile"
+                isOpen={activeSection === "profile"}
+                onToggle={() => handleToggleSection("profile")}
+              >
+                <div className="space-y-4">
+                  <Input
+                    id="name-input"
+                    label="Nama lengkap"
+                    required
+                    value={form.name || ""}
+                    onChange={(event) => setForm({ ...form, name: event.target.value })}
+                  />
+                  <Input
+                    id="email-input"
+                    label="Email"
+                    type="email"
+                    value={form.email || ""}
+                    onChange={(event) => setForm({ ...form, email: event.target.value })}
+                  />
+                  <Input
+                    id="whatsapp-input"
+                    label="Nomor WhatsApp"
+                    type="phone"
+                    value={form.whatsapp_number || ""}
+                    onChange={(event) => setForm({ ...form, whatsapp_number: event.target.value })}
+                    placeholder="62812..."
+                  />
+                  <Input
+                    id="password-input"
+                    label="Password baru"
+                    type="password"
+                    value={form.password || ""}
+                    onChange={(event) => setForm({ ...form, password: event.target.value })}
+                    placeholder="Kosongkan jika tidak diubah"
+                  />
+                  <Input
+                    id="password-conf-input"
+                    label="Konfirmasi password"
+                    type="password"
+                    value={form.password_confirmation || ""}
+                    onChange={(event) => setForm({ ...form, password_confirmation: event.target.value })}
+                  />
+                </div>
+              </AccordionSection>
+
+              {/* Roles Section */}
+              <AccordionSection
+                id="sec-roles"
+                title="Roles"
+                isOpen={activeSection === "roles"}
+                onToggle={() => handleToggleSection("roles")}
+              >
+                <div className="relative w-full z-20">
+                  <Input
+                    id="roles-dropdown"
+                    label="Peran (Roles)"
+                    type="dropdown"
+                    placeholder="Pilih Peran"
+                    value={form.roles.join(", ")}
+                    onClick={() => setRolesDropdownOpen(!rolesDropdownOpen)}
+                    active={rolesDropdownOpen}
+                  />
+                  <DropdownMenu
+                    isOpen={rolesDropdownOpen}
+                    items={rolesItems}
+                    selectedValues={form.roles}
+                    onSelect={(val) => {
+                      toggleArrayValue("roles", val);
+                    }}
+                    onClose={() => setRolesDropdownOpen(false)}
+                  />
+                </div>
+              </AccordionSection>
+
+              {/* Applications Section */}
+              <AccordionSection
+                id="sec-apps"
+                title="Akses Aplikasi"
+                isOpen={activeSection === "apps"}
+                onToggle={() => handleToggleSection("apps")}
+              >
+                <div className="relative w-full z-10">
+                  <Input
+                    id="apps-dropdown"
+                    label="Akses Sub-Aplikasi"
+                    type="dropdown"
+                    placeholder="Pilih Sub-Aplikasi"
+                    value={
+                      form.applications
+                        .map((key) => (options?.applications || []).find((a) => a.key === key)?.display_name ?? key)
+                        .join(", ")
+                    }
+                    onClick={() => setAppsDropdownOpen(!appsDropdownOpen)}
+                    active={appsDropdownOpen}
+                  />
+                  <DropdownMenu
+                    isOpen={appsDropdownOpen}
+                    items={appsItems}
+                    selectedValues={form.applications}
+                    onSelect={(val) => {
+                      toggleArrayValue("applications", val);
+                    }}
+                    onClose={() => setAppsDropdownOpen(false)}
+                  />
+                </div>
+              </AccordionSection>
+
+              {/* Permissions Section */}
+              <AccordionSection
+                id="sec-perms"
+                title="Izin Langsung"
+                isOpen={activeSection === "perms"}
+                onToggle={() => handleToggleSection("perms")}
+              >
+                <div className="relative w-full z-0">
+                  <Input
+                    id="perms-dropdown"
+                    label="Izin Langsung"
+                    type="dropdown"
+                    placeholder="Pilih Izin Langsung"
+                    value={
+                      form.permissions
+                        .map((perm) => options?.permission_aliases[perm] ?? perm)
+                        .join(", ")
+                    }
+                    onClick={() => setPermsDropdownOpen(!permsDropdownOpen)}
+                    active={permsDropdownOpen}
+                  />
+                  <DropdownMenu
+                    isOpen={permsDropdownOpen}
+                    items={permsItems}
+                    selectedValues={form.permissions}
+                    onSelect={(val) => {
+                      toggleArrayValue("permissions", val);
+                    }}
+                    onClose={() => setPermsDropdownOpen(false)}
+                  />
+                </div>
+              </AccordionSection>
             </div>
-
-            <CheckboxGroup
-              title="Peran (Roles)"
-              items={options?.roles || []}
-              selected={form.roles}
-              onToggle={(value) => toggleArrayValue("roles", value)}
-            />
-            
-            <CheckboxGroup
-              title="Akses Sub-Aplikasi"
-              items={(options?.applications || []).map((application) => application.key)}
-              labels={Object.fromEntries(
-                (options?.applications || []).map((application) => [
-                  application.key,
-                  application.display_name,
-                ])
-              )}
-              selected={form.applications}
-              onToggle={(value) => toggleArrayValue("applications", value)}
-              empty="Tidak ada aplikasi yang dapat Anda delegasikan."
-            />
-
-            <CheckboxGroup
-              title="Izin Langsung"
-              items={options?.permissions || []}
-              labels={options?.permission_aliases}
-              selected={form.permissions}
-              onToggle={(value) => toggleArrayValue("permissions", value)}
-              empty="Tidak ada permission yang dapat Anda delegasikan."
-            />
           </div>
 
           {selected.can_view_audit && (
@@ -144,86 +291,58 @@ export function UserDetailModal({
             </div>
           )}
         </div>
-
-        <div className="border-t border-cu-line bg-cu-panel-soft/40 px-6 py-4">
-          <div className="flex justify-end gap-3">
-            {isRoot && (
-              <button
-                type="button"
-                onClick={onDeleteClick}
-                disabled={isSaving || isDeleting}
-                className="mr-auto inline-flex items-center gap-2 btn btn-danger"
-              >
-                {isDeleting && (
-                  <span
-                    aria-hidden="true"
-                    className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
-                  />
-                )}
-                {isDeleting ? "Menghapus..." : "Hapus Akun"}
-              </button>
-            )}
-            <button type="button" onClick={onClose} className="btn btn-secondary">
-              Batal
-            </button>
-            <button type="submit" disabled={isSaving} className="btn btn-primary">
-              {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
-            </button>
-          </div>
-        </div>
       </form>
     </Modal>
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function AccordionSection({
+  id,
+  title,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  id: string;
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
   return (
-    <label className="space-y-1.5 text-xs font-semibold text-cu-ink">
-      <span>{label}</span>
-      {children}
-    </label>
+    <div
+      id={id}
+      className="border-b border-cu-line transition-colors"
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`group flex w-full items-center justify-between gap-4 py-4 text-left text-xs font-semibold uppercase tracking-wider transition-colors hover:text-brand ${
+          isOpen ? "bg-brand/5 text-brand" : "text-cu-ink"
+        }`}
+      >
+        <span>{title}</span>
+        <span
+          className={`flex size-7 shrink-0 items-center justify-center rounded-full transition-colors ${
+            isOpen ? "bg-brand/10" : "bg-transparent"
+          }`}
+        >
+          <MaterialIcon
+            name="expand_more"
+            className={`transition-transform duration-200 group-hover:text-brand ${
+              isOpen ? "text-brand rotate-180" : "text-cu-muted"
+            }`}
+            size="sm"
+          />
+        </span>
+      </button>
+      {isOpen && <div className="relative space-y-4 pb-5">{children}</div>}
+    </div>
   );
 }
 
-function CheckboxGroup({
-  title,
-  items,
-  labels = {},
-  selected,
-  onToggle,
-  empty,
-}: {
-  title: string;
-  items: string[];
-  labels?: Record<string, string>;
-  selected: string[];
-  onToggle: (value: string) => void;
-  empty?: string;
-}) {
-  return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-cu-ink">{title}</h4>
-        <span className="text-xs text-cu-muted">{selected.length} dipilih</span>
-      </div>
-      {items.length === 0 ? (
-        <p className="text-xs italic text-cu-muted">{empty}</p>
-      ) : (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {items.map((item) => (
-            <label
-              key={item}
-              className="flex cursor-pointer items-center gap-3 rounded-xl border border-cu-line bg-cu-panel-soft/30 p-3 text-xs font-semibold text-cu-ink"
-            >
-              <input type="checkbox" checked={selected.includes(item)} onChange={() => onToggle(item)} />
-              {labels[item] ?? item}
-            </label>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
+
+
 
 function AuditPanel({
   detail,

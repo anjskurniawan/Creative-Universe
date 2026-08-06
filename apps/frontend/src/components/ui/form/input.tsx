@@ -1,13 +1,17 @@
-import type { InputHTMLAttributes, ReactNode } from "react";
+import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { DropdownMenu } from "@/components/ui/form/dropdown-menu";
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
-  type?: InputHTMLAttributes<HTMLInputElement>["type"] | "dropdown" | "phone";
+  type?: InputHTMLAttributes<HTMLInputElement>["type"] | "dropdown" | "phone" | "email";
   label?: string;
   error?: string;
   rightElement?: ReactNode;
   active?: boolean;
 }
+
+const EMAIL_DOMAINS = ["@gmail.com", "@outlook.com", "@yahoo.com", "@icloud.com"];
+const EMAIL_DOMAIN_ITEMS = EMAIL_DOMAINS.map((domain) => ({ value: domain, label: domain }));
 
 export function Input({
   label,
@@ -22,6 +26,23 @@ export function Input({
   ...props
 }: InputProps) {
   const hasError = Boolean(error);
+  const emailValue = typeof props.value === "string" ? props.value : "";
+  const [emailDomain, setEmailDomain] = useState(
+    EMAIL_DOMAINS.find((domain) => emailValue.endsWith(domain)) || EMAIL_DOMAINS[0],
+  );
+  const [isEmailDomainOpen, setIsEmailDomainOpen] = useState(false);
+
+  const activeEmailDomain =
+    EMAIL_DOMAINS.find((domain) => emailValue.endsWith(domain)) || emailDomain;
+
+  const handleEmailDomainChange = (domain: string) => {
+    setEmailDomain(domain);
+    const username = emailValue.split("@")[0];
+    props.onChange?.({
+      target: { value: `${username}${domain}` },
+      currentTarget: { value: `${username}${domain}` },
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
 
   return (
     <div className="flex flex-col gap-2 items-start w-full group">
@@ -78,6 +99,53 @@ export function Input({
                   ? "border-rose-500 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10"
                   : "border-sky hover:border-slate-300 focus:border-brand focus:ring-2 focus:ring-brand/10"
               } ${className}`}
+            />
+          </div>
+        ) : type === "email" ? (
+          <div
+            className={`relative flex h-12 w-full items-center rounded-xl border bg-white transition-all duration-200 hover:border-slate-300 focus-within:outline-none ${
+              hasError
+                ? "border-rose-500 focus-within:border-rose-500 focus-within:ring-4 focus-within:ring-rose-500/10"
+                : "border-sky focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10"
+            }`}
+          >
+            <input
+              id={id}
+              type="text"
+              value={emailValue.split("@")[0]}
+              disabled={disabled}
+              onChange={(event) => {
+                const username = event.target.value.replace(/@/g, "");
+                props.onChange?.({
+                  ...event,
+                  target: { ...event.target, value: `${username}${activeEmailDomain}` },
+                  currentTarget: { ...event.currentTarget, value: `${username}${activeEmailDomain}` },
+                } as React.ChangeEvent<HTMLInputElement>);
+              }}
+              placeholder={props.placeholder || "nama"}
+              className={`h-full min-w-0 flex-1 border-0 bg-transparent px-4 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-0 focus:outline-none focus:ring-0 ${className}`}
+            />
+            <button
+              type="button"
+              aria-label="Pilih domain email"
+              disabled={disabled}
+              onClick={() => setIsEmailDomainOpen((open) => !open)}
+              className="flex h-full items-center gap-1 border-l border-slate-200 px-3 text-sm text-slate-600 outline-none transition-colors hover:text-brand disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {activeEmailDomain}
+              <MaterialIcon name="expand_more" size="sm" />
+            </button>
+            <DropdownMenu
+              isOpen={isEmailDomainOpen}
+              items={EMAIL_DOMAIN_ITEMS}
+              searchable={false}
+              onSelect={(domain) => {
+                handleEmailDomainChange(domain);
+                setIsEmailDomainOpen(false);
+              }}
+              onClose={() => setIsEmailDomainOpen(false)}
+              className="left-auto right-0 w-44"
+              style={{ top: "calc(100% + 4px)" }}
             />
           </div>
         ) : ( // Default input

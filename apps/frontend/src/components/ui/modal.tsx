@@ -1,26 +1,49 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { MaterialIcon } from "@/components/ui/material-icon";
 
 export interface ModalProps {
   title: string;
   children: ReactNode;
+  footer?: ReactNode;
   onClose: () => void;
   wide?: boolean;
+  fullHeight?: boolean;
 }
 
-export function Modal({ title, children, onClose, wide = false }: ModalProps) {
-  return (
+export function Modal({
+  title,
+  children,
+  footer,
+  onClose,
+  wide = false,
+  fullHeight = false,
+}: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-cu-overlay/60 p-4 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-cu-overlay/60 p-8 backdrop-blur-sm animate-fade-in"
       role="dialog"
       aria-modal="true"
     >
       <div
-        className={`max-h-[92vh] w-full overflow-y-auto rounded-2xl border border-cu-line bg-cu-surface shadow-xl ${
-          wide ? "max-w-4xl" : "max-w-2xl"
-        }`}
+        className={`flex flex-col w-full bg-cu-surface shadow-xl overflow-hidden border border-cu-line rounded-2xl ${
+          fullHeight ? "h-full" : "max-h-[92vh]"
+        } ${wide ? "max-w-5xl" : "max-w-2xl"}`}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-cu-line bg-cu-surface px-6 py-4">
+        {/* Sticky Header */}
+        <div className="flex-none flex items-center justify-between border-b border-cu-line bg-cu-surface px-6 py-4">
           <h2 className="text-lg font-semibold text-cu-ink">{title}</h2>
           <button
             type="button"
@@ -31,8 +54,20 @@ export function Modal({ title, children, onClose, wide = false }: ModalProps) {
             <MaterialIcon name="close" size="sm" />
           </button>
         </div>
-        {children}
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6 min-h-0">
+          {children}
+        </div>
+
+        {/* Sticky Footer */}
+        {footer && (
+          <div className="flex-none border-t border-cu-line bg-cu-panel-soft/40 px-6 py-4">
+            {footer}
+          </div>
+        )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

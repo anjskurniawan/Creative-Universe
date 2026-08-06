@@ -10,7 +10,7 @@ import { CreativeReportToolbar, type ReportMetric } from "@/components/creative-
 import { GroupAccordion } from "@/components/creative-report/group-accordion";
 import { AssessmentTable } from "@/components/creative-report/assessment-table";
 import { AssessmentMobileCards } from "@/components/creative-report/assessment-mobile-cards";
-import { HrdRulesFooter } from "./components/hrd-rules-footer";
+import { HrdRulesFooter } from "@/components/creative-report/hrd-rules-footer";
 
 const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer", "Content Creator"];
 
