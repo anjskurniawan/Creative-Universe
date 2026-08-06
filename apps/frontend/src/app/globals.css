@@ -15,6 +15,12 @@
 @theme {
   --font-sans: "Google Sans Flex", ui-sans-serif, system-ui, sans-serif;
 
+  --color-brand: #ba0dcb;
+  --color-dark: #232925;
+  --color-divider: #edeef0;
+  --color-cu-dark: #111827;
+  --color-label: #526677;
+  --color-sky: #cfe4f0;
   --color-cu-ink: #0a0a0a;
   --color-cu-ink-hover: #262626;
   --color-cu-muted: #6b7280;
@@ -43,6 +49,13 @@
   --color-cu-gradient-start: #d946ef;
   --color-cu-gradient-middle: #3b82f6;
   --color-cu-gradient-end: #22d3ee;
+  --color-sidebar-blue: #00a4ff;
+  --color-sidebar-lime: #b0ff5e;
+  --color-sidebar-lime-ink: #181818;
+  --color-sidebar-retro: #eceee6;
+  --color-sidebar-retro-ink: #24252b;
+  --color-sidebar-badge: #ec4899;
+  --color-sidebar-muted: #3b4446;
 
   --animate-blob-1: blob-movement-1 20s infinite ease-in-out;
   --animate-blob-2: blob-movement-2 16s infinite ease-in-out;
@@ -470,6 +483,21 @@
 /* Micro-Animations & Keyframes */
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
+}
+
+.media-agent-enter {
+  animation: mediaAgentEnter 3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes mediaAgentEnter {
+  from {
+    opacity: 0;
+    transform: translateY(36px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .animate-slide-up {
@@ -1086,6 +1114,44 @@
 }
 
 /* Custom Minimalist Scrollbar */
+.dropdown-menu-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(186 13 203 / 0.38) transparent;
+}
+
+.dropdown-menu-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown-menu-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
+}
+
+.dropdown-menu-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(186 13 203 / 0.38);
+  border: 2px solid transparent;
+  border-radius: 9999px;
+}
+
+.dropdown-menu-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(151 9 167 / 0.55);
+}
+
+.dropdown-menu-scrollbar::-webkit-scrollbar-button,
+.dropdown-menu-scrollbar::-webkit-scrollbar-button:single-button,
+.dropdown-menu-scrollbar::-webkit-scrollbar-button:vertical:decrement,
+.dropdown-menu-scrollbar::-webkit-scrollbar-button:vertical:increment,
+.dropdown-menu-scrollbar::-webkit-scrollbar-button:vertical:start:decrement,
+.dropdown-menu-scrollbar::-webkit-scrollbar-button:vertical:end:increment,
+.dropdown-menu-scrollbar::-webkit-scrollbar-button:start:decrement,
+.dropdown-menu-scrollbar::-webkit-scrollbar-button:end:increment {
+  display: none;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;

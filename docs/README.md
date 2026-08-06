@@ -43,7 +43,8 @@ Dokumentasi aktif di folder ini adalah sumber arah arsitektur dan operasional Cr
 34. `07_design_system/Component_Error_Runner_Game.md`
 35. `07_design_system/Pattern_ODDS_Gameboy_Frame.md`
 36. `07_design_system/Template_Universal_Error_View.md`
-37. `08_operations/Emergency_Maintenance.md`
+37. `07_design_system/Component_Naming_Conventions.md`
+38. `08_operations/Emergency_Maintenance.md`
 
 ## Dokumen aktif utama
 
@@ -102,6 +103,7 @@ Dokumentasi aktif di folder ini adalah sumber arah arsitektur dan operasional Cr
 - `07_design_system/Component_Error_Runner_Game.md`
 - `07_design_system/Pattern_ODDS_Gameboy_Frame.md`
 - `07_design_system/Template_Universal_Error_View.md`
+- `07_design_system/Component_Naming_Conventions.md`
 - Visualisasi dan control panel komponen tersedia melalui `/docs?section=components/navbar`.
 
 ## Web Documentation

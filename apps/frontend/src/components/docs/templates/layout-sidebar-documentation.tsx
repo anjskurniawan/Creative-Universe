@@ -115,7 +115,6 @@ export default function Sidebar({
                 <div className="doc-preview-area !p-3 !bg-white border border-slate-200/80 rounded-2xl shadow-xl">
                   <div className="h-[440px] overflow-hidden rounded-xl relative flex bg-slate-50 border border-slate-200/60">
                     <Sidebar 
-                      theme={theme}
                       expanded={expanded}
                       primaryItems={[
                         { label: "Dashboard", href: "#", icon: "dashboard" },
@@ -128,8 +127,6 @@ export default function Sidebar({
                       }))}
                       activeHref={activeItem}
                       onToggleExpanded={() => setExpanded(!expanded)}
-                      onToggleTheme={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                      onToggleRetro={() => setTheme(theme === 'retro' ? 'light' : 'retro')}
                     />
                     <div className="flex-1 w-[380px] flex flex-col items-center justify-center text-cu-muted p-6 text-center">
                       <span className="font-semibold text-sm">Workspace Content Canvas</span>
@@ -147,7 +144,6 @@ export default function Sidebar({
 export default function WorkspaceSidebar() {
   return (
     <Sidebar 
-      theme="${theme}"
       expanded={${expanded}}
       primaryItems={[
         { label: "Dashboard", href: "/dashboard", icon: "dashboard", isActive: true },

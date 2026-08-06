@@ -1,2 +1,2 @@
-import GlobalNavbar, { type GlobalLayoutNavbarProps } from "../navbar";
-export default function Navbar(props: GlobalLayoutNavbarProps) { return <GlobalNavbar {...props} />; }
+import Navbar, { type NavbarProps } from "../navbar";
+export default function LayoutNavbar(props: NavbarProps) { return <Navbar {...props} />; }

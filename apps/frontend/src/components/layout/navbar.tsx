@@ -16,9 +16,9 @@ import MessageDropdown from "./navbar/message-dropdown";
 import NotificationDropdown from "./navbar/notification-dropdown";
 import ProfileDropdown from "./navbar/profile-dropdown";
 
-export type GlobalLayoutNavbarProps = { viewport?: "Mobile" | "Desktop"; sticky?: boolean; breadcrumbItems?: string[]; theme?: "light" | "dark" | "retro" };
+export type NavbarProps = { viewport?: "Mobile" | "Desktop"; sticky?: boolean; breadcrumbItems?: string[]; theme?: "light" | "dark" | "retro"; showNavigation?: boolean; bordered?: boolean; className?: string };
 
-export default function GlobalLayoutNavbar({ sticky = false, breadcrumbItems, viewport = "Desktop", theme = "light", onMenuClick }: GlobalLayoutNavbarProps & { onMenuClick?: () => void }) {
+export default function Navbar({ sticky = false, breadcrumbItems, viewport = "Desktop", theme = "light", showNavigation = true, bordered = true, className = "", onMenuClick }: NavbarProps & { onMenuClick?: () => void }) {
   const auth = useAuth();
   const { user } = auth;
   const [openMenu, setOpenMenu] = useState<"developer" | "notifications" | "messages" | "apps" | "profile" | null>(null);
@@ -45,9 +45,9 @@ export default function GlobalLayoutNavbar({ sticky = false, breadcrumbItems, vi
     if (conversations.status === "fulfilled") setMessages(conversations.value.map((conversation) => ({ id: String(conversation.id), sender: conversation.task?.task_number ?? conversation.partner?.name ?? "Conversation", preview: conversation.last_message?.body ?? "No message preview.", time: conversation.last_message?.created_at ?? conversation.updated_at ?? "", unread: conversation.last_message?.is_read === false, avatarUrl: resolveStorageUrl(conversation.partner?.avatar_path ?? conversation.partner?.avatar) ?? undefined })));
     if (notificationResult.status === "fulfilled") setNotifications(notificationResult.value.notifications.map((notification) => ({ id: String(notification.id), title: notification.type || "Notification", content: notification.message, time: notification.created_at ?? "", read: notification.is_read, icon: "notifications" })));
   }, [user]);
-  return <header className={`${sticky ? "sticky top-0" : "relative"} z-20 flex h-16 shrink-0 items-center justify-between px-4 backdrop-blur-md ${dark ? "border-b border-white/[0.06] bg-[#111413]/55" : "border-b border-slate-100 bg-[rgba(255,255,255,0.55)]"}`}>
-    {viewport === "Mobile" ? <button type="button" onClick={onMenuClick} className="flex size-10 items-center justify-center" aria-label="Menu"><ButtonMenu icon="menu" dark={dark} /></button> : <div className="relative flex shrink-0 items-center gap-4"><AppIcon />{historyButtons}<Breadcrumb items={breadcrumbItems} dark={dark} /></div>}
-    <div className="flex h-full items-center gap-1">
+  return <header className={`${sticky ? "sticky top-0" : "relative"} z-20 flex h-16 shrink-0 items-center justify-between px-4 backdrop-blur-md ${bordered ? dark ? "border-b border-white/[0.06]" : "border-b border-slate-100" : ""} ${dark ? "bg-[#111413]/55" : "bg-[rgba(255,255,255,0.55)]"} ${className}`}>
+    {showNavigation && (viewport === "Mobile" ? <button type="button" onClick={onMenuClick} className="flex size-10 items-center justify-center" aria-label="Menu"><ButtonMenu icon="menu" dark={dark} /></button> : <div className="relative flex shrink-0 items-center gap-4"><AppIcon />{historyButtons}<Breadcrumb items={breadcrumbItems} dark={dark} /></div>)}
+    <div className="ml-auto flex h-full items-center gap-1">
       {user?.roles?.some((role) => role.toLowerCase() === "root") && (
         <div className="relative flex h-full items-center">
           <button type="button" data-dropdown-trigger onClick={() => toggle("developer")} className="flex h-full w-10 items-center justify-center">

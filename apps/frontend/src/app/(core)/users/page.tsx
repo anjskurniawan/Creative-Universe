@@ -27,6 +27,7 @@ interface UserFormState {
   applications: string[];
 }
 
+// Default form state
 const emptyForm: UserFormState = {
   name: "",
   email: "",
@@ -39,12 +40,12 @@ const emptyForm: UserFormState = {
 };
 
 export default function UsersPage() {
+  // Access and page state
   const { hasPermission, hasRole } = useAuth();
   const [users, setUsers] = useState<ManagedUser[]>([]);
   const [options, setOptions] = useState<UserManagementOptions | null>(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-  const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
@@ -58,12 +59,15 @@ export default function UsersPage() {
   const [form, setForm] = useState<UserFormState>(emptyForm);
   const [isModalLoading, setIsModalLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
   const [showWhitelist, setShowWhitelist] = useState(false);
   const [whitelist, setWhitelist] = useState<string[]>([]);
   const [isSavingWhitelist, setIsSavingWhitelist] = useState(false);
 
+  // Data loading
   const loadUsers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -78,7 +82,6 @@ export default function UsersPage() {
       );
       setUsers(result.data);
       setLastPage(result.meta.last_page);
-      setTotal(result.meta.total);
     } catch (requestError) {
       setError(errorMessage(requestError));
     } finally {
@@ -114,16 +117,19 @@ export default function UsersPage() {
     return () => document.removeEventListener("mousedown", closeMenu);
   }, []);
 
+  // Permission gate
   if (!hasPermission("manage-users")) {
     return <AccessDenied />;
   }
 
+  // Search and filter actions
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setPage(1);
     setAppliedSearch(search.trim());
   };
 
+  // User modal actions
   const openUser = async (user: ManagedUser) => {
     setSelected(null);
     setModalError(null);
@@ -156,6 +162,7 @@ export default function UsersPage() {
     setForm(emptyForm);
     setModalError(null);
     setIsModalLoading(false);
+    setIsDeleteConfirmOpen(false);
   };
 
   const saveUser = async (event: FormEvent<HTMLFormElement>) => {
@@ -184,8 +191,8 @@ export default function UsersPage() {
   };
 
   const deleteUser = async () => {
-    if (!selected || !window.confirm(`Hapus akun ${selected.user.name}? Akun akan dinonaktifkan dan tidak dapat digunakan lagi.`)) return;
-    setIsSaving(true);
+    if (!selected) return;
+    setIsDeleting(true);
     setModalError(null);
     try {
       await coreApi.users.remove(selected.user.id);
@@ -196,7 +203,7 @@ export default function UsersPage() {
     } catch (requestError) {
       setModalError(errorMessage(requestError));
     } finally {
-      setIsSaving(false);
+      setIsDeleting(false);
     }
   };
 
@@ -242,6 +249,7 @@ export default function UsersPage() {
     }));
   };
 
+  // Page layout
   return (
     <div className="flex min-h-full flex-col gap-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -412,19 +420,19 @@ export default function UsersPage() {
                   {modalError && <Alert type="error" message={modalError} />}
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label="Nama lengkap">
-                      <input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="form-input" />
+                      <input required value={form.name || ""} onChange={(event) => setForm({ ...form, name: event.target.value })} className="form-input" />
                     </Field>
                     <Field label="Email">
-                      <input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className="form-input" />
+                      <input type="email" value={form.email || ""} onChange={(event) => setForm({ ...form, email: event.target.value })} className="form-input" />
                     </Field>
                     <Field label="Nomor WhatsApp">
-                      <input value={form.whatsapp_number} onChange={(event) => setForm({ ...form, whatsapp_number: event.target.value })} placeholder="62812..." className="form-input" />
+                      <input value={form.whatsapp_number || ""} onChange={(event) => setForm({ ...form, whatsapp_number: event.target.value })} placeholder="62812..." className="form-input" />
                     </Field>
                     <Field label="Password baru">
-                      <input type="password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} placeholder="Kosongkan jika tidak diubah" className="form-input" />
+                      <input type="password" value={form.password || ""} onChange={(event) => setForm({ ...form, password: event.target.value })} placeholder="Kosongkan jika tidak diubah" className="form-input" />
                     </Field>
                     <Field label="Konfirmasi password">
-                      <input type="password" value={form.password_confirmation} onChange={(event) => setForm({ ...form, password_confirmation: event.target.value })} className="form-input" />
+                      <input type="password" value={form.password_confirmation || ""} onChange={(event) => setForm({ ...form, password_confirmation: event.target.value })} className="form-input" />
                     </Field>
                   </div>
 
@@ -449,15 +457,37 @@ export default function UsersPage() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end gap-3 border-t border-cu-line bg-cu-panel-soft/40 px-6 py-4">
-                {hasRole("Root") && <button type="button" onClick={() => void deleteUser()} disabled={isSaving} className="mr-auto btn btn-danger">Hapus Akun</button>}
-                <button type="button" onClick={closeUser} className="btn btn-secondary">Batal</button>
-                <button type="submit" disabled={isSaving} className="btn btn-primary">{isSaving ? "Menyimpan..." : "Simpan Perubahan"}</button>
+              <div className="border-t border-cu-line bg-cu-panel-soft/40 px-6 py-4">
+                {modalError && <div className="mb-3"><Alert type="error" message={modalError} /></div>}
+                <div className="flex justify-end gap-3">
+                  {hasRole("Root") && <button type="button" onClick={() => setIsDeleteConfirmOpen(true)} disabled={isSaving || isDeleting} className="mr-auto inline-flex items-center gap-2 btn btn-danger">
+                    {isDeleting && <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
+                    {isDeleting ? "Menghapus..." : "Hapus Akun"}
+                  </button>}
+                  <button type="button" onClick={closeUser} className="btn btn-secondary">Batal</button>
+                  <button type="submit" disabled={isSaving} className="btn btn-primary">{isSaving ? "Menyimpan..." : "Simpan Perubahan"}</button>
+                </div>
               </div>
             </form>
           ) : (
             <div className="p-6">{modalError && <Alert type="error" message={modalError} />}</div>
           )}
+        </Modal>
+      )}
+
+      {isDeleteConfirmOpen && selected && (
+        <Modal title="Hapus Akun Permanen" onClose={() => !isDeleting && setIsDeleteConfirmOpen(false)}>
+          <div className="space-y-4 p-6 text-sm text-cu-muted">
+            <p>Hapus permanen akun <strong className="text-cu-ink">{selected.user.name}</strong>? Akun dan aksesnya tidak dapat dipulihkan.</p>
+            {modalError && <Alert type="error" message={modalError} />}
+          </div>
+          <div className="flex justify-end gap-3 border-t border-cu-line px-6 py-4">
+            <button type="button" onClick={() => setIsDeleteConfirmOpen(false)} disabled={isDeleting} className="btn btn-secondary">Batal</button>
+            <button type="button" onClick={() => void deleteUser()} disabled={isDeleting} className="inline-flex items-center gap-2 btn btn-danger">
+              {isDeleting && <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
+              {isDeleting ? "Menghapus..." : "Hapus Permanen"}
+            </button>
+          </div>
         </Modal>
       )}
 
@@ -497,6 +527,7 @@ export default function UsersPage() {
   );
 }
 
+// Small reusable UI pieces
 function AccessDenied() {
   return (
     <div className="rounded-2xl border border-cu-danger/20 bg-cu-danger-soft p-8 text-center">

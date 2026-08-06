@@ -1,0 +1,36 @@
+src/
+├── app/                      # NEXT.JS APP ROUTER (Hanya routing & layouting global)
+│   ├── (auth)/               # Route Group untuk Authentication (login, onboarding)
+│   ├── (core)/               # Route Group untuk Core App (dashboard admin, settings)
+│   ├── odds/                 # Rute sub-aplikasi ODDS
+│   ├── kv-retail/            # Rute sub-aplikasi KV-Retail
+│   ├── creative-ai/          # Rute sub-aplikasi Creative AI
+│   ├── layout.tsx            # Root Layout
+│   └── page.tsx              # Portal Utama (Role-based selector)
+│
+├── components/               # CENTRALIZED COMPONENTS (Satu lokasi untuk seluruh komponen UI)
+│   ├── ui/                   # Primitive UI / Design System (Button, Input, Modal, Icon)
+│   ├── layout/               # Komponen layout global (Navbar, Footer, Sidebar)
+│   ├── typography/           # Komponen teks standar (Heading, HeroHeading)
+│   │
+│   # Subfolders per fitur / aplikasi untuk kerapian pengelompokan:
+│   ├── landing/              # Komponen khusus Portal/Landing utama (LandingText, ApplicationUniverse)
+│   ├── odds/                 # Komponen khusus sub-aplikasi ODDS
+│   ├── kv-retail/            # Komponen khusus sub-aplikasi KV-Retail
+│   ├── creative-report/      # Komponen khusus sub-aplikasi Creative Report
+│   └── creative-ai/          # Komponen khusus sub-aplikasi Creative AI
+│
+├── core/                     # CORE CONFIG & CONSTANTS (Konfigurasi global sistem)
+│   ├── api/                  # Base API Client & Interceptor
+│   ├── navigation/           # Daftar rute konstan (routes.ts)
+│   ├── config/               # Environment config, app constants
+│   └── types/                # Global / Shared Types (User, Role, Application)
+│
+├── providers/                # GLOBAL PROVIDERS (React Context / State Management)
+│   ├── auth-provider.tsx     # Session & Auth State Provider
+│   ├── theme-provider.tsx    # Theme/Styling Provider
+│   └── query-provider.tsx    # React Query / Data Fetching Provider
+│
+└── lib/                      # UTILITIES & EXTERNAL CLIENTS (Helper global)
+    ├── utils.ts              # Fungsi pembantu (cn class merger, date formatter)
+    └── gsap.ts               # Inisialisasi / Register Plugin GSAP global

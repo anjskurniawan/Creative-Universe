@@ -18,6 +18,13 @@ export function HeroHeading({ children, align = "center", className = "", typing
   const characters = splitCharacters(text);
   const [visibleCount, setVisibleCount] = useState(typing ? 0 : characters.length);
   const visibleText = characters.slice(0, visibleCount).join("");
+  const gradientStart = gradientSuffix
+    ? characters.length - splitCharacters(gradientSuffix).length
+    : characters.length;
+  const visiblePrefix = characters.slice(0, Math.min(visibleCount, gradientStart)).join("");
+  const visibleSuffix = characters
+    .slice(gradientStart, Math.max(gradientStart, visibleCount))
+    .join("");
 
   useEffect(() => {
     if (!typing || !text) return;
@@ -46,7 +53,15 @@ export function HeroHeading({ children, align = "center", className = "", typing
         <span aria-hidden="true" className="relative inline-block max-w-full text-left">
           <span className="block opacity-0">{text}</span>
           <span className="absolute inset-0 block text-left">
-            {gradientSuffix && visibleText.endsWith(gradientSuffix) ? <>{visibleText.slice(0, -gradientSuffix.length)}<span className="hero-heading-gradient-suffix">{gradientSuffix}</span></> : visibleText}<span className="hero-heading-cursor-anchor" />
+            {gradientSuffix ? (
+              <>
+                {visiblePrefix}
+                {visibleSuffix && <span className="hero-heading-gradient-suffix">{visibleSuffix}</span>}
+              </>
+            ) : (
+              visibleText
+            )}
+            <span className="hero-heading-cursor-anchor" />
           </span>
         </span>
       ) : children}

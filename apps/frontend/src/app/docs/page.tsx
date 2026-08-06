@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import DocsMenu, { getDocsBreadcrumbs } from "@/components/docs/DocsMenu";
 import DocsContent from "@/components/docs/DocsContent";
-import GlobalLayoutNavbar from "@/components/layout/navbar";
+import Navbar from "@/components/layout/navbar";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import "./docs.css";
 
@@ -26,7 +26,7 @@ function DocsNavbar({
   const slug = searchParams.get("section") ?? "";
 
   return (
-    <GlobalLayoutNavbar
+    <Navbar
       viewport={isDesktop ? "Desktop" : "Mobile"}
       breadcrumbItems={["Documentation", ...getDocsBreadcrumbs(slug)]}
       onMenuClick={onMenuClick}
@@ -64,7 +64,7 @@ export default function DocsPage() {
       <div className="flex size-full flex-col overflow-hidden rounded-2xl bg-[#f3fbff] shadow-[0_14px_42px_rgba(44,42,39,0.16)]">
         <Suspense
           fallback={
-            <GlobalLayoutNavbar
+            <Navbar
               viewport={isDesktop ? "Desktop" : "Mobile"}
               breadcrumbItems={["Documentation", "Overview"]}
               onMenuClick={() => setMenuOpen(true)}

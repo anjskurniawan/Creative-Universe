@@ -27,22 +27,7 @@ class UserController extends BaseApiController
 
         DB::transaction(function () use ($request, $user): void {
             DB::table('sessions')->where('user_id', $user->id)->delete();
-            // Asset links require an owner. Transfer ownership to the Root actor
-            // so the generated assets remain available after hard deletion.
-            DB::table('asset_links')
-                ->where('created_by', $user->id)
-                ->update(['created_by' => $request->user()->id]);
-            // These records are personal performance history and use
-            // restrict-on-delete foreign keys, so remove them with the account.
-            DB::table('odds_designer_daily_reports')->where('designer_id', $user->id)->delete();
-            DB::table('odds_designer_rankings')->where('designer_id', $user->id)->delete();
-            DB::table('odds_task_queue')->where('designer_id', $user->id)->delete();
-            DB::table('odds_task_results')->where('submitted_by', $user->id)->delete();
-            $memberIds = DB::table('creative_report_members')->where('user_id', $user->id)->pluck('id');
-            if ($memberIds->isNotEmpty()) {
-                DB::table('creative_report_assessments')->whereIn('creative_report_member_id', $memberIds)->delete();
-                DB::table('creative_report_members')->whereIn('id', $memberIds)->delete();
-            }
+            $this->reassignRestrictedUserReferences($user->id, $request->user()->id);
             $user->roles()->detach();
             $user->permissions()->detach();
             $user->applications()->detach();
@@ -342,6 +327,28 @@ class UserController extends BaseApiController
     private function canManageTarget(User $actor, User $target): bool
     {
         return $actor->hasRole('Root') || ! $target->hasRole('Root');
+    }
+
+    private function reassignRestrictedUserReferences(int $userId, int $actorId): void
+    {
+        foreach ([
+            ['asset_links', 'created_by'],
+            ['generator_pricetag_batches', 'created_by'],
+            ['generator_pricetag_categories', 'created_by'],
+            ['generator_pricetag_products', 'created_by'],
+            ['odds_designer_daily_reports', 'designer_id'],
+            ['odds_designer_rankings', 'designer_id'],
+            ['odds_task_cancel_requests', 'requested_by'],
+            ['odds_task_priority_requests', 'requested_by'],
+            ['odds_task_queue', 'designer_id'],
+            ['odds_task_results', 'submitted_by'],
+            ['odds_task_reviews', 'reviewer_id'],
+            ['odds_task_revisions', 'requested_by'],
+            ['odds_task_skip_requests', 'designer_id'],
+            ['odds_tasks', 'requester_id'],
+        ] as [$table, $column]) {
+            DB::table($table)->where($column, $userId)->update([$column => $actorId]);
+        }
     }
 
     // Removed isPending
