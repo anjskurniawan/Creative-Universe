@@ -19,7 +19,7 @@ export function AuthPortal() {
   // Callback untuk menandai selesainya animasi pengetikan judul
   const completeTyping = useCallback(() => setHasTypingCompleted(true), []);
 
-  const creativeRole = user?.roles.find((role) => ["Designer", "Videographer", "Content Creator"].includes(role));
+  const creativeRole = user?.roles.find((role) => ["Designer", "Videographer", "Content Creator", "SPV"].includes(role));
   const accessibleApplications = visibleSubApplications(user?.applications ?? []);
   const firstName = user?.name?.trim().split(/\s+/).slice(0, 2).join(" ") || "Creative";
   const cardImage = user?.card_image_url ?? user?.avatar_url;

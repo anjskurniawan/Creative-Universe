@@ -22,6 +22,21 @@ class GetDashboardStatsAction
             return $result;
         }
 
+        $gitBranch = 'N/A';
+        $gitCommit = 'N/A';
+        try {
+            $branchOutput = shell_exec('git branch --show-current');
+            if ($branchOutput) {
+                $gitBranch = trim($branchOutput);
+            }
+            $commitOutput = shell_exec('git log -1 --pretty=format:"%h - %s"');
+            if ($commitOutput) {
+                $gitCommit = trim($commitOutput);
+            }
+        } catch (\Throwable) {
+            // Silently fall back to N/A
+        }
+
         $result['root_metrics'] = [
             'total_sessions' => DB::table('sessions')->count(),
             'suspended_users' => 0,
@@ -31,6 +46,8 @@ class GetDashboardStatsAction
             'database_size' => $this->databaseSize(),
             'laravel_version' => app()->version(),
             'php_version' => PHP_VERSION,
+            'git_branch' => $gitBranch,
+            'git_commit' => $gitCommit,
             'latest_activities' => Activity::with('causer')
                 ->latest()
                 ->limit(5)

@@ -19,9 +19,8 @@ class ApplicationAccessSeeder extends Seeder
             if ($roles->contains('Root')) {
                 $keys = $applicationIds->keys()->all();
             } else {
-                if ($roles->intersect(['Manajer', 'SPV', 'Designer', 'Videographer', 'Client'])->isNotEmpty()) {
-                    $keys[] = 'odds';
-                }
+                // ODDS is available to every role; feature permissions remain role-based.
+                $keys[] = 'odds';
                 if ($roles->intersect(['Manajer', 'SPV', 'Leader Retail', 'PIC Retail'])->isNotEmpty()
                     || $user->kvRetailTasks()->exists()) {
                     $keys[] = 'kv-retail';

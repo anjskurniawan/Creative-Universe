@@ -1,12 +1,12 @@
 src/
 ├── app/                      # NEXT.JS APP ROUTER (Hanya routing & layouting global)
-│   ├── (auth)/               # Route Group untuk Authentication (login, onboarding)
+│   ├── (auth)/               # Route Group untuk Authentication (login, onboarding) (OTW)
 │   ├── (core)/               # Route Group untuk Core App (dashboard admin, settings)
 │   ├── odds/                 # Rute sub-aplikasi ODDS
 │   ├── kv-retail/            # Rute sub-aplikasi KV-Retail
 │   ├── creative-ai/          # Rute sub-aplikasi Creative AI
 │   ├── layout.tsx            # Root Layout
-│   └── page.tsx              # Portal Utama (Role-based selector)
+│   └── page.tsx              # Portal Utama (Role-based selector) ( DONE )
 │
 ├── components/               # CENTRALIZED COMPONENTS (Satu lokasi untuk seluruh komponen UI)
 │   ├── ui/                   # Primitive UI / Design System (Button, Input, Modal, Icon)

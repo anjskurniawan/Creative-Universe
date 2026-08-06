@@ -28,7 +28,7 @@ export default function Navbar({ sticky = false, breadcrumbItems, viewport = "De
   const dark = theme === "dark";
   const historyButtons = <div className="flex items-center gap-0.5"><button type="button" onClick={() => window.history.back()} aria-label="Kembali" className={`flex size-8 items-center justify-center rounded-lg transition ${dark ? "text-[#e3e3e3] hover:bg-white/10" : "text-[#3b4446] hover:bg-slate-100"}`}><MaterialIcon name="arrow_back" size="sm" /></button><button type="button" onClick={() => window.history.forward()} aria-label="Maju" className={`flex size-8 items-center justify-center rounded-lg transition ${dark ? "text-[#e3e3e3] hover:bg-white/10" : "text-[#3b4446] hover:bg-slate-100"}`}><MaterialIcon name="arrow_forward" size="sm" /></button></div>;
   const applications = useMemo(() => (user?.applications?.length ? visibleSubApplications(user.applications).map((app) => ({ key: app.key, display_name: app.display_name, href: app.frontend_path ?? "#", icon: APPLICATION_ICONS[app.key] ?? "apps" })) : [
-    { key: "core", display_name: "Core", href: "/dashboard", icon: "apps" },
+    { key: "core", display_name: "Core", href: "/panel", icon: "apps" },
     { key: "kv-retail", display_name: "KV Retail Task", href: "/kv-retail", icon: "apps" },
     { key: "creative-report", display_name: "Creative Report", href: "/creative-report", icon: "apps" },
     { key: "odds", display_name: "One Dashboard Design System", href: "/odds", icon: "apps" },
