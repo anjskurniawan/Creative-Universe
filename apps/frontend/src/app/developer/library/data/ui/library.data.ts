@@ -52,6 +52,16 @@ export const uiComponents: ComponentItem[] = [
     ]
   },
   {
+    "name": "Button",
+    "file": "button.tsx",
+    "description": "Komponen tombol kustom dengan status loading dan penyesuaian gaya visual.",
+    "tags": [
+      "Button",
+      "Interaction",
+      "UI"
+    ]
+  },
+  {
     "name": "ConfirmModal",
     "file": "confirm-modal.tsx",
     "description": "Dialog konfirmasi untuk meminta persetujuan sebelum menjalankan aksi penting.",
@@ -162,6 +172,17 @@ export const uiComponents: ComponentItem[] = [
     ]
   },
   {
+    "name": "SearchBar",
+    "file": "search-bar.tsx",
+    "description": "Input pencarian reusable dengan ikon search, state controlled, placeholder, dan aksi hapus nilai.",
+    "tags": [
+      "Form",
+      "Search",
+      "Input",
+      "Interaction"
+    ]
+  },
+  {
     "name": "StatCard",
     "file": "stat-card.tsx",
     "description": "Kartu ringkasan metrik dengan nilai, ikon, subtitle, dan state visual.",
@@ -210,17 +231,6 @@ export const uiComponents: ComponentItem[] = [
     ],
     "children": [
       {
-        "name": "Button",
-        "file": "form/button.tsx",
-        "description": "Komponen Form\\button pada kategori ui.",
-        "tags": [
-          "Component",
-          "ui",
-          "Button",
-          "Form"
-        ]
-      },
-      {
         "name": "DropdownMenu",
         "file": "form/dropdown-menu.tsx",
         "description": "Komponen Form\\dropdownMenu pada kategori ui.",
@@ -245,4 +255,3 @@ export const uiComponents: ComponentItem[] = [
     ]
   }
 ];
-

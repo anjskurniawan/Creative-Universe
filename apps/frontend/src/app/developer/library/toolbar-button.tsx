@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type MouseEventHandler } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 
 type ToolbarButtonProps = {
@@ -8,9 +8,10 @@ type ToolbarButtonProps = {
   label?: string;
   active?: boolean;
   onClick?: () => void;
+  onMouseDown?: MouseEventHandler<HTMLButtonElement>;
 };
 
-export function ToolbarButton({ icon, label = "Toolbar action", active, onClick }: ToolbarButtonProps) {
+export function ToolbarButton({ icon, label = "Toolbar action", active, onClick, onMouseDown }: ToolbarButtonProps) {
   const [internalActive, setInternalActive] = useState(false);
   const isActive = active ?? internalActive;
 
@@ -20,6 +21,7 @@ export function ToolbarButton({ icon, label = "Toolbar action", active, onClick 
       aria-pressed={isActive}
       aria-label={label}
       title={label}
+      onMouseDown={onMouseDown}
       onClick={onClick ?? (() => setInternalActive((current) => !current))}
       className={`flex size-8 cursor-pointer items-center justify-center rounded-md border text-slate-500 transition active:bg-slate-100 ${
         isActive

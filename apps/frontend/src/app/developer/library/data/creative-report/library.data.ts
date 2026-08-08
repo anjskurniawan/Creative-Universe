@@ -1,115 +1,36 @@
 import type { ComponentItem } from "@/app/developer/library/library.data";
 
 export const creativeReportComponents: ComponentItem[] = [
-  {
-    "name": "AssessmentMobileCards",
-    "file": "assessment-mobile-cards.tsx",
-    "description": "Kartu penilaian responsif untuk mengisi assessment pada perangkat mobile.",
-    "tags": [
-      "Creative Report",
-      "Assessment",
-      "Mobile"
-    ]
-  },
-  {
-    "name": "AssessmentTable",
-    "file": "assessment-table.tsx",
-    "description": "Tabel interaktif untuk menampilkan dan mengubah nilai assessment.",
-    "tags": [
-      "Creative Report",
-      "Assessment",
-      "Table"
-    ]
-  },
-  {
-    "name": "ExportPdfButton",
-    "file": "export-pdf-button.tsx",
-    "description": "Tombol untuk mengekspor laporan assessment ke format PDF.",
-    "tags": [
-      "Creative Report",
-      "Export",
-      "Button"
-    ]
-  },
-  {
-    "name": "GroupAccordion",
-    "file": "group-accordion.tsx",
-    "description": "Accordion untuk membuka dan menutup kelompok data assessment.",
-    "tags": [
-      "Creative Report",
-      "Accordion",
-      "Interaction"
-    ]
-  },
-  {
-    "name": "HrdDateModal",
-    "file": "hrd-date-modal.tsx",
-    "description": "Modal untuk memilih atau mengatur periode tanggal laporan HRD.",
-    "tags": [
-      "Creative Report",
-      "Modal",
-      "Date"
-    ]
-  },
-  {
-    "name": "HrdRulesFooter",
-    "file": "hrd-rules-footer.tsx",
-    "description": "Footer yang menjelaskan aturan dan formula penilaian HRD.",
-    "tags": [
-      "Creative Report",
-      "Rules",
-      "Footer"
-    ]
-  },
-  {
-    "name": "MonthPickerButton",
-    "file": "month-picker-button.tsx",
-    "description": "Tombol pemilih bulan untuk mengganti periode laporan.",
-    "tags": [
-      "Creative Report",
-      "Date",
-      "Button"
-    ]
-  },
-  {
-    "name": "CreativeReportGroup",
-    "file": "report-group.tsx",
-    "description": "Kelompok tampilan laporan berdasarkan unit atau group assessment.",
-    "tags": [
-      "Creative Report",
-      "Report",
-      "Group"
-    ]
-  },
-  {
-    "name": "CreativeReportHeader",
-    "file": "report-header.tsx",
-    "description": "Header laporan yang menampilkan konteks periode dan informasi assessment.",
-    "tags": [
-      "Creative Report",
-      "Report",
-      "Header"
-    ]
-  },
-  {
-    "name": "ReportTitle",
-    "file": "report-title.tsx",
-    "description": "Judul utama halaman laporan Creative Report.",
-    "tags": [
-      "Creative Report",
-      "Report",
-      "Typography"
-    ]
-  },
-  {
-    "name": "CreativeReportToolbar",
-    "file": "report-toolbar.tsx",
-    "description": "Toolbar laporan untuk filter, periode, dan aksi terkait report.",
-    "tags": [
-      "Creative Report",
-      "Report",
-      "Toolbar"
-    ]
-  }
+  { name: "AspectScoreList", file: "aspect-score-list.tsx", description: "Daftar aspek penilaian dengan progress bar persentase, nilai aktual, dan batas maksimal setiap aspek.", tags: ["Creative Report", "Assessment", "Score", "List", "Progress"] },
+  { name: "AspectScoreTotal", file: "aspect-score-total.tsx", description: "Ringkasan total skor aspek terhadap nilai maksimum dengan warna indikator.", tags: ["Creative Report", "Assessment", "Score", "Summary"] },
+  { name: "AssessmentMobileCards", file: "assessment-mobile-cards.tsx", description: "Kartu penilaian responsif untuk melihat dan mengisi assessment pada perangkat mobile.", tags: ["Creative Report", "Assessment", "Mobile", "Interactive"] },
+  { name: "AssessmentTable", file: "assessment-table.tsx", description: "Tabel desktop interaktif untuk menampilkan, mengedit, menyimpan draft, mengelola catatan tanggal HRD, dan menyelesaikan nilai assessment per member.", tags: ["Creative Report", "Assessment", "Table", "Interactive", "HRD", "Desktop"], childComponents: [{ name: "AssessmentTableActions", category: "creative-report", file: "assessment-table-actions.tsx" }, { name: "AssessmentTableAvatar", category: "creative-report", file: "assessment-table-avatar.tsx" }, { name: "AssessmentTableCell", category: "creative-report", file: "assessment-table-cell.tsx" }, { name: "AssessmentTableHeader", category: "creative-report", file: "assessment-table-header.tsx" }, { name: "AssessmentTableRow", category: "creative-report", file: "assessment-table-row.tsx" }, { name: "HrdDateModal", category: "creative-report", file: "hrd-date-modal.tsx" }] },
+  { name: "AssessmentTableActions", file: "assessment-table-actions.tsx", description: "Footer aksi AssessmentTable untuk input, penyimpanan draft, penyelesaian penilaian, dan pesan error.", tags: ["Creative Report", "Assessment", "Table", "Actions"] },
+  { name: "AssessmentTableAvatar", file: "assessment-table-avatar.tsx", description: "Avatar ringkas untuk identitas user pada baris AssessmentTable dengan fallback initials.", tags: ["Creative Report", "Assessment", "Table", "Avatar"] },
+  { name: "AssessmentTableCell", file: "assessment-table-cell.tsx", description: "Renderer cell AssessmentTable untuk nilai, input skor, dan pengelolaan tanggal HRD.", tags: ["Creative Report", "Assessment", "Table", "Cell", "HRD"] },
+  { name: "AssessmentTableHeader", file: "assessment-table-header.tsx", description: "Header bertingkat AssessmentTable untuk aspek kolaborasi, performa, dan HRD.", tags: ["Creative Report", "Assessment", "Table", "Header"] },
+  { name: "AssessmentTableRow", file: "assessment-table-row.tsx", description: "Baris AssessmentTable yang menghitung skor kolaborasi, performa, dan HRD menjadi nilai akhir, menandai baris di bawah 75 dengan highlight merah, serta menampilkan popup profil member saat hover.", tags: ["Creative Report", "Assessment", "Table", "Row", "Score", "Hover"], childComponents: [{ name: "AssessmentTableAvatar", category: "creative-report", file: "assessment-table-avatar.tsx" }, { name: "AssessmentTableCell", category: "creative-report", file: "assessment-table-cell.tsx" }, { name: "PopupPerson", category: "layout", file: "profile/popup-person.tsx" }] },
+  { name: "EditMemberHeader", file: "edit-member-header.tsx", description: "Header halaman edit member yang menampilkan nama dan konteks anggota.", tags: ["Creative Report", "Member", "Edit", "Header"] },
+  { name: "EditMemberMediaPreview", file: "edit-member-media-preview.tsx", description: "Preview media atau gambar member pada form pengeditan profil.", tags: ["Creative Report", "Member", "Edit", "Media"] },
+  { name: "EditMemberMediaUpload", file: "edit-member-media-upload.tsx", description: "Kontrol upload media member dengan status dan aksi penggantian file.", tags: ["Creative Report", "Member", "Edit", "Upload"] },
+  { name: "EditMemberPersonalTab", file: "edit-member-personal-tab.tsx", description: "Tab form untuk mengedit data personal member.", tags: ["Creative Report", "Member", "Edit", "Form"] },
+  { name: "EditMemberSpecialtiesTab", file: "edit-member-specialties-tab.tsx", description: "Tab form untuk mengatur spesialisasi dan keahlian member.", tags: ["Creative Report", "Member", "Edit", "Specialties"] },
+  { name: "EditMemberTabs", file: "edit-member-tabs.tsx", description: "Navigasi tab untuk berpindah antara bagian form edit member.", tags: ["Creative Report", "Member", "Edit", "Tabs"] },
+  { name: "EvaluationNotesCard", file: "evaluation-notes-card.tsx", description: "Card informasi catatan evaluasi berdasarkan periode laporan.", tags: ["Creative Report", "Evaluation", "Notes", "Card"] },
+  { name: "ExportPdfButton", file: "export-pdf-button.tsx", description: "Tombol untuk mengekspor laporan assessment ke format PDF.", tags: ["Creative Report", "Export", "PDF", "Button"] },
+  { name: "GroupAccordion", file: "group-accordion.tsx", description: "Accordion untuk membuka dan menutup kelompok data assessment.", tags: ["Creative Report", "Assessment", "Accordion", "Interaction"] },
+  { name: "HrdDateModal", file: "hrd-date-modal.tsx", description: "Modal overlay untuk mengganti atau menghapus satu tanggal riwayat HRD yang sedang dipilih pada assessment.", tags: ["Creative Report", "HRD", "Modal", "Overlay", "Date", "Interactive"], childComponents: [{ name: "MaterialIcon", category: "ui", file: "material-icon.tsx" }] },
+  { name: "HrdReviewCard", file: "hrd-review-card.tsx", description: "Card ringkasan catatan HRD dan skor review berdasarkan beberapa kategori.", tags: ["Creative Report", "HRD", "Review", "Card"] },
+  { name: "HrdRulesCard", file: "hrd-rules-card.tsx", description: "Card yang menjelaskan aturan perhitungan penilaian HRD.", tags: ["Creative Report", "HRD", "Rules", "Card"] },
+  { name: "HrdRulesFooter", file: "hrd-rules-footer.tsx", description: "Footer aturan penilaian HRD dengan dukungan tema light, dark, dan retro.", tags: ["Creative Report", "HRD", "Rules", "Footer", "Theme"] },
+  { name: "MonthPickerButton", file: "month-picker-button.tsx", description: "Tombol pemilih bulan untuk mengganti periode laporan Creative Report.", tags: ["Creative Report", "Date", "Month", "Button"] },
+  { name: "CreativeReportGroup", file: "report-group.tsx", description: "Header accordion kelompok laporan dengan nama, jumlah staff, dan kontrol buka tutup.", tags: ["Creative Report", "Report", "Group", "Accordion"] },
+  { name: "ReportHeader", file: "report-header.tsx", description: "Header laporan yang menampilkan konteks periode dan aksi utama report.", tags: ["Creative Report", "Report", "Header", "Layout"] },
+  { name: "ReportSummaryInfo", file: "report-summary-info.tsx", description: "Informasi ringkasan jumlah staff dan periode bulan aktif.", tags: ["Creative Report", "Report", "Summary", "Info"] },
+  { name: "ReportTitle", file: "report-title.tsx", description: "Judul dan subtitle utama halaman laporan Creative Report.", tags: ["Creative Report", "Report", "Title", "Typography"] },
+  { name: "ReportToolbar", file: "report-toolbar.tsx", description: "Toolbar laporan untuk pencarian, filter jobdesk, dan metrik report.", tags: ["Creative Report", "Report", "Toolbar", "Filter"], childComponents: [{ name: "Button", category: "ui", file: "button.tsx" }, { name: "DropdownMenu", category: "ui", file: "form/dropdown-menu.tsx" }, { name: "SearchBar", category: "ui", file: "search-bar.tsx" }, { name: "CreativeReportMetricCard", category: "creative-report", file: "report-metric-card.tsx" }] },
+  { name: "CreativeReportMetricCard", file: "report-metric-card.tsx", description: "Card metrik laporan dengan icon, label, nilai, dan accent indicator.", tags: ["Creative Report", "Report", "Metric", "Card"] },
+  { name: "ScorePanel", file: "score-panel.tsx", description: "Panel skor untuk menampilkan daftar aspek, nilai maksimum, dan total penilaian.", tags: ["Creative Report", "Assessment", "Score", "Panel"] },
+  { name: "SummaryPillars", file: "summary-pillars.tsx", description: "Ringkasan pilar skor kolaborasi, performa, HRD, dan nilai akhir.", tags: ["Creative Report", "Summary", "Score", "Pillars"] },
+  { name: "SummaryProfile", file: "summary-profile.tsx", description: "Ringkasan profil user, group, periode, dan nilai akhir assessment.", tags: ["Creative Report", "Summary", "Profile", "Assessment"] },
 ];
-

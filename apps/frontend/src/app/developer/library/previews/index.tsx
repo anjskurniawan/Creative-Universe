@@ -1,25 +1,86 @@
 import React from "react";
 import { DefaultPreviewPlaceholder } from "./placeholder";
-import { MaterialIconPreview, SpinningWheelPreview, StatCardPreview, ActionCardPreview, ConfirmModalPreview, CustomDatePickerPreview, ToastPreview } from "./ui/index";
+import {
+  MaterialIconPreview,
+  SpinningWheelPreview,
+  StatCardPreview,
+  ActionCardPreview,
+  ConfirmModalPreview,
+  CustomDatePickerPreview,
+  ToastPreview,
+  AccessDeniedPreview,
+  ButtonActionPreview,
+  ContentTitlePreview,
+  LogoPreview,
+  PrimaryActionLinkPreview,
+  ButtonPreview,
+  InputPreview,
+  AuthParticleBackgroundPreview,
+  SearchBarPreview
+} from "./ui/index";
 import { HeaderTitlePreview, HeroHeadingPreview } from "./typography/index";
 import { UniversalErrorViewPreview, ErrorTetrisGamePreview } from "./feedback/index";
-import { ProfileCardPreview, ContentPreview, BreadcrumbPreview, SidebarPreview } from "./layout.preview";
-import { AccessDeniedPreview, ButtonActionPreview, ContentTitlePreview, LogoPreview, PrimaryActionLinkPreview, ButtonPreview, InputPreview } from "./ui/basic.preview";
-import { DropdownMenuPreview, ModalPreview, AuthCardPreview, AuthCardHeaderPreview, AuthCardFooterPreview } from "./forms.preview";
-import { DefaultStatsGridPreview, QuickActionsSectionPreview, SystemStatusGridPreview, GroupAccordionPreview } from "./features.preview";
-import { OddsGameboyFramePreview, OddsRichTextEditorPreview } from "./odds.preview";
+import { ProfileCardPreview, ContentPreview, BreadcrumbPreview, SidebarPreview, AppTitlePreview } from "./layout/index";
+import { DropdownMenuPreview, ModalPreview, AuthCardPreview, AuthCardHeaderPreview, AuthCardFooterPreview } from "./forms/index";
+import { DefaultStatsGridPreview, QuickActionsSectionPreview, SystemStatusGridPreview, GroupAccordionPreview, ReportSummaryInfoPreview } from "./features/index";
+import { OddsGameboyFramePreview, OddsRichTextEditorPreview } from "./odds/index";
+import { AssessmentMobileCardsPreview, ReportHeaderPreview, ReportToolbarPreview, CreativeReportMetricCardPreview, AssessmentTableActionsPreview, AssessmentTablePreview, AssessmentTableAvatarPreview, AssessmentTableCellPreview, AssessmentTableHeaderPreview, AssessmentTableRowPreview, HrdDateModalPreview, AspectScoreListPreview } from "./creative-report/index";
 
 export { DefaultPreviewPlaceholder };
 export const PREVIEW_REGISTRY: Record<string, React.ReactNode> = {
+  AppTitle: <AppTitlePreview />,
+  ReportSummaryInfo: <ReportSummaryInfoPreview />,
   MaterialIcon: <MaterialIconPreview />, SpinningWheel: <SpinningWheelPreview />, StatCard: <StatCardPreview />, ActionCard: <ActionCardPreview />,
   HeaderTitle: <HeaderTitlePreview />, HeroHeading: <HeroHeadingPreview />, UniversalErrorView: <UniversalErrorViewPreview />, ErrorTetrisGame: <ErrorTetrisGamePreview />,
   ProfileCard: <ProfileCardPreview />, ConfirmModal: <ConfirmModalPreview />, CustomDatePicker: <CustomDatePickerPreview />, Toast: <ToastPreview />,
   AccessDenied: <AccessDeniedPreview />, ButtonAction: <ButtonActionPreview />, ContentTitle: <ContentTitlePreview />, Logo: <LogoPreview />,
   PrimaryActionLink: <PrimaryActionLinkPreview />, Button: <ButtonPreview />, Input: <InputPreview />,
+  AuthParticleBackground: <AuthParticleBackgroundPreview />,
+  SearchBar: <SearchBarPreview />,
   DropdownMenu: <DropdownMenuPreview />, Modal: <ModalPreview />, AuthCard: <AuthCardPreview />,
   AuthCardHeader: <AuthCardHeaderPreview />, AuthCardFooter: <AuthCardFooterPreview />,
   Content: <ContentPreview />, Breadcrumb: <BreadcrumbPreview />, Sidebar: <SidebarPreview />,
   DefaultStatsGrid: <DefaultStatsGridPreview />, QuickActionsSection: <QuickActionsSectionPreview />,
   SystemStatusGrid: <SystemStatusGridPreview />, GroupAccordion: <GroupAccordionPreview />,
+  AssessmentMobileCards: <AssessmentMobileCardsPreview />,
+  AspectScoreList: <AspectScoreListPreview />,
+  AspectScoreTotal: <DefaultPreviewPlaceholder componentName="AspectScoreTotal" />,
+  AssessmentTable: <AssessmentTablePreview />,
+  AssessmentTableActions: <AssessmentTableActionsPreview />,
+  AssessmentTableAvatar: <AssessmentTableAvatarPreview />,
+  AssessmentTableCell: <AssessmentTableCellPreview />,
+  AssessmentTableHeader: <AssessmentTableHeaderPreview />,
+  AssessmentTableRow: <AssessmentTableRowPreview />,
+  EditMemberHeader: <DefaultPreviewPlaceholder componentName="EditMemberHeader" />,
+  EditMemberMediaPreview: <DefaultPreviewPlaceholder componentName="EditMemberMediaPreview" />,
+  EditMemberMediaUpload: <DefaultPreviewPlaceholder componentName="EditMemberMediaUpload" />,
+  EditMemberPersonalTab: <DefaultPreviewPlaceholder componentName="EditMemberPersonalTab" />,
+  EditMemberSpecialtiesTab: <DefaultPreviewPlaceholder componentName="EditMemberSpecialtiesTab" />,
+  EditMemberTabs: <DefaultPreviewPlaceholder componentName="EditMemberTabs" />,
+  EvaluationNotesCard: <DefaultPreviewPlaceholder componentName="EvaluationNotesCard" />,
+  ExportPdfButton: <DefaultPreviewPlaceholder componentName="ExportPdfButton" />,
+  CreativeReportGroup: <DefaultPreviewPlaceholder componentName="CreativeReportGroup" />,
+  HrdDateModal: <HrdDateModalPreview />,
+  HrdReviewCard: <DefaultPreviewPlaceholder componentName="HrdReviewCard" />,
+  HrdRulesCard: <DefaultPreviewPlaceholder componentName="HrdRulesCard" />,
+  HrdRulesFooter: <DefaultPreviewPlaceholder componentName="HrdRulesFooter" />,
+  MonthPickerButton: <DefaultPreviewPlaceholder componentName="MonthPickerButton" />,
+  ReportHeader: <ReportHeaderPreview />,
+  ReportTitle: <DefaultPreviewPlaceholder componentName="ReportTitle" />,
+  ReportToolbar: <ReportToolbarPreview />,
+  CreativeReportMetricCard: <CreativeReportMetricCardPreview />,
+  ScorePanel: <DefaultPreviewPlaceholder componentName="ScorePanel" />,
+  SummaryPillars: <DefaultPreviewPlaceholder componentName="SummaryPillars" />,
+  SummaryProfile: <DefaultPreviewPlaceholder componentName="SummaryProfile" />,
   OddsGameboyFrame: <OddsGameboyFramePreview />, OddsRichTextEditor: <OddsRichTextEditorPreview />,
+  MessagesPageContent: <DefaultPreviewPlaceholder componentName="MessagesPageContent" />,
+  NotificationsPageContent: <DefaultPreviewPlaceholder componentName="NotificationsPageContent" />,
+  SettingMenu: <DefaultPreviewPlaceholder componentName="SettingMenu" />,
+  SettingsProfileHeader: <DefaultPreviewPlaceholder componentName="SettingsProfileHeader" />,
+  SettingsMobileHeader: <DefaultPreviewPlaceholder componentName="SettingsMobileHeader" />,
+  SecuritySettings: <DefaultPreviewPlaceholder componentName="SecuritySettings" />,
+  RolesPageContent: <DefaultPreviewPlaceholder componentName="RolesPageContent" />,
+  ActivityLog: <DefaultPreviewPlaceholder componentName="ActivityLog" />,
+  ProfileSettingsPage: <DefaultPreviewPlaceholder componentName="ProfileSettingsPage" />,
+  RoleSettingPage: <DefaultPreviewPlaceholder componentName="RoleSettingPage" />,
 };

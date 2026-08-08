@@ -2,6 +2,16 @@ import type { ComponentItem } from "@/app/developer/library/library.data";
 
 export const layoutComponents: ComponentItem[] = [
   {
+    "name": "AppTitle",
+    "file": "app-title.tsx",
+    "description": "Judul landing sub-aplikasi yang dinamis, responsif, dan interaktif memenuhi area konten.",
+    "tags": [
+      "Layout",
+      "Heading",
+      "Landing"
+    ]
+  },
+  {
     "name": "Container",
     "file": "container.tsx",
     "description": "Pembungkus viewport utama yang mengatur padding, ukuran layar, dan komposisi Workspace.",

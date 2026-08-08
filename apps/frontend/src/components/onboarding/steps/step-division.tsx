@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Logo } from "@/components/ui/logo";
-import { Button } from "@/components/ui/form/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/form/input";
 import { DropdownMenu } from "@/components/ui/form/dropdown-menu";
 import { type OnboardingDivision } from "@/core/auth";

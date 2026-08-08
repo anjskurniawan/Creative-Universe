@@ -39,6 +39,8 @@ ehthumbs_vista.db
 # ------------------------------------------------------------------------------
 .agents/
 .codex/
+# Junction ke skills/ project; sumber sebenarnya sudah dilacak di skills/
+.claude/skills/
 .playwright-cli/
 .phpunit.result.cache
 **/.phpunit.result.cache

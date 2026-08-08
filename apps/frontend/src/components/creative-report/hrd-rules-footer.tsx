@@ -12,7 +12,7 @@ const rules = [
   ["Telat >2", "−2"],
 ];
 
-export function HrdRulesFooter({ theme }: { theme: "light" | "dark" | "retro" }) {
+export function HrdRulesFooter({ theme = "light" }: { theme?: "light" | "dark" | "retro" }) {
   const [pinned, setPinned] = useState(false);
   useEffect(() => {
     if (window.innerWidth >= 1024) setPinned(true);

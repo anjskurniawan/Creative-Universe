@@ -1,4 +1,5 @@
 import { MaterialIcon } from "@/components/ui/material-icon";
+import Link from "next/link";
 import type { ComponentItem } from "./library.data";
 import { VisualPreview } from "./visual-preview";
 
@@ -33,7 +34,7 @@ function ComponentHeader({ category, component }: { category: string; component:
         <h2 className="text-lg font-bold text-slate-800">{component.name}</h2>
         <div className="mt-1 flex items-center gap-1.5 font-mono text-xs text-slate-400">
           <MaterialIcon name="code" size="xs" />
-          <span>import &#123; {component.name} &#125; from "@/components/{category}/{importPath}"</span>
+          <span>import &#123; {component.name} &#125; from &quot;@/components/{category}/{importPath}&quot;</span>
         </div>
       </div>
       <button type="button" onClick={copyComponentPath} title="Salin path komponen"
@@ -64,12 +65,33 @@ function ComponentInformation({ component }: { component: ComponentItem }) {
   );
 }
 
+function ChildComponents({ components }: { components: NonNullable<ComponentItem["childComponents"]> }) {
+  if (!components.length) return null;
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Child Components</h3>
+      <div className="flex flex-wrap gap-1.5">
+        {components.map((child) => (
+          <Link
+            key={`${child.category}/${child.file}`}
+            href={`/developer/library?cat=${encodeURIComponent(child.category)}&comp=${encodeURIComponent(child.file)}`}
+            className="inline-flex items-center rounded-full border border-brand/15 bg-brand/5 px-2.5 py-1 text-[10px] font-medium text-brand transition-colors hover:border-brand/30 hover:bg-brand/10"
+          >
+            {child.name}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function LibraryPreview({ category, component }: LibraryPreviewProps) {
   if (!component) return <EmptyPreview />;
   return (
     <div className="flex min-h-full flex-col gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
       <ComponentHeader category={category} component={component} />
       <ComponentInformation component={component} />
+      {component.childComponents && <ChildComponents components={component.childComponents} />}
       <VisualPreview component={component} />
     </div>
   );

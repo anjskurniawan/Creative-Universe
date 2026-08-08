@@ -1,6 +1,6 @@
 ---
 name: route-modularization
-description: Standarisasi struktur rute aplikasi dengan memisahkan tampilan halaman ke dalam berkas layout.tsx lokal yang membungkus komponen Container utama.
+description: Standarisasi struktur rute aplikasi dengan memisahkan tampilan halaman ke dalam berkas layout.tsx lokal yang menggunakan rangkaian Container, Workspace, dan Content.
 ---
 
 # Route Modularization Skill
@@ -11,7 +11,7 @@ Skill ini memandu agen AI dalam merestrukturisasi rute halaman Next.js di reposi
 
 ## 1. Rute Pengecualian Eksplisit (Explicit Exceptions)
 
-Standarisasi tata letak `layout.tsx` lokal yang menggunakan komponen `Container` utama **TIDAK berlaku** untuk rute-rute khusus berikut yang memerlukan tata letak visual kustom secara eksplisit:
+Standarisasi tata letak `layout.tsx` lokal yang menggunakan rangkaian `Container → Workspace → Content` **TIDAK berlaku** untuk rute-rute khusus berikut yang memerlukan tata letak visual kustom secara eksplisit:
 
 1. **Halaman Landing Utama (`/`):** Memerlukan tampilan canvas 3D & interaksi GSAP layar penuh tanpa sidebar/navbar.
 2. **Halaman Otentikasi (`/login`, `/forgot-password`):** Memerlukan tata letak kartu otentikasi minimalis layar penuh.
@@ -27,10 +27,17 @@ Setiap rute/fitur utama (misal: `/creative-report`, `/creative-ai`, `/odds`) har
 
 1. **Buat file `layout.tsx` di dalam folder rute:**
    * Contoh: `apps/frontend/src/app/my-route/layout.tsx`
-2. **Bungkus halaman menggunakan komponen `Container`:**
-   * Gunakan komponen `Container` dari `@/components/layout/container` di dalam `layout.tsx` tersebut.
-3. **Posisikan area konten (`children`):**
-   * Teruskan parameter `children` ke dalam `Container` agar semua sub-halaman di bawah rute tersebut otomatis memiliki layout yang sama.
+2. **Gunakan struktur layout wajib:**
+   * `Container` dari `@/components/layout/container` menjadi wrapper paling luar.
+   * `Container` harus merender `Workspace` melalui API `contentProps` yang tersedia.
+   * `Workspace` harus merender `Content` sebagai area konten utama.
+   * `children` harus diteruskan sampai ke `Content` melalui `Container`.
+3. **Jangan membuat shell layout paralel:**
+   * Jangan membungkus route dengan `CoreShell`, `SubAppShell`, `Navbar`, `Sidebar`, atau shell custom lain jika layout baru sudah menggunakan `Container`.
+   * Jika route sebelumnya memakai shell tersebut, rombak route itu agar shell lama dilepas dari jalur render dan kebutuhan layout dikonfigurasi pada `layout.tsx` baru.
+4. **Kontrol sidebar secara eksplisit:**
+   * Jika route membutuhkan sidebar, definisikan `menuItems` yang relevan dengan route tersebut.
+   * Jika route tidak membutuhkan sidebar, gunakan kemampuan `Workspace` untuk menyembunyikannya; jangan mengirim menu Core yang tidak relevan.
 
 ---
 
@@ -41,20 +48,13 @@ Gunakan template di bawah ini sebagai acuan saat membuat berkas `layout.tsx` bar
 ```tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { useState } from "react";
 import Container from "@/components/layout/container";
 
-export default function FeatureLayout({ children }: { children: React.ReactNode }) {
-  const [viewport, setViewport] = useState<"Mobile" | "Desktop">("Mobile");
+export default function FeatureLayout({ children }: { children: ReactNode }) {
+  const [viewport] = useState<"Mobile" | "Desktop">("Desktop");
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
-  const [sidebarTheme, setSidebarTheme] = useState<"light" | "dark" | "retro">("light");
-
-  useEffect(() => {
-    const syncViewport = () => setViewport(window.innerWidth >= 1024 ? "Desktop" : "Mobile");
-    syncViewport();
-    window.addEventListener("resize", syncViewport);
-    return () => window.removeEventListener("resize", syncViewport);
-  }, []);
 
   // Definisikan menu samping (sidebar menu items) khusus fitur
   const menuItems = [
@@ -68,13 +68,7 @@ export default function FeatureLayout({ children }: { children: React.ReactNode 
         viewport={viewport}
         menuTitle="Nama Fitur"
         menuItems={menuItems}
-        contentProps={{
-          sidebarTheme,
-          sidebarExpanded,
-          onToggleSidebarTheme: () => setSidebarTheme((c) => c === "dark" ? "light" : "dark"),
-          onToggleSidebarRetro: () => setSidebarTheme((c) => c === "retro" ? "light" : "retro"),
-          onToggleSidebarExpanded: () => setSidebarExpanded((c) => !c),
-        }}
+        contentProps={{ sidebarExpanded, onToggleSidebarExpanded: () => setSidebarExpanded((c) => !c) }}
       >
         {children}
       </Container>
@@ -98,7 +92,77 @@ Setelah membuat `layout.tsx` lokal:
 
 ---
 
-## 5. Pembaruan Catatan Dokumentasi (Update Route Layouts Note)
+## 5. Alur Kerja Detail Refaktor Route
+
+Ikuti langkah berikut secara berurutan untuk setiap route yang dimodularisasikan.
+
+### Langkah 1 — Inspeksi route dan jalur render
+
+1. Baca `page.tsx` target secara utuh.
+2. Cari parent `layout.tsx`, route group layout, `CoreShell`, `SubAppShell`, `Navbar`, `Sidebar`, `Container`, dan wrapper layout lain yang membungkus route.
+3. Catat komponen UI inline, state, handler, API call, serta batas visual halaman.
+4. Tentukan apakah sidebar diperlukan dan menu apa yang benar-benar relevan untuk route tersebut.
+
+### Langkah 2 — Tetapkan baseline layout baru
+
+Sebelum mengubah kode, tetapkan struktur target berikut:
+
+```text
+layout.tsx
+└── Container
+    └── Workspace
+        ├── Navbar
+        ├── Sidebar atau tanpa Sidebar sesuai kebutuhan route
+        ├── Menu
+        └── Content
+            └── children
+```
+
+Jika API `Container` mengenkapsulasi `Workspace` dan `Content`, pastikan konfigurasi `contentProps` benar-benar meneruskan `children` sampai ke `Content`.
+
+### Langkah 3 — Buat layout route baru
+
+1. Buat `layout.tsx` di folder route.
+2. Gunakan `Container` sebagai wrapper layout baru.
+3. Konfigurasikan `Workspace` melalui props yang tersedia pada `Container`.
+4. Konfigurasikan `Content` melalui `contentProps`.
+5. Tentukan wrapper visual baru secara eksplisit; jangan menyalin wrapper shell lama secara otomatis.
+6. Atur `menuItems` hanya jika sidebar relevan.
+7. Gunakan opsi hide sidebar jika route tidak memerlukan sidebar.
+
+### Langkah 4 — Lepaskan shell lama
+
+1. Keluarkan route target dari `CoreShell`, `SubAppShell`, atau shell custom lama.
+2. Pastikan route tidak menerima Navbar, Sidebar, Content, padding, atau background ganda dari parent lama.
+3. Jangan membiarkan shell lama berjalan paralel dengan `layout.tsx` baru.
+
+### Langkah 5 — Ekstrak component inline
+
+1. Identifikasi blok JSX mandiri di `page.tsx`.
+2. Pindahkan blok tersebut ke `src/components/<feature-name>/`.
+3. Pindahkan type, props, dan helper yang hanya dibutuhkan component tersebut.
+4. Pertahankan styling, struktur JSX, nama props, dan logic tanpa perubahan.
+5. Ganti blok inline di `page.tsx` dengan component hasil ekstraksi.
+6. Jadikan `page.tsx` hanya sebagai entry point konten route.
+
+### Langkah 6 — Samakan konfigurasi route sejenis
+
+Bandingkan layout baru dengan route pembanding yang memakai sistem layout sama. Pastikan wrapper, ukuran, padding, background, shadow, sidebar, dan Content konsisten. Perbedaan harus berasal dari kebutuhan route, bukan dari sisa implementasi lama.
+
+### Langkah 7 — Verifikasi struktural dan runtime
+
+Sebelum selesai, periksa:
+
+1. Struktur `Container → Workspace → Content`.
+2. Tidak ada shell lama yang membungkus route secara paralel.
+3. Sidebar dan `menuItems` sesuai kebutuhan route.
+4. Wrapper baru konsisten dengan route pembanding.
+5. `page.tsx` hanya menangani konten/entry point, bukan layout global.
+6. Browser/live route bila tersedia.
+
+---
+
+## 6. Pembaruan Catatan Dokumentasi (Update Route Layouts Note)
 
 Setiap kali suatu rute selesai dimodularisasikan atau disesuaikan tata letaknya:
 1. **Buka file dokumentasi:**

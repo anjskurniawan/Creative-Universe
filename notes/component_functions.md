@@ -17,6 +17,7 @@ Menyusun struktur tata letak (layout shell) halaman aplikasi.
 * **`SettingsLayout`** (`settings-layout.tsx`): Tata letak khusus dua kolom untuk halaman pengaturan.
 * **`RouteGuard`** (`route-guard.tsx`): Middleware visual untuk menjaga kelancaran otentikasi rute.
 * **`ViewportDebug`** (`viewport-debug.tsx`): Indikator layar responsif untuk developer.
+* **`AppTitle`** (`app-title.tsx`): Komponen judul landing sub-app yang dinamis dan interaktif memenuhi area konten.
 * **Profil Tata Letak (`profile/`):**
   * `card.tsx`: Ringkasan profil staff.
   * `detail-card.tsx`: Detail biodata staff lengkap.
@@ -47,9 +48,12 @@ Kumpulan komponen atom dan elemen dasar (*design system primitives*) yang diguna
 * **`toast.tsx`**: Notifikasi melayang (*toast alerts*) untuk info sukses/error.
 * **`spinning-wheel.tsx`**: Indikator pemuatan data (*loading spinner*).
 * **`primary-action-link.tsx`**: Tombol/tautan aksi utama dengan gaya visual khas.
+* **`button.tsx`**: Komponen tombol kustom dengan status loading dan penyesuaian gaya visual.
 * **`stat-card.tsx`**: Kartu visual untuk menampilkan data metrik / statistik.
 * **`action-card.tsx`**: Kartu pilihan aksi interaktif.
 * **`auth-particle-background.tsx`**: Efek partikel latar belakang untuk halaman login.
+* **`search-bar.tsx`**: Input pencarian reusable dengan ikon, state controlled, placeholder, dan aksi clear.
+* **`report-metric-card.tsx`**: Card metrik Creative Report dengan icon, label, nilai, dan accent indicator.
 * **`guest-mobile-orbit-motion.tsx`**: Animasi orbit visual pada landing page mobile.
 
 ---
@@ -67,6 +71,10 @@ Komponen-komponen spesifik yang terikat dengan logika bisnis modul tertentu.
 
 * **`/creative-ai` (Asisten AI):**
   * Komponen chat bubble, panel input pesan AI, dan efek visual aurora.
+* **`/messages` (Pesan):**
+  * `messages-page.tsx`: Workspace pesan langsung dan diskusi task ODDS dengan percakapan, kontak, attachment, mention, dan realtime messages.
+* **`/notifications` (Notifikasi):**
+  * `notifications-page.tsx`: Pusat aktivitas yang menampilkan notifikasi server dan lokal serta aksi tandai semua dibaca.
 * **`/creative-report` (Laporan Kinerja):**
   * `assessment-table.tsx`: Tabel input nilai evaluasi.
   * `assessment-mobile-cards.tsx`: Kartu evaluasi khusus tampilan seluler.
@@ -74,6 +82,7 @@ Komponen-komponen spesifik yang terikat dengan logika bisnis modul tertentu.
   * `export-pdf-button.tsx`: Tombol ekspor laporan ke PDF.
   * `group-accordion.tsx`: Pembagi kelompok divisi dengan akordion.
   * `hrd-rules-footer.tsx`: Panduan aturan pengurangan nilai HRD.
+  * `report-summary-info.tsx`: Teks deskripsi ringkasan jumlah staff dan periode bulan aktif.
 * **`/odds` (One Dashboard Design System):**
   * `TaskCard/`: Komponen composable penyusun kartu tugas (`odds-task-card.tsx`, `task-card-date.tsx`, `task-card-people.tsx`, `task-card-status-panel.tsx`).
   * `legacy-taskcard/`: Versi lama taskcard untuk fallback layout (`task-card.tsx`, `task-card-mobile.tsx`, dsb.).
@@ -83,6 +92,16 @@ Komponen-komponen spesifik yang terikat dengan logika bisnis modul tertentu.
   * `odds-gameboy-frame.tsx`: Bingkai visual bergaya retro gameboy.
   * `task-card.tsx` & `task-form-modal.tsx`: Modal form tugas dan layout kartu tugas.
   * `task-performance-desktop.tsx` & `task-performance-mobile.tsx`: Visual dashboard performa tugas ODDS.
+* **`/settings` (Pengaturan):**
+  * `profile-settings-page.tsx`: Halaman pengaturan profil dan konfigurasi akun yang digunakan langsung oleh route Profile dan Role Settings.
+  * `role-setting-page.tsx`: Halaman pengaturan khusus peran untuk konfigurasi sistem, integrasi, dan default Pricetag.
+  * `setting-menu.tsx`: Navigasi pengaturan responsif dengan grup menu, active state, filter permission, dan submenu collapsible.
+  * `settings-profile-header.tsx`: Header profil Settings yang menampilkan avatar, nama, dan username pengguna.
+  * `settings-mobile-header.tsx`: Header navigasi mobile Settings dengan tombol kembali dan label halaman aktif.
+  * `settings-navigation-config.ts`: Konfigurasi grup menu Settings, permission, dan helper active state navigasi.
+  * `security-settings.tsx`: Daftar sesi perangkat aktif, status sesi, dan aksi pencabutan akses perangkat.
+  * `roles/roles-page.tsx`: Workspace pengelolaan role dan permission dengan tabel, editor, dan konfirmasi penghapusan.
+  * `activity-log.tsx`: Timeline aktivitas keamanan dengan status loading/error, detail aksi, dan informasi audit.
 * **`/typography` (Tipografi Kustom):**
   * `header-title.tsx` & `hero-heading.tsx`: Tipografi terstandarisasi untuk bagian header halaman dan elemen dekoratif hero.
 * **`/auth` (Kerangka Otentikasi):**

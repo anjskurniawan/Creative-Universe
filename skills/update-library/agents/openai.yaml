@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Developer Library"
+  short_description: "Sinkronkan satu component ke catalog dan visual preview"
+  default_prompt: "Gunakan $update-library untuk memperbarui metadata, child components, dan visual preview satu target component."

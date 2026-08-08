@@ -1,1 +1,10 @@
-export { default } from "@/features/core-profile/components/profile-settings-page";
+import ProfileSettingsPage from "@/components/settings/profile-settings-page";
+import { SettingsLayout } from "@/components/layout/settings-layout";
+
+export default function ProfilePage() {
+  return (
+    <SettingsLayout>
+      <ProfileSettingsPage />
+    </SettingsLayout>
+  );
+}

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Check, Copy, Code2, MonitorPlay, Accessibility, BookOpen, FileCode, CheckCircle2, Palette, LayoutTemplate } from "lucide-react";
-import { CreativeReportHeader } from "@/components/creative-report/report-header";
+import { ReportHeader } from "@/components/creative-report/report-header";
 
 export function CreativeReportHeaderDocumentation() {
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
@@ -28,7 +28,7 @@ import { ReportTitle } from "@/components/creative-report/report-title";
 import { MonthPickerButton } from "@/components/creative-report/month-picker-button";
 import { ExportPdfButton } from "@/components/creative-report/export-pdf-button";
 
-export type CreativeReportHeaderProps = {
+export type ReportHeaderProps = {
   month: string;
   monthLabel: string;
   theme?: "light" | "dark" | "retro";
@@ -37,14 +37,14 @@ export type CreativeReportHeaderProps = {
   onExportPdf?: () => void;
 };
 
-export function CreativeReportHeader({
+export function ReportHeader({
   month,
   monthLabel,
   theme = "light",
   title = "Creative Report",
   onMonthChange,
   onExportPdf,
-}: CreativeReportHeaderProps) {
+}: ReportHeaderProps) {
   // ... implementation ...
 }`;
 
@@ -120,7 +120,7 @@ export function CreativeReportHeader({
               <div className="doc-playground-content">
                 <div className="doc-preview-area !p-4 !bg-white border border-slate-200/80 rounded-2xl shadow-xl w-full max-w-[760px]">
                   <div className={`p-4 rounded-xl border ${theme === 'dark' ? 'bg-[#111413] border-slate-800' : theme === 'retro' ? 'bg-[#c9ccc0] border-slate-400' : 'bg-slate-50 border-slate-200'}`}>
-                    <CreativeReportHeader
+                    <ReportHeader
                       month={month}
                       monthLabel="Juli 2026"
                       theme={theme}
@@ -134,11 +134,11 @@ export function CreativeReportHeader({
           ) : (
             <div className="p-6 bg-[#111]">
               <div className="doc-code-area">
-                <pre><code>{`import { CreativeReportHeader } from "@/components/creative-report/report-header";
+                <pre><code>{`import { ReportHeader } from "@/components/creative-report/report-header";
 
 export default function Page() {
   return (
-    <CreativeReportHeader
+    <ReportHeader
       month="${month}"
       monthLabel="Juli 2026"
       theme="${theme}"
@@ -163,11 +163,11 @@ export default function Page() {
         <div className="doc-install-card mt-4">
           <div className="doc-install-header flex-between">
             <span className="flex items-center gap-2"><CheckCircle2 size={14} /> Import Statement</span>
-            <button onClick={() => handleCopy(`import { CreativeReportHeader } from "@/components/creative-report/report-header";`)} className="copy-btn">
+            <button onClick={() => handleCopy(`import { ReportHeader } from "@/components/creative-report/report-header";`)} className="copy-btn">
               {copied ? <Check size={14} /> : <Copy size={14} />}
             </button>
           </div>
-          <div className="doc-install-body"><code>import {'{ CreativeReportHeader }'} from "@/components/creative-report/report-header";</code></div>
+          <div className="doc-install-body"><code>import {'{ ReportHeader }'} from "@/components/creative-report/report-header";</code></div>
         </div>
       </section>
 
@@ -175,7 +175,7 @@ export default function Page() {
       <section className="doc-section">
         <div className="doc-section-header">
           <h2 className="doc-section-title"><Code2 size={18} className="inline-icon" /> Component Source</h2>
-          <p className="doc-section-desc">Interface exports of the CreativeReportHeader component.</p>
+          <p className="doc-section-desc">Interface exports of the ReportHeader component.</p>
         </div>
         
         <div className="doc-code-block-container">

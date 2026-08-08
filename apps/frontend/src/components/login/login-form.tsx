@@ -8,7 +8,7 @@ import { resolveAuthenticatedRoute } from "@/core/auth";
 import { ValidationError } from "@/core/api/client";
 import { Logo } from "@/components/ui/logo";
 import { Input } from "@/components/ui/form/input";
-import { Button } from "@/components/ui/form/button";
+import { Button } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { playUniverseTransition } from "@/components/login/login-animations";
 

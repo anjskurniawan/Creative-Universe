@@ -1,106 +1,72 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { CreativeMemberManagement } from "@/features/creative-report/creative-member-management";
 import { useAuth } from "@/providers/auth-provider";
-import { useCreativeReportTheme } from "../theme-context";
-import {
-  useCreativeReportSettings,
-  saveCreativeReportSettings,
-  type CreativeReportAspect,
-  type CreativeReportAspectGroupTitles,
-} from "../settings";
+import { Toast } from "@/components/ui/toast";
+import { Input } from "@/components/ui/form/input";
+import { Button } from "@/components/ui/button";
+import { useAspectsConfiguration } from "./use-aspects-configuration";
 
-function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) {
-  const [collab, setCollab] = useState<CreativeReportAspect[]>([]);
-  const [perf, setPerf] = useState<CreativeReportAspect[]>([]);
-  const [groupTitles, setGroupTitles] = useState<CreativeReportAspectGroupTitles>({ collab: "", perf: "" });
-  const [detailAspectIndexes, setDetailAspectIndexes] = useState<number[]>([0, 1, 2, 3, 4]);
-  const [success, setSuccess] = useState(false);
-  const { settings, setSettings } = useCreativeReportSettings();
+/**
+ * Panel Konfigurasi Aspek Penilaian (Collab 30% & Performance 50%)
+ */
+function AspectsConfiguration() {
+  // --- KONSUMSI CUSTOM DATA HOOK ---
+  const {
+    collab,
+    perf,
+    groupTitles,
+    setGroupTitles,
+    detailAspectIndexes,
+    setDetailAspectIndexes,
+    success,
+    setSuccess,
+    totalCollab,
+    totalPerf,
+    isCollabValid,
+    isPerfValid,
+    isValid,
+    handleSave,
+    updateCollab,
+    updatePerf,
+  } = useAspectsConfiguration();
 
-  useEffect(() => {
-    setCollab(settings.collabAspects);
-    setPerf(settings.perfAspects);
-    setGroupTitles(settings.groupTitles);
-    setDetailAspectIndexes(settings.detailCardAspectIndexes);
-  }, [settings]);
-
-  const totalCollab = collab.reduce((sum, item) => sum + (item.maxPoints || 0), 0);
-  const totalPerf = perf.reduce((sum, item) => sum + (item.maxPoints || 0), 0);
-
-  const isCollabValid = totalCollab === 30;
-  const isPerfValid = totalPerf === 50;
-  const isValid = isCollabValid && isPerfValid && Boolean(groupTitles.collab.trim()) && Boolean(groupTitles.perf.trim());
-
-  const handleSave = async () => {
-    if (!isValid) return;
-    const nextSettings = { collabAspects: collab, perfAspects: perf, groupTitles, detailCardAspectIndexes: detailAspectIndexes };
-    await saveCreativeReportSettings(nextSettings);
-    setSettings(nextSettings);
-    setSuccess(true);
-    setTimeout(() => setSuccess(false), 3000);
-  };
-
-  const updateCollab = (index: number, key: keyof CreativeReportAspect, value: string | number) => {
-    setCollab((prev) =>
-      prev.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              [key]: key === "maxPoints" ? Math.max(0, Number(value) || 0) : value,
-            }
-          : item
-      )
-    );
-  };
-
-  const updatePerf = (index: number, key: keyof CreativeReportAspect, value: string | number) => {
-    setPerf((prev) =>
-      prev.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              [key]: key === "maxPoints" ? Math.max(0, Number(value) || 0) : value,
-            }
-          : item
-      )
-    );
-  };
-
-  const dark = theme === "dark";
-  const retro = theme === "retro";
-  const inputClass = `h-9 px-3 text-xs rounded-lg border outline-none transition w-full ${dark ? "bg-[#181818] border-white/10 text-white focus:border-[#b0ff5e]" : "bg-white border-slate-200 text-slate-800 focus:border-[#00a4ff]"}`;
-  const sectionTitleClass = dark ? "text-slate-200" : "text-slate-700";
+  // --- STYLING CONSTANTS ---
+  const dark = false;
+  const sectionTitleClass = "text-slate-700";
 
   return (
     <div className="w-full">
+      {/* Header Info */}
       <h2 className="text-base font-semibold text-[#3b4446]">
         Konfigurasi Aspek Penilaian
       </h2>
-      <p className={`mt-1 mb-4 text-xs ${dark ? "text-slate-400" : "text-slate-500"}`}>
+      <p className="mt-1 mb-4 text-xs text-slate-500">
         Atur nama aspek beserta nilai maksimalnya untuk porsi penilaian 30% dan 50%.
       </p>
 
+      {/* Toast Alert Sukses */}
       {success && (
-        <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-semibold flex items-center gap-2">
-          <MaterialIcon name="check_circle" />
-          Konfigurasi aspek penilaian berhasil disimpan!
-        </div>
+        <Toast
+          message="Konfigurasi aspek penilaian berhasil disimpan!"
+          status="success"
+          onClose={() => setSuccess(false)}
+        />
       )}
 
+      {/* Grid Inputs Aspek Penilaian */}
       <div className="grid gap-8 md:grid-cols-2">
-        {/* Collab aspects (30%) */}
+        {/* KOLOM KIRI: Aspek Kolaboratif (30%) */}
         <div>
-          <div className={`mb-3 rounded-xl border p-3 ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50/70"}`}>
-            <label className={`mb-1.5 block text-[11px] font-semibold ${dark ? "text-slate-400" : "text-slate-500"}`} htmlFor="collab-category-title">Nama kategori</label>
-            <input
+          <div className="mb-3 rounded-xl border p-3 border-slate-200 bg-slate-50/70">
+            <Input
               id="collab-category-title"
-              aria-label="Nama kelompok aspek penilaian 30%"
+              label="Nama kategori"
               value={groupTitles.collab}
               onChange={(event) => setGroupTitles((current) => ({ ...current, collab: event.target.value }))}
-              className={`h-9 w-full rounded-lg border px-2 text-sm font-bold outline-none ${dark ? "border-white/10 bg-[#181818] text-slate-200" : "border-slate-200 bg-white text-slate-700 focus:border-[#00a4ff]"}`}
+              className="font-bold text-slate-700 focus:border-[#00a4ff]"
             />
           </div>
           <div className={`mb-2 grid grid-cols-[minmax(0,1fr)_80px] items-center gap-2 px-1 text-[11px] font-semibold ${sectionTitleClass}`}>
@@ -110,19 +76,19 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
           <div className="space-y-3">
             {collab.map((item, index) => (
               <div key={index} className="grid grid-cols-[1fr_80px] gap-2 items-center">
-                <input
+                <Input
+                  id={`collab-aspect-name-${index}`}
                   type="text"
                   placeholder={`Nama Aspek ${index + 1}`}
                   value={item.name}
                   onChange={(e) => updateCollab(index, "name", e.target.value)}
-                  className={inputClass}
                 />
-                <input
+                <Input
+                  id={`collab-aspect-max-${index}`}
                   type="number"
                   placeholder="Max"
                   value={item.maxPoints || ""}
                   onChange={(e) => updateCollab(index, "maxPoints", e.target.value)}
-                  className={inputClass}
                 />
               </div>
             ))}
@@ -134,16 +100,15 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
           )}
         </div>
 
-        {/* Perf aspects (50%) */}
+        {/* KOLOM KANAN: Aspek Performa (50%) */}
         <div>
-          <div className={`mb-3 rounded-xl border p-3 ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50/70"}`}>
-            <label className={`mb-1.5 block text-[11px] font-semibold ${dark ? "text-slate-400" : "text-slate-500"}`} htmlFor="perf-category-title">Nama kategori</label>
-            <input
+          <div className="mb-3 rounded-xl border p-3 border-slate-200 bg-slate-50/70">
+            <Input
               id="perf-category-title"
-              aria-label="Nama kelompok aspek penilaian 50%"
+              label="Nama kategori"
               value={groupTitles.perf}
               onChange={(event) => setGroupTitles((current) => ({ ...current, perf: event.target.value }))}
-              className={`h-9 w-full rounded-lg border px-2 text-sm font-bold outline-none ${dark ? "border-white/10 bg-[#181818] text-slate-200" : "border-slate-200 bg-white text-slate-700 focus:border-[#00a4ff]"}`}
+              className="font-bold text-slate-700 focus:border-[#00a4ff]"
             />
           </div>
           <div className={`mb-2 grid grid-cols-[minmax(0,1fr)_80px] items-center gap-2 px-1 text-[11px] font-semibold ${sectionTitleClass}`}>
@@ -153,19 +118,19 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
           <div className="space-y-3">
             {perf.map((item, index) => (
               <div key={index} className="grid grid-cols-[1fr_80px] gap-2 items-center">
-                <input
+                <Input
+                  id={`perf-aspect-name-${index}`}
                   type="text"
                   placeholder={`Nama Aspek ${index + 1}`}
                   value={item.name}
                   onChange={(e) => updatePerf(index, "name", e.target.value)}
-                  className={inputClass}
                 />
-                <input
+                <Input
+                  id={`perf-aspect-max-${index}`}
                   type="number"
                   placeholder="Max"
                   value={item.maxPoints || ""}
                   onChange={(e) => updatePerf(index, "maxPoints", e.target.value)}
-                  className={inputClass}
                 />
               </div>
             ))}
@@ -178,17 +143,18 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
         </div>
       </div>
 
-      <section className={`mt-6 rounded-xl border p-4 ${dark ? "border-white/10 bg-white/5" : "border-slate-200 bg-slate-50/70"}`}>
+      {/* Bagian Pilihan Tampilan Aspek pada Detail Card */}
+      <section className="mt-6 rounded-xl border p-4 border-slate-200 bg-slate-50/70">
         <h3 className={`text-sm font-bold ${sectionTitleClass}`}>Aspek pada Detail Card</h3>
-        <p className={`mt-1 text-xs ${dark ? "text-slate-400" : "text-slate-500"}`}>Pilih lima aspek yang tampil pada profil Creative Agent. Nilainya diambil dari assessment bulan berjalan.</p>
+        <p className="mt-1 text-xs text-slate-500 font-medium">Pilih lima aspek yang tampil pada profil Creative Agent. Nilainya diambil dari assessment bulan berjalan.</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {detailAspectIndexes.map((selectedIndex, slot) => (
-            <label key={slot} className={`text-xs font-medium ${dark ? "text-slate-300" : "text-slate-600"}`}>
+            <label key={slot} className="text-xs font-semibold text-slate-600">
               Bar {slot + 1}
               <select
                 value={selectedIndex}
                 onChange={(event) => setDetailAspectIndexes((current) => current.map((value, index) => index === slot ? Number(event.target.value) : value))}
-                className={`mt-1 h-9 w-full rounded-lg border px-2 text-xs outline-none ${dark ? "border-white/10 bg-[#181818] text-white" : "border-slate-200 bg-white text-slate-800"}`}
+                className="mt-1 h-9 w-full rounded-lg border px-2 text-xs outline-none border-slate-200 bg-white text-slate-800"
               >
                 {[...collab, ...perf].map((aspect, index) => <option key={`${aspect.name}-${index}`} value={index}>{aspect.name} ({aspect.maxPoints})</option>)}
               </select>
@@ -197,33 +163,33 @@ function AspectsConfiguration({ theme }: { theme: "light" | "dark" | "retro" }) 
         </div>
       </section>
 
+      {/* Tombol Simpan Konfigurasi */}
       <div className="mt-6 flex justify-end">
-        <button
-          type="button"
+        <Button
           disabled={!isValid}
           onClick={handleSave}
-          className={`flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition sm:w-auto ${
-            isValid
-              ? dark
-                ? "bg-[#b0ff5e] text-[#181818] hover:bg-[#c4ff80]"
-                : "bg-[#6d46eb] hover:bg-[#5b35d9] text-white"
-              : "bg-slate-300 dark:bg-white/5 text-slate-500 dark:text-slate-600 cursor-not-allowed"
-          }`}
+          className="!h-9 !py-2 !text-xs font-bold sm:!w-auto flex items-center justify-center gap-1.5 px-4"
         >
           <MaterialIcon name="save" size="auto" className="text-base" />
           Simpan Konfigurasi
-        </button>
+        </Button>
       </div>
     </div>
   );
 }
 
+/**
+ * Halaman Utama Pengaturan Creative Report (Tabs & Access Gate)
+ */
 export default function CreativeReportOptionPage() {
-  const { theme } = useCreativeReportTheme();
+  // Validasi Role User
   const { hasRole } = useAuth();
   const canManageMembers = hasRole("Root") || hasRole("Manajer");
+  
+  // Tab Aktif
   const [activeTab, setActiveTab] = useState<"validation" | "historical" | "aspects">("validation");
 
+  // Definisi Item Tab Pengaturan
   const tabs = [
     { id: "validation" as const, label: "Agent", icon: "how_to_reg" },
     { id: "historical" as const, label: "Add Agent", icon: "history" },
@@ -233,19 +199,22 @@ export default function CreativeReportOptionPage() {
   return (
     <main className="flex h-full min-w-0 w-full flex-1 flex-col">
       <div className="flex h-full min-h-0 w-full flex-1 flex-col">
+        {/* Title Header */}
         <header className="flex min-h-[45px] items-center justify-between gap-6 pb-4">
           <div>
-            <h1 className={`text-4xl font-medium leading-none tracking-[-0.72px] ${theme === "dark" ? "text-white" : "text-[#24252b]"}`}>
+            <h1 className="text-4xl font-medium leading-none tracking-[-0.72px] text-[#24252b]">
               Setting
             </h1>
           </div>
         </header>
 
+        {/* Tabbed Layout Area */}
         <div className="flex h-full min-h-0 w-full flex-1 flex-col">
           {canManageMembers ? (
             <>
-              <section className={`flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border ${theme === "dark" ? "border-white/10 bg-white/5" : theme === "retro" ? "border-[#24252b] bg-[#eceee6]" : "border-[#e1e8eb] bg-white shadow-sm"}`}>
-                <div className={`flex flex-nowrap gap-1 overflow-x-auto border-b p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${theme === "dark" ? "border-white/10" : theme === "retro" ? "border-[#24252b]" : "border-[#e1e8eb]"}`}>
+              <section className="flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border border-[#e1e8eb] bg-white shadow-sm">
+                {/* Tab Navigation */}
+                <div className="flex flex-nowrap gap-1 overflow-x-auto border-b p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-[#e1e8eb]">
                   {tabs.map((tab) => {
                     const active = activeTab === tab.id;
                     return (
@@ -253,7 +222,7 @@ export default function CreativeReportOptionPage() {
                         key={tab.id}
                         type="button"
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${active ? theme === "dark" ? "bg-[#b0ff5e] text-[#181818]" : "bg-[#6d46eb] text-white" : theme === "dark" ? "text-slate-300 hover:bg-white/10" : "text-slate-600 hover:bg-slate-100"}`}
+                        className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${active ? "bg-[#6d46eb] text-white" : "text-slate-600 hover:bg-slate-100"}`}
                       >
                         <MaterialIcon name={tab.icon} className="text-base" />
                         {tab.label}
@@ -261,15 +230,17 @@ export default function CreativeReportOptionPage() {
                     );
                   })}
                 </div>
+                {/* Tab Content Panel */}
                 <div className="min-h-0 flex-1 overflow-y-auto p-5 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
                   {activeTab === "validation" && <CreativeMemberManagement section="pending" />}
                   {activeTab === "historical" && <CreativeMemberManagement section="historical" />}
-                  {activeTab === "aspects" && <AspectsConfiguration theme={theme} />}
+                  {activeTab === "aspects" && <AspectsConfiguration />}
                 </div>
               </section>
             </>
           ) : (
-            <div className={`p-8 text-center rounded-2xl border ${theme === "dark" ? "border-white/10 bg-white/5 text-[#888c80]" : "border-slate-200 bg-slate-50 text-slate-500"}`}>
+            /* Warning Akses Terbatas */
+            <div className="p-8 text-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-500">
               <MaterialIcon name="info" className="text-4xl mx-auto mb-2 opacity-80" />
               <p className="text-sm font-medium">Anda tidak memiliki akses untuk mengelola anggota Creative.</p>
             </div>

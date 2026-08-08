@@ -39,6 +39,7 @@
     "@types/three": "^0.184.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "prettier": "^3.9.6",
     "typescript": "^5"
   }
 }

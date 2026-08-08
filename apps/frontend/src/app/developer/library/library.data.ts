@@ -7,6 +7,9 @@ import { feedbackComponents } from "./data/feedback/library.data";
 import { landingComponents } from "./data/landing/library.data";
 import { layoutComponents } from "./data/layout/library.data";
 import { loginComponents } from "./data/login/library.data";
+import { messagesComponents } from "./data/messages/library.data";
+import { notificationsComponents } from "./data/notifications/library.data";
+import { settingsComponents } from "./data/settings/library.data";
 import { navigationComponents } from "./data/navigation/library.data";
 import { oddsComponents } from "./data/odds/library.data";
 import { onboardingComponents } from "./data/onboarding/library.data";
@@ -21,6 +24,7 @@ export interface ComponentItem {
   description: string;
   tags?: string[];
   children?: ComponentItem[];
+  childComponents?: Array<{ name: string; category: string; file: string }>;
 }
 
 export const COMPONENT_DATABASE: Record<string, ComponentItem[]> = {
@@ -33,6 +37,9 @@ export const COMPONENT_DATABASE: Record<string, ComponentItem[]> = {
   landing: landingComponents,
   layout: layoutComponents,
   login: loginComponents,
+  messages: messagesComponents,
+  notifications: notificationsComponents,
+  settings: settingsComponents,
   navigation: navigationComponents,
   odds: oddsComponents,
   onboarding: onboardingComponents,

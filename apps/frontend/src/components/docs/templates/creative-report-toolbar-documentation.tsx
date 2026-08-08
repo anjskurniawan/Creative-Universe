@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Check, Copy, Code2, MonitorPlay, Accessibility, BookOpen, FileCode, CheckCircle2, Palette } from "lucide-react";
-import { CreativeReportToolbar } from "@/components/creative-report/report-toolbar";
+import { ReportToolbar } from "@/components/creative-report/report-toolbar";
 
 export function CreativeReportToolbarDocumentation() {
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
@@ -34,7 +34,7 @@ export type ReportMetric = {
   accent: string;
 };
 
-export type CreativeReportToolbarProps = {
+export type ReportToolbarProps = {
   search: string;
   onSearchChange: (search: string) => void;
   jobdesk: string;
@@ -44,7 +44,7 @@ export type CreativeReportToolbarProps = {
   showMetrics?: boolean;
 };
 
-export function CreativeReportToolbar({
+export function ReportToolbar({
   search,
   onSearchChange,
   jobdesk,
@@ -52,7 +52,7 @@ export function CreativeReportToolbar({
   jobdesks,
   metrics,
   showMetrics = false,
-}: CreativeReportToolbarProps) {
+}: ReportToolbarProps) {
   // ... implementation ...
 }`;
 
@@ -101,7 +101,7 @@ export function CreativeReportToolbar({
 
               <div className="doc-playground-content">
                 <div className="doc-preview-area !p-4 !bg-white border border-slate-200/80 rounded-2xl shadow-xl w-full max-w-[800px]">
-                  <CreativeReportToolbar
+                  <ReportToolbar
                     search={search}
                     onSearchChange={setSearch}
                     jobdesk={jobdesk}
@@ -119,11 +119,11 @@ export function CreativeReportToolbar({
           ) : (
             <div className="p-6 bg-[#111]">
               <div className="doc-code-area">
-                <pre><code>{`import { CreativeReportToolbar } from "@/components/creative-report/report-toolbar";
+                <pre><code>{`import { ReportToolbar } from "@/components/creative-report/report-toolbar";
 
 export default function Page() {
   return (
-    <CreativeReportToolbar
+    <ReportToolbar
       search="${search}"
       onSearchChange={(s) => setSearch(s)}
       jobdesk="${jobdesk}"
@@ -150,11 +150,11 @@ export default function Page() {
         <div className="doc-install-card mt-4">
           <div className="doc-install-header flex-between">
             <span className="flex items-center gap-2"><CheckCircle2 size={14} /> Import Statement</span>
-            <button onClick={() => handleCopy(`import { CreativeReportToolbar } from "@/components/creative-report/report-toolbar";`)} className="copy-btn">
+            <button onClick={() => handleCopy(`import { ReportToolbar } from "@/components/creative-report/report-toolbar";`)} className="copy-btn">
               {copied ? <Check size={14} /> : <Copy size={14} />}
             </button>
           </div>
-          <div className="doc-install-body"><code>import {'{ CreativeReportToolbar }'} from "@/components/creative-report/report-toolbar";</code></div>
+          <div className="doc-install-body"><code>import {'{ ReportToolbar }'} from "@/components/creative-report/report-toolbar";</code></div>
         </div>
       </section>
 
@@ -162,7 +162,7 @@ export default function Page() {
       <section className="doc-section">
         <div className="doc-section-header">
           <h2 className="doc-section-title"><Code2 size={18} className="inline-icon" /> Component Source</h2>
-          <p className="doc-section-desc">Interface exports of the CreativeReportToolbar component.</p>
+          <p className="doc-section-desc">Interface exports of the ReportToolbar component.</p>
         </div>
         
         <div className="doc-code-block-container">

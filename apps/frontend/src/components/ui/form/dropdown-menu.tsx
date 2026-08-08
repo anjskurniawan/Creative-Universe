@@ -73,7 +73,7 @@ export function DropdownMenu({
     <div
       ref={menuRef}
       style={style}
-      className={`absolute top-[84px] left-0 w-full bg-white border border-divider rounded-[12px] shadow-lg z-50 flex flex-col max-h-[260px] overflow-hidden animate-fade-in ${className}`}
+      className={`absolute top-[calc(100%+6px)] left-0 w-full bg-white border border-divider rounded-[12px] shadow-lg z-50 flex flex-col max-h-[260px] overflow-hidden animate-fade-in ${className}`}
     >
       {/* Search Bar Input */}
       {searchable && (

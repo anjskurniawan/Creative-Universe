@@ -21,6 +21,12 @@ Rute-rute ini telah dipisahkan tata letaknya ke dalam berkas `layout.tsx` lokal 
   * Tata Letak: [apps/frontend/src/app/generator/layout.tsx](file:///c:/laragon/www/creativeuniverse/apps/frontend/src/app/generator/layout.tsx) & [apps/frontend/src/app/generator/pricetag/layout.tsx](file:///c:/laragon/www/creativeuniverse/apps/frontend/src/app/generator/pricetag/layout.tsx)
 * **`/design-assets`** (Galeri Aset Desain)  
   * Tata Letak: [apps/frontend/src/app/design-assets/layout.tsx](file:///c:/laragon/www/creativeuniverse/apps/frontend/src/app/design-assets/layout.tsx)
+* **`/messages`** (Pesan)
+  * Tata Letak: [apps/frontend/src/app/(core)/messages/layout.tsx](file:///c:/laragon/www/creativeuniverse/apps/frontend/src/app/(core)/messages/layout.tsx)
+* **`/notifications`** (Notifikasi)
+  * Tata Letak: [apps/frontend/src/app/(core)/notifications/layout.tsx](file:///c:/laragon/www/creativeuniverse/apps/frontend/src/app/(core)/notifications/layout.tsx)
+* **`/settings`** (Pengaturan)
+  * Tata Letak: [apps/frontend/src/app/(core)/settings/layout.tsx](file:///c:/laragon/www/creativeuniverse/apps/frontend/src/app/(core)/settings/layout.tsx)
 
 ---
 

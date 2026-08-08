@@ -7,7 +7,7 @@ import { RoleTable } from "@/components/panel/roles/role-table";
 import { RoleEditorModal } from "@/components/panel/roles/role-editor-modal";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 
-import { useRoles } from "./use-roles";
+import { useRoles } from "@/components/settings/roles/use-roles";
 
 export default function RolesPage() {
   const {
@@ -32,9 +32,7 @@ export default function RolesPage() {
   } = useRoles();
 
   if (!hasPermission) {
-    return (
-      <AccessDenied message="Anda tidak memiliki permission manage-roles." />
-    );
+    return <AccessDenied message="Anda tidak memiliki permission manage-roles." />;
   }
 
   return (
@@ -44,11 +42,7 @@ export default function RolesPage() {
         subtitle="Atur role dinamis dan akses aplikasi dari satu tempat."
       />
 
-      <RoleTable
-        roles={roles}
-        isLoading={isLoading}
-        onEdit={openEdit}
-      />
+      <RoleTable roles={roles} isLoading={isLoading} onEdit={openEdit} />
 
       {showEditor && (
         <RoleEditorModal
@@ -72,8 +66,8 @@ export default function RolesPage() {
           title="Hapus Role"
           message={
             <>
-              Role <strong className="text-cu-ink">{deleting.name}</strong> akan
-              dihapus permanen. Role dengan pengguna aktif tidak dapat dihapus.
+              Role <strong className="text-cu-ink">{deleting.name}</strong> akan dihapus permanen.
+              Role dengan pengguna aktif tidak dapat dihapus.
             </>
           }
           confirmText="Hapus Role"

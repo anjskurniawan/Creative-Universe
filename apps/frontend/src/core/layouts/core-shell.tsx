@@ -17,6 +17,18 @@ export function CoreShell({ children }: { children: ReactNode }) {
 
   const isMessagesPage = pathname.startsWith("/messages");
   const isSettingsPage = pathname.startsWith("/settings");
+
+  if (isMessagesPage) {
+    return <>{children}</>;
+  }
+
+  if (pathname.startsWith("/notifications")) {
+    return <>{children}</>;
+  }
+
+  if (isSettingsPage) {
+    return <>{children}</>;
+  }
   
   if (pathname.startsWith("/panel")) {
     return <>{children}</>;
@@ -28,9 +40,7 @@ export function CoreShell({ children }: { children: ReactNode }) {
     pathname.startsWith("/maintenance") ||
     pathname.startsWith("/profile");
 
-  const mainClass = isMessagesPage
-    ? `w-full ${CORE_CONTENT_GUTTER} py-4 h-[calc(100vh-72px)] overflow-hidden relative z-10 flex flex-col`
-    : isSettingsPage
+  const mainClass = isSettingsPage
       ? `${CORE_CONTENT_GUTTER} pt-4 pb-6 md:pt-6`
       : `${CORE_CONTENT_GUTTER} py-6`;
 
@@ -62,7 +72,7 @@ export function CoreShell({ children }: { children: ReactNode }) {
         </Container>
       </div>
     ) : (
-    <div className={`${isMessagesPage ? "h-screen overflow-hidden" : "min-h-screen"} flex flex-col bg-white font-sans text-cu-ink antialiased`}>
+    <div className="min-h-screen flex flex-col bg-white font-sans text-cu-ink antialiased">
       <GlobalLayoutNavbar viewport="Desktop" sticky={false} />
       <main className={`flex flex-1 flex-col ${mainClass}`}>{children}</main>
     </div>

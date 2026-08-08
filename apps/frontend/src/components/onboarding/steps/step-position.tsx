@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Logo } from "@/components/ui/logo";
 import { Input } from "@/components/ui/form/input";
-import { Button } from "@/components/ui/form/button";
+import { Button } from "@/components/ui/button";
 import { DropdownMenu } from "@/components/ui/form/dropdown-menu";
 
 export interface StepPositionProps {

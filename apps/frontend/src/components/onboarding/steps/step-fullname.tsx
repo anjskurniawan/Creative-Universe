@@ -3,7 +3,7 @@
 import React from "react";
 import { Logo } from "@/components/ui/logo";
 import { Input } from "@/components/ui/form/input";
-import { Button } from "@/components/ui/form/button";
+import { Button } from "@/components/ui/button";
 
 export interface StepFullNameProps {
   value: string;

@@ -1,10 +1,12 @@
 import { useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { DropdownMenu } from "@/components/ui/form/dropdown-menu";
+import { CustomDatePicker } from "@/components/ui/custom-date-picker";
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
-  type?: InputHTMLAttributes<HTMLInputElement>["type"] | "dropdown" | "phone" | "email";
+  type?: InputHTMLAttributes<HTMLInputElement>["type"] | "dropdown" | "phone" | "email" | "datepick" | "checkbox";
   label?: string;
+  description?: string;
   error?: string;
   rightElement?: ReactNode;
   active?: boolean;
@@ -15,6 +17,7 @@ const EMAIL_DOMAIN_ITEMS = EMAIL_DOMAINS.map((domain) => ({ value: domain, label
 
 export function Input({
   label,
+  description,
   error,
   id,
   className = "",
@@ -46,7 +49,7 @@ export function Input({
 
   return (
     <div className="flex flex-col gap-2 items-start w-full group">
-      {label && id && (
+      {label && id && type !== "checkbox" && (
         <label
           htmlFor={id}
           className={`font-sans font-semibold text-xs uppercase tracking-wider transition-colors duration-200 ${
@@ -61,7 +64,45 @@ export function Input({
         </label>
       )}
       <div className="relative w-full">
-        {type === "dropdown" ? (
+        {type === "checkbox" ? (
+          description ? (
+            <label className={`flex cursor-pointer items-center justify-between w-full ${className}`}>
+              <span>
+                <span className="block font-semibold font-sans text-sm text-[#3b4446]">{label}</span>
+                <span className="mt-0.5 block text-xs text-slate-500 font-sans">{description}</span>
+              </span>
+              <input
+                {...props}
+                id={id}
+                type="checkbox"
+                className="size-4 rounded border-slate-300 text-[#6d46eb] focus:ring-[#6d46eb]"
+              />
+            </label>
+          ) : (
+            <label className={`flex items-center gap-2 cursor-pointer select-none ${className}`}>
+              <input
+                {...props}
+                id={id}
+                type="checkbox"
+                className="size-4 rounded border-slate-300 text-[#6d46eb] focus:ring-[#6d46eb]"
+              />
+              {label && <span className="font-sans text-sm text-slate-700">{label}</span>}
+            </label>
+          )
+        ) : type === "datepick" ? (
+          <CustomDatePicker
+            compact
+            value={typeof props.value === "string" ? props.value : ""}
+            onChange={(val) => {
+              props.onChange?.({
+                target: { value: val },
+                currentTarget: { value: val },
+              } as React.ChangeEvent<HTMLInputElement>);
+            }}
+            placeholder={props.placeholder}
+            className={className}
+          />
+        ) : type === "dropdown" ? (
           <div
             id={id}
             tabIndex={disabled ? undefined : 0}
