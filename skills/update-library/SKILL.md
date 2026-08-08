@@ -47,8 +47,10 @@ Perbarui entry yang sama jika sudah ada; jangan membuat duplicate entry. Pastika
 - `name`: export component utama.
 - `file`: path relatif kategori dengan separator `/`.
 - `description`: fungsi nyata, singkat, dan tidak generik.
+- `version`: gunakan format singkat `major.minor`; default component baru adalah `0.0`. Naikkan major untuk perubahan kontrak/struktur besar pada source component dan minor untuk perubahan fitur, visual, atau state pada source component.
 - `tags`: domain, interaction, visual role, dan fitur relevan.
 - `childComponents`: dependency component yang relevan untuk navigasi library.
+- `history`: ringkasan Markdown perubahan component, tanpa menyalin source code. Entri terbaru harus memuat tanggal, versi, ringkasan perubahan, dan validasi.
 
 Gunakan `childComponents` untuk dependency component, bukan `children` yang merupakan struktur folder. Setiap child wajib memiliki `name`, `category`, dan `file` yang cocok dengan catalog. Jangan memasukkan utility, type-only module, hook, API, atau dependency eksternal sebagai child.
 
@@ -68,6 +70,15 @@ Aturan:
 - Pastikan preview tidak terpotong dan container mengikuti kebutuhan component.
 - Gunakan UI reusable dan token styling project.
 - Untuk helper internal yang tidak bermakna dirender mandiri, gunakan placeholder dan catat alasannya.
+
+### 4a. Version dan log history
+
+- Pastikan badge versi component tampil di header library dengan fallback `0.0`.
+- Pastikan area `Log History` tetap berada di bawah Visual Preview dan membaca history Markdown dari metadata component.
+- Hanya perubahan nyata pada source component—logic, props/API, struktur, styling, fitur, atau state—yang boleh menaikkan versi dan menambah satu entri history Markdown bertanggal.
+- Perubahan catalog metadata, child route, preview, toolbar, registry, atau explorer saja tidak menaikkan versi dan tidak menambah history component; catat perubahan tersebut hanya pada agent work log.
+- Gunakan versi `major.minor` secara konsisten: major untuk breaking change/kontrak/struktur besar, minor untuk fitur, state, atau styling source component.
+- Jangan menghapus history lama. Jika source component belum pernah memiliki history, buat baseline versi `0.0` hanya saat component pertama kali dibuat atau pertama kali mengalami perubahan source yang dicatat.
 
 Target preview dianggap belum selesai jika registry masih menunjuk ke `DefaultPreviewPlaceholder`. Dalam kondisi tersebut:
 

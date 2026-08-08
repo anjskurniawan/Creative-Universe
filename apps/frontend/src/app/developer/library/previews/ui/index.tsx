@@ -14,3 +14,6 @@ export { ButtonPreview } from "./button.preview";
 export { InputPreview } from "./input.preview";
 export { AuthParticleBackgroundPreview } from "./auth-particle-background.preview";
 export { SearchBarPreview } from "./search-bar.preview";
+export { BackgroundPreview } from "./background.preview";
+export { CreativeUniverseLogoPreview } from "./creative-universe-logo.preview";
+export { FileUploadDropzonePreview } from "./file-upload-dropzone.preview";

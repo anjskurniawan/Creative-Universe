@@ -2,6 +2,7 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 import Link from "next/link";
 import type { ComponentItem } from "./library.data";
 import { VisualPreview } from "./visual-preview";
+import { LibraryLogHistory } from "./library-log-history";
 
 type LibraryPreviewProps = {
   category: string;
@@ -31,7 +32,10 @@ function ComponentHeader({ category, component }: { category: string; component:
   return (
     <div className="flex flex-col gap-4 border-b border-slate-50 pb-5 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-lg font-bold text-slate-800">{component.name}</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-bold text-slate-800">{component.name}</h2>
+          <span className="rounded-full border border-brand/15 bg-brand/5 px-2 py-0.5 text-[9px] font-semibold text-brand">v{component.version ?? "0.0"}</span>
+        </div>
         <div className="mt-1 flex items-center gap-1.5 font-mono text-xs text-slate-400">
           <MaterialIcon name="code" size="xs" />
           <span>import &#123; {component.name} &#125; from &quot;@/components/{category}/{importPath}&quot;</span>
@@ -93,6 +97,7 @@ export function LibraryPreview({ category, component }: LibraryPreviewProps) {
       <ComponentInformation component={component} />
       {component.childComponents && <ChildComponents components={component.childComponents} />}
       <VisualPreview component={component} />
+      <LibraryLogHistory componentName={component.name} version={component.version} markdown={component.history} />
     </div>
   );
 }

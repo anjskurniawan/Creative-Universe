@@ -12,10 +12,149 @@
 .v1-code-panel .line { display: inline; counter-increment: v1-code-line; }
 .v1-code-panel .line::before { display: inline-block; width: 2.5rem; margin-right: 1rem; color: #6e7681; content: counter(v1-code-line); user-select: none; text-align: right; }
 
+:root, .light, .light-theme {
+  --black-a1: rgba(0, 0, 0, 0.05);
+  --black-a2: rgba(0, 0, 0, 0.1);
+  --black-a3: rgba(0, 0, 0, 0.15);
+  --black-a4: rgba(0, 0, 0, 0.2);
+  --black-a5: rgba(0, 0, 0, 0.3);
+  --black-a6: rgba(0, 0, 0, 0.4);
+  --black-a7: rgba(0, 0, 0, 0.5);
+  --black-a8: rgba(0, 0, 0, 0.6);
+  --black-a9: rgba(0, 0, 0, 0.7);
+  --black-a10: rgba(0, 0, 0, 0.8);
+  --black-a11: rgba(0, 0, 0, 0.9);
+  --black-a12: rgba(0, 0, 0, 0.95);
+  --white-a1: rgba(255, 255, 255, 0.05);
+  --white-a2: rgba(255, 255, 255, 0.1);
+  --white-a3: rgba(255, 255, 255, 0.15);
+  --white-a4: rgba(255, 255, 255, 0.2);
+  --white-a5: rgba(255, 255, 255, 0.3);
+  --white-a6: rgba(255, 255, 255, 0.4);
+  --white-a7: rgba(255, 255, 255, 0.5);
+  --white-a8: rgba(255, 255, 255, 0.6);
+  --white-a9: rgba(255, 255, 255, 0.7);
+  --white-a10: rgba(255, 255, 255, 0.8);
+  --white-a11: rgba(255, 255, 255, 0.9);
+  --white-a12: rgba(255, 255, 255, 0.95);
+  --sky-1: #f9feff;
+  --sky-2: #f1fafd;
+  --sky-3: #e1f6fd;
+  --sky-4: #d1f0fa;
+  --sky-5: #bee7f5;
+  --sky-6: #a9daed;
+  --sky-7: #8dcae3;
+  --sky-8: #60b3d7;
+  --sky-9: #7ce2fe;
+  --sky-10: #74daf8;
+  --sky-11: #00749e;
+  --sky-12: #1d3e56;
+  --lime-a1: #66990005;
+  --lime-a2: #6b95000c;
+  --lime-a3: #96c80029;
+  --lime-a4: #8fc60042;
+  --lime-a5: #81bb0059;
+  --lime-a6: #72aa006e;
+  --lime-a7: #61990087;
+  --lime-a8: #559200ab;
+  --lime-a9: #93e4009c;
+  --lime-a10: #8fdc00b3;
+  --lime-a11: #375f00d0;
+  --lime-a12: #1e2900e3;
+  --lime-1: #fcfdfa;
+  --lime-2: #f8faf3;
+  --lime-3: #eef6d6;
+  --lime-4: #e2f0bd;
+  --lime-5: #d3e7a6;
+  --lime-6: #c2da91;
+  --lime-7: #abc978;
+  --lime-8: #8db654;
+  --lime-9: #bdee63;
+  --lime-10: #b0e64c;
+  --lime-11: #5c7c2f;
+  --lime-12: #37401c;
+  --gray-1: #fcfcfc;
+  --gray-2: #f9f9f9;
+  --gray-3: #f0f0f0;
+  --gray-4: #e8e8e8;
+  --gray-5: #e0e0e0;
+  --gray-6: #d9d9d9;
+  --gray-7: #cecece;
+  --gray-8: #bbbbbb;
+  --gray-9: #8d8d8d;
+  --gray-10: #838383;
+  --gray-11: #646464;
+  --gray-12: #202020;
+  --orange-1: #fefcfb;
+  --orange-2: #fff7ed;
+  --orange-3: #ffefd6;
+  --orange-4: #ffdfb5;
+  --orange-5: #ffd19a;
+  --orange-6: #ffc182;
+  --orange-7: #f5ae73;
+  --orange-8: #ec9455;
+  --orange-9: #f76b15;
+  --orange-10: #ef5f00;
+  --orange-11: #cc4e00;
+  --orange-12: #582d1d;
+  --nebula-1: #faf6fa;
+  --nebula-2: #f8f1f8;
+  --nebula-3: #f8e2f9;
+  --nebula-4: #f6d4f8;
+  --nebula-5: #f1c5f5;
+  --nebula-6: #eab4f0;
+  --nebula-7: #e19ce8;
+  --nebula-8: #d57cdf;
+  --nebula-9: #ba0dcb;
+  --nebula-10: #a900b9;
+  --nebula-11: #9e00ad;
+  --nebula-12: #5e0068;
+  --nebula-a1: #faf3ff80;
+  --nebula-a2: #f2ddff4d;
+  --nebula-a3: #f4beff66;
+  --nebula-a4: #eb7dff4d;
+  --nebula-a5: #cd05f537;
+  --nebula-a6: #bf03e448;
+  --nebula-a7: #b501d360;
+  --nebula-a8: #b000ca81;
+  --nebula-a9: #b600c9f2;
+  --nebula-a10: #a900b9;
+  --nebula-a11: #9e00ad;
+  --nebula-a12: #5e0068;
+  --nebula-contrast: #fff;
+  --nebula-surface: #f8eff9cc;
+  --nebula-indicator: #ba0dcb;
+  --nebula-track: #ba0dcb;
+}
+
+ .light, .light-theme {
+  --semantic-background: var(--sky-1);
+  --semantic-surface: var(--sky-2);
+  --semantic-surface-raised: var(--nebula-1);
+  --semantic-border: var(--sky-6);
+  --semantic-text: var(--nebula-12);
+  --semantic-text-muted: var(--sky-11);
+  --semantic-action: var(--nebula-9);
+  --semantic-action-hover: var(--nebula-10);
+  --semantic-focus: var(--nebula-8);
+}
+
+.dark, .dark-theme {
+  --semantic-background: var(--lime-12);
+  --semantic-surface: var(--lime-11);
+  --semantic-surface-raised: var(--lime-10);
+  --semantic-border: var(--lime-8);
+  --semantic-text: var(--lime-1);
+  --semantic-text-muted: var(--lime-3);
+  --semantic-action: var(--lime-9);
+  --semantic-action-hover: var(--lime-10);
+  --semantic-focus: var(--lime-7);
+}
+
 @theme {
   --font-sans: "Google Sans Flex", ui-sans-serif, system-ui, sans-serif;
 
-  --color-brand: #ba0dcb;
+  --color-brand: var(--nebula-9);
   --color-dark: #232925;
   --color-divider: #edeef0;
   --color-cu-dark: #111827;

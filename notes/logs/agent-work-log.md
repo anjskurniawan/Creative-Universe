@@ -1,6 +1,624 @@
 # AI Agent Work Log
 ---
 
+## 2026-08-08 20:46:10 +07:00 - Membuat folder Primitives
+
+- **Timestamp:** `2026-08-08T20:46:10+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Membuat folder component `primitives` untuk primitive components baru.
+- **Scope:** `apps/frontend/src/components/primitives/`.
+- **Perubahan:** Folder primitives dibuat sebagai direktori baru.
+- **Penambahan:** Tidak ada component atau file placeholder; folder dibiarkan siap diisi.
+- **Cara penyelesaian:** Membuat direktori terpisah tanpa mengubah component existing atau catalog library.
+- **Validasi teknis:** Path folder terverifikasi tersedia.
+- **Validasi visual/live:** Tidak dijalankan; belum ada component atau UI yang dibuat.
+- **Keputusan penting:** Folder ditempatkan langsung di `src/components/primitives` sesuai struktur component project.
+- **Blocker/Risiko:** Folder kosong tidak muncul pada git diff sampai file component pertama ditambahkan.
+- **Tindak lanjut:** Tambahkan primitive component baru ke folder tersebut saat siap.
+- **Referensi:** `apps/frontend/src/components/primitives/`
+
+## 2026-08-08 20:43:07 +07:00 - Menambahkan tab Semantic Layer
+
+- **Timestamp:** `2026-08-08T20:43:07+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menambahkan semantic layer Light dan Dark ke sistem tab Token Page.
+- **Scope:** `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Tab `Semantic Layer` ditambahkan dan section mapping Light/Dark kini tampil saat tab tersebut aktif.
+- **Penambahan:** Navigasi terfokus untuk semantic background, surface, border, text, action, dan focus.
+- **Cara penyelesaian:** Menggunakan state tab yang sama dengan color family tanpa mengubah mapping semantic CSS.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Semantic layer diperlakukan sebagai tab tersendiri karena merupakan role mapping, bukan color family.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Finalisasi semantic contract setelah seluruh family warna selesai.
+- **Referensi:** `apps/frontend/src/app/developer/token/page.tsx`, `apps/frontend/src/app/globals.css`, route `/developer/token`
+
+## 2026-08-08 20:42:14 +07:00 - Menambahkan tab pada Color Tokens
+
+- **Timestamp:** `2026-08-08T20:42:14+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Merapikan bagian Color pada Token Page menggunakan tab.
+- **Scope:** `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Color family kini dipisah menjadi tab Nebula, Sky, Lime, Gray, Orange, Black Alpha, White Alpha, dan Lime Alpha.
+- **Penambahan:** State tab aktif, tab bar horizontal compact, dan conditional rendering setiap family.
+- **Cara penyelesaian:** Menyimpan satu family aktif pada satu waktu agar halaman lebih mudah dipahami dan tidak terlalu panjang.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Tab default dibuka pada Nebula; family Gray dan Orange tetap tersedia dalam satu group tab yang sama.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Pisahkan Gray dan Orange menjadi panel individual jika kebutuhan eksplorasi makin detail.
+- **Referensi:** `apps/frontend/src/app/developer/token/page.tsx`, route `/developer/token`
+
+## 2026-08-08 20:41:08 +07:00 - Contoh semantic mapping Light dan Dark
+
+- **Timestamp:** `2026-08-08T20:41:08+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Membuat contoh semantic mapping dengan Light memakai Nebula/Sky dan Dark memakai Lime.
+- **Scope:** `apps/frontend/src/app/globals.css` dan `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Menambahkan semantic variables untuk background, surface, raised surface, border, text, muted text, action, action hover, dan focus pada light/dark selector.
+- **Penambahan:** Section contoh mapping Light dan Dark pada Token Page.
+- **Cara penyelesaian:** Light memetakan Sky sebagai fondasi dan Nebula sebagai action/text; Dark memetakan Lime sebagai background, surface, text, dan action.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Mapping ini diposisikan sebagai contoh baseline, bukan final semantic contract.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Review contrast dan accessibility pada tahap finalisasi theme.
+- **Referensi:** `apps/frontend/src/app/globals.css`, `apps/frontend/src/app/developer/token/page.tsx`, route `/developer/token`
+
+## 2026-08-08 20:36:58 +07:00 - Menambahkan Gray dan Orange Tokens
+
+- **Timestamp:** `2026-08-08T20:36:58+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menambahkan family Gray dan Orange dari palette yang diberikan.
+- **Scope:** `apps/frontend/src/app/globals.css` dan `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Menambahkan `--gray-1` sampai `--gray-12` serta `--orange-1` sampai `--orange-12`; keduanya ditampilkan sebagai color family di Token Page.
+- **Penambahan:** Swatch, nama semantic, dan hex value untuk Gray dan Orange.
+- **Cara penyelesaian:** Menggunakan grid compact yang sama dan dikelompokkan dua kolom agar halaman tetap ringkas.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Gray dan Orange diperlakukan sebagai solid color family terpisah dari alpha family.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tetapkan semantic usage masing-masing family saat token guide difinalisasi.
+- **Referensi:** `apps/frontend/src/app/globals.css`, `apps/frontend/src/app/developer/token/page.tsx`, token `--gray-*`, `--orange-*`
+
+## 2026-08-08 20:33:22 +07:00 - Menambahkan Lime Solid Tokens
+
+- **Timestamp:** `2026-08-08T20:33:22+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menambahkan family Lime solid dari palette yang diberikan.
+- **Scope:** `apps/frontend/src/app/globals.css` dan `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Menambahkan `--lime-1` sampai `--lime-12` dan section Lime solid terpisah dari Lime Alpha.
+- **Penambahan:** Swatch Lime solid dengan nama semantic dan hex value.
+- **Cara penyelesaian:** Mengikuti struktur visual family Nebula dan Sky agar guide konsisten.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Lime solid dan Lime Alpha dipisahkan sebagai dua family token berbeda.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tentukan semantic usage Lime solid pada tahap finalisasi token.
+- **Referensi:** `apps/frontend/src/app/globals.css`, `apps/frontend/src/app/developer/token/page.tsx`, token `--lime-*`
+
+## 2026-08-08 20:32:09 +07:00 - Menambahkan Lime Alpha Tokens
+
+- **Timestamp:** `2026-08-08T20:32:09+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menambahkan family Lime Alpha dari palette yang diberikan.
+- **Scope:** `apps/frontend/src/app/globals.css` dan `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Menambahkan `--lime-a1` sampai `--lime-a12` dan section Lime Alpha pada Token Page.
+- **Penambahan:** Swatch alpha Lime dengan nilai hex alpha yang diberikan.
+- **Cara penyelesaian:** Menempatkan family alpha pada panel visual terpisah dengan preview di atas background gelap.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Lime Alpha diperlakukan sebagai family alpha khusus, bukan skala warna solid.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tentukan semantic usage Lime Alpha untuk state atau accent jika diperlukan.
+- **Referensi:** `apps/frontend/src/app/globals.css`, `apps/frontend/src/app/developer/token/page.tsx`, token `--lime-a*`
+
+## 2026-08-08 20:31:06 +07:00 - Menambahkan Sky Color Tokens
+
+- **Timestamp:** `2026-08-08T20:31:06+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menambahkan family Sky ke sistem design token.
+- **Scope:** `apps/frontend/src/app/globals.css` dan `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Menambahkan `--sky-1` sampai `--sky-12` dan menampilkan swatch Sky di Token Page.
+- **Penambahan:** Section `Sky` dengan nama semantic dan hex value.
+- **Cara penyelesaian:** Mengikuti struktur visual Nebula tanpa membuat alias brand baru.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Sky menjadi family warna tersendiri untuk aksen biru muda dan tidak menggantikan brand Nebula.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tentukan semantic usage Sky pada tahap token berikutnya jika diperlukan.
+- **Referensi:** `apps/frontend/src/app/globals.css`, `apps/frontend/src/app/developer/token/page.tsx`, token `--sky-*`
+
+## 2026-08-08 20:30:17 +07:00 - Menambahkan White Alpha Overlay Tokens
+
+- **Timestamp:** `2026-08-08T20:30:17+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menambahkan family White Alpha untuk kebutuhan overlay.
+- **Scope:** `apps/frontend/src/app/globals.css` dan `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Menambahkan `--white-a1` sampai `--white-a12`; Token Page menampilkan section White Alpha dengan swatch dan alpha value pada panel gelap.
+- **Penambahan:** Dokumentasi overlay putih yang konsisten lintas light/dark theme.
+- **Cara penyelesaian:** Mengikuti skala alpha Black Alpha dan menggunakan panel gelap agar perbedaan opacity terbaca.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** White Alpha menjadi family overlay universal terpisah dari Nebula dan Black Alpha.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Gunakan White Alpha untuk highlight, surface, dan overlay pada konteks gelap.
+- **Referensi:** `apps/frontend/src/app/globals.css`, `apps/frontend/src/app/developer/token/page.tsx`, token `--white-a*`
+
+## 2026-08-08 20:29:28 +07:00 - Menambahkan Black Alpha Overlay Tokens
+
+- **Timestamp:** `2026-08-08T20:29:28+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menambahkan family Black Alpha untuk kebutuhan overlay yang konsisten lintas theme.
+- **Scope:** `apps/frontend/src/app/globals.css` dan `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Menambahkan `--black-a1` sampai `--black-a12` dengan nilai rgba yang diberikan; Token Page menampilkan swatch dan alpha value dalam section Black Alpha.
+- **Penambahan:** Dokumentasi label `Overlay family` dan keterangan bahwa nilai tidak berubah pada light/dark theme.
+- **Cara penyelesaian:** Menambahkan token global pada root theme scope dan visualisasi compact pada guide token.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Black Alpha dipisahkan dari family Nebula karena berfungsi sebagai overlay universal, bukan warna brand.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Gunakan token Black Alpha untuk overlay/backdrop agar konsisten lintas theme.
+- **Referensi:** `apps/frontend/src/app/globals.css`, `apps/frontend/src/app/developer/token/page.tsx`, token `--black-a*`
+
+## 2026-08-08 20:22:09 +07:00 - Memperbarui semantic usage Nebula
+
+- **Timestamp:** `2026-08-08T20:22:09+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menyesuaikan keterangan pemakaian skala Nebula pada Token Page.
+- **Scope:** `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Anotasi skala diperbarui menjadi Background `1–2`, Interactive Component `3–5`, Border/separator `6–8`, Solid Color `9–10`, dan Accessible Text `11–12`.
+- **Penambahan:** Tidak ada.
+- **Cara penyelesaian:** Mengganti legend fungsi pada section Nebula tanpa mengubah nilai warna atau struktur UI.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Guide penggunaan skala Nebula sekarang mengikuti aturan semantic yang diberikan pengguna.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Gunakan rentang semantic ini sebagai pedoman saat family token lain ditambahkan.
+- **Referensi:** `apps/frontend/src/app/developer/token/page.tsx`, route `/developer/token`
+
+## 2026-08-08 20:18:49 +07:00 - Redesign minimalis Token Page
+
+- **Timestamp:** `2026-08-08T20:18:49+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Meredesain UI `/developer/token` agar minimalis dan modern.
+- **Scope:** `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Header diringkas, hierarchy visual diperjelas, Nebula palette dibuat sebagai swatch grid, dan section token kosong dibuat compact dengan status `To be defined`.
+- **Penambahan:** Metadata visual draft, anotasi fungsi skala Nebula, hover ringan, dan footer semantic usage.
+- **Cara penyelesaian:** Menggunakan whitespace, border halus, rounded-xl/2xl, shadow-sm, typography compact, dan token brand aktif.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Nebula menjadi satu-satunya family yang terisi; token lain tetap kosong sebagai struktur guide.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tambahkan family atau nilai token berikutnya pada struktur yang sama.
+- **Referensi:** `apps/frontend/src/app/developer/token/page.tsx`, route `/developer/token`
+
+## 2026-08-08 20:17:25 +07:00 - Menampilkan Nebula di Token Page
+
+- **Timestamp:** `2026-08-08T20:17:25+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menampilkan token Nebula pada halaman `/developer/token`.
+- **Scope:** `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Section Color Tokens kini menampilkan swatch dan nilai `nebula-1` sampai `nebula-12`; section token lain tetap kosong.
+- **Penambahan:** Visual palette Nebula dengan nama semantic dan hex value.
+- **Cara penyelesaian:** Menambahkan data token Nebula pada halaman utama tanpa mengubah route legacy atau token CSS.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Hanya family Nebula yang ditampilkan sekarang; family/token lain menunggu rancangan berikutnya.
+- **Blocker/Risiko:** Alpha token, contrast, surface, indicator, dan track belum ditampilkan pada UI page.
+- **Tindak lanjut:** Tambahkan visualisasi alpha dan semantic support token jika diperlukan.
+- **Referensi:** `apps/frontend/src/app/developer/token/page.tsx`, `apps/frontend/src/app/globals.css`, route `/developer/token`
+
+## 2026-08-08 20:16:17 +07:00 - Menggunakan family token Nebula
+
+- **Timestamp:** `2026-08-08T20:16:17+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menggunakan nama family `nebula` untuk palet warna brand.
+- **Scope:** `apps/frontend/src/app/globals.css` dan `skills/frontend-styling/SKILL.md`.
+- **Perubahan:** Namespace `purple-*` diganti menjadi `nebula-*`; `--color-brand` diarahkan ke `var(--nebula-9)`; guide styling diperbarui.
+- **Penambahan:** Dokumentasi semantic family Nebula untuk penggunaan future color family.
+- **Cara penyelesaian:** Mempertahankan seluruh nilai palet dan mengganti namespace secara konsisten tanpa mengubah hasil warna brand.
+- **Validasi teknis:** `git diff --check` dan `npx tsc --noEmit --pretty false` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** `nebula-9` tetap menjadi brand utama `#ba0dcb`; component sebaiknya memakai `bg-brand`/`text-brand`.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Family warna berikutnya dapat ditambahkan dengan namespace semantic terpisah.
+- **Referensi:** `apps/frontend/src/app/globals.css`, `skills/frontend-styling/SKILL.md`, token `--nebula-*`
+
+## 2026-08-08 20:14:45 +07:00 - Mengganti namespace custom menjadi purple
+
+- **Timestamp:** `2026-08-08T20:14:45+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Tidak menggunakan namespace `custom` karena akan ada family warna lain.
+- **Scope:** `apps/frontend/src/app/globals.css`.
+- **Perubahan:** Seluruh token `--custom-*` diganti menjadi `--purple-*`; alias `--color-brand` diarahkan ke `var(--purple-9)`.
+- **Penambahan:** Namespace family warna yang eksplisit dan dapat diperluas ke family lain.
+- **Cara penyelesaian:** Mempertahankan nilai palet yang sama dan mengganti nama namespace agar semantic family tidak generik.
+- **Validasi teknis:** `git diff --check` dan `npx tsc --noEmit --pretty false` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Family warna memakai nama spesifik (`purple`) sehingga family berikutnya dapat memakai namespace masing-masing tanpa konflik.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tambahkan family warna baru saat palet berikutnya diberikan.
+- **Referensi:** `apps/frontend/src/app/globals.css`, token `--purple-*`, `--color-brand`
+
+## 2026-08-08 20:13:22 +07:00 - Menambahkan semantic custom color tokens
+
+- **Timestamp:** `2026-08-08T20:13:22+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mengubah palet purple menjadi semantic token dengan nama custom.
+- **Scope:** `apps/frontend/src/app/globals.css`.
+- **Perubahan:** Menambahkan token `--custom-1` sampai `--custom-12`, alpha scale, contrast, surface, indicator, dan track; token `--color-brand` kini merujuk ke `var(--custom-9)`.
+- **Penambahan:** Semantic custom palette berbasis nilai palet yang diberikan pengguna.
+- **Cara penyelesaian:** Mempertahankan nilai warna dan mengganti nama namespace agar component memakai semantic custom token, bukan nama warna literal.
+- **Validasi teknis:** `git diff --check` dan `npx tsc --noEmit --pretty false` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Brand utama tetap `#ba0dcb` melalui alias `custom-9`, sehingga penggunaan `bg-brand` dan `text-brand` tidak berubah.
+- **Blocker/Risiko:** Varian P3/OKLCH belum ditambahkan ke globals; nilai fallback hex tetap aktif dan aman.
+- **Tindak lanjut:** Tambahkan semantic dark-theme mapping atau P3 override ketika rancangan tema final ditetapkan.
+- **Referensi:** `apps/frontend/src/app/globals.css`, token `--custom-*`, `--color-brand`
+
+## 2026-08-08 20:07:59 +07:00 - Mengosongkan nilai Token utama
+
+- **Timestamp:** `2026-08-08T20:07:59+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mempertahankan struktur `/developer/token` tetapi mengosongkan isi setiap token.
+- **Scope:** `apps/frontend/src/app/developer/token/page.tsx`.
+- **Perubahan:** Route utama kini menampilkan struktur section Color, Radius/Elevation, Typography, dan Implementation Rules dengan nilai placeholder kosong.
+- **Penambahan:** Tidak ada token final; setiap item memakai placeholder `—`.
+- **Cara penyelesaian:** Mempertahankan layout guide dan kategori token tanpa membawa nilai dari halaman legacy.
+- **Validasi teknis:** TypeScript, ESLint pada page Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Konten token lengkap tetap tersimpan di `/developer/token/legacy`, sedangkan route utama menjadi struktur kosong untuk pengisian berikutnya.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Isi nilai token saat design guide final sudah ditetapkan.
+- **Referensi:** `apps/frontend/src/app/developer/token/page.tsx`, `apps/frontend/src/app/developer/token/legacy/page.tsx`, route `/developer/token`
+
+## 2026-08-08 20:07:01 +07:00 - Memindahkan Token ke Legacy
+
+- **Timestamp:** `2026-08-08T20:07:01+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menyimpan dokumentasi Token saat ini di route `token/legacy`.
+- **Scope:** Route Developer Token.
+- **Perubahan:** Konten dokumentasi dipindahkan ke `/developer/token/legacy`; root `/developer/token` kini menjadi halaman pengantar dengan link ke arsip legacy.
+- **Penambahan:** Entry page ringan untuk route utama Token dan folder nested `legacy`.
+- **Cara penyelesaian:** Mempertahankan layout Token bersama dan memindahkan halaman dokumentasi tanpa menghapus kontennya.
+- **Validasi teknis:** TypeScript, ESLint pada route Token, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Dokumentasi lama tetap dapat diakses, tetapi tidak lagi menjadi landing utama route Token.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Route utama dapat diisi dengan token guide baru ketika sudah siap.
+- **Referensi:** `apps/frontend/src/app/developer/token/page.tsx`, `apps/frontend/src/app/developer/token/legacy/page.tsx`, route `/developer/token/legacy`
+
+## 2026-08-08 20:05:03 +07:00 - Membuat route Developer Token
+
+- **Timestamp:** `2026-08-08T20:05:03+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Membuat route `/developer/token` sebagai guide Design Token aplikasi.
+- **Scope:** Route layout dan halaman Developer Token.
+- **Perubahan:** Menambahkan layout route dengan struktur seperti Developer Log dan halaman dokumentasi token visual.
+- **Penambahan:** Panduan color semantic, radius, elevation, typography, implementation rules, serta referensi sumber token aktif.
+- **Cara penyelesaian:** Menggunakan `Container`, `Content`, `MaterialIcon`, token CSS aktif, dan card reusable bergaya compact tanpa sidebar global.
+- **Validasi teknis:** TypeScript, ESLint pada layout/page, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Route memakai struktur Developer Log dengan `hideSidebar: true` agar fokus pada dokumentasi token.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tambahkan token baru ke halaman ini jika token semantic project bertambah.
+- **Referensi:** `apps/frontend/src/app/developer/token/layout.tsx`, `apps/frontend/src/app/developer/token/page.tsx`, route `/developer/token`, `apps/frontend/src/app/globals.css`
+
+## 2026-08-08 20:01:23 +07:00 - Memperjelas scope version dan component history
+
+- **Timestamp:** `2026-08-08T20:01:23+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Membatasi version dan Log History hanya saat source component benar-benar berubah.
+- **Scope:** `skills/update-library/SKILL.md` dan `skills/component-management/SKILL.md`.
+- **Perubahan:** Aturan diperjelas bahwa perubahan logic, props/API, struktur, fitur, state, atau styling source component yang menaikkan versi dan menambah history; metadata, preview, registry, toolbar, dan explorer saja tidak.
+- **Penambahan:** Pembedaan eksplisit antara component history dan agent work log.
+- **Cara penyelesaian:** Mempersempit definisi perubahan versionable dan memindahkan perubahan non-source ke pencatatan agent work log saja.
+- **Validasi teknis:** `quick_validate.py` untuk component-management dan update-library lulus.
+- **Validasi visual/live:** Tidak dijalankan; perubahan hanya dokumentasi skill.
+- **Keputusan penting:** Baseline `0.0` hanya dibuat saat component baru atau perubahan source pertama yang dicatat, bukan setiap sinkronisasi library.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Agent wajib membedakan perubahan source component dari perubahan infrastruktur library pada sesi berikutnya.
+- **Referensi:** `skills/component-management/SKILL.md`, `skills/update-library/SKILL.md`, `apps/frontend/src/app/developer/library/library-log-history.tsx`
+
+## 2026-08-08 19:59:13 +07:00 - Sinkronisasi skill dengan Developer Library terbaru
+
+- **Timestamp:** `2026-08-08T19:59:13+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Memperbarui seluruh skill yang relevan agar sesuai dengan perubahan Developer Library.
+- **Scope:** `skills/component-management/SKILL.md`, `skills/frontend-styling/SKILL.md`, dan `skills/update-library/SKILL.md`.
+- **Perubahan:** Aturan component management kini mencakup explorer internal, root component top-level, path unik, version `major.minor`, dan history Markdown; frontend styling mencakup reusable control serta shell library; update-library sudah memiliki aturan version/history.
+- **Penambahan:** Konvensi active/expand explorer, badge versi, area Log History, dan kewajiban baseline/perubahan history.
+- **Cara penyelesaian:** Audit skill yang menyebut catalog/preview/component lalu menyelaraskan instruksi tanpa mengubah skill yang tidak relevan.
+- **Validasi teknis:** `quick_validate.py` untuk ketiga skill lulus.
+- **Validasi visual/live:** Tidak dijalankan; perubahan hanya dokumentasi skill.
+- **Keputusan penting:** Hanya skill component-management, frontend-styling, dan update-library yang diperbarui karena memiliki keterkaitan langsung dengan Developer Library.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Agent berikutnya wajib mengikuti metadata version/history saat memperbarui component library.
+- **Referensi:** `skills/component-management/SKILL.md`, `skills/frontend-styling/SKILL.md`, `skills/update-library/SKILL.md`, route `/developer/library`
+
+## 2026-08-08 19:57:31 +07:00 - Menambahkan versi dan Log History Library
+
+- **Timestamp:** `2026-08-08T19:57:31+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menambahkan badge versi component dan area Log History berbasis Markdown di Developer Library.
+- **Scope:** Metadata library, header/preview detail, component history reusable, dan skill `update-library`.
+- **Perubahan:** Header menampilkan badge versi dengan fallback `0.0`; area Log History ditampilkan di bawah Visual Preview dan parsing Markdown heading didukung.
+- **Penambahan:** Field metadata `version` dan `history`, component `library-log-history.tsx`, serta aturan version/history pada `skills/update-library/SKILL.md`.
+- **Cara penyelesaian:** Menyediakan format versi `major.minor`, fallback baseline `0.0`, dan renderer riwayat yang tidak menampilkan source code.
+- **Validasi teknis:** TypeScript, ESLint pada file library terkait, `git diff --check`, dan `quick_validate.py skills/update-library` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** History disimpan sebagai Markdown pada metadata component agar dapat dirender konsisten; workflow update-library diwajibkan menambah entri bertanggal pada setiap perubahan target.
+- **Blocker/Risiko:** Metadata existing belum memiliki history/version eksplisit sehingga masih memakai fallback `0.0` dan empty state sampai entri baseline ditambahkan.
+- **Tindak lanjut:** Saat target component berikutnya diperbarui, tambahkan `version` dan `history` Markdown baseline/perubahan pada entry catalog.
+- **Referensi:** `apps/frontend/src/app/developer/library/library.data.ts`, `apps/frontend/src/app/developer/library/library-preview.tsx`, `apps/frontend/src/app/developer/library/library-log-history.tsx`, `skills/update-library/SKILL.md`
+
+## 2026-08-08 19:50:41 +07:00 - Menstabilkan tinggi SearchBar Explorer
+
+- **Timestamp:** `2026-08-08T19:50:41+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Memperbaiki tinggi SearchBar yang menyusut ketika banyak folder explorer dibuka.
+- **Scope:** `apps/frontend/src/app/developer/library/library-menu.tsx`.
+- **Perubahan:** Header dan SearchBar dibuat non-shrink; daftar explorer menjadi area flex yang dapat scroll dengan `flex-1` dan `min-h-0`.
+- **Penambahan:** Tidak ada.
+- **Cara penyelesaian:** Memisahkan area kontrol tetap dari area tree yang fleksibel agar pertumbuhan item hanya memengaruhi scroll list.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada LibraryMenu, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Tinggi search box dikunci melalui kombinasi `h-8` dan `shrink-0` tanpa mengubah reusable SearchBar.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/library-menu.tsx`, route `/developer/library`
+
+## 2026-08-08 19:48:51 +07:00 - Menggunakan SearchBar reusable di Library Explorer
+
+- **Timestamp:** `2026-08-08T19:48:51+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mengganti search bar inline pada explorer dengan component UI reusable yang sudah tersedia.
+- **Scope:** `apps/frontend/src/app/developer/library/library-menu.tsx`.
+- **Perubahan:** Input inline diganti dengan `SearchBar` dari `@/components/ui/search-bar` dan dikonfigurasi tetap compact.
+- **Penambahan:** Tidak ada component baru; callback clear dan pencarian tetap terhubung ke state explorer.
+- **Cara penyelesaian:** Memakai API controlled `value`, `onChange`, `onClear`, dan className ukuran compact dari SearchBar existing.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada page/menu, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Styling dan perilaku dasar search kini mengikuti reusable UI component agar konsisten.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/library-menu.tsx`, `apps/frontend/src/components/ui/search-bar.tsx`, route `/developer/library`
+
+## 2026-08-08 19:47:58 +07:00 - Menambahkan pencarian Component Explorer
+
+- **Timestamp:** `2026-08-08T19:47:58+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mengganti label jumlah file menjadi jumlah component dan menambahkan search box di bawahnya.
+- **Scope:** `apps/frontend/src/app/developer/library/library-menu.tsx` dan `page.tsx`.
+- **Perubahan:** Header menjadi `Component (Total Component)`; jumlah hanya menghitung item component, bukan folder; search box memfilter nama atau path component.
+- **Penambahan:** State pencarian lokal, ikon search, placeholder, dan empty state ketika component tidak ditemukan.
+- **Cara penyelesaian:** Menambahkan filter memoized pada tree item yang sedang tampil tanpa mengubah handler folder, URL, atau active state.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada page/menu, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Counter menampilkan total component dari seluruh explorer; folder tidak dihitung sebagai component.
+- **Blocker/Risiko:** Search memfilter item yang sedang tersedia pada tree explorer; struktur folder tetap mengikuti state expand saat ini.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/library-menu.tsx`, `apps/frontend/src/app/developer/library/page.tsx`, route `/developer/library`
+
+## 2026-08-08 19:46:21 +07:00 - Mengembalikan root component ke top-level explorer
+
+- **Timestamp:** `2026-08-08T19:46:21+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menampilkan component kategori root di luar folder `root/` seperti struktur aslinya.
+- **Scope:** `apps/frontend/src/app/developer/library/page.tsx`.
+- **Perubahan:** Folder virtual `root/` dihapus dari explorer; item dari `COMPONENT_DATABASE.root` dirender langsung pada level teratas dan resolver URL root disesuaikan.
+- **Penambahan:** Tidak ada.
+- **Cara penyelesaian:** Mengecualikan kategori root saat membentuk folder explorer, lalu menambahkan item root tanpa prefix path.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada page/menu, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Struktur top-level root dipertahankan agar sama dengan struktur sumber/library sebelumnya.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/page.tsx`, route `/developer/library`
+
+## 2026-08-08 19:44:19 +07:00 - Penyempurnaan active state Library Explorer
+
+- **Timestamp:** `2026-08-08T19:44:19+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mengecilkan explorer, menampilkan component pada folder root, dan menambahkan active state bertingkat.
+- **Scope:** `apps/frontend/src/app/developer/library/page.tsx` dan `library-menu.tsx`.
+- **Perubahan:** Ukuran explorer dipadatkan lagi; path child diberi prefix kategori agar root dan nested folder dapat dirender/navigasi; folder aktif parent diberi state abu-abu samar, item terakhir diberi state aktif utama.
+- **Penambahan:** Auto-expand path aktif dan resolver navigasi component lintas kategori.
+- **Cara penyelesaian:** Membentuk path tree unik per kategori, menurunkan active state berdasarkan prefix path, dan mempertahankan item parent tetap terlihat saat level terakhir aktif.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada page/menu, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Folder level sebelumnya tetap aktif dengan warna abu-abu lebih gelap, sedangkan level terakhir menjadi active state utama.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/page.tsx`, `apps/frontend/src/app/developer/library/library-menu.tsx`, route `/developer/library`
+
+## 2026-08-08 19:39:17 +07:00 - Compact Library Explorer
+
+- **Timestamp:** `2026-08-08T19:39:17+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menyesuaikan ukuran item dan padding sidebar explorer agar lebih compact.
+- **Scope:** `apps/frontend/src/app/developer/library/library-menu.tsx`.
+- **Perubahan:** Mengurangi padding container dan item, gap, radius, indentasi tree, ukuran teks, ukuran ikon, serta label FILE.
+- **Penambahan:** Tidak ada.
+- **Cara penyelesaian:** Mempertahankan struktur tree dan handler navigasi, hanya merapikan dimensi visual menggunakan utility class yang lebih kecil.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada LibraryMenu, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Explorer dibuat padat agar lebih banyak folder dan file terlihat tanpa mengubah perilaku.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/library-menu.tsx`, route `/developer/library`
+
+## 2026-08-08 19:37:52 +07:00 - Menjadikan LibraryMenu sebagai explorer
+
+- **Timestamp:** `2026-08-08T19:37:52+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Memindahkan fungsi folder dari sidebar global ke preview menu agar Developer Library menjadi sidebar explorer.
+- **Scope:** `apps/frontend/src/app/developer/library/page.tsx`; sidebar global tetap tersembunyi pada layout.
+- **Perubahan:** `LibraryMenu` kini menampilkan seluruh kategori sebagai folder tingkat atas beserta child component; pemilihan folder/component diarahkan ke category dan component yang sesuai.
+- **Penambahan:** Explorer tree berbasis `COMPONENT_DATABASE` dan resolver URL lintas kategori.
+- **Cara penyelesaian:** Membentuk folder virtual dari setiap kategori, meratakan tree untuk rendering, lalu mempertahankan `LibraryPreview` sebagai area content utama.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada page/menu/layout, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Sidebar global tidak dirender; `LibraryMenu` internal menjadi navigasi explorer utama untuk kategori dan file.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/page.tsx`, `apps/frontend/src/app/developer/library/library-menu.tsx`, `apps/frontend/src/app/developer/library/layout.tsx`, route `/developer/library`
+
+## 2026-08-08 19:33:57 +07:00 - Koreksi sidebar Developer Library
+
+- **Timestamp:** `2026-08-08T19:33:57+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mempertahankan sidebar internal library dan hanya menyembunyikan sidebar global.
+- **Scope:** `apps/frontend/src/app/developer/library/page.tsx` dan konfigurasi layout terkait.
+- **Perubahan:** `LibraryMenu` internal dikembalikan bersama navigasi kategori/component; `hideSidebar: true` pada layout tetap dipertahankan untuk sidebar global.
+- **Penambahan:** Tidak ada.
+- **Cara penyelesaian:** Mengembalikan grid dua kolom page library tanpa mengubah konfigurasi `Container → Workspace → Content`.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada layout/page, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Sidebar internal library tetap menjadi navigasi component; sidebar global Workspace tidak dirender.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/layout.tsx`, `apps/frontend/src/app/developer/library/page.tsx`, route `/developer/library`
+
+## 2026-08-08 19:30:25 +07:00 - Menghapus sidebar Developer Library
+
+- **Timestamp:** `2026-08-08T19:30:25+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mengubah `/developer/library` agar langsung menampilkan area content tanpa sidebar menu.
+- **Scope:** Layout dan page Developer Library.
+- **Perubahan:** Sidebar global pada route disembunyikan melalui konfigurasi layout; `LibraryMenu` internal dihapus dari halaman sehingga preview menggunakan lebar penuh.
+- **Penambahan:** Tidak ada.
+- **Cara penyelesaian:** Mempertahankan `Container → Workspace → Content`, mengaktifkan `hideSidebar`, dan menjadikan `LibraryPreview` sebagai content utama.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada layout/page, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak diminta.
+- **Keputusan penting:** Navigasi component tetap dapat dilakukan melalui query URL dan child component chip; sidebar kategori tidak lagi dirender.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/app/developer/library/layout.tsx`, `apps/frontend/src/app/developer/library/page.tsx`, route `/developer/library`
+
+## 2026-08-08 19:24:11 +07:00 - Audit update library CreativeUniverseLogo
+
+- **Timestamp:** `2026-08-08T19:24:11+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menjalankan `$update-library` untuk `@/components/ui/creative-universe-logo.tsx`.
+- **Scope:** Audit source, metadata catalog, preview visual, dan registry.
+- **Perubahan:** Tidak ada perubahan source atau metadata karena seluruhnya masih sesuai dengan implementasi terbaru.
+- **Penambahan:** Tidak ada; preview existing sudah menampilkan tiga kombinasi ukuran dan warna melalui `className`.
+- **Cara penyelesaian:** Mencocokkan prop source, export, catalog entry, preview import, dan registry key; component tidak memiliki state, variant, atau child component.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada file terkait, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan sesuai aturan update-library; browser tidak wajib.
+- **Keputusan penting:** Tidak menambahkan toolbar karena satu-satunya prop bersifat styling dan sudah dicakup oleh beberapa contoh className pada preview.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/components/ui/creative-universe-logo.tsx`, `apps/frontend/src/app/developer/library/previews/ui/creative-universe-logo.preview.tsx`, `apps/frontend/src/app/developer/library/previews/index.tsx`, `apps/frontend/src/app/developer/library/data/ui/library.data.ts`
+
+## 2026-08-08 17:56:46 +07:00 - Update library FileUploadDropzone
+
+- **Timestamp:** `2026-08-08T17:56:46+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menjalankan `$update-library` untuk `@/components/ui/file-upload-dropzone.tsx`.
+- **Scope:** Metadata UI catalog, preview visual, registry, dan toolbar Visual Preview.
+- **Perubahan:** Menambahkan preview nyata yang merender source `FileUploadDropzone` dan mendaftarkannya ke registry.
+- **Penambahan:** Kontrol toolbar untuk label, deskripsi, dan batas jumlah file; dependency `MaterialIcon` dicatat pada metadata.
+- **Cara penyelesaian:** Menggunakan fixture lokal dan callback no-op; preview tidak memanggil upload karena tidak ada interaksi file yang dijalankan.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada file terkait, dan `git diff --check` lulus.
+- **Validasi visual/live:** Tidak dijalankan sesuai aturan update-library; browser tidak wajib dan upload API tidak dipanggil.
+- **Keputusan penting:** Props visual yang aman dikendalikan dari toolbar; upload service internal source tidak dimock atau diubah agar scope tetap pada library.
+- **Blocker/Risiko:** Interaksi pemilihan file tetap terhubung ke service upload asli saat pengguna mengklik preview; jangan melakukan upload dari Visual Preview.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/components/ui/file-upload-dropzone.tsx`, `apps/frontend/src/app/developer/library/previews/ui/file-upload-dropzone.preview.tsx`, `apps/frontend/src/app/developer/library/previews/index.tsx`, `apps/frontend/src/app/developer/library/visual-preview.tsx`, `apps/frontend/src/app/developer/library/data/ui/library.data.ts`
+
+## 2026-08-08 17:51:57 +07:00 - Membuat preview nyata CreativeUniverseLogo
+
+- **Timestamp:** `2026-08-08T17:51:57+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menjalankan `$update-library` untuk target `@/components/ui/creative-universe-logo.tsx`.
+- **Scope:** Component target, metadata UI catalog, preview UI, dan registry.
+- **Perubahan:** Preview nyata dibuat untuk menampilkan tiga ukuran dan warna logo menggunakan source SVG asli; metadata diperbarui untuk menjelaskan kontrol `className`, SVG, dan branding.
+- **Penambahan:** `creative-universe-logo.preview.tsx`; export preview UI dan registry `CreativeUniverseLogo` ditambahkan.
+- **Cara penyelesaian:** Menggunakan fixture className lokal tanpa API, state runtime, atau mutation.
+- **Validasi teknis:** TypeScript, ESLint pada target/catalog/preview/registry, dan `git diff --check` berhasil.
+- **Validasi visual/live:** Tidak dijalankan sesuai aturan update-library; browser tidak wajib.
+- **Keputusan penting:** Preview merender component SVG source asli dan menunjukkan variasi ukuran/warna yang memang didukung melalui `className`.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `src/components/ui/creative-universe-logo.tsx`, `src/app/developer/library/previews/ui/creative-universe-logo.preview.tsx`, `src/app/developer/library/previews/index.tsx`, `src/app/developer/library/data/ui/library.data.ts`
+
+Berhasil di catat di notes logs
+
+## 2026-08-08 17:50:58 +07:00 - Update library Button
+
+- **Timestamp:** `2026-08-08T17:50:58+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menjalankan `$update-library` untuk target `@/components/ui/button.tsx`.
+- **Scope:** Button source, preview, metadata UI catalog, dan registry terkait.
+- **Perubahan:** Metadata Button diperbarui untuk mencakup variant primary/secondary/danger/outline/filter, ukuran, icon, loading, dan disabled state. Child component `MaterialIcon` ditambahkan.
+- **Penambahan:** Tidak ada file preview baru karena preview Button sudah nyata dan sudah terhubung; tipe props preview dirapikan dari `any` menjadi typed props.
+- **Cara penyelesaian:** Mempertahankan preview existing yang menerima kontrol toolbar VisualPreview dan merender source Button asli.
+- **Validasi teknis:** TypeScript, ESLint pada target/preview/catalog/registry, dan `git diff --check` berhasil.
+- **Validasi visual/live:** Tidak dijalankan sesuai aturan update-library; browser tidak wajib.
+- **Keputusan penting:** Preview existing dianggap mencakup mode Button karena VisualPreview sudah mengalirkan variant, size, icon, loading, dan disabled ke registry.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `src/components/ui/button.tsx`, `src/app/developer/library/previews/ui/button.preview.tsx`, `src/app/developer/library/data/ui/library.data.ts`, `src/app/developer/library/previews/index.tsx`
+
+Berhasil di catat di notes logs
+
+## 2026-08-08 17:49:27 +07:00 - Membuat preview nyata Background
+
+- **Timestamp:** `2026-08-08T17:49:27+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menjalankan `$update-library` untuk target `@/components/ui/background.tsx`.
+- **Scope:** Component target, metadata UI catalog, preview UI, dan registry.
+- **Perubahan:** Preview nyata `Background` dibuat dengan container relative dan konten fixture di atas background source component; metadata diperbarui agar menjelaskan efek fade-in/parallax zoom berbasis GSAP.
+- **Penambahan:** `background.preview.tsx`; export preview UI dan registry `Background` ditambahkan; tags `GSAP` dan `Parallax` ditambahkan.
+- **Cara penyelesaian:** Preview merender source `Background` asli dengan asset background yang dipakai component, tanpa API atau mutation.
+- **Validasi teknis:** TypeScript, ESLint, dan `git diff --check` berhasil dari `apps/frontend`; percobaan command awal dari repository root gagal karena root tidak memiliki TypeScript context, lalu validasi diulang dari directory frontend dan berhasil.
+- **Validasi visual/live:** Tidak dijalankan sesuai aturan update-library; browser tidak wajib.
+- **Keputusan penting:** Asset dan animasi source dipertahankan; preview hanya menyediakan wrapper dan konten demonstrasi.
+- **Blocker/Risiko:** Tidak ada blocker.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `src/components/ui/background.tsx`, `src/app/developer/library/previews/ui/background.preview.tsx`, `src/app/developer/library/previews/index.tsx`, `src/app/developer/library/data/ui/library.data.ts`
+
+Berhasil di catat di notes logs
+
 ## 2026-08-08 17:45:21 +07:00 - Audit catalog component UI
 
 - **Timestamp:** `2026-08-08T17:45:21+07:00`

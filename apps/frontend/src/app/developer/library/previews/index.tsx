@@ -16,7 +16,10 @@ import {
   ButtonPreview,
   InputPreview,
   AuthParticleBackgroundPreview,
-  SearchBarPreview
+  SearchBarPreview,
+  BackgroundPreview,
+  CreativeUniverseLogoPreview,
+  FileUploadDropzonePreview
 } from "./ui/index";
 import { HeaderTitlePreview, HeroHeadingPreview } from "./typography/index";
 import { UniversalErrorViewPreview, ErrorTetrisGamePreview } from "./feedback/index";
@@ -36,6 +39,9 @@ export const PREVIEW_REGISTRY: Record<string, React.ReactNode> = {
   AccessDenied: <AccessDeniedPreview />, ButtonAction: <ButtonActionPreview />, ContentTitle: <ContentTitlePreview />, Logo: <LogoPreview />,
   PrimaryActionLink: <PrimaryActionLinkPreview />, Button: <ButtonPreview />, Input: <InputPreview />,
   AuthParticleBackground: <AuthParticleBackgroundPreview />,
+  Background: <BackgroundPreview />,
+  CreativeUniverseLogo: <CreativeUniverseLogoPreview />,
+  FileUploadDropzone: <FileUploadDropzonePreview />,
   SearchBar: <SearchBarPreview />,
   DropdownMenu: <DropdownMenuPreview />, Modal: <ModalPreview />, AuthCard: <AuthCardPreview />,
   AuthCardHeader: <AuthCardHeaderPreview />, AuthCardFooter: <AuthCardFooterPreview />,

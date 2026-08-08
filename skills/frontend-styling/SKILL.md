@@ -26,7 +26,7 @@ Sebelum menambahkan atau menulis kelas Tailwind CSS untuk komponen baru:
 Komponen primitif di Creative Universe memiliki standar styling Tailwind sebagai berikut:
 
 * **Warna Tema Utama (Brand Colors):**
-  * Ungu Aksentuasi: `#6d46eb` (Tailwind: `text-[#6d46eb]`, `bg-[#6d46eb]`, `border-[#ede9fe]`).
+  * Family brand Nebula: gunakan `--nebula-*`; brand utama adalah `--nebula-9` (`#ba0dcb`) melalui semantic `bg-brand`/`text-brand`.
   * Biru Aksentuasi: `#00a4ff` (Tailwind: `text-[#00a4ff]`, `bg-[#00a4ff]`).
   * Dark Slate Text: `#3b4446` (Tailwind: `text-[#3b4446]`).
 * **Sistem Tema Light vs Dark (Navbar & Components):**
@@ -63,3 +63,12 @@ Komponen primitif di Creative Universe memiliki standar styling Tailwind sebagai
 1. Saat membuat komponen baru dengan skill `component-management`, picu skill `frontend-styling` ini secara bersamaan.
 2. Bandingkan markup CSS Tailwind komponen baru Anda dengan berkas UI di `src/components/ui/`.
 3. Lakukan penyesuaian jika ada ketidakselarasan warna, radius, atau shadow sebelum melakukan finalisasi.
+
+## 5. Konsistensi Developer Library
+
+Saat membuat atau memperbarui preview di `apps/frontend/src/app/developer/library/`:
+
+1. Gunakan component UI reusable yang sudah tersedia, seperti `SearchBar`, `Button`, `ToolbarButton`, dan `ToolbarControl`; jangan membuat input atau toolbar inline jika primitive yang sesuai sudah ada.
+2. Pertahankan preview tetap compact, tidak terpotong, dan gunakan token brand yang sama dengan component source.
+3. Kontrol variant/state preview harus berada di toolbar reusable dan tidak boleh mengubah source component hanya demi kebutuhan preview.
+4. Badge versi dan area `Log History` adalah bagian dari shell library; jangan menduplikasi keduanya pada preview component.

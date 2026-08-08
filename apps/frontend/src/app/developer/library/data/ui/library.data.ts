@@ -34,11 +34,13 @@ export const uiComponents: ComponentItem[] = [
   {
     "name": "Background",
     "file": "background.tsx",
-    "description": "Komponen lapisan latar belakang visual yang dapat digunakan ulang pada halaman.",
+    "description": "Lapisan background gambar dengan efek fade-in dan parallax zoom lembut berbasis GSAP.",
     "tags": [
       "Background",
       "Layout",
-      "Visual"
+      "Visual",
+      "GSAP",
+      "Parallax"
     ]
   },
   {
@@ -54,12 +56,21 @@ export const uiComponents: ComponentItem[] = [
   {
     "name": "Button",
     "file": "button.tsx",
-    "description": "Komponen tombol kustom dengan status loading dan penyesuaian gaya visual.",
+      "description": "Tombol reusable dengan variant primary, secondary, danger, outline, filter, ukuran responsif, icon, loading, dan disabled state.",
     "tags": [
       "Button",
       "Interaction",
-      "UI"
-    ]
+        "UI",
+        "Variant",
+        "Loading"
+      ],
+      "childComponents": [
+        {
+          "name": "MaterialIcon",
+          "category": "ui",
+          "file": "material-icon.tsx"
+        }
+      ]
   },
   {
     "name": "ConfirmModal",
@@ -84,11 +95,13 @@ export const uiComponents: ComponentItem[] = [
   {
     "name": "CreativeUniverseLogo",
     "file": "creative-universe-logo.tsx",
-    "description": "Logo Creative Universe dengan opsi tampilan untuk kebutuhan branding.",
+    "description": "Mark SVG Creative Universe reusable dengan ukuran dan warna yang dapat dikendalikan melalui className.",
     "tags": [
       "Branding",
       "Logo",
-      "Visual"
+      "Visual",
+      "SVG",
+      "Branding"
     ]
   },
   {
@@ -109,6 +122,13 @@ export const uiComponents: ComponentItem[] = [
       "Form",
       "Upload",
       "DragDrop"
+    ],
+    "childComponents": [
+      {
+        "name": "MaterialIcon",
+        "category": "ui",
+        "file": "material-icon.tsx"
+      }
     ]
   },
   {

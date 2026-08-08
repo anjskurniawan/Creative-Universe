@@ -21,6 +21,9 @@ type PreviewProps = {
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
   dropdownVariant?: "basic" | "search" | "search-reset" | "multi-select";
+  label?: string;
+  description?: string;
+  maxFiles?: number;
 };
 
 export function VisualPreview({ component }: { component: ComponentItem }) {
@@ -40,6 +43,9 @@ export function VisualPreview({ component }: { component: ComponentItem }) {
   const [actionCardExample, setActionCardExample] = useState<"report" | "team" | "settings">("report");
   const [dropdownOpen, setDropdownOpen] = useState(true);
   const [dropdownVariant, setDropdownVariant] = useState<"basic" | "search" | "search-reset" | "multi-select">("basic");
+  const [fileUploadLabel, setFileUploadLabel] = useState("Lampiran file");
+  const [fileUploadDescription, setFileUploadDescription] = useState("PDF, JPG, PNG hingga 10 MB");
+  const [fileUploadMaxFiles, setFileUploadMaxFiles] = useState("3");
 
   const viewportWidth = {
     Desktop: "w-full",
@@ -230,6 +236,19 @@ export function VisualPreview({ component }: { component: ComponentItem }) {
             </>
           )}
 
+          {component.name === "FileUploadDropzone" && (
+            <>
+              <div className="h-4 w-px bg-slate-200 mx-1" />
+              <ToolbarControl icon="upload_file" label="Pengaturan Upload">
+                <ToolbarControl.Input label="Label" value={fileUploadLabel} onChange={setFileUploadLabel} />
+                <hr className="my-1 border-slate-100" />
+                <ToolbarControl.Input label="Deskripsi" value={fileUploadDescription} onChange={setFileUploadDescription} />
+                <hr className="my-1 border-slate-100" />
+                <ToolbarControl.Input label="Maksimal File" value={fileUploadMaxFiles} onChange={setFileUploadMaxFiles} />
+              </ToolbarControl>
+            </>
+          )}
+
           {component.name === "DropdownMenu" && (
             <>
               <div className="h-4 w-px bg-slate-200 mx-1" />
@@ -283,6 +302,9 @@ export function VisualPreview({ component }: { component: ComponentItem }) {
                   isOpen: dropdownOpen,
                   onOpenChange: setDropdownOpen,
                   dropdownVariant,
+                  label: fileUploadLabel,
+                  description: fileUploadDescription,
+                  maxFiles: Math.max(1, Number(fileUploadMaxFiles) || 1),
                 })
               ) : (
                 <DefaultPreviewPlaceholder componentName={component.name} />

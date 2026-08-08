@@ -76,7 +76,19 @@ Jika ada perubahan pada isi `apps/frontend/src/components/`, sinkronkan katalog 
    * Jangan menambahkan preview yang memanggil API nyata, autentikasi, atau mutasi database; gunakan fixture lokal.
    * Component kompleks yang belum aman dipreview harus memakai placeholder dengan alasan yang jelas.
 7. Jangan menghapus metadata manual yang sudah dikurasi kecuali metadata tersebut terbukti salah berdasarkan source.
-8. Setelah sinkronisasi, periksa bahwa tidak ada file source yang hilang, duplicate path, separator `\\`, metadata kosong, atau child folder yang ter-flatten menjadi file biasa.
+8. Setiap entry catalog harus mendukung metadata `version` dengan format `major.minor`; gunakan default `0.0` untuk component yang belum memiliki baseline.
+9. Hanya perubahan nyata pada source component, API/props, struktur, logic, fitur, state, atau styling yang boleh menaikkan version dan menambahkan history Markdown bertanggal. Jangan menyalin source code ke history dan jangan menghapus entri lama.
+10. Perubahan catalog, preview, registry, explorer, atau metadata tanpa perubahan source component tidak boleh menaikkan version atau menambah history component; catat hanya pada agent work log.
+11. Pastikan metadata `history` dapat dibaca oleh area `Log History` di bawah Visual Preview.
+12. Setelah sinkronisasi, periksa bahwa tidak ada file source yang hilang, duplicate path, separator `\\`, metadata kosong, atau child folder yang ter-flatten menjadi file biasa.
+
+### 3.1 Konvensi Developer Library terbaru
+
+* `LibraryMenu` internal pada `/developer/library` berfungsi sebagai explorer folder kategori.
+* Sidebar global route Developer Library tidak dirender; jangan menambahkan kembali menu global sebagai wrapper route.
+* Kategori `root` tetap ditampilkan sebagai component top-level, bukan folder virtual `root/`.
+* Folder kategori dan nested child harus memakai path separator `/` yang unik agar active state, expand state, dan navigasi lintas kategori tidak ambigu.
+* Preview target harus tetap terhubung ke source component asli, dan perubahan variant/state penting perlu disediakan melalui toolbar reusable bila aman.
 
 ---
 
@@ -102,7 +114,8 @@ Setelah setiap operasi Create, Move, atau Extract selesai dilakukan:
    * Jika component di-rename, perbarui nama, export, path, metadata, dan referensi preview pada entry catalog yang sama.
    * Jika hanya ada perubahan implementasi atau styling, tidak perlu memasukkan component ulang ke catalog; cukup pertahankan entry dan perbarui metadata/preview jika relevan.
 6. Laporkan jumlah file source, jumlah entry catalog, daftar file yang belum memiliki preview, dan setiap blocker yang belum terselesaikan.
-7. Jika operasi berhasil, gunakan keterangan hasil yang sesuai konteks:
+7. Laporkan versi aktif dan apakah history Markdown sudah memiliki baseline/perubahan terbaru.
+8. Jika operasi berhasil, gunakan keterangan hasil yang sesuai konteks:
    * Untuk component baru: `Berhasil, component baru telah ditambahkan ke katalog library.`
    * Untuk component yang sudah ada: `Berhasil, catalog library telah diperbarui.`
    * Untuk rename: `Berhasil, nama dan referensi component di katalog library telah diperbarui.`

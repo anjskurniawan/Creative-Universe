@@ -22,6 +22,8 @@ export interface ComponentItem {
   name: string;
   file: string;
   description: string;
+  version?: string;
+  history?: string;
   tags?: string[];
   children?: ComponentItem[];
   childComponents?: Array<{ name: string; category: string; file: string }>;

@@ -3,7 +3,6 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Container from "@/components/layout/container";
-import { COMPONENT_DATABASE } from "./library.data";
 
 function LibraryLayoutContent({ children }: { children: React.ReactNode }) {
   const [viewport, setViewport] = useState<"Mobile" | "Desktop">("Mobile");
@@ -20,21 +19,6 @@ function LibraryLayoutContent({ children }: { children: React.ReactNode }) {
     window.addEventListener("resize", syncViewport);
     return () => window.removeEventListener("resize", syncViewport);
   }, []);
-
-  const menuItems = [
-    ...Object.keys(COMPONENT_DATABASE)
-      .filter((category) => category !== "root")
-      .map((category) => ({
-        label: category.charAt(0).toUpperCase() + category.slice(1).replace("-", " "),
-        href: `/developer/library?cat=${category}`,
-        icon: "folder",
-      })),
-    ...(COMPONENT_DATABASE.root ?? []).map((component) => ({
-      label: component.file,
-      href: `/developer/library?cat=root&comp=${encodeURIComponent(component.file)}`,
-      icon: "description",
-    })),
-  ];
 
   const activeMenuHref = cat === "root" && comp
     ? `/developer/library?cat=root&comp=${encodeURIComponent(comp)}`
@@ -53,10 +37,10 @@ function LibraryLayoutContent({ children }: { children: React.ReactNode }) {
       <Container
         viewport={viewport}
         menuTitle="Library Sandbox"
-        menuItems={menuItems}
         breadcrumbItems={breadcrumbs}
         activeMenuHref={activeMenuHref}
         contentProps={{
+          hideSidebar: true,
           sidebarTheme,
           sidebarExpanded,
           onToggleSidebarTheme: () => setSidebarTheme((c) => c === "dark" ? "light" : "dark"),
