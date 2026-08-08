@@ -56,6 +56,11 @@ Kumpulan komponen atom dan elemen dasar (*design system primitives*) yang diguna
 * **`report-metric-card.tsx`**: Card metrik Creative Report dengan icon, label, nilai, dan accent indicator.
 * **`guest-mobile-orbit-motion.tsx`**: Animasi orbit visual pada landing page mobile.
 
+## 3.1 Komponen Foundation Primitives - `src/components/primitives/`
+Komponen dasar tanpa keputusan visual sebagai fondasi design system.
+
+* **`button.tsx`**: Tombol native tanpa styling yang meneruskan atribut HTML dan ref.
+
 ---
 
 ## 4. Komponen Feedback & Status - `src/components/feedback/`

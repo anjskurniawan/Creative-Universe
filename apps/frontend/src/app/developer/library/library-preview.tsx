@@ -96,7 +96,7 @@ export function LibraryPreview({ category, component }: LibraryPreviewProps) {
       <ComponentHeader category={category} component={component} />
       <ComponentInformation component={component} />
       {component.childComponents && <ChildComponents components={component.childComponents} />}
-      <VisualPreview component={component} />
+      <VisualPreview category={category} component={component} />
       <LibraryLogHistory componentName={component.name} version={component.version} markdown={component.history} />
     </div>
   );

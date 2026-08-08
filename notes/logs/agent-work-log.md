@@ -1,6 +1,99 @@
 # AI Agent Work Log
 ---
 
+## 2026-08-08 23:36:08 +07:00 - Menyeragamkan nama primitive menjadi Button
+
+- **Timestamp:** `2026-08-08T23:36:08+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mengubah nama primitive dari `PrimitiveButton` menjadi hanya `Button`.
+- **Scope:** Source primitive, Storybook story, Developer Library catalog/preview/registry, dan resolver preview.
+- **Perubahan:** Export source, props type, story title, preview, dan metadata catalog kini menggunakan nama `Button`; versi catalog diperbarui ke `0.1` dengan history perubahan.
+- **Penambahan:** Registry preview mendukung key berbasis kategori (`primitives/Button`) dan `VisualPreview` menerima kategori agar primitive `Button` tidak menimpa `ui/Button` yang sudah ada.
+- **Cara penyelesaian:** Memisahkan identitas preview berdasarkan kombinasi kategori dan nama, dengan fallback nama lama untuk component yang belum membutuhkan key khusus.
+- **Validasi teknis:** Validasi pertama menemukan error TypeScript karena kategori belum diteruskan ke `VisualPreview`; setelah diperbaiki, `npx tsc --noEmit --pretty false`, ESLint seluruh file terkait, dan `git diff --check` lulus. Build Storybook juga lulus dan membundel story button.
+- **Validasi visual/live:** Tidak dijalankan; browser tidak dibuka karena workflow library/Storybook menggunakan validasi build untuk perubahan ini.
+- **Keputusan penting:** `ui/Button` dan `primitives/Button` dipertahankan sebagai dua component berbeda berdasarkan kategori, meskipun nama export keduanya sama.
+- **Blocker/Risiko:** Tidak ada blocker. Warning build Storybook terkait ukuran chunk dan Next.js rewrites tetap non-blocking.
+- **Tindak lanjut:** Tidak ada.
+- **Referensi:** `apps/frontend/src/components/primitives/button.tsx`, `apps/frontend/src/components/primitives/button.stories.tsx`, `apps/frontend/src/app/developer/library/previews/index.tsx`, `apps/frontend/src/app/developer/library/visual-preview.tsx`.
+
+---
+
+## 2026-08-08 23:28:45 +07:00 - Mendaftarkan PrimitiveButton ke Storybook
+
+- **Timestamp:** `2026-08-08T23:28:45+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menyiapkan agar component primitive `button.tsx` terbaca di Storybook.
+- **Scope:** `apps/frontend/src/components/primitives/button.stories.tsx`.
+- **Perubahan:** Menambahkan story `Primitives/PrimitiveButton` yang merender `PrimitiveButton` source asli, dengan state default dan disabled.
+- **Penambahan:** Autodocs, action spy untuk click, serta control props native melalui Storybook.
+- **Cara penyelesaian:** Menempatkan file `*.stories.tsx` berdampingan dengan source agar otomatis cocok dengan glob Storybook yang sudah dikonfigurasi.
+- **Validasi teknis:** ESLint story, `npm run build-storybook`, dan `git diff --check` lulus. Output build memuat asset `button.stories`, sehingga story berhasil ditemukan dan dibundel.
+- **Validasi visual/live:** Tidak dijalankan; production build Storybook berhasil tanpa membuka browser.
+- **Keputusan penting:** Tidak ada perubahan pada `PrimitiveButton`; story hanya meregistrasikan dan mendemonstrasikan component tanpa memaksakan styling.
+- **Blocker/Risiko:** Tidak ada blocker. Build mengeluarkan warning non-blocking chunk Storybook di atas 500 kB dan warning Next.js rewrites dengan `output: export` yang sudah ada sebelumnya.
+- **Tindak lanjut:** Jalankan `npm run storybook` dari `apps/frontend` untuk melihat story pada port `6006` bila diperlukan.
+- **Referensi:** `apps/frontend/src/components/primitives/button.stories.tsx`, `apps/frontend/.storybook/main.ts`, perintah `npm run build-storybook`.
+
+---
+
+## 2026-08-08 23:27:35 +07:00 - Menambahkan PrimitiveButton tanpa styling
+
+- **Timestamp:** `2026-08-08T23:27:35+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Membuat base component tanpa styling bernama `button.tsx` di folder primitives.
+- **Scope:** `apps/frontend/src/components/primitives/button.tsx`, Developer Library, dan indeks component.
+- **Perubahan:** Menambahkan `PrimitiveButton` sebagai pembungkus button native yang typed, meneruskan ref dan atribut HTML, dengan default `type="button"`; tidak ada class, variant, atau styling.
+- **Penambahan:** Kategori `primitives` pada catalog library, metadata `PrimitiveButton` versi `0.0` dengan baseline history, preview nyata yang merender source component, registry preview, dan dokumentasi pada component catalog index.
+- **Cara penyelesaian:** Menggunakan nama export `PrimitiveButton` agar tidak berbenturan dengan `Button` reusable yang sudah ada di kategori `ui`, sambil mempertahankan nama file yang diminta.
+- **Validasi teknis:** `npx tsc --noEmit --pretty false`, ESLint pada source/library preview terkait, dan `git diff --check` seluruhnya lulus. Audit menemukan satu export source, satu entry catalog, satu registry entry, dan preview mengimpor serta merender source asli.
+- **Validasi visual/live:** Tidak dijalankan; workflow update library menetapkan verifikasi browser tidak otomatis untuk menghemat token/waktu.
+- **Keputusan penting:** Styling sengaja diletakkan nol pada primitive agar dapat menjadi fondasi; kebutuhan visual tetap menggunakan `ui/Button` atau wrapper lain di atasnya.
+- **Blocker/Risiko:** Tidak ada blocker. Artefak Storybook dan perubahan worktree sebelumnya tidak disentuh.
+- **Tindak lanjut:** Tambahkan primitives lain atau Storybook story khusus bila diperlukan.
+- **Referensi:** `apps/frontend/src/components/primitives/button.tsx`, `apps/frontend/src/app/developer/library/data/primitives/library.data.ts`, `apps/frontend/src/app/developer/library/previews/primitives/button.preview.tsx`, `apps/frontend/src/app/developer/library/previews/index.tsx`, `notes/component_functions.md`.
+
+---
+
+## 2026-08-08 23:19:51 +07:00 - Konsolidasi memory Phase 2 Creative Universe
+
+- **Timestamp:** `2026-08-08T23:19:51+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Mengonsolidasikan raw memories dan rollout summaries menjadi handbook memory progresif.
+- **Scope:** `C:\Users\DoranJETE\.codex\memories\MEMORY.md`, `memory_summary.md`, dan rollout Creative Universe terbaru.
+- **Perubahan:** Menambahkan handbook untuk Roles/multiselect, orbit Application Universe, dan hard delete user; memperbarui handbook Creative AI untuk routing model Kie.ai, Grok Responses, serta z-image ratio.
+- **Penambahan:** Index summary kini memuat memori aktif 2026-08-07, 2026-08-06, dan 2026-08-05 dengan preference/failure shield yang dapat dicari.
+- **Cara penyelesaian:** Membaca workspace diff, extension ad-hoc, raw-memory evidence, rollout summaries baru, dan handbook existing; menjaga batas task family serta provenance rollout.
+- **Validasi teknis:** Audit menemukan 45 referensi rollout di `MEMORY.md` dan 0 file hilang; `git diff --check` lulus; header `memory_summary.md` terverifikasi `v1`.
+- **Validasi visual/live:** Tidak dijalankan; pekerjaan hanya konsolidasi dokumentasi memory.
+- **Keputusan penting:** Tidak membuat skill baru karena bukti baru memperkuat handbook/failure shield yang sudah ada, bukan prosedur berulang baru yang cukup stabil.
+- **Blocker/Risiko:** Urutan blok handbook lama tidak direstruktur penuh; detail provider/model tetap perlu live recheck sebelum perubahan runtime.
+- **Tindak lanjut:** Gunakan `MEMORY.md` untuk detail task-local dan `memory_summary.md` sebagai routing prompt ringkas pada rollout berikutnya.
+- **Referensi:** `C:\Users\DoranJETE\.codex\memories\phase2_workspace_diff.md`, `MEMORY.md`, `memory_summary.md`, `rollout_summaries\2026-08-05T06-45-35-t9Gz-creative_universe_orbit_and_user_deletion_fixes.md`, `rollout_summaries\2026-08-06T09-10-04-tnqr-creative_ai_kie_model_routing_z_image_ratios.md`.
+
+---
+
+## 2026-08-08 23:18:53 +07:00 - Setup Storybook resmi untuk Frontend
+
+- **Timestamp:** `2026-08-08T23:18:53+07:00`
+- **Agent/Model:** `Codex - GPT-5`
+- **Status:** `Selesai`
+- **Permintaan:** Menjalankan `npm create storybook@latest` dan mengikuti setup resmi Storybook.
+- **Scope:** `apps/frontend`.
+- **Perubahan:** Menambahkan konfigurasi `.storybook`, script `storybook` dan `build-storybook`, dependency Storybook untuk Next.js/Vite, lint integration, Vitest configuration, dan sample stories.
+- **Penambahan:** `@storybook/nextjs-vite`, addons accessibility/docs/vitest/MCP/Chromatic, Vite, Vitest, Playwright, serta sample stories di `src/stories`.
+- **Cara penyelesaian:** Menjalankan CLI `npm create storybook@latest -- --yes`; CLI membuat file setup meskipun proses CLI melebihi batas waktu setelah perubahan selesai.
+- **Validasi teknis:** `npm run build-storybook` lulus dan menghasilkan static build. Ada warning non-blocking: beberapa chunk lebih dari 500 kB dan warning Next.js terkait rewrites dengan `output: export`.
+- **Validasi visual/live:** Tidak dijalankan; production build Storybook berhasil.
+- **Keputusan penting:** Storybook menggunakan framework resmi `@storybook/nextjs-vite` pada port default `6006`.
+- **Blocker/Risiko:** Artefak `apps/frontend/storybook-static/` masih tidak terlacak karena pembersihan output build diblokir kebijakan shell; aman dihapus bila tidak diperlukan.
+- **Tindak lanjut:** Jalankan `npm run storybook` dari `apps/frontend` untuk membuka Storybook pada port 6006 dan tambahkan stories untuk primitives baru.
+- **Referensi:** `apps/frontend/.storybook/main.ts`, `apps/frontend/.storybook/preview.tsx`, `apps/frontend/package.json`, `apps/frontend/src/stories/`
+
 ## 2026-08-08 20:46:10 +07:00 - Membuat folder Primitives
 
 - **Timestamp:** `2026-08-08T20:46:10+07:00`

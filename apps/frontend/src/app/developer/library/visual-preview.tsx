@@ -26,7 +26,7 @@ type PreviewProps = {
   maxFiles?: number;
 };
 
-export function VisualPreview({ component }: { component: ComponentItem }) {
+export function VisualPreview({ category, component }: { category: string; component: ComponentItem }) {
   const [viewport, setViewport] = useState<"Desktop" | "Tablet" | "Mobile">("Desktop");
   const [darkBackground, setDarkBackground] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
@@ -290,8 +290,8 @@ export function VisualPreview({ component }: { component: ComponentItem }) {
         <div className="flex min-h-[268px] w-full items-center justify-center">
           <div className={`${viewportWidth} transition-[max-width] duration-300`}>
             <div className="relative flex min-h-[268px] w-full items-center justify-center p-6">
-              {PREVIEW_REGISTRY[component.name] ? (
-                React.cloneElement(PREVIEW_REGISTRY[component.name] as React.ReactElement<PreviewProps>, {
+              {(PREVIEW_REGISTRY[`${category}/${component.name}`] || PREVIEW_REGISTRY[component.name]) ? (
+                React.cloneElement((PREVIEW_REGISTRY[`${category}/${component.name}`] || PREVIEW_REGISTRY[component.name]) as React.ReactElement<PreviewProps>, {
                   variant: btnVariant,
                   size: btnSize,
                   iconLeft: btnIconLeft,

@@ -28,6 +28,7 @@ import { DropdownMenuPreview, ModalPreview, AuthCardPreview, AuthCardHeaderPrevi
 import { DefaultStatsGridPreview, QuickActionsSectionPreview, SystemStatusGridPreview, GroupAccordionPreview, ReportSummaryInfoPreview } from "./features/index";
 import { OddsGameboyFramePreview, OddsRichTextEditorPreview } from "./odds/index";
 import { AssessmentMobileCardsPreview, ReportHeaderPreview, ReportToolbarPreview, CreativeReportMetricCardPreview, AssessmentTableActionsPreview, AssessmentTablePreview, AssessmentTableAvatarPreview, AssessmentTableCellPreview, AssessmentTableHeaderPreview, AssessmentTableRowPreview, HrdDateModalPreview, AspectScoreListPreview } from "./creative-report/index";
+import { ButtonPreview as PrimitivesButtonPreview } from "./primitives/index";
 
 export { DefaultPreviewPlaceholder };
 export const PREVIEW_REGISTRY: Record<string, React.ReactNode> = {
@@ -38,6 +39,7 @@ export const PREVIEW_REGISTRY: Record<string, React.ReactNode> = {
   ProfileCard: <ProfileCardPreview />, ConfirmModal: <ConfirmModalPreview />, CustomDatePicker: <CustomDatePickerPreview />, Toast: <ToastPreview />,
   AccessDenied: <AccessDeniedPreview />, ButtonAction: <ButtonActionPreview />, ContentTitle: <ContentTitlePreview />, Logo: <LogoPreview />,
   PrimaryActionLink: <PrimaryActionLinkPreview />, Button: <ButtonPreview />, Input: <InputPreview />,
+  "primitives/Button": <PrimitivesButtonPreview />,
   AuthParticleBackground: <AuthParticleBackgroundPreview />,
   Background: <BackgroundPreview />,
   CreativeUniverseLogo: <CreativeUniverseLogoPreview />,

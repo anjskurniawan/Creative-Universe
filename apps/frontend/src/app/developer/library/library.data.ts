@@ -14,6 +14,7 @@ import { navigationComponents } from "./data/navigation/library.data";
 import { oddsComponents } from "./data/odds/library.data";
 import { onboardingComponents } from "./data/onboarding/library.data";
 import { panelComponents } from "./data/panel/library.data";
+import { primitivesComponents } from "./data/primitives/library.data";
 import { typographyComponents } from "./data/typography/library.data";
 import { uiComponents } from "./data/ui/library.data";
 import { rootComponents } from "./data/root/library.data";
@@ -46,6 +47,7 @@ export const COMPONENT_DATABASE: Record<string, ComponentItem[]> = {
   odds: oddsComponents,
   onboarding: onboardingComponents,
   panel: panelComponents,
+  primitives: primitivesComponents,
   typography: typographyComponents,
   ui: uiComponents,
   root: rootComponents,
