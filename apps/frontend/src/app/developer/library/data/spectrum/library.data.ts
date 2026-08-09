@@ -1,0 +1,115 @@
+import type { ComponentItem } from "@/app/developer/library/library.data";
+
+export const spectrumComponents: ComponentItem[] = [
+  {
+    name: "SideNav",
+    file: "SideNav/SideNav.tsx",
+    description: "Wrapper SideNav React Spectrum S2 untuk navigasi hierarki bertingkat dengan routing, expansion, sections, collections, disabled items, dan accessible navigation.",
+    version: "0.0",
+    history: "## 2026-08-09 - v0.0\n\nBaseline wrapper SideNav React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "SideNav", "Navigation", "Collection", "Accessible"],
+    childComponents: [
+      { name: "SideNavItem", category: "spectrum", file: "SideNav/SideNav.tsx" },
+      { name: "SideNavItemContent", category: "spectrum", file: "SideNav/SideNav.tsx" },
+      { name: "SideNavItemLink", category: "spectrum", file: "SideNav/SideNav.tsx" },
+      { name: "SideNavSection", category: "spectrum", file: "SideNav/SideNav.tsx" },
+      { name: "SideNavHeader", category: "spectrum", file: "SideNav/SideNav.tsx" },
+    ],
+  },
+  {
+    name: "Badge",
+    file: "Badge/Badge.tsx",
+    description: "Wrapper Badge React Spectrum S2 untuk menampilkan metadata singkat dengan kategori warna, semantic variant, fill style, size, dan overflow behavior.",
+    version: "0.0",
+    history: "## 2026-08-09 - v0.0\n\nBaseline wrapper Badge React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "Badge", "Metadata", "Status", "Accessible"],
+    childComponents: [],
+  },
+  {
+    name: "AvatarGroup",
+    file: "AvatarGroup/AvatarGroup.tsx",
+    description: "Wrapper AvatarGroup React Spectrum S2 untuk mengelompokkan avatar yang saling terkait dengan dukungan label, ukuran, dan accessibility.",
+    version: "0.0",
+    history: "## 2026-08-09 - v0.0\n\nBaseline wrapper AvatarGroup React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "AvatarGroup", "Avatar", "Identity", "Accessible"],
+    childComponents: [{ name: "Avatar", category: "spectrum", file: "Avatar/Avatar.tsx" }],
+  },
+  {
+    name: "Avatar",
+    file: "Avatar/Avatar.tsx",
+    description: "Wrapper Avatar React Spectrum S2 untuk menampilkan thumbnail representasi user atau organisasi dengan dukungan ukuran, image source, alt text, fallback, dan background state.",
+    version: "0.0",
+    history: "## 2026-08-09 - v0.0\n\nBaseline wrapper Avatar React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "Avatar", "Identity", "Image", "Accessible"],
+    childComponents: [],
+  },
+  {
+    name: "ActionMenu",
+    file: "ActionMenu/ActionMenu.tsx",
+    description: "Wrapper ActionMenu React Spectrum S2 untuk menu aksi tambahan dengan keyboard navigation, controlled open state, disabled items, dan placement.",
+    version: "0.0",
+    history: "## 2026-08-09 - v0.0\n\nBaseline wrapper ActionMenu React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "ActionMenu", "Menu", "Overlay", "Accessible"],
+    childComponents: [{ name: "MenuItem", category: "spectrum", file: "ActionMenu/ActionMenu.tsx" }],
+  },
+  {
+    name: "ActionButton",
+    file: "ActionButton/ActionButton.tsx",
+    description: "Wrapper ActionButton React Spectrum S2 untuk aksi task-based dengan dukungan icon/content, press events, quiet style, ukuran, disabled, dan pending state.",
+    version: "0.0",
+    history: "## 2026-08-09 - v0.0\n\nBaseline wrapper ActionButton React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "ActionButton", "Action", "Press", "Accessible"],
+    childComponents: [],
+  },
+  {
+    name: "ActionButtonGroup",
+    file: "ActionButtonGroup/ActionButtonGroup.tsx",
+    description: "Wrapper ActionButtonGroup React Spectrum S2 untuk mengelompokkan ActionButton terkait dengan dukungan orientation, density, size, justified, quiet, dan disabled state.",
+    version: "0.0",
+    history: "## 2026-08-09 - v0.0\n\nBaseline wrapper ActionButtonGroup React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "ActionButtonGroup", "Action", "Toolbar", "Accessible"],
+    childComponents: [{ name: "ActionButton", category: "spectrum", file: "ActionButton/ActionButton.tsx" }],
+  },
+  {
+    name: "ActionBar",
+    file: "ActionBar/ActionBar.tsx",
+    description: "Wrapper ActionBar React Spectrum S2 untuk aksi pada satu atau banyak item terpilih, dengan dukungan jumlah selection, clear selection, emphasized style, dan ActionButton.",
+    version: "0.0",
+    history: "## 2026-08-09 - v0.0\n\nBaseline wrapper ActionBar React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "ActionBar", "Selection", "Bulk Actions", "Accessible"],
+    childComponents: [{ name: "ActionButton", category: "spectrum", file: "ActionButton/ActionButton.tsx" }],
+  },
+  {
+    name: "Accordion",
+    file: "Accordion/Accordion.tsx",
+    description:
+      "Wrapper Accordion React Spectrum S2 untuk mengelola beberapa panel yang dapat dibuka dan ditutup, termasuk controlled expansion dan header action.",
+    version: "0.0",
+    history:
+      "## 2026-08-09 - v0.0\n\nBaseline wrapper Accordion React Spectrum S2 ditambahkan dengan style, font, dan color scheme Spectrum otomatis.",
+    tags: ["Spectrum", "Accordion", "Disclosure", "Accessible", "Expandable"],
+    childComponents: [],
+  },
+  {
+    name: "Button",
+    file: "Button/Button.tsx",
+    description:
+      "Wrapper Button dari React Spectrum S2 dengan variant, ukuran, state disabled, dan perilaku press bawaan Spectrum.",
+    version: "0.2",
+    history:
+      "## 2026-08-09 - v0.2\n\nWrapper menerapkan baseline Spectrum secara otomatis pada Button, tanpa setup tambahan dan tanpa memengaruhi component Universe.\n\n## 2026-08-09 - v0.1\n\nWrapper menggunakan import subpath resmi React Spectrum S2 dan preview mendemonstrasikan event press serta pending state.\n\n## 2026-08-09 - v0.0\n\nBaseline wrapper Button React Spectrum S2 ditambahkan ke kategori Spectrum.",
+    tags: ["Spectrum", "Button", "Action", "Accessible"],
+    childComponents: [],
+  },
+  {
+    name: "Calendar",
+    file: "Calendar/Calendar.tsx",
+    description:
+      "Wrapper Calendar dari React Spectrum S2 untuk memilih satu tanggal, dengan dukungan nilai, batas tanggal, validasi, dan kalender internasional.",
+    version: "0.0",
+    history:
+      "## 2026-08-09 - v0.0\n\nBaseline wrapper Calendar React Spectrum S2 ditambahkan dengan style Spectrum otomatis.",
+    tags: ["Spectrum", "Calendar", "Date", "Accessible", "Internationalization"],
+    childComponents: [],
+  },
+];

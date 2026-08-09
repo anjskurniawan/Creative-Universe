@@ -1,0 +1,111 @@
+import { Meta, Title, Description, Primary, Controls, Stories, Source } from "@storybook/addon-docs/blocks";
+import * as ActionButtonStories from "./ActionButton.stories";
+
+<Meta of={ActionButtonStories} />
+<Title />
+<Description>
+ActionButtons allow users to perform an action. They are used for similar, task-based options within a workflow and are ideal for interfaces where buttons are not meant to draw a lot of attention. This wrapper automatically applies React Spectrum S2 styling, typography, color schemes, and accessibility behavior.
+</Description>
+
+## QA color scheme
+
+Use the **Spectrum Light** or **Spectrum Dark** toolbar control in Storybook to inspect every state in both color schemes.
+
+## Basic usage
+
+<Source language="tsx" code={`import { ActionButton } from "@/components/spectrum/ActionButton";
+
+<ActionButton>Edit</ActionButton>`} />
+<Primary />
+
+ActionButtons can contain an icon, text, avatar, or other Spectrum content. Provide `aria-label` when the button has no visible text label.
+
+<Source language="tsx" code={`import { ActionButton } from "@/components/spectrum/ActionButton";
+import Cut from "@react-spectrum/s2/icons/Cut";
+
+<ActionButton aria-label="Cut"><Cut />Cut</ActionButton>`} />
+
+## Events
+
+Use `onPress` to handle mouse, keyboard, and touch interactions. `onPressStart`, `onPressEnd`, and `onPressChange` are also emitted during the interaction lifecycle.
+
+<Source language="tsx" code={`import { useState } from "react";
+import { ActionButton } from "@/components/spectrum/ActionButton";
+
+function Example() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <ActionButton onPress={() => setCount((value) => value + 1)}>
+      {count} Edits
+    </ActionButton>
+  );
+}`} />
+
+## Pending
+
+Set `isPending` to display an indeterminate spinner. Pending buttons remain focusable but do not accept press or hover interactions while pending.
+
+<Source language="tsx" code={`import { useState } from "react";
+import { ActionButton } from "@/components/spectrum/ActionButton";
+
+function PendingButton() {
+  const [isPending, setPending] = useState(false);
+
+  return (
+    <ActionButton
+      isPending={isPending}
+      onPress={() => {
+        setPending(true);
+        setTimeout(() => setPending(false), 5000);
+      }}>
+      Save
+    </ActionButton>
+  );
+}`} />
+
+## Appearance and state
+
+- `isQuiet` applies the quiet ActionButton style.
+- `isDisabled` disables the button.
+- `size` supports `XS`, `S`, `M`, `L`, and `XL`.
+- `staticColor` supports `auto`, `black`, and `white` when the button appears over a colored background.
+- Use `type="submit"` or `type="reset"` when the button participates in a form.
+
+<Stories title="Examples" include={["WithIcon", "Quiet", "Disabled", "Pending", "InteractivePending"]} />
+
+## API
+
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>aria-controls</code></td><td><code>string | undefined</code></td><td>-</td><td>Identifies the contents controlled by the button.</td></tr>
+    <tr><td><code>aria-current</code></td><td><code>boolean | "true" | "false" | "date" | "location" | "page" | "step" | "time" | undefined</code></td><td>-</td><td>Indicates whether the button represents the current item.</td></tr>
+    <tr><td><code>aria-describedby</code></td><td><code>string | undefined</code></td><td>-</td><td>Identifies the element that describes the button.</td></tr>
+    <tr><td><code>aria-details</code></td><td><code>string | undefined</code></td><td>-</td><td>Identifies detailed information about the button.</td></tr>
+    <tr><td><code>aria-disabled</code></td><td><code>boolean | "true" | "false" | undefined</code></td><td>-</td><td>Exposes the disabled state to assistive technology.</td></tr>
+    <tr><td><code>aria-expanded</code></td><td><code>boolean | "true" | "false" | undefined</code></td><td>-</td><td>Indicates whether a controlled popup is expanded.</td></tr>
+    <tr><td><code>aria-haspopup</code></td><td><code>boolean | "true" | "false" | "dialog" | "grid" | "listbox" | "menu" | "tree" | undefined</code></td><td>-</td><td>Indicates the type of popup triggered by the button.</td></tr>
+    <tr><td><code>aria-label</code></td><td><code>string | undefined</code></td><td>-</td><td>Defines an accessible label.</td></tr>
+    <tr><td><code>aria-labelledby</code></td><td><code>string | undefined</code></td><td>-</td><td>References the element that labels the button.</td></tr>
+    <tr><td><code>aria-pressed</code></td><td><code>boolean | "true" | "false" | "mixed" | undefined</code></td><td>-</td><td>Indicates the current pressed state of a toggle button.</td></tr>
+    <tr><td><code>autoFocus</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether the button receives focus on render.</td></tr>
+    <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>-</td><td>The button content.</td></tr>
+    <tr><td><code>excludeFromTabOrder</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether to exclude the button from sequential tab order.</td></tr>
+    <tr><td><code>id</code></td><td><code>string | undefined</code></td><td>-</td><td>The element's unique identifier.</td></tr>
+    <tr><td><code>isDisabled</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether the button is disabled.</td></tr>
+    <tr><td><code>isPending</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether the button is pending while remaining focusable.</td></tr>
+    <tr><td><code>isQuiet</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether the button uses the quiet style.</td></tr>
+    <tr><td><code>onPress</code></td><td><code>(event: PressEvent) =&gt; void</code></td><td>-</td><td>Handler called when a press is released over the target.</td></tr>
+    <tr><td><code>onPressStart</code> / <code>onPressEnd</code> / <code>onPressChange</code></td><td><code>PressEvent / boolean</code></td><td>-</td><td>Handlers for the press interaction lifecycle.</td></tr>
+    <tr><td><code>preventFocusOnPress</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether pressing prevents focus from moving to the button.</td></tr>
+    <tr><td><code>size</code></td><td><code>"L" | "M" | "S" | "XL" | "XS" | undefined</code></td><td><code>M</code></td><td>Size of the ActionButton.</td></tr>
+    <tr><td><code>staticColor</code></td><td><code>"auto" | "black" | "white" | undefined</code></td><td>-</td><td>Static color over a color background.</td></tr>
+    <tr><td><code>styles</code></td><td><code>StylesProp | undefined</code></td><td>-</td><td>Spectrum-defined styles returned by the style macro.</td></tr>
+    <tr><td><code>type</code></td><td><code>"button" | "reset" | "submit" | undefined</code></td><td><code>button</code></td><td>Behavior when used inside a form.</td></tr>
+    <tr><td><code>UNSAFE_className</code> / <code>UNSAFE_style</code></td><td><code>UnsafeClassName / CSSProperties</code></td><td>-</td><td>Last-resort custom CSS escape hatches.</td></tr>
+    <tr><td><code>value</code></td><td><code>string | undefined</code></td><td>-</td><td>Value submitted with form data.</td></tr>
+  </tbody>
+</table>
+
+<Controls />

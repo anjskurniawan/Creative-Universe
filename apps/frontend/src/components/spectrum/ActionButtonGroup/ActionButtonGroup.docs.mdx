@@ -1,0 +1,73 @@
+import { Meta, Title, Description, Primary, Controls, Stories, Source } from "@storybook/addon-docs/blocks";
+import * as ActionButtonGroupStories from "./ActionButtonGroup.stories";
+
+<Meta of={ActionButtonGroupStories} />
+<Title />
+<Description>
+An ActionButtonGroup is a grouping of related ActionButtons. This wrapper uses React Spectrum S2 and automatically applies Spectrum styling, typography, color schemes, and accessibility behavior.
+</Description>
+
+## QA color scheme
+
+Use the **Spectrum Light** or **Spectrum Dark** toolbar control in Storybook to inspect the group in both color schemes.
+
+## Basic usage
+
+Place related ActionButtons inside the group. Use `Text` alongside an icon to provide visible labels.
+
+<Source language="tsx" code={`import { ActionButtonGroup, ActionButton, Text } from "@/components/spectrum/ActionButtonGroup";
+import Cut from "@react-spectrum/s2/icons/Cut";
+import Copy from "@react-spectrum/s2/icons/Copy";
+import Paste from "@react-spectrum/s2/icons/Paste";
+
+<ActionButtonGroup>
+  <ActionButton aria-label="Cut"><Cut /><Text>Cut</Text></ActionButton>
+  <ActionButton aria-label="Copy"><Copy /><Text>Copy</Text></ActionButton>
+  <ActionButton aria-label="Paste"><Paste /><Text>Paste</Text></ActionButton>
+</ActionButtonGroup>`} />
+<Primary />
+
+## Orientation and density
+
+Set `orientation="vertical"` to stack buttons. Use `density="compact"` for tighter spacing, or keep the default `regular` density for standard spacing.
+
+<Source language="tsx" code={`<ActionButtonGroup orientation="vertical" density="compact">
+  <ActionButton aria-label="Cut">Cut</ActionButton>
+  <ActionButton aria-label="Copy">Copy</ActionButton>
+</ActionButtonGroup>`} />
+
+## Justified and quiet groups
+
+Set `isJustified` to divide the available width equally between buttons. Set `isQuiet` when the group should use the quiet ActionButton style. Use `staticColor="black"` or `staticColor="white"` when the group appears over a colored background.
+
+## Disabled state
+
+Set `isDisabled` on the group to disable all ActionButtons in the group consistently.
+
+<Stories title="Examples" include={["Vertical", "Compact", "Justified", "Disabled", "Quiet"]} />
+
+## API
+
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>aria-describedby</code></td><td><code>string | undefined</code></td><td>-</td><td>Identifies the element or elements that describe the group.</td></tr>
+    <tr><td><code>aria-details</code></td><td><code>string | undefined</code></td><td>-</td><td>Identifies detailed information about the group.</td></tr>
+    <tr><td><code>aria-label</code></td><td><code>string | undefined</code></td><td>-</td><td>Defines an accessible label for the group.</td></tr>
+    <tr><td><code>aria-labelledby</code></td><td><code>string | undefined</code></td><td>-</td><td>References the element that labels the group.</td></tr>
+    <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>-</td><td>The ActionButton children of the group.</td></tr>
+    <tr><td><code>density</code></td><td><code>"compact" | "regular" | undefined</code></td><td><code>regular</code></td><td>Spacing between the buttons.</td></tr>
+    <tr><td><code>isDisabled</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether the group is disabled.</td></tr>
+    <tr><td><code>isJustified</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether buttons divide the container width equally.</td></tr>
+    <tr><td><code>isQuiet</code></td><td><code>boolean | undefined</code></td><td>-</td><td>Whether the group uses the quiet style.</td></tr>
+    <tr><td><code>orientation</code></td><td><code>"horizontal" | "vertical" | undefined</code></td><td><code>horizontal</code></td><td>The axis the group should align with.</td></tr>
+    <tr><td><code>size</code></td><td><code>"L" | "M" | "S" | "XL" | "XS" | undefined</code></td><td><code>M</code></td><td>Size of the buttons.</td></tr>
+    <tr><td><code>slot</code></td><td><code>string | null | undefined</code></td><td>-</td><td>A slot name for receiving props from a parent.</td></tr>
+    <tr><td><code>staticColor</code></td><td><code>"auto" | "black" | "white" | undefined</code></td><td>-</td><td>Static color style for groups over a color background.</td></tr>
+    <tr><td><code>styles</code></td><td><code>StylesPropWithHeight | undefined</code></td><td>-</td><td>Spectrum-defined styles returned by the style macro.</td></tr>
+    <tr><td><code>UNSAFE_className</code></td><td><code>UnsafeClassName | undefined</code></td><td>-</td><td>Custom class name, intended only as a last resort.</td></tr>
+    <tr><td><code>UNSAFE_style</code></td><td><code>CSSProperties | undefined</code></td><td>-</td><td>Inline style, intended only as a last resort.</td></tr>
+  </tbody>
+</table>
+
+<Controls />

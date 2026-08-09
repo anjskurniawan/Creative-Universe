@@ -28,7 +28,7 @@ import { DropdownMenuPreview, ModalPreview, AuthCardPreview, AuthCardHeaderPrevi
 import { DefaultStatsGridPreview, QuickActionsSectionPreview, SystemStatusGridPreview, GroupAccordionPreview, ReportSummaryInfoPreview } from "./features/index";
 import { OddsGameboyFramePreview, OddsRichTextEditorPreview } from "./odds/index";
 import { AssessmentMobileCardsPreview, ReportHeaderPreview, ReportToolbarPreview, CreativeReportMetricCardPreview, AssessmentTableActionsPreview, AssessmentTablePreview, AssessmentTableAvatarPreview, AssessmentTableCellPreview, AssessmentTableHeaderPreview, AssessmentTableRowPreview, HrdDateModalPreview, AspectScoreListPreview } from "./creative-report/index";
-import { ButtonPreview as PrimitivesButtonPreview } from "./primitives/index";
+import { SpectrumAccordionPreview, SpectrumActionBarPreview, SpectrumActionButtonGroupPreview, SpectrumActionButtonPreview, SpectrumActionMenuPreview, SpectrumAvatarGroupPreview, SpectrumAvatarPreview, SpectrumBadgePreview, SpectrumButtonPreview, SpectrumCalendarPreview, SpectrumSideNavPreview } from "./spectrum/index";
 
 export { DefaultPreviewPlaceholder };
 export const PREVIEW_REGISTRY: Record<string, React.ReactNode> = {
@@ -39,7 +39,17 @@ export const PREVIEW_REGISTRY: Record<string, React.ReactNode> = {
   ProfileCard: <ProfileCardPreview />, ConfirmModal: <ConfirmModalPreview />, CustomDatePicker: <CustomDatePickerPreview />, Toast: <ToastPreview />,
   AccessDenied: <AccessDeniedPreview />, ButtonAction: <ButtonActionPreview />, ContentTitle: <ContentTitlePreview />, Logo: <LogoPreview />,
   PrimaryActionLink: <PrimaryActionLinkPreview />, Button: <ButtonPreview />, Input: <InputPreview />,
-  "primitives/Button": <PrimitivesButtonPreview />,
+  "spectrum/Button": <SpectrumButtonPreview />,
+  "spectrum/Accordion": <SpectrumAccordionPreview />,
+  "spectrum/ActionBar": <SpectrumActionBarPreview />,
+  "spectrum/ActionButtonGroup": <SpectrumActionButtonGroupPreview />,
+  "spectrum/ActionButton": <SpectrumActionButtonPreview />,
+  "spectrum/ActionMenu": <SpectrumActionMenuPreview />,
+  "spectrum/Avatar": <SpectrumAvatarPreview />,
+  "spectrum/AvatarGroup": <SpectrumAvatarGroupPreview />,
+  "spectrum/Badge": <SpectrumBadgePreview />,
+  "spectrum/SideNav": <SpectrumSideNavPreview />,
+  "spectrum/Calendar": <SpectrumCalendarPreview />,
   AuthParticleBackground: <AuthParticleBackgroundPreview />,
   Background: <BackgroundPreview />,
   CreativeUniverseLogo: <CreativeUniverseLogoPreview />,

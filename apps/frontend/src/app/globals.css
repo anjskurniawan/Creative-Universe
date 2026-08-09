@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap");
 @import "tailwindcss";
+@import "../styles/spectrum-fonts.css";
 .v1-code-panel { background: #20252b; font-family: Consolas, "Courier New", monospace; }
 .v1-code-panel { scrollbar-color: #4b5563 #20252b; scrollbar-width: thin; }
 .v1-code-panel::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -1518,4 +1519,24 @@
   .cu-option-content-enter {
     animation: none;
   }
+}
+/* Spectrum S2 baseline attached automatically by components/spectrum wrappers. */
+.spectrum-component {
+  display: contents;
+  --s2-color-scheme: light;
+  --s2-container-bg: #fff;
+  --s2-scale: 1;
+  --s2-font-size-base: 14;
+  --lightningcss-light: initial;
+  --lightningcss-dark: ;
+  color-scheme: light;
+}
+
+[data-theme="dark"] .spectrum-component,
+[data-spectrum-color-scheme="dark"] .spectrum-component {
+  --s2-color-scheme: dark;
+  --s2-container-bg: #111;
+  --lightningcss-light: ;
+  --lightningcss-dark: initial;
+  color-scheme: dark;
 }

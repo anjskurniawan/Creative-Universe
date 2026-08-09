@@ -12,6 +12,20 @@ const dirname =
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
+  optimizeDeps: {
+    include: [
+      "@react-spectrum/s2/ActionButtonGroup",
+      "@react-spectrum/s2/ActionButton",
+      "@react-spectrum/s2/ActionMenu",
+      "@react-spectrum/s2/Avatar",
+      "@react-spectrum/s2/AvatarGroup",
+      "@react-spectrum/s2/Badge",
+      "@react-spectrum/s2/SideNav",
+      "@react-spectrum/s2/icons/Copy",
+      "@react-spectrum/s2/icons/Cut",
+      "@react-spectrum/s2/icons/Paste",
+    ],
+  },
   test: {
     projects: [
       {

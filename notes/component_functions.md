@@ -56,12 +56,15 @@ Kumpulan komponen atom dan elemen dasar (*design system primitives*) yang diguna
 * **`report-metric-card.tsx`**: Card metrik Creative Report dengan icon, label, nilai, dan accent indicator.
 * **`guest-mobile-orbit-motion.tsx`**: Animasi orbit visual pada landing page mobile.
 
-## 3.1 Komponen Foundation Primitives - `src/components/primitives/`
-Komponen dasar tanpa keputusan visual sebagai fondasi design system.
+## 3.1 Komponen React Spectrum S2 - `src/components/spectrum/`
+Component dengan visual dan interaksi bawaan Adobe React Spectrum S2.
 
-* **`button.tsx`**: Tombol native tanpa styling yang meneruskan atribut HTML dan ref.
-
----
+* **`accordion.tsx`**: Wrapper Accordion React Spectrum S2 dengan item expandable, controlled expansion, dan header action.
+* **`action-bar.tsx`**: Wrapper ActionBar React Spectrum S2 untuk aksi pada item terpilih, termasuk bulk selection, clear selection, dan ActionButton.
+* **`ActionButtonGroup/ActionButtonGroup.tsx`**: Wrapper ActionButtonGroup React Spectrum S2 untuk mengelompokkan ActionButton terkait secara horizontal atau vertical.
+* **`ActionButton/ActionButton.tsx`**: Wrapper ActionButton React Spectrum S2 untuk aksi task-based dengan dukungan press event, icon/content, quiet, disabled, dan pending state.
+* **`button.tsx`**: Wrapper Button React Spectrum S2 dengan variant, ukuran, dan state aksesibel bawaan.
+* **`calendar.tsx`**: Wrapper Calendar React Spectrum S2 untuk pemilihan tanggal tunggal, validasi rentang tanggal, dan kalender internasional.
 
 ## 4. Komponen Feedback & Status - `src/components/feedback/`
 Mengelola tampilan feedback visual saat terjadi galat (error) atau halaman tidak ditemukan.
@@ -124,3 +127,23 @@ Komponen-komponen spesifik yang terikat dengan logika bisnis modul tertentu.
   * `system-env-bar.tsx` & `dashboard.types.ts`: Konfigurasi bar variabel lingkungan dan definisi tipe data dashboard.
 * **`/panel` (Halaman Admin & Staff):**
   * Komponen-komponen spesifik halaman admin yang dikelompokkan dalam sub-folder `/users`, `/roles`, `/profile`, dan `/maintenance`.
+### `apps/frontend/src/components/spectrum/ActionMenu/ActionMenu.tsx`
+- Wrapper React Spectrum S2 untuk menu aksi tambahan berbasis ActionButton.
+- Mengekspos MenuItem, Text, dan Keyboard untuk menyusun item menu yang accessible.
+- Mendukung disabled, quiet, controlled open, placement, sizing, dan keyboard interaction melalui props Spectrum.
+### `apps/frontend/src/components/spectrum/Avatar/Avatar.tsx`
+- Wrapper React Spectrum S2 untuk thumbnail representasi user atau organisasi.
+- Mendukung image source, alt text, fallback, ukuran, dan over-background state.
+- Mempertahankan props dan accessibility behavior resmi Avatar S2.
+### `apps/frontend/src/components/spectrum/AvatarGroup/AvatarGroup.tsx`
+- Wrapper React Spectrum S2 untuk mengelompokkan avatar yang saling terkait.
+- Mengekspos child `Avatar` dari subpath resmi AvatarGroup agar pola penggunaan tetap konsisten.
+- Mendukung label, ukuran group, accessible labeling, dan seluruh props resmi AvatarGroup S2.
+### `apps/frontend/src/components/spectrum/Badge/Badge.tsx`
+- Wrapper React Spectrum S2 untuk metadata singkat berkategori warna.
+- Mendukung semantic variant, fill style, ukuran, dan overflow behavior.
+- Mempertahankan props accessibility dan styling resmi Badge S2.
+### `apps/frontend/src/components/spectrum/SideNav/SideNav.tsx`
+- Wrapper React Spectrum S2 untuk navigasi nested hierarchical links.
+- Mengekspos SideNavItem, SideNavItemContent, SideNavItemLink, SideNavSection, dan SideNavHeader.
+- Mendukung route selection terkontrol, expansion, collections, sections, disabled items, dan accessibility.

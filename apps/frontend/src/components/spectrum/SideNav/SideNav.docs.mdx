@@ -1,0 +1,86 @@
+import {Canvas, Controls, Meta} from "@storybook/addon-docs/blocks";
+import * as SideNavStories from "./SideNav.stories";
+
+<Meta of={SideNavStories} />
+
+# SideNav
+
+A SideNav provides users with a way to navigate a nested hierarchical set of links. It supports static and dynamic collections, expansion, routing, sections, disabled items, and accessible navigation semantics.
+
+## Basic usage
+
+```tsx
+import {SideNav, SideNavItem, SideNavItemContent, SideNavItemLink, Text} from "@/components/spectrum/SideNav";
+
+<SideNav aria-label="Files" selectedRoute="/guidelines" defaultExpandedKeys={["guidelines"]}>
+  <SideNavItem href="/guidelines" id="guidelines" textValue="Guidelines">
+    <SideNavItemContent>
+      <SideNavItemLink><Text>Guidelines</Text></SideNavItemLink>
+    </SideNavItemContent>
+  </SideNavItem>
+</SideNav>
+```
+
+<Canvas of={SideNavStories.Default} />
+
+## Sections
+
+Use `SideNavSection` and `SideNavHeader` to group related items. Sections are non-collapsible and non-interactive.
+
+<Canvas of={SideNavStories.WithSections} />
+
+## Routing and selection
+
+SideNav does not support uncontrolled selection. Manage the current route through `selectedRoute` and update it from your router. Items with an `href` must render a `SideNavItemLink` inside `SideNavItemContent`.
+
+## Collections and nesting
+
+SideNav follows the Collection Components API. Use `items` and a recursive render function for dynamic collections, or use static nested `SideNavItem` children for small trees. Set `defaultExpandedKeys` for initial expansion and `expandedKeys` with `onExpandedChange` for controlled expansion.
+
+## Accessibility
+
+Provide `aria-label` or `aria-labelledby` for the navigation landmark. Give each item a useful `textValue` for typeahead and accessible collection behavior. Use `disabledKeys` for items that cannot be selected or interacted with.
+
+## API
+
+### SideNav
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `aria-label` | `string` | — | Defines an accessible name for the navigation. |
+| `autoFocus` | `boolean \| FocusStrategy` | — | Whether to focus the grid list or an option. |
+| `children` | `ReactNode \| (item: T) => ReactNode` | — | The contents of the collection. |
+| `defaultExpandedKeys` | `Iterable<Key>` | — | Initial expanded keys in the collection. |
+| `disabledKeys` | `Iterable<Key>` | — | Items that cannot be selected or interacted with. |
+| `expandedKeys` | `Iterable<Key>` | — | Currently expanded keys in the collection. |
+| `id` | `string` | — | The element's unique identifier. |
+| `items` | `Iterable<T>` | — | Item objects in a dynamic collection. |
+| `onExpandedChange` | `(keys: Set<Key>) => any` | — | Called when items are expanded or collapsed. |
+| `selectedRoute` | `string \| null` | — | The route currently selected. |
+| `styles` | `StylesPropWithHeight` | — | Spectrum-defined styles. |
+| `UNSAFE_className` | `UnsafeClassName` | — | Custom class name, intended only as a last resort. |
+| `UNSAFE_style` | `CSSProperties` | — | Inline style, intended only as a last resort. |
+
+### SideNavItem
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | — | Content and nested children of the item. |
+| `hasChildItems` | `boolean` | — | Whether the item has children. |
+| `href` | `string` | — | URL to link to. |
+| `id` | `Key` | — | Unique item identifier. |
+| `isDisabled` | `boolean` | — | Whether the item is disabled. |
+| `textValue` | `string` | — | Text representation used for typeahead. |
+
+### SideNavItemContent and SideNavItemLink
+
+Both components accept `children: ReactNode`. `SideNavItemContent` contains the item content and optional actions; `SideNavItemLink` renders the navigable content for items with an `href`.
+
+### SideNavSection and SideNavHeader
+
+`SideNavSection` groups items, while `SideNavHeader` renders the section heading. Sections do not collapse or act as links.
+
+## Controls
+
+<Controls />
+

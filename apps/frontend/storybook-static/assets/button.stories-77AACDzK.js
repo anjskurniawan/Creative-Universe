@@ -1,5 +1,0 @@
-import{n as e}from"./rolldown-runtime-CsOFd3vK.js";import{t}from"./react-Drno7eUL.js";import{f as n}from"./iframe-DCqreJn3.js";var r,i,a;function o(){return(o=e((()=>{r=n(),i=t(),a=(0,i.forwardRef)(function({type:e=`button`,...t},n){return(0,r.jsx)(`button`,{ref:n,type:e,...t})}),a.__docgenInfo={description:``,methods:[],displayName:`Button`,props:{type:{defaultValue:{value:`"button"`,computed:!1},required:!1}}}})))()}var s,c,l,u,d;function f(){return(f=e((()=>{o(),{fn:s}=__STORYBOOK_MODULE_TEST__,c={title:`Primitives/Button`,component:a,parameters:{layout:`centered`},tags:[`autodocs`],args:{children:`Primitive button`,onClick:s()}},l={},u={args:{disabled:!0}},l.parameters={...l.parameters,docs:{...l.parameters?.docs,source:{originalSource:`{}`,...l.parameters?.docs?.source}}},u.parameters={...u.parameters,docs:{...u.parameters?.docs,source:{originalSource:`{
-  args: {
-    disabled: true
-  }
-}`,...u.parameters?.docs?.source}}},d=[`Default`,`Disabled`]})))()}f();export{l as Default,u as Disabled,d as __namedExportsOrder,c as default};

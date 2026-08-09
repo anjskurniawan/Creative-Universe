@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spectrum Component"
+  short_description: "Create and document React Spectrum S2 components in PascalCase."
+  default_prompt: "Create a Spectrum component from the complete instructions provided, including source wrapper, Storybook stories/docs, Developer Library preview, validation, and work logging."

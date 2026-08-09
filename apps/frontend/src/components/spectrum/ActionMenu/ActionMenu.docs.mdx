@@ -1,0 +1,68 @@
+import {Canvas, Controls, Meta} from '@storybook/addon-docs/blocks';
+import * as ActionMenuStories from './ActionMenu.stories';
+
+<Meta of={ActionMenuStories} />
+
+# ActionMenu
+
+ActionMenu combines an ActionButton with a Menu for simple “more actions” use cases. It provides Spectrum styling, keyboard navigation, focus management, and accessible menu semantics.
+
+## Basic usage
+
+```tsx
+import {ActionMenu, Keyboard, MenuItem, Text} from '@/components/spectrum/ActionMenu';
+
+<ActionMenu aria-label="More actions">
+  <MenuItem textValue="Copy" onAction={() => copySelection()}>
+    <Text slot="label">Copy</Text>
+    <Text slot="description">Copy the selected text</Text>
+    <Keyboard>⌘C</Keyboard>
+  </MenuItem>
+</ActionMenu>
+```
+
+<Canvas of={ActionMenuStories.Default} />
+
+## Variants and states
+
+Use `isQuiet` for a low-emphasis trigger, `isDisabled` to disable the entire menu, and `disabledKeys` to disable specific menu items. `size` controls the trigger while `menuSize` controls the menu.
+
+<Canvas of={ActionMenuStories.Quiet} />
+<Canvas of={ActionMenuStories.DisabledItems} />
+
+## Controlled open state
+
+Use `isOpen` with `onOpenChange` when the open state must be controlled by the parent.
+
+<Canvas of={ActionMenuStories.Controlled} />
+
+## Placement and accessibility
+
+Use `direction`, `align`, and `shouldFlip` to control placement. The menu flips automatically by default when space is limited. Provide an accessible name with `aria-label` or `aria-labelledby`, and use `textValue` for items whose visible content is not plain text.
+
+## API
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `align` | `"end" \| "start"` | `start` | Alignment of the menu relative to the trigger. |
+| `children` | `ReactNode \| (item: T) => ReactNode` | — | The contents of the collection. |
+| `defaultOpen` | `boolean` | — | Whether the overlay is open by default. |
+| `direction` | `"bottom" \| "end" \| "left" \| "right" \| "start" \| "top"` | `bottom` | Where the menu opens relative to its trigger. |
+| `disabledKeys` | `Iterable<Key>` | — | Items that cannot be selected or focused. |
+| `isDisabled` | `boolean` | — | Whether the button is disabled. |
+| `isOpen` | `boolean` | — | Whether the overlay is controlled as open. |
+| `isQuiet` | `boolean` | — | Whether the trigger uses a quiet style. |
+| `items` | `Iterable<T>` | — | Item objects in the collection. |
+| `menuSize` | `"L" \| "M" \| "S" \| "XL"` | `M` | The size of the Menu. |
+| `onAction` | `(key: Key, value: T) => void` | — | Called when an item is selected. |
+| `onOpenChange` | `(isOpen: boolean) => void` | — | Called when the overlay open state changes. |
+| `shouldCloseOnSelect` | `boolean` | — | Whether the menu closes when an item is selected. |
+| `shouldFlip` | `boolean` | `true` | Whether the menu automatically flips when space is limited. |
+| `size` | `"L" \| "M" \| "S" \| "XL" \| "XS"` | `M` | Size of the ActionButton trigger. |
+| `styles` | `StylesProp` | — | Spectrum-defined styles. |
+| `UNSAFE_className` | `UnsafeClassName` | — | Custom class name, intended only as a last resort. |
+| `UNSAFE_style` | `CSSProperties` | — | Inline style, intended only as a last resort. |
+
+## Controls
+
+<Controls />

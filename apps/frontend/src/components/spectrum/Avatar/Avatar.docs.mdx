@@ -1,0 +1,55 @@
+import {Canvas, Controls, Meta} from "@storybook/addon-docs/blocks";
+import * as AvatarStories from "./Avatar.stories";
+
+<Meta of={AvatarStories} />
+
+# Avatar
+
+An avatar is a thumbnail representation of an entity, such as a user or an organization. This wrapper uses React Spectrum S2 styling and preserves its accessible image behavior.
+
+## Basic usage
+
+```tsx
+import {Avatar} from "@/components/spectrum/Avatar";
+
+<Avatar src="/images/user.png" alt="Alex Johnson" />
+```
+
+<Canvas of={AvatarStories.Default} />
+
+## Sizes
+
+Use the `size` prop to select a supported Spectrum size or provide a numeric size. The default size is `24`.
+
+<Canvas of={AvatarStories.Small} />
+<Canvas of={AvatarStories.Large} />
+
+## Backgrounds and fallback
+
+Set `isOverBackground` when the avatar appears over a color background. If no `src` is supplied, Spectrum renders the appropriate fallback treatment.
+
+<Canvas of={AvatarStories.OverBackground} />
+<Canvas of={AvatarStories.WithoutImage} />
+
+## Accessibility
+
+Always provide meaningful `alt` text when the avatar communicates identity. If the avatar is purely decorative, use an empty `alt` value. The image URL is passed through the `src` prop.
+
+## API
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `alt` | `string` | — | Text description of the avatar. |
+| `id` | `string` | — | The element's unique identifier. |
+| `isOverBackground` | `boolean` | — | Whether the avatar is over a color background. |
+| `size` | `16 \| 20 \| 24 \| 28 \| 32 \| 36 \| 40 \| 44 \| 48 \| 56 \| 64 \| 80 \| 96 \| 112 \| number` | `24` | The size of the avatar. |
+| `slot` | `string \| null` | — | A slot name for receiving parent props. |
+| `src` | `string` | — | The image URL for the avatar. |
+| `styles` | `StylesPropWithoutWidth` | — | Spectrum-defined styles returned by the style macro. |
+| `UNSAFE_className` | `UnsafeClassName` | — | Custom class name, intended only as a last resort. |
+| `UNSAFE_style` | `CSSProperties` | — | Inline style, intended only as a last resort. |
+
+## Controls
+
+<Controls />
+

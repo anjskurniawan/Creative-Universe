@@ -1,0 +1,159 @@
+import {
+  Controls,
+  Description,
+  Meta,
+  Primary,
+  Source,
+  Stories,
+  Title,
+} from "@storybook/addon-docs/blocks";
+import * as AccordionStories from "./Accordion.stories";
+
+<Meta of={AccordionStories} />
+
+<Title />
+
+<Description>
+  An accordion is a container for multiple accordion items. Import it from the Creative Universe
+  Spectrum wrapper to receive Spectrum styling, color scheme support, and Adobe Clean typography
+  automatically.
+</Description>
+
+## Basic usage
+
+<Source
+  language="tsx"
+  code={`import {
+  Accordion,
+  AccordionItem,
+  AccordionItemPanel,
+  AccordionItemTitle,
+} from "@/components/spectrum/Accordion";
+
+<Accordion>
+  <AccordionItem id="personal">
+    <AccordionItemTitle>Personal Information</AccordionItemTitle>
+    <AccordionItemPanel>Personal information form here.</AccordionItemPanel>
+  </AccordionItem>
+  <AccordionItem id="billing">
+    <AccordionItemTitle>Billing Address</AccordionItemTitle>
+    <AccordionItemPanel>Billing address form here.</AccordionItemPanel>
+  </AccordionItem>
+</Accordion>`}
+/>
+
+<Primary />
+
+## Expanding
+
+Use `defaultExpandedKeys` for the initial uncontrolled state. Use `expandedKeys` with `onExpandedChange` to control which items are open. The expanded keys correspond to each `AccordionItem` `id`.
+
+<Source
+  language="tsx"
+  code={`import { useState } from "react";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemPanel,
+  AccordionItemTitle,
+  type Key,
+} from "@/components/spectrum/Accordion";
+
+function Example() {
+const [expandedKeys, setExpandedKeys] = useState(new Set<Key>(["settings"]));
+
+return (
+<Accordion expandedKeys={expandedKeys} onExpandedChange={setExpandedKeys}>
+<AccordionItem id="settings">
+<AccordionItemTitle>Settings</AccordionItemTitle>
+<AccordionItemPanel>Application settings content.</AccordionItemPanel>
+</AccordionItem>
+</Accordion>
+);
+}`}
+/>
+
+Set `allowsMultipleExpanded` when several items may stay open at the same time.
+
+## Content
+
+Use `AccordionItemHeader` to add elements next to an item title, such as icons or action buttons.
+
+<Source
+  language="tsx"
+  code={`import { ActionButton } from "@react-spectrum/s2/ActionButton";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemHeader,
+  AccordionItemPanel,
+  AccordionItemTitle,
+} from "@/components/spectrum/Accordion";
+
+<Accordion>
+  <AccordionItem id="project">
+    <AccordionItemHeader>
+      <AccordionItemTitle>Project Settings</AccordionItemTitle>
+      <ActionButton aria-label="Edit project settings">Edit</ActionButton>
+    </AccordionItemHeader>
+    <AccordionItemPanel>
+      Configure your project settings including name, description, and permissions.
+    </AccordionItemPanel>
+  </AccordionItem>
+</Accordion>`}
+/>
+
+<Stories title="Examples" include={["Controlled", "MultipleExpanded", "WithHeaderActions"]} />
+
+## API
+
+```tsx
+<Accordion>
+  <AccordionItem>
+    <AccordionItemHeader>
+      <AccordionItemTitle />
+    </AccordionItemHeader>
+    <AccordionItemPanel />
+  </AccordionItem>
+</Accordion>
+```
+
+### Accordion
+
+| Name                                | Type                             | Default   | Description                                                        |
+| ----------------------------------- | -------------------------------- | --------- | ------------------------------------------------------------------ |
+| `allowsMultipleExpanded`            | `boolean`                        | —         | Whether multiple accordion items can be expanded at the same time. |
+| `defaultExpandedKeys`               | `Iterable<Key>`                  | —         | The initial expanded keys in the uncontrolled state.               |
+| `expandedKeys`                      | `Iterable<Key>`                  | —         | The currently expanded keys in the controlled state.               |
+| `onExpandedChange`                  | `(keys: Set<Key>) => void`       | —         | Called when accordion items are expanded or collapsed.             |
+| `density`                           | `compact \| regular \| spacious` | `regular` | The amount of space between accordion items.                       |
+| `size`                              | `S \| M \| L \| XL`              | `M`       | The size of the accordion.                                         |
+| `isDisabled`                        | `boolean`                        | `false`   | Whether all accordion items are disabled.                          |
+| `isQuiet`                           | `boolean`                        | `false`   | Whether the accordion uses a quiet style.                          |
+| `styles`                            | `StylesPropWithHeight`           | —         | Spectrum-defined styles returned by the style macro.               |
+| `UNSAFE_className` / `UNSAFE_style` | `string` / `CSSProperties`       | —         | Last-resort custom CSS escape hatches.                             |
+
+### AccordionItem
+
+| Name                         | Type                            | Default   | Description                                       |
+| ---------------------------- | ------------------------------- | --------- | ------------------------------------------------- |
+| `id`                         | `Key`                           | —         | Identifier that matches `expandedKeys`.           |
+| `defaultExpanded`            | `boolean`                       | `false`   | Whether the item is initially expanded.           |
+| `isExpanded`                 | `boolean`                       | —         | Controlled expanded state for an individual item. |
+| `onExpandedChange`           | `(isExpanded: boolean) => void` | —         | Called when the item changes expanded state.      |
+| `isDisabled`                 | `boolean`                       | `false`   | Whether the item is disabled.                     |
+| `density`, `size`, `isQuiet` | —                               | Inherited | Item-level display options.                       |
+
+### AccordionItemHeader and AccordionItemTitle
+
+`AccordionItemHeader` accepts the header content. `AccordionItemTitle` renders the item heading and accepts `level`, which defaults to `3`. Both also support `id`, `UNSAFE_className`, and `UNSAFE_style`.
+
+### AccordionItemPanel
+
+`AccordionItemPanel` contains the expandable content. It supports standard accessibility labels and `role`, which defaults to `group`; use `region` when the panel needs a landmark role.
+
+## Controls
+
+Use the Storybook Controls panel to QA `allowsMultipleExpanded`, `density`, `isDisabled`, `isQuiet`, and `size`.
+
+<Controls />
