@@ -25,23 +25,34 @@ export function isCollapsible(item: SettingsNavItem | SettingsNavCollapsible): i
 
 export const NAV_GROUPS: SettingsNavGroup[] = [
   { title: "Pengaturan Akun", items: [
-    { href: "/settings/profile", mobileHref: "/settings/profile", label: "Profil & Tampilan", icon: "person" },
-    { href: "/settings/profile?tab=notifications", mobileHref: "/settings/profile?tab=notifications", label: "Notifikasi", icon: "notifications" },
-    { href: "/settings/profile?tab=privacy", mobileHref: "/settings/profile?tab=privacy", label: "Privasi Profil", icon: "visibility" },
-    { href: "/settings/profile?tab=applications", mobileHref: "/settings/profile?tab=applications", label: "Aplikasi Saya", icon: "apps" },
+    { href: "/settings/account/profile", mobileHref: "/settings/account/profile", label: "Profil", icon: "person" },
+    { href: "/settings/account/appearance", mobileHref: "/settings/account/appearance", label: "Tampilan", icon: "palette" },
+    { href: "/settings/account/notifications", mobileHref: "/settings/account/notifications", label: "Notifikasi", icon: "notifications" },
+    { href: "/settings/account/privacy", mobileHref: "/settings/account/privacy", label: "Privasi Profil", icon: "visibility" },
+    { href: "/settings/account/applications", mobileHref: "/settings/account/applications", label: "Aplikasi Saya", icon: "apps" },
   ] },
-  { title: "Keamanan & Akses", items: [{ href: "/settings/profile?tab=security", mobileHref: "/settings/security", label: "Perangkat & Sesi", icon: "devices" }] },
-  { title: "Hak Akses", items: [{ href: "/settings/profile?tab=role_settings", mobileHref: "/settings/role-settings", label: "Pengaturan Peran", icon: "admin_panel_settings", permission: "manage-settings" }] },
-  { title: "Log Audit", items: [{ href: "/settings/profile?tab=activity_log", mobileHref: "/settings/activity-log", label: "Jejak Aktivitas", icon: "history" }] },
-  { title: "Administrasi", items: [{ href: "/roles", mobileHref: "/settings/roles", label: "Kelola Role", icon: "shield_person", permission: "manage-roles" }] },
+  { title: "Security", items: [
+    { href: "/settings/security/authentication", mobileHref: "/settings/security/authentication", label: "Authentication", icon: "lock" },
+    { href: "/settings/security/session", mobileHref: "/settings/security/session", label: "Session", icon: "devices" },
+    { href: "/settings/security/activity-log", mobileHref: "/settings/security/activity-log", label: "Log Aktivitas", icon: "history" },
+  ] },
+  { title: "Administrasi", items: [
+    { href: "/settings/administration/system-configuration", mobileHref: "/settings/administration/system-configuration", label: "Konfigurasi Sistem", icon: "settings" },
+    { href: "/settings/administration/workflow", mobileHref: "/settings/administration/workflow", label: "Alur Kerja", icon: "account_tree" },
+    { href: "/settings/administration/generator-preferences", mobileHref: "/settings/administration/generator-preferences", label: "Preferensi Generator", icon: "auto_awesome" },
+    { href: "/settings/administration/access-control", mobileHref: "/settings/administration/access-control", label: "Hak Akses", icon: "shield_person", permission: "manage-settings" },
+  ] },
 ];
 
 export function hrefMatches(href: string, pathname: string | null, searchParams: URLSearchParams | null): boolean {
   const [hrefPath, hrefQuery] = href.split("?");
-  const pathMatch = pathname === hrefPath || (pathname?.startsWith(hrefPath + "/") ?? false);
+  const normalizedPathname = (pathname ?? "").replace(/\/$/, "") || "/";
+  const pathMatch = hrefPath === "/settings/account/profile"
+    ? normalizedPathname === hrefPath
+    : normalizedPathname === hrefPath || normalizedPathname.startsWith(hrefPath + "/");
   if (!pathMatch) return false;
   if (hrefQuery) return new URLSearchParams(hrefQuery).get("tab") === (searchParams?.get("tab") ?? null);
-  if (hrefPath === "/settings/profile") return !searchParams?.get("tab");
+  if (hrefPath === "/settings/account/profile") return !searchParams?.get("tab");
   return true;
 }
 

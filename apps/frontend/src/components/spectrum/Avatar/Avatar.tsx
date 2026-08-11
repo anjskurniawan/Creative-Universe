@@ -17,4 +17,3 @@ export const Avatar = forwardRef<SpectrumAvatarRef, AvatarProps>(function Avatar
     </div>
   );
 });
-

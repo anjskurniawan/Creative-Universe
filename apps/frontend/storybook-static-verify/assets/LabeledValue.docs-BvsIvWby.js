@@ -1,0 +1,6 @@
+import{n as e}from"./rolldown-runtime-CsOFd3vK.js";import{o as t}from"./iframe-dkOi0t0j.js";import{i as n,r}from"./react-k3YPvb47.js";import{c as i,n as a,p as o}from"./blocks-BcDC8w0t.js";import{n as s,r as c,t as l}from"./LabeledValue.stories-CaNOmVHl.js";function u(e){let t={h1:`h1`,h2:`h2`,p:`p`,...n(),...e.components};return(0,f.jsxs)(f.Fragment,{children:[(0,f.jsx)(i,{of:s}),`
+`,(0,f.jsx)(t.h1,{id:`labeledvalue`,children:`LabeledValue`}),`
+`,(0,f.jsx)(t.p,{children:`The LabeledValue wrapper exposes the official React Spectrum S2 component with Spectrum styling and ref forwarding.`}),`
+`,(0,f.jsx)(a,{of:l}),`
+`,(0,f.jsx)(t.h2,{id:`accessibility`,children:`Accessibility`}),`
+`,(0,f.jsx)(t.p,{children:`Use the official React Spectrum S2 API and provide the accessible labels, values, and collection semantics required by the component's context.`})]})}function d(e={}){let{wrapper:t}={...n(),...e.components};return t?(0,f.jsx)(t,{...e,children:(0,f.jsx)(u,{...e})}):u(e)}var f;function p(){return(p=e((()=>{f=t(),r(),o(),c()})))()}p();export{d as default};

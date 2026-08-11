@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-CsOFd3vK.js";import{t}from"./react-Drno7eUL.js";import{n,r}from"./Color-BtnyzXi3.js";function i(e){return(0,a.useMemo)(()=>{if(typeof e==`string`)try{return n(e)}catch{return}return e},[e])}var a;function o(){return(o=e((()=>{r(),a=t()})))()}export{o as n,i as t};

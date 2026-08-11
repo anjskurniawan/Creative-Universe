@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-CsOFd3vK.js";function t(...e){return e.length===1&&e[0]?e[0]:t=>{let r=!1,i=e.map(e=>{let i=n(e,t);return r||=typeof i==`function`,i});if(r)return()=>{i.forEach((t,r)=>{typeof t==`function`?t():n(e[r],null)})}}}function n(e,t){if(typeof e==`function`)return e(t);e!=null&&(e.current=t)}function r(){return(r=e((()=>{})))()}export{r as n,t};

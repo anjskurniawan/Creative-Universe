@@ -23,4 +23,3 @@ export const SemanticNegative: Story = { args: { children: "Blocked", variant: "
 export const Outline: Story = { args: { children: "In review", variant: "notice", fillStyle: "outline" } };
 export const Subtle: Story = { args: { children: "Draft", variant: "informative", fillStyle: "subtle" } };
 export const Truncated: Story = { args: { children: "This is a very long badge label", overflowMode: "truncate", variant: "purple", size: "M" } };
-

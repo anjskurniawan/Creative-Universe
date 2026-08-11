@@ -1,0 +1,38 @@
+import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks';
+import * as Stories from './ComboBox.stories';
+
+<Meta of={Stories} />
+
+# ComboBox
+
+ComboBox allows users to choose a single option from a collapsible list when space is limited.
+
+## Basic usage
+
+Use `ComboBoxItem` children with stable `id` values for selectable options. The wrapper preserves the React Spectrum S2 API and automatically applies the Spectrum baseline through `.spectrum-component`.
+
+<Canvas of={Stories.Default} />
+
+## Content and sections
+
+Items can contain label and description slots. Use `ComboBoxSection` with `Header`, `Heading`, and `Text` to group related options.
+
+<Canvas of={Stories.WithDescriptions} />
+
+<Canvas of={Stories.WithSections} />
+
+## State
+
+Use `defaultSelectedKey` for uncontrolled selection or `selectedKey` with `onSelectionChange` for controlled selection. `isDisabled`, `isRequired`, `isInvalid`, `loadingState`, and `onLoadMore` support common form and asynchronous states.
+
+<Canvas of={Stories.Disabled} />
+
+## Accessibility
+
+Provide a visible `label` or an accessible `aria-label`. ComboBox items should contain text or decorative graphics only; interactive controls inside items break keyboard and screen reader navigation.
+
+## API
+
+<Controls />
+
+See the React Spectrum S2 ComboBox API for the complete prop and collection contract.

@@ -1,0 +1,31 @@
+import { RouteCard } from "@/components/spectrum/developer/RouteCard";
+import { Tab, TabList, TabPanel, Tabs } from "@/components/spectrum/Tabs";
+import { BetaContent } from "@/components/universe/developer";
+
+export default function DeveloperBetaPage() {
+  return (
+    <div className="w-full px-6 bg-white h-screen">
+      <Tabs aria-label="Developer beta routes">
+        <TabList aria-label="Developer beta routes">
+          <Tab id="landing">Landing</Tab>
+        </TabList>
+        <TabPanel id="landing">
+          <BetaContent>
+            <RouteCard
+              title="Guest"
+              description="Guest landing state."
+              previewLabel="Guest preview"
+              href="/developer/beta/landing/guest"
+            />
+            <RouteCard
+              title="Login"
+              description="Authenticated landing state."
+              previewLabel="Login preview"
+              href="/developer/beta/landing/login"
+            />
+          </BetaContent>
+        </TabPanel>
+      </Tabs>
+    </div>
+  );
+}

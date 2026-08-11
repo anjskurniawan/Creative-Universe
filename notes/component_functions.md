@@ -5,6 +5,10 @@ Dokumen ini mendata seluruh direktori dan komponen aktif yang berada di bawah `a
 
 ---
 
+* **`Toast`** (`src/components/spectrum/Toast/`): Wrapper React Spectrum S2 untuk ToastContainer dan ToastQueue yang menampilkan feedback sementara di root aplikasi.
+
+* **`ComboBox`** (`src/components/spectrum/ComboBox/`): Wrapper React Spectrum S2 untuk memilih satu opsi dari daftar collapsible, termasuk item, section, selection, validation, dan loading state.
+
 ## 1. Komponen Tata Letak (Layout) - `src/components/layout/`
 Menyusun struktur tata letak (layout shell) halaman aplikasi.
 
@@ -147,3 +151,184 @@ Komponen-komponen spesifik yang terikat dengan logika bisnis modul tertentu.
 - Wrapper React Spectrum S2 untuk navigasi nested hierarchical links.
 - Mengekspos SideNavItem, SideNavItemContent, SideNavItemLink, SideNavSection, dan SideNavHeader.
 - Mendukung route selection terkontrol, expansion, collections, sections, disabled items, dan accessibility.
+
+### `apps/frontend/src/components/spectrum/Card/Card.tsx`
+
+- Wrapper Card React Spectrum S2 untuk merangkum object yang dapat dipilih atau dinavigasi.
+- Mengekspos CardPreview, CollectionCardPreview, AssetCard, UserCard, ProductCard, Content, Footer, Image, dan Text.
+- Mendukung preview, metadata content, footer, variant, density, size, disabled state, dan href melalui API resmi Spectrum.
+
+### `apps/frontend/src/components/spectrum/TextField/TextField.tsx`
+
+- Wrapper TextField React Spectrum S2 untuk input teks keyboard dengan label, description, placeholder, dan prefix.
+- Mendukung controlled/uncontrolled value, ukuran, tipe input, disabled/read-only, required, validation, dan form integration.
+- Mengekspos TextFieldContext dan type TextFieldProps/TextFieldRef dari API resmi S2.
+
+### `apps/frontend/src/components/spectrum/InlineAlert/InlineAlert.tsx`
+
+- Wrapper React Spectrum S2 untuk feedback non-modal yang terkait dengan object atau validasi form.
+- Mengekspos Heading, Content, variant, fillStyle, autoFocus, dan API accessibility resmi InlineAlert S2.
+
+### `apps/frontend/src/components/spectrum/Settings/SettingTitle/SettingTitle.tsx`
+
+- Reusable Settings page heading yang menerapkan typography `heading-xl` dari style macro React Spectrum S2.
+- Mendukung subtitle opsional dengan typography `body` dari style macro Spectrum.
+### Breadcrumbs
+
+React Spectrum S2 wrapper for Breadcrumbs, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ButtonGroup
+
+React Spectrum S2 wrapper for ButtonGroup, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### CardView
+
+React Spectrum S2 wrapper for CardView, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Checkbox
+
+React Spectrum S2 wrapper for Checkbox, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### CheckboxGroup
+
+React Spectrum S2 wrapper for CheckboxGroup, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ColorArea
+
+React Spectrum S2 wrapper for ColorArea, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ColorField
+
+React Spectrum S2 wrapper for ColorField, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ColorSlider
+
+React Spectrum S2 wrapper for ColorSlider, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ColorSwatch
+
+React Spectrum S2 wrapper for ColorSwatch, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ColorSwatchPicker
+
+React Spectrum S2 wrapper for ColorSwatchPicker, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ColorWheel
+
+React Spectrum S2 wrapper for ColorWheel, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ContextualHelp
+
+React Spectrum S2 wrapper for ContextualHelp, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### DateField
+
+React Spectrum S2 wrapper for DateField, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### DatePicker
+
+React Spectrum S2 wrapper for DatePicker, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### DateRangePicker
+
+React Spectrum S2 wrapper for DateRangePicker, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Dialog
+
+React Spectrum S2 wrapper for Dialog, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Disclosure
+
+React Spectrum S2 wrapper for Disclosure, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Divider
+
+React Spectrum S2 wrapper for Divider, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### DropZone
+
+React Spectrum S2 wrapper for DropZone, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Form
+
+React Spectrum S2 wrapper for Form, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### IllustratedMessage
+
+React Spectrum S2 wrapper for IllustratedMessage, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Image
+
+React Spectrum S2 wrapper for Image, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### LabeledValue
+
+React Spectrum S2 wrapper for LabeledValue, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Link
+
+React Spectrum S2 wrapper for Link, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ListView
+
+React Spectrum S2 wrapper for ListView, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Menu
+
+React Spectrum S2 wrapper for Menu, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Meter
+
+React Spectrum S2 wrapper for Meter, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### NumberField
+
+React Spectrum S2 wrapper for NumberField, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Picker
+
+React Spectrum S2 wrapper for Picker, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Popover
+
+React Spectrum S2 wrapper for Popover, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ProgressBar
+
+React Spectrum S2 wrapper for ProgressBar, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ProgressCircle
+
+React Spectrum S2 wrapper for ProgressCircle, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Provider
+
+React Spectrum S2 wrapper for Provider, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### RadioGroup
+
+React Spectrum S2 wrapper for RadioGroup, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### RangeCalendar
+
+React Spectrum S2 wrapper for RangeCalendar, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### RangeSlider
+
+React Spectrum S2 wrapper for RangeSlider, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### SearchField
+
+React Spectrum S2 wrapper for SearchField, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### SegmentedControl
+
+React Spectrum S2 wrapper for SegmentedControl, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### SelectBoxGroup
+
+React Spectrum S2 wrapper for SelectBoxGroup, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Skeleton
+
+React Spectrum S2 wrapper for Skeleton, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Slider
+
+React Spectrum S2 wrapper for Slider, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### StatusLight
+
+React Spectrum S2 wrapper for StatusLight, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Switch
+
+React Spectrum S2 wrapper for Switch, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### TableView
+
+React Spectrum S2 wrapper for TableView, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Tabs
+
+React Spectrum S2 wrapper for Tabs, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### TagGroup
+
+React Spectrum S2 wrapper for TagGroup, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### TimeField
+
+React Spectrum S2 wrapper for TimeField, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ToggleButton
+
+React Spectrum S2 wrapper for ToggleButton, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### ToggleButtonGroup
+
+React Spectrum S2 wrapper for ToggleButtonGroup, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### Tooltip
+
+React Spectrum S2 wrapper for Tooltip, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### TreeView
+
+React Spectrum S2 wrapper for TreeView, exposing the official API with Spectrum styling, ref forwarding, Storybook documentation, and Developer Library preview.
+### LinkButton
+
+Official wrapper around the installed `@react-spectrum/s2/LinkButton` subpath with ref forwarding and Spectrum styling.
+### TextArea
+
+Official wrapper around the installed `@react-spectrum/s2/TextArea` subpath with ref forwarding and Spectrum styling.

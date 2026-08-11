@@ -24,4 +24,3 @@ export const SideNav = forwardRef<SpectrumSideNavRef, SideNavProps<object>>(func
     </div>
   );
 });
-

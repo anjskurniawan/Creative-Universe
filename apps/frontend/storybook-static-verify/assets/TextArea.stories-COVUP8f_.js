@@ -1,0 +1,6 @@
+import{n as e,r as t}from"./rolldown-runtime-CsOFd3vK.js";import{t as n}from"./react-Drno7eUL.js";import{o as r}from"./iframe-dkOi0t0j.js";import{n as i,t as a}from"./TextField-DkK60o3s.js";var o,s,c;function l(){return(l=e((()=>{o=r(),s=n(),i(),c=(0,s.forwardRef)(function({rows:e=4,...t},n){return(0,o.jsx)(`div`,{className:`spectrum-component`,children:(0,o.jsx)(a,{...t,ref:n,UNSAFE_style:{minHeight:`${e*1.5}rem`,...t.UNSAFE_style??{}}})})}),c.__docgenInfo={description:``,methods:[],displayName:`TextArea`,props:{rows:{required:!1,tsType:{name:`number`},description:``,defaultValue:{value:`4`,computed:!1}}}}})))()}var u=t({Basic:()=>f,Required:()=>p,__namedExportsOrder:()=>m,default:()=>d}),d,f,p,m;function h(){return(h=e((()=>{l(),d={title:`Spectrum/TextArea`,component:c,args:{label:`Comment`,placeholder:`Share your thoughts`,rows:4}},f={},p={args:{isRequired:!0,description:`At least 10 characters.`}},f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{}`,...f.parameters?.docs?.source}}},p.parameters={...p.parameters,docs:{...p.parameters?.docs,source:{originalSource:`{
+  args: {
+    isRequired: true,
+    description: "At least 10 characters."
+  }
+}`,...p.parameters?.docs?.source}}},m=[`Basic`,`Required`]})))()}export{u as n,h as r,f as t};

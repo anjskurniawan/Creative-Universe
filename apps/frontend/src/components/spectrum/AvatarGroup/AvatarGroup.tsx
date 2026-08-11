@@ -20,4 +20,3 @@ export const AvatarGroup = forwardRef<SpectrumAvatarGroupRef, AvatarGroupProps>(
     </div>
   );
 });
-

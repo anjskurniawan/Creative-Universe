@@ -28,7 +28,12 @@ export function GuestPortal() {
 
       {/* Konten Utama */}
       <main className="relative z-10 flex flex-1 flex-col items-center justify-center gap-8 px-4 py-12 md:gap-10 md:px-16">
-        <HeroHeading typing typingDelay={760} onTypingComplete={completeTyping} className="w-full !text-white">
+        <HeroHeading
+          typing
+          typingDelay={760}
+          onTypingComplete={completeTyping}
+          className="w-full !text-center !text-white [&_.absolute]:!text-center [&_.relative]:!text-center"
+        >
           This is Where Creative Begins
         </HeroHeading>
         {isPrimaryActionVisible && (

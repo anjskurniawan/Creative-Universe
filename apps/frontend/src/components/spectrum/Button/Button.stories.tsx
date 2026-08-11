@@ -9,7 +9,6 @@ const meta = {
   parameters: {
     layout: "centered",
   },
-  tags: ["autodocs"],
   args: {
     children: "Continue",
     onPress: fn(),
@@ -25,6 +24,17 @@ export const Accent: Story = {
   args: {
     variant: "accent",
   },
+};
+
+export const VariantsAndSizes: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="primary" size="S">Small</Button>
+      <Button variant="accent">Accent</Button>
+      <Button variant="secondary" fillStyle="outline" size="L">Outline</Button>
+      <Button variant="negative" size="XL">Delete</Button>
+    </div>
+  ),
 };
 
 export const Disabled: Story = {
@@ -52,4 +62,8 @@ function PendingButtonExample() {
 
 export const Pending: Story = {
   render: () => <PendingButtonExample />,
+};
+
+export const PressEvents: Story = {
+  render: () => <Button onPress={() => window.alert("Pressed")}>Press me</Button>,
 };

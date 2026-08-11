@@ -3,11 +3,13 @@
 import { forwardRef, type ComponentRef } from "react";
 import {
   Button as SpectrumButton,
+  Text,
   type ButtonProps,
   type PressEvent,
 } from "@react-spectrum/s2/Button";
 
 export type { ButtonProps, PressEvent };
+export { Text };
 
 type SpectrumButtonRef = ComponentRef<typeof SpectrumButton>;
 

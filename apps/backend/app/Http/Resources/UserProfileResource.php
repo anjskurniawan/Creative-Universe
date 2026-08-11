@@ -16,6 +16,19 @@ class UserProfileResource extends JsonResource
     public function toArray(Request $request): array
     {
         $safeSettings = Arr::only($this->settings ?? [], [
+            'theme',
+            'language',
+            'timezone',
+            'reduce_motion',
+            'high_contrast',
+            'notification_in_app',
+            'notification_whatsapp',
+            'notification_task_updates',
+            'notification_mentions',
+            'notification_deadlines',
+            'notification_quiet_start',
+            'notification_quiet_end',
+            'profile_show_applications',
             'navbar_variant',
             'redirect_to',
             'notify_new_registration',

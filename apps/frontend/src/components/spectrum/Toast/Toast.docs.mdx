@@ -1,0 +1,34 @@
+import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks';
+import * as Stories from './Toast.stories';
+
+<Meta of={Stories} />
+
+# Toast
+
+`ToastContainer` renders queued toasts in an application. Place it at the root of the application, then use `ToastQueue` to add neutral, positive, negative, or informational messages.
+
+## Basic usage
+
+Render one `Toast` or `ToastContainer` near the application root and enqueue messages from user actions.
+
+<Canvas of={Stories.Default} />
+
+## Variants and actions
+
+Use the variant-specific queue methods for semantic feedback. Pass `actionLabel`, `onAction`, and `shouldCloseOnAction` to add an action button.
+
+<Canvas of={Stories.Variants} />
+
+<Canvas of={Stories.Actionable} />
+
+## Dismissal and accessibility
+
+Use the `timeout` option for automatic dismissal. Toasts have a minimum accessible timeout of five seconds, and actionable toasts do not automatically dismiss. Timers pause when users focus or hover a toast.
+
+The returned close function can dismiss a toast programmatically. Toast content should be concise and meaningful because it is announced through the toast region.
+
+## API
+
+<Controls />
+
+`ToastQueue` exposes `neutral`, `positive`, `negative`, and `info` methods. `ToastContainer` supports `placement` and accessible region props.

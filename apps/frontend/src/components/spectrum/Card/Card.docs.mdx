@@ -1,0 +1,39 @@
+import {Meta, Title, Description, Primary, Controls, Stories, Source} from "@storybook/addon-docs/blocks";
+import * as CardStories from "./Card.stories";
+
+<Meta of={CardStories} />
+
+<Title />
+
+<Description>
+Card summarizes an object that a user can select or navigate to. Compose a preview, content section, and optional footer to represent assets, users, or products.
+</Description>
+
+## Basic usage
+
+<Source language="tsx" code={`import {Card, CardPreview, Content, Image, Text} from "@/components/spectrum/Card";
+
+<Card aria-label="Project Aurora">
+  <CardPreview><Image alt="Project preview" src={preview} /></CardPreview>
+  <Content>
+    <Text slot="title">Project Aurora</Text>
+    <Text slot="description">A concise project overview.</Text>
+  </Content>
+</Card>`} />
+
+<Primary />
+
+## Variants and states
+
+Use `size`, `density`, and `variant` to adjust the card presentation. Use `isDisabled` to prevent interaction and `href` to make the card navigable. The `AssetCard`, `UserCard`, and `ProductCard` variants provide predefined layouts.
+
+<Controls />
+<Stories include={["Quiet", "Disabled", "Linked", "Asset", "User", "Product"]} />
+
+## Accessibility and internationalization
+
+Provide an accessible label when the card does not contain an equivalent visible label. Card content uses the Spectrum S2 locale and color scheme context supplied by the consuming application boundary.
+
+## QA color schemes
+
+Use the Storybook Spectrum Light and Spectrum Dark toolbar controls to verify both color schemes.

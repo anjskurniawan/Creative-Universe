@@ -26,4 +26,3 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = { render: (args) => <SideNav {...args}><StaticItems /></SideNav> };
 export const WithSections: Story = { render: (args) => <SideNav {...args} selectedRoute="/files" defaultExpandedKeys={[]}><SideNavSection><SideNavHeader>Favorites</SideNavHeader><SideNavItem href="/applications" textValue="Applications"><SideNavItemContent><SideNavItemLink><Text>Applications</Text></SideNavItemLink></SideNavItemContent></SideNavItem></SideNavSection><SideNavSection><SideNavHeader>Workspaces</SideNavHeader><SideNavItem href="/files" textValue="Files"><SideNavItemContent><SideNavItemLink><Text>Files</Text></SideNavItemLink></SideNavItemContent></SideNavItem></SideNavSection></SideNav> };
 export const DisabledItems: Story = { render: (args) => <SideNav {...args} disabledKeys={["support"]}><StaticItems /></SideNav> };
-

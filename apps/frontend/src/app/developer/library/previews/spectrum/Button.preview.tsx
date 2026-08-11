@@ -15,6 +15,9 @@ export function SpectrumButtonPreview() {
         <Button variant="secondary" fillStyle="outline">
           Cancel
         </Button>
+        <Button variant="negative" size="S">
+          Delete
+        </Button>
         <Button
           isPending={isPending}
           onPress={() => {

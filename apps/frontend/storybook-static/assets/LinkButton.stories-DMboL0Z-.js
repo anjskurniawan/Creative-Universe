@@ -1,0 +1,5 @@
+import{n as e,r as t}from"./rolldown-runtime-CsOFd3vK.js";import{t as n}from"./react-Drno7eUL.js";import{o as r}from"./iframe-cJXKqkYU.js";import{o as i,r as a}from"./Button-CP4RjQto.js";var o,s,c;function l(){return(l=e((()=>{o=r(),s=n(),i(),c=(0,s.forwardRef)(function(e,t){return(0,o.jsx)(`div`,{className:`spectrum-component`,children:(0,o.jsx)(a,{...e,ref:t})})}),c.__docgenInfo={description:``,methods:[],displayName:`LinkButton`}})))()}var u=t({Basic:()=>f,Disabled:()=>p,__namedExportsOrder:()=>m,default:()=>d}),d,f,p,m;function h(){return(h=e((()=>{l(),d={title:`Spectrum/LinkButton`,component:c,args:{children:`Open project`,href:`#project`}},f={},p={args:{isDisabled:!0}},f.parameters={...f.parameters,docs:{...f.parameters?.docs,source:{originalSource:`{}`,...f.parameters?.docs?.source}}},p.parameters={...p.parameters,docs:{...p.parameters?.docs,source:{originalSource:`{
+  args: {
+    isDisabled: true
+  }
+}`,...p.parameters?.docs?.source}}},m=[`Basic`,`Disabled`]})))()}export{u as n,h as r,f as t};

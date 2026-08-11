@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-CsOFd3vK.js";import{d as t,u as n}from"./Skeleton-KlQE9w70.js";function r(){return n(`not ((hover: hover) and (pointer: fine))`)?`large`:`medium`}function i(){return(i=e((()=>{t()})))()}export{i as n,r as t};

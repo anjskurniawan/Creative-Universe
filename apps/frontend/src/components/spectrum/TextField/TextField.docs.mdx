@@ -1,0 +1,50 @@
+import {Meta, Title, Description, Primary, Controls, Stories, Source} from "@storybook/addon-docs/blocks";
+import * as TextFieldStories from "./TextField.stories";
+
+<Meta of={TextFieldStories} />
+
+<Title />
+
+<Description>
+TextField is a keyboard text input for custom text entries. It supports labels, descriptions, validation, prefix decorations, controlled values, and native input types.
+</Description>
+
+## Basic usage
+
+<Source language="tsx" code={`import {TextField} from "@/components/spectrum/TextField";
+
+<TextField label="Name" placeholder="Enter your full name" />`} />
+
+<Primary />
+
+## Controlled value
+
+Use `value` and `onChange` when the entered text needs to be stored in application state. Use `defaultValue` for an uncontrolled initial value.
+
+<Source language="tsx" code={`import {useState} from "react";
+import {TextField} from "@/components/spectrum/TextField";
+
+function Example() {
+  const [name, setName] = useState("");
+  return <TextField label="Name" value={name} onChange={setName} />;
+}`} />
+
+<Stories include={["Controlled", "WithDescription", "Required", "Invalid", "Disabled", "WithPrefix"]} />
+
+## Validation and form integration
+
+Use `isRequired`, `minLength`, `maxLength`, `pattern`, `type`, `validate`, `isInvalid`, and `errorMessage` to communicate validation rules. Provide `name` when submitting the field in a form.
+
+## Accessibility and internationalization
+
+Provide a visible `label` whenever possible. Use `aria-label` only when a visible label cannot be provided. TextField follows the locale and direction from the consuming Spectrum Provider.
+
+## API and Controls
+
+All props are forwarded to the React Spectrum S2 TextField. Important props include `label`, `description`, `placeholder`, `value`, `defaultValue`, `onChange`, `prefix`, `size`, `isDisabled`, `isReadOnly`, `isRequired`, `isInvalid`, `errorMessage`, `type`, and `name`.
+
+<Controls />
+
+## QA color schemes
+
+Use the Storybook Spectrum Light and Spectrum Dark toolbar controls to verify both color schemes.

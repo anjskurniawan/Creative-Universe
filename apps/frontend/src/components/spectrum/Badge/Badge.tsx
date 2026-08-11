@@ -14,4 +14,3 @@ export const Badge = forwardRef<SpectrumBadgeRef, BadgeProps>(function Badge(pro
     </div>
   );
 });
-

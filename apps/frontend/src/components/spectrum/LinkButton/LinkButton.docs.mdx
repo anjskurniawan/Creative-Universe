@@ -1,0 +1,12 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import * as Stories from './LinkButton.stories';
+
+<Meta of={Stories} />
+
+# LinkButton
+
+This compatibility adapter combines the Spectrum Button appearance with link navigation. The installed S2 package does not currently export a `LinkButton` subpath, so navigation is handled by the adapter while visual behavior comes from the official S2 Button.
+
+<Canvas of={Stories.Basic} />
+
+Use `href`, `target`, `rel`, `isDisabled`, and the regular S2 button props. Browser navigation is not triggered while disabled.

@@ -6,4 +6,3 @@ const avatarSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' 
 export function SpectrumAvatarGroupPreview() {
   return <PreviewWrapper width="md"><AvatarGroup label="Project members" size={32}><Avatar alt="Abraham Baker" src={avatarSrc} /><Avatar alt="Adriana Sullivan" src={avatarSrc} /><Avatar alt="Jonathan Kelly" src={avatarSrc} /><Avatar alt="Zara Bush" src={avatarSrc} /></AvatarGroup></PreviewWrapper>;
 }
-

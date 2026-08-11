@@ -25,4 +25,3 @@ export const Default: Story = { render: (args) => <AvatarGroup {...args}><GroupA
 export const Small: Story = { args: { size: 20 }, render: (args) => <AvatarGroup {...args}><GroupAvatars /></AvatarGroup> };
 export const Large: Story = { args: { size: 40 }, render: (args) => <AvatarGroup {...args}><GroupAvatars /></AvatarGroup> };
 export const TwoMembers: Story = { render: (args) => <AvatarGroup {...args}><Avatar alt="Abraham Baker" src={avatarSrc} /><Avatar alt="Adriana Sullivan" src={avatarSrc} /></AvatarGroup> };
-

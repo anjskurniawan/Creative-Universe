@@ -94,7 +94,7 @@ export function ProfileCard({ user, type = "full" }: ProfileCardProps) {
           </div>
         </div>
         <Link
-          href="/settings/profile"
+          href="/settings/account/profile"
           className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-cu-line bg-cu-surface text-cu-muted transition hover:border-cu-ink hover:bg-cu-panel-soft hover:text-cu-ink"
           title="Ubah Profil"
         >
@@ -149,7 +149,7 @@ export function ProfileCard({ user, type = "full" }: ProfileCardProps) {
             <p className="mt-1 text-sm text-cu-muted">{user.roles.join(", ") || "User"}</p>
             <p className="text-sm text-cu-muted">@{user.username}</p>
             <Link
-              href="/settings/profile"
+              href="/settings/account/profile"
               className="mt-4 inline-flex h-10 items-center gap-2 rounded-full bg-cu-ink px-5 text-sm font-medium text-white transition hover:opacity-90"
             >
               <MaterialIcon name="edit" size="sm" />

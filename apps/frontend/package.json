@@ -5,9 +5,9 @@
   "scripts": {
     "sync:documentation": "node scripts/sync-documentation.mjs",
     "predev": "npm run sync:documentation",
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "prebuild": "npm run sync:documentation",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test:contracts": "node scripts/check-frontend-contracts.mjs",
@@ -56,6 +56,7 @@
     "prettier": "^3.9.6",
     "storybook": "^10.5.7",
     "typescript": "^5",
+    "unplugin-parcel-macros": "^0.2.0",
     "vite": "latest",
     "vitest": "latest"
   }

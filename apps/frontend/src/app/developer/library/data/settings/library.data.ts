@@ -44,12 +44,6 @@ export const settingsComponents: ComponentItem[] = [
     "tags": ["Settings", "Activity", "Audit", "Security"]
   },
   {
-    "name": "ProfileSettingsPage",
-    "file": "profile-settings-page.tsx",
-    "description": "Halaman pengaturan profil dan konfigurasi akun untuk data profil serta pengaturan peran.",
-    "tags": ["Settings", "Profile", "Account", "Permissions"]
-  },
-  {
     "name": "RoleSettingPage",
     "file": "role-setting-page.tsx",
     "description": "Halaman pengaturan khusus peran untuk konfigurasi sistem, integrasi, dan default Pricetag.",
