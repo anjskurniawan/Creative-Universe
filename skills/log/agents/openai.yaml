@@ -1,4 +1,0 @@
-interface:
-  display_name: "Agent Work Log"
-  short_description: "Record concise, consistent summaries of completed agent work"
-  default_prompt: "Use $log to read the latest relevant work logs before acting, then append a concise timestamped summary after completing the task."

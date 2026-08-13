@@ -85,7 +85,7 @@ const markdownComponents: Components = {
 };
 
 async function readAgentWorkLog() {
-  const logPath = path.resolve(process.cwd(), "../../notes/logs/agent-work-log.md");
+  const logPath = path.resolve(process.cwd(), "../../logs/logs.md");
   return fs.readFile(logPath, "utf8");
 }
 

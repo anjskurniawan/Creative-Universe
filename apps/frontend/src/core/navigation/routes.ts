@@ -12,7 +12,6 @@ export const APP_ROUTES = {
   messages: "/messages",
   notifications: "/notifications",
   maintenance: "/panel/maintenance",
-  documentation: "/docs",
   kvRetail: "/kv-retail",
   creativeReport: "/creative-report",
   odds: "/odds",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 import { useAuth } from "@/providers/auth-provider";
 import { Toast } from "@/components/ui/toast";
 

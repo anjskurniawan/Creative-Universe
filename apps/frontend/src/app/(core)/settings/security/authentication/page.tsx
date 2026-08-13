@@ -1,4 +1,6 @@
-import { Content, Heading, InlineAlert } from "@/components/spectrum/InlineAlert";
+"use client";
+
+import { Content, Heading, InlineAlert } from "@react-spectrum/s2/InlineAlert";
 import { style } from "@react-spectrum/s2/style" with { type: "macro" };
 
 export default function AuthenticationPage() {

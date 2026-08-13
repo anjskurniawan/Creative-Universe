@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 
 const creativeReportMenu = [
   {
@@ -64,4 +64,3 @@ export default function CreativeReportLayout({ children }: { children: React.Rea
     </div>
   );
 }
-

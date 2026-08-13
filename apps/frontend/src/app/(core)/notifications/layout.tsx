@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function NotificationsLayout({ children }: { children: ReactNode }) {

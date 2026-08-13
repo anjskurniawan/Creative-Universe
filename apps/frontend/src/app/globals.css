@@ -1520,23 +1520,3 @@
     animation: none;
   }
 }
-/* Spectrum S2 baseline attached automatically by components/spectrum wrappers. */
-.spectrum-component {
-  display: contents;
-  --s2-color-scheme: light;
-  --s2-container-bg: #fff;
-  --s2-scale: 1;
-  --s2-font-size-base: 14;
-  --lightningcss-light: initial;
-  --lightningcss-dark: ;
-  color-scheme: light;
-}
-
-[data-theme="dark"] .spectrum-component,
-[data-spectrum-color-scheme="dark"] .spectrum-component {
-  --s2-color-scheme: dark;
-  --s2-container-bg: #111;
-  --lightningcss-light: ;
-  --lightningcss-dark: initial;
-  color-scheme: dark;
-}

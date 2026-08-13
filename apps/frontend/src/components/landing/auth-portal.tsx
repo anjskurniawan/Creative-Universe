@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Navbar from "@/components/layout/navbar";
+import NavBar from "@/components/universe/NavBar/NavBar";
 import { useAuth } from "@/providers/auth-provider";
 import { visibleSubApplications } from "@/core/applications";
 import { LandingText } from "@/components/landing/landing-text";
@@ -38,7 +38,7 @@ export function AuthPortal() {
 
   return (
     <div className={`flex ${creativeRole ? "h-screen overflow-hidden" : "min-h-screen"} flex-col bg-white font-sans text-cu-ink antialiased`}>
-      <Navbar viewport="Desktop" sticky={false} showNavigation={false} bordered={false} className="items-end" />
+      <NavBar viewport="Desktop" sticky={false} showNavigation={false} bordered={false} className="items-end" />
       {/* Konten Utama Terbagi Menjadi 2 Kolom (50% / 50%) pada Layar Lebar (lg) */}
       <main aria-label="Universe landing" className="min-h-0 flex-1 grid lg:grid-cols-2">
         {/* Kolom Kiri: Sapaan dan Judul Utama */}

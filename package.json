@@ -1,0 +1,11 @@
+{
+  "name": "creativeuniverse",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "npm --prefix apps/frontend run dev",
+    "build:static": "node scripts/build-static.mjs",
+    "prepare:storage": "php scripts/prepare-storage.php",
+    "check:storage": "php scripts/prepare-storage.php --check",
+    "test:backend": "composer --working-dir=apps/backend test"
+  }
+}

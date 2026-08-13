@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 
 function LibraryLayoutContent({ children }: { children: React.ReactNode }) {
   const [viewport, setViewport] = useState<"Mobile" | "Desktop">("Mobile");

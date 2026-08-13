@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { useAuth } from "@/providers/auth-provider";
-import GlobalLayoutNavbar from "@/components/layout/navbar";
-import Container from "@/components/layout/container";
+import NavBar from "@/components/universe/NavBar/NavBar";
+import Container from "@/components/universe/Layouts/Container/Container";
 
 const CORE_CONTENT_GUTTER = "px-4 md:px-16";
 
@@ -73,7 +73,7 @@ export function CoreShell({ children }: { children: ReactNode }) {
       </div>
     ) : (
     <div className="min-h-screen flex flex-col bg-white font-sans text-cu-ink antialiased">
-      <GlobalLayoutNavbar viewport="Desktop" sticky={false} />
+      <NavBar viewport="Desktop" sticky={false} />
       <main className={`flex flex-1 flex-col ${mainClass}`}>{children}</main>
     </div>
     )

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/providers/auth-provider";
-import { Card, Content, Text } from "@/components/spectrum/Card";
+import { Card, Content, Text } from "@react-spectrum/s2/Card";
 
 export default function AccountApplicationsSettings() {
   const { user } = useAuth();

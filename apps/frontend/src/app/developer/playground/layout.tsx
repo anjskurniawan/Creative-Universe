@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import "@react-spectrum/s2/page.css";
 import { Provider } from "@react-spectrum/s2/Provider";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 
 declare module "@react-spectrum/s2/Provider" {
   interface RouterConfig {

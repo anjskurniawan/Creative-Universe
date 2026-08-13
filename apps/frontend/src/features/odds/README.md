@@ -35,18 +35,12 @@ mode control. Main content aktif berisi card:
 - Message
 
 Card `Score Kamu`, `Grafik Performa`, dan `Queue Jobs` sedang tidak dirender.
-Inventory lengkap dan sumber data tiap card dicatat di
-`docs/05_migration/Frontend_ODDS_Integration.md` dan terbaca di route
-`/docs?section=components/odds-designer-dashboard-cards` melalui menu
-`Design System > ODDS > Designer Dashboard Cards`.
 
 ### ODDS Task Card
 
-Task card ODDS terdokumentasi sebagai komponen library di
-`/docs?section=components/odds-task-card`. Komponen ini disiapkan untuk 3 view:
-`Admin`, `Client`, dan `Designer`. View Designer dipakai pada menu Dashboard
-Designer `Semua Tugas`; view Admin dan Client menjadi kontrak library untuk
-implementasi berikutnya.
+View task card yang aktif mengikuti konteks pengguna pada route ODDS. View
+Designer dipakai pada menu Dashboard Designer `Semua Tugas`; view Admin dan
+Client tetap menjadi kontrak UI untuk implementasi berikutnya.
 
 ## Request Creation
 

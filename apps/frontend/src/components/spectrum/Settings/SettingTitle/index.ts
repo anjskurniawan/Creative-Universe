@@ -1,1 +1,0 @@
-export { SettingTitle } from "./SettingTitle";

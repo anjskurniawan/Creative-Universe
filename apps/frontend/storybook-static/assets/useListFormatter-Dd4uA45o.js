@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-CsOFd3vK.js";import{t}from"./react-Drno7eUL.js";import{r as n,t as r}from"./I18nProvider-BXrjeOGE.js";function i(e={}){let{locale:t}=r();return(0,a.useMemo)(()=>new Intl.ListFormat(t,e),[t,e])}var a;function o(){return(o=e((()=>{n(),a=t()})))()}export{o as n,i as t};

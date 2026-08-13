@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 
 export default function DeveloperLogLayout({ children }: { children: ReactNode }) {
   return (

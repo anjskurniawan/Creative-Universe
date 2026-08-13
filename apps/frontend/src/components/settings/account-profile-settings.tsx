@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState, type FormEvent, type PointerEvent, type WheelEvent } from "react";
 import { apiFetch, ApiError, ValidationError } from "@/core/api/client";
 import { useAuth } from "@/providers/auth-provider";
-import { Avatar } from "@/components/spectrum/Avatar";
-import { Button, Text } from "@/components/spectrum/Button";
-import { InlineAlert, Content, Heading } from "@/components/spectrum/InlineAlert";
-import { Slider } from "@/components/spectrum/Slider";
-import { TextField } from "@/components/spectrum/TextField";
-import { Toast, ToastQueue } from "@/components/spectrum/Toast";
+import { Avatar } from "@react-spectrum/s2/Avatar";
+import { Button, Text } from "@react-spectrum/s2/Button";
+import { InlineAlert, Content, Heading } from "@react-spectrum/s2/InlineAlert";
+import { Slider } from "@react-spectrum/s2/Slider";
+import { TextField } from "@react-spectrum/s2/TextField";
+import { ToastContainer, ToastQueue } from "@react-spectrum/s2/Toast";
 
 export default function AccountProfileSettings() {
   const { user, refreshUser } = useAuth();
@@ -117,7 +117,7 @@ export default function AccountProfileSettings() {
 
   return (
     <form onSubmit={save} className="max-w-3xl space-y-5">
-      <Toast placement="bottom end" />
+      <ToastContainer placement="bottom end" />
       {status && <InlineAlert variant="positive" fillStyle="subtleFill"><Heading>Berhasil</Heading><Content>{status}</Content></InlineAlert>}
       {error && <InlineAlert variant="negative" fillStyle="subtleFill"><Heading>Gagal menyimpan</Heading><Content>{error}</Content></InlineAlert>}
       <section className="overflow-hidden rounded-2xl border border-cu-line bg-cu-surface shadow-sm">

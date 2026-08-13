@@ -10,7 +10,7 @@ import { TaskCardMobile, type TaskCardConfig } from "@/components/odds/legacy-ta
 import { TaskCard, type TaskCardState } from "@/components/odds/task-card";
 import { TaskFormModal } from "@/components/odds/task-form-modal";
 import { PerformanceNavbar } from "@/features/kv-retail/components/performance-navbar";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 import { resolveStorageUrl } from "@/core/api/client";
 import { coreApi } from "@/core/api";
 import { kvRetailApi, type KvRetailTask, type KvRetailTaskDeletedEvent, type KvRetailTaskEvent } from "@/features/kv-retail/api";

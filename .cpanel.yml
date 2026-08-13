@@ -1,5 +1,0 @@
----
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home/creativedoran/creative.doran.id/
-    - /bin/cp -R /home/creativedoran/appcreative/apps/backend/. $DEPLOYPATH

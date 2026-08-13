@@ -3,16 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "sync:documentation": "node scripts/sync-documentation.mjs",
-    "predev": "npm run sync:documentation",
     "dev": "next dev --webpack",
-    "prebuild": "npm run sync:documentation",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint",
-    "test:contracts": "node scripts/check-frontend-contracts.mjs",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "lint": "eslint"
   },
   "dependencies": {
     "@react-spectrum/s2": "^1.6.0",
@@ -37,27 +31,15 @@
     "three": "^0.184.0"
   },
   "devDependencies": {
-    "@chromatic-com/storybook": "latest",
-    "@storybook/addon-a11y": "^10.5.7",
-    "@storybook/addon-docs": "^10.5.7",
-    "@storybook/addon-mcp": "latest",
-    "@storybook/addon-vitest": "^10.5.7",
-    "@storybook/nextjs-vite": "^10.5.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.184.1",
-    "@vitest/browser-playwright": "latest",
-    "@vitest/coverage-v8": "latest",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
-    "eslint-plugin-storybook": "^10.5.7",
     "playwright": "latest",
     "prettier": "^3.9.6",
-    "storybook": "^10.5.7",
     "typescript": "^5",
-    "unplugin-parcel-macros": "^0.2.0",
-    "vite": "latest",
-    "vitest": "latest"
+    "unplugin-parcel-macros": "^0.2.0"
   }
 }

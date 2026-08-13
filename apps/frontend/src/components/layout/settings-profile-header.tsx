@@ -1,5 +1,4 @@
 import type { User } from "@/providers/auth-provider";
-import { Avatar } from "@/components/spectrum/Avatar";
 
 export default function SettingsProfileHeader({
   user,

@@ -9,7 +9,7 @@ import {
   SideNavItemLink,
   SideNavSection,
   Text,
-} from "@/components/spectrum/SideNav";
+} from "@react-spectrum/s2/SideNav";
 import { useAuth } from "@/providers/auth-provider";
 import { NAV_GROUPS, hrefMatches, isCollapsible, type SettingsNavItem } from "@/components/layout/settings-navigation-config";
 

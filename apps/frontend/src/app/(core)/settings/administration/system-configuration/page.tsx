@@ -3,11 +3,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { apiFetch, ApiError, ValidationError } from "@/core/api/client";
 import { useAuth } from "@/providers/auth-provider";
-import { Button, Text } from "@/components/spectrum/Button";
-import { ComboBox, ComboBoxItem } from "@/components/spectrum/ComboBox";
-import { TextField } from "@/components/spectrum/TextField";
-import { Toast, ToastQueue } from "@/components/spectrum/Toast";
-import { Content, Heading, InlineAlert } from "@/components/spectrum/InlineAlert";
+import { Button, Text } from "@react-spectrum/s2/Button";
+import { ComboBox, ComboBoxItem } from "@react-spectrum/s2/ComboBox";
+import { TextField } from "@react-spectrum/s2/TextField";
+import { ToastContainer, ToastQueue } from "@react-spectrum/s2/Toast";
+import { Content, Heading, InlineAlert } from "@react-spectrum/s2/InlineAlert";
 import SaveFloppy from "@react-spectrum/s2/icons/SaveFloppy";
 import { style } from "@react-spectrum/s2/style" with { type: "macro" };
 
@@ -124,7 +124,7 @@ export default function SystemConfigurationPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <Toast placement="bottom end" />
+      <ToastContainer placement="bottom end" />
       <form onSubmit={submit} className="w-full space-y-5">
         <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 
 export default function CreativeAiLayout({ children }: { children: ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);

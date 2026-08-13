@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { apiFetch, ApiError, ValidationError } from "@/core/api/client";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { useAuth } from "@/providers/auth-provider";
-import { Card } from "@/components/spectrum/Card";
+import { Card } from "@react-spectrum/s2/Card";
 import { style } from "@react-spectrum/s2/style" with { type: "macro" };
 
 interface UserSession {

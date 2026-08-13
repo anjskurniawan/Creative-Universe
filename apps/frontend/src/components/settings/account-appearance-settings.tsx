@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { apiFetch, ApiError, ValidationError } from "@/core/api/client";
 import { useAuth } from "@/providers/auth-provider";
-import { Button, Text } from "@/components/spectrum/Button";
-import { ComboBox, ComboBoxItem } from "@/components/spectrum/ComboBox";
-import { InlineAlert, Content, Heading } from "@/components/spectrum/InlineAlert";
-import { Switch } from "@/components/spectrum/Switch";
-import { Toast, ToastQueue } from "@/components/spectrum/Toast";
+import { Button, Text } from "@react-spectrum/s2/Button";
+import { ComboBox, ComboBoxItem } from "@react-spectrum/s2/ComboBox";
+import { InlineAlert, Content, Heading } from "@react-spectrum/s2/InlineAlert";
+import { Switch } from "@react-spectrum/s2/Switch";
+import { ToastContainer, ToastQueue } from "@react-spectrum/s2/Toast";
 
 function message(error: unknown): string {
   if (error instanceof ValidationError) return Object.values(error.errors).flat()[0] || "Data yang diberikan tidak valid.";
@@ -57,7 +57,7 @@ export default function AccountAppearanceSettings() {
 
   return (
     <form onSubmit={save} className="max-w-xl space-y-4">
-      <Toast placement="bottom end" />
+      <ToastContainer placement="bottom end" />
       {status && <InlineAlert variant="positive" fillStyle="subtleFill"><Heading>Berhasil</Heading><Content>{status}</Content></InlineAlert>}
       {error && <InlineAlert variant="negative" fillStyle="subtleFill"><Heading>Gagal menyimpan</Heading><Content>{error}</Content></InlineAlert>}
       <div className="grid gap-4 sm:grid-cols-2">

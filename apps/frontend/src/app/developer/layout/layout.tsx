@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 
 export default function DeveloperLayoutLayout({ children }: { children: React.ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);

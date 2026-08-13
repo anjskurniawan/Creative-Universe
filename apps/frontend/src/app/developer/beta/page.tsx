@@ -1,5 +1,7 @@
-import { RouteCard } from "@/components/spectrum/developer/RouteCard";
-import { Tab, TabList, TabPanel, Tabs } from "@/components/spectrum/Tabs";
+"use client";
+
+import { RouteCard } from "@/components/universe/developer/RouteCard";
+import { Tab, TabList, TabPanel, Tabs } from "@react-spectrum/s2/Tabs";
 import { BetaContent } from "@/components/universe/developer";
 
 export default function DeveloperBetaPage() {

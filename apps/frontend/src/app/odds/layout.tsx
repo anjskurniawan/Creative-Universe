@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
-import Container from "@/components/layout/container";
+import Container from "@/components/universe/Layouts/Container/Container";
 import {
   getOddsTasks,
   OddsTask,

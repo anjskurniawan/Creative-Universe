@@ -3,10 +3,10 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { apiFetch, ApiError, ValidationError } from "@/core/api/client";
 import { useAuth } from "@/providers/auth-provider";
-import { Button, Text } from "@/components/spectrum/Button";
-import { Content, Heading, InlineAlert } from "@/components/spectrum/InlineAlert";
-import { Switch } from "@/components/spectrum/Switch";
-import { Toast, ToastQueue } from "@/components/spectrum/Toast";
+import { Button, Text } from "@react-spectrum/s2/Button";
+import { Content, Heading, InlineAlert } from "@react-spectrum/s2/InlineAlert";
+import { Switch } from "@react-spectrum/s2/Switch";
+import { ToastContainer, ToastQueue } from "@react-spectrum/s2/Toast";
 
 export default function AccountPrivacySettings() {
   const { user, refreshUser } = useAuth();
@@ -31,5 +31,5 @@ export default function AccountPrivacySettings() {
     } finally { setSaving(false); }
   }
 
-  return <form onSubmit={save} className="max-w-2xl space-y-5"><Toast placement="bottom end" />{status && <InlineAlert variant="positive" fillStyle="subtleFill"><Heading>Berhasil</Heading><Content>{status}</Content></InlineAlert>}{error && <InlineAlert variant="negative" fillStyle="subtleFill"><Heading>Gagal menyimpan</Heading><Content>{error}</Content></InlineAlert>}<div className="rounded-2xl border border-cu-line bg-cu-surface p-5"><Switch isSelected={showApplications} onChange={setShowApplications}>Tampilkan daftar aplikasi saya</Switch><p className="mt-2 text-sm text-cu-muted">Izinkan daftar aplikasi yang Anda akses terlihat pada profil pengguna lain.</p></div><Button type="submit" variant="primary" size="XL" isDisabled={saving} isPending={saving}><Text>{saving ? "Menyimpan..." : "Simpan Preferensi"}</Text></Button></form>;
+  return <form onSubmit={save} className="max-w-2xl space-y-5"><ToastContainer placement="bottom end" />{status && <InlineAlert variant="positive" fillStyle="subtleFill"><Heading>Berhasil</Heading><Content>{status}</Content></InlineAlert>}{error && <InlineAlert variant="negative" fillStyle="subtleFill"><Heading>Gagal menyimpan</Heading><Content>{error}</Content></InlineAlert>}<div className="rounded-2xl border border-cu-line bg-cu-surface p-5"><Switch isSelected={showApplications} onChange={setShowApplications}>Tampilkan daftar aplikasi saya</Switch><p className="mt-2 text-sm text-cu-muted">Izinkan daftar aplikasi yang Anda akses terlihat pada profil pengguna lain.</p></div><Button type="submit" variant="primary" size="XL" isDisabled={saving} isPending={saving}><Text>{saving ? "Menyimpan..." : "Simpan Preferensi"}</Text></Button></form>;
 }

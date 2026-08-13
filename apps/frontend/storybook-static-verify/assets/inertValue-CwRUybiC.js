@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-CsOFd3vK.js";import{t}from"./react-Drno7eUL.js";function n(e){let t=r.version.split(`.`);return parseInt(t[0],10)>=19?e:e?`true`:void 0}var r;function i(){return(i=e((()=>{r=t()})))()}export{i as n,n as t};

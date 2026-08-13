@@ -8,7 +8,7 @@ import SettingMenu from "@/components/layout/setting-menu";
 import SettingsMobileHeader from "@/components/layout/settings-mobile-header";
 import SettingsProfileHeader from "@/components/layout/settings-profile-header";
 import { getActiveSettingsLabel } from "@/components/layout/settings-navigation-config";
-import { SettingTitle } from "@/components/spectrum/Settings/SettingTitle";
+import { SettingTitle } from "@/components/universe/Settings/SettingTitle/SettingTitle";
 
 declare module "@react-spectrum/s2/Provider" {
   interface RouterConfig {
