@@ -83,7 +83,6 @@ export const PREVIEW_REGISTRY: Record<string, React.ReactNode> = {
   NotificationsPageContent: <DefaultPreviewPlaceholder componentName="NotificationsPageContent" />,
   SettingMenu: <DefaultPreviewPlaceholder componentName="SettingMenu" />,
   SettingsProfileHeader: <DefaultPreviewPlaceholder componentName="SettingsProfileHeader" />,
-  SettingsMobileHeader: <DefaultPreviewPlaceholder componentName="SettingsMobileHeader" />,
   SecuritySettings: <DefaultPreviewPlaceholder componentName="SecuritySettings" />,
   RolesPageContent: <DefaultPreviewPlaceholder componentName="RolesPageContent" />,
   ActivityLog: <DefaultPreviewPlaceholder componentName="ActivityLog" />,

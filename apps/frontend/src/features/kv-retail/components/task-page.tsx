@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MaterialIcon } from "@/components/ui/material-icon";
 import { type SideMenuItem } from "@/components/navigation/side-menu";
 import { TaskPageTitle } from "@/features/kv-retail/components/task-page-title";
 import { TaskDesktopPageTransition } from "@/components/ui/task-desktop-page-transition";
@@ -502,18 +501,8 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
           <main aria-label={`${scopedPageTitle} mobile`} className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6 pt-6">
             <TaskPageTitle theme={desktopTheme} mobile>{scopedPageTitle}</TaskPageTitle>
             <div className="mt-5 flex shrink-0 min-w-0 items-stretch gap-2">
-              {scope === "all" && !isMentionOnlyUser && (
-                <button
-                  type="button"
-                  aria-label="Buat tugas baru"
-                  onClick={() => setIsModalOpen(true)}
-                  className={`flex h-[76px] w-16 shrink-0 items-center justify-center rounded-2xl transition-colors focus-visible:outline-none focus-visible:ring-2 ${desktopTheme === "dark" ? "bg-[#b0ff5e] text-[#181818] hover:bg-[#c6ff89] focus-visible:ring-[#b0ff5e]/40" : desktopTheme === "retro" ? "border-2 border-[#24252b] bg-[#ba0dcb] text-white shadow-[3px_3px_0_#24252b] hover:bg-[#9c0bac] focus-visible:ring-[#ba0dcb]/40" : "bg-[#ec4899] text-white shadow-[0_8px_18px_rgba(236,72,153,0.24)] hover:bg-[#db2777] focus-visible:ring-[#ec4899]/40"}`}
-                >
-                  <MaterialIcon name="add" size="auto" weight={400} className="text-3xl" />
-                </button>
-              )}
               <div className="relative min-w-0 flex-1">
-                <TaskKpiMetrics metrics={desktopMetrics} theme={desktopTheme} fill={scope === "unfinished"} />
+                <TaskKpiMetrics metrics={desktopMetrics} theme={desktopTheme} fill={scope === "unfinished"} onAddTask={!isMentionOnlyUser ? () => setIsModalOpen(true) : undefined} />
                 {desktopMetrics.length > 1 && <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 right-0 w-10 rounded-r-2xl bg-gradient-to-l ${desktopTheme === "dark" ? "from-[#171717] via-[#171717]/55 to-transparent" : desktopTheme === "retro" ? "from-[#eceee6] via-[#eceee6]/55 to-transparent" : "from-white via-white/55 to-transparent"}`} />}
               </div>
             </div>
@@ -623,7 +612,7 @@ export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
               <TaskKpiMetrics
                 metrics={desktopMetrics}
                 theme={desktopTheme}
-                onAddTask={scope === "all" && !isMentionOnlyUser ? () => setIsModalOpen(true) : undefined}
+                onAddTask={!isMentionOnlyUser ? () => setIsModalOpen(true) : undefined}
               />
             </div>
 

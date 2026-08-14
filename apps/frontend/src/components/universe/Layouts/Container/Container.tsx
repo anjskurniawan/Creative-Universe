@@ -20,7 +20,7 @@ export default function Container({
     <div
       className={
         className ??
-        "relative flex h-dvh w-dvw flex-col items-stretch overflow-hidden p-2"
+        "relative flex h-dvh w-dvw flex-col items-stretch overflow-hidden p-3 lg:p-6"
       }
     >
       <Workspace

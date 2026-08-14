@@ -5,14 +5,15 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Provider } from "@react-spectrum/s2/Provider";
 import { useAuth } from "@/providers/auth-provider";
 import SettingMenu from "@/components/layout/setting-menu";
-import SettingsMobileHeader from "@/components/layout/settings-mobile-header";
 import SettingsProfileHeader from "@/components/layout/settings-profile-header";
 import { getActiveSettingsLabel } from "@/components/layout/settings-navigation-config";
 import { SettingTitle } from "@/components/universe/Settings/SettingTitle/SettingTitle";
 
 declare module "@react-spectrum/s2/Provider" {
   interface RouterConfig {
-    routerOptions: NonNullable<Parameters<ReturnType<typeof useRouter>["push"]>[1]>;
+    routerOptions: NonNullable<
+      Parameters<ReturnType<typeof useRouter>["push"]>[1]
+    >;
   }
 }
 
@@ -22,7 +23,9 @@ interface SettingsLayoutProps {
   subtitle?: ReactNode;
 }
 
-function getSettingsTitle(pathname: string): { title: string; subtitle: string } | null {
+function getSettingsTitle(
+  pathname: string,
+): { title: string; subtitle: string } | null {
   const route = pathname.replace(/\/$/, "") || "/";
   const titles: Record<string, { title: string; subtitle: string }> = {
     "/settings/account/profile": {
@@ -55,7 +58,8 @@ function getSettingsTitle(pathname: string): { title: string; subtitle: string }
     },
     "/settings/security/activity-log": {
       title: "Log Aktivitas",
-      subtitle: "Tinjau riwayat aktivitas dan perubahan penting pada akun Anda.",
+      subtitle:
+        "Tinjau riwayat aktivitas dan perubahan penting pada akun Anda.",
     },
     "/settings/administration/system-configuration": {
       title: "Konfigurasi Sistem",
@@ -77,7 +81,11 @@ function getSettingsTitle(pathname: string): { title: string; subtitle: string }
   return titles[route] ?? null;
 }
 
-export function SettingsLayout({ children, title, subtitle }: SettingsLayoutProps) {
+export function SettingsLayout({
+  children,
+  title,
+  subtitle,
+}: SettingsLayoutProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -89,7 +97,10 @@ export function SettingsLayout({ children, title, subtitle }: SettingsLayoutProp
 
   if (!user) return null;
 
-  const activeMobileLabel = getActiveSettingsLabel(normalizedPath, searchParams);
+  const activeMobileLabel = getActiveSettingsLabel(
+    normalizedPath,
+    searchParams,
+  );
   const routeTitle = getSettingsTitle(normalizedPath);
   const resolvedTitle = title ?? routeTitle?.title;
   const resolvedSubtitle = subtitle ?? routeTitle?.subtitle;
@@ -101,26 +112,35 @@ export function SettingsLayout({ children, title, subtitle }: SettingsLayoutProp
       router={{ navigate: router.push }}
       UNSAFE_className="contents"
     >
-      <div className="flex w-full flex-col gap-0 px-1 lg:gap-8 lg:px-64">
-        <div className="mt-4 grid w-full grid-cols-1 items-stretch gap-6 lg:mt-2 lg:grid-cols-12">
+      <div className="flex w-full flex-col gap-0 px-0 lg:gap-8 lg:px-64">
+        <div className="grid w-full grid-cols-1 items-stretch gap-0 lg:mt-2 lg:grid-cols-12 lg:gap-6">
           <div className="w-full space-y-4 lg:col-span-2">
-            <SettingsProfileHeader user={user} isMobileDetail={isMobileDetail} />
+            <SettingsProfileHeader
+              user={user}
+              isMobileDetail={isMobileDetail}
+            />
             <SettingMenu isMobileDetail={isMobileDetail} />
           </div>
 
           <div
-            className={`${isMobileDetail ? "block" : "hidden lg:block"} w-full px-1 lg:col-span-10 lg:px-8`}
+            className={`${isMobileDetail ? "block" : "hidden lg:block"} w-full lg:col-span-10 lg:px-8`}
           >
-            <SettingsMobileHeader label={activeMobileLabel} />
             {/* Internal layout: 2/6 supporting column, 4/6 main content. */}
-            <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-6">
-              <div className="col-span-1 flex min-w-0 flex-col gap-8 lg:col-span-5">
+            <div className="grid w-full grid-cols-1 lg:grid-cols-6">
+              <div className="col-span-1 flex min-w-0 flex-col gap-8 lg:col-span-5 pb-4">
                 {resolvedTitle && (
-                  <SettingTitle title={resolvedTitle} subtitle={resolvedSubtitle} />
+                  <SettingTitle
+                    title={resolvedTitle ?? activeMobileLabel}
+                    subtitle={resolvedSubtitle}
+                    backHref="/settings"
+                  />
                 )}
                 {children}
               </div>
-              <div className="hidden lg:col-span-1 lg:block" aria-hidden="true" />
+              <div
+                className="hidden lg:col-span-1 lg:block"
+                aria-hidden="true"
+              />
             </div>
           </div>
         </div>

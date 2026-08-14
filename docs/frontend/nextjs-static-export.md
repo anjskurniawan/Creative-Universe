@@ -18,6 +18,19 @@ Static exports do not apply rewrites after hosting. Therefore production fronten
 - UI routes live in src/app/; domain features live in src/features/.
 - Public environment variables include NEXT_PUBLIC_API_URL, NEXT_PUBLIC_PUSHER_KEY, and NEXT_PUBLIC_PUSHER_CLUSTER.
 
+## Error surfaces
+
+The shared `UniversalErrorView` renders distinct titles through the `errorKind` prop while preserving the same recovery UI:
+
+- `runtime`: route-level runtime errors from `src/app/error.tsx`;
+- `global`: root-level failures from `src/app/global-error.tsx`;
+- `not-found`: missing routes from `src/app/not-found.tsx`;
+- `forbidden`: authorization failures from `/forbidden`;
+- `session`: session-check or API connection failures handled by `RouteGuard`;
+- `maintenance`: emergency maintenance state handled by `RouteGuard`.
+
+The frontend does not currently expose separate route pages for HTTP 401 or HTTP 500; those states use the relevant shared error surface.
+
 ## Build and constraints
 
 Run focused linting and type checks, then npm --prefix apps/frontend run build. Do not add behavior requiring a persistent Next.js server: a production API Route backend, server-only request state, runtime Server Actions, or dynamic routes without complete static output.

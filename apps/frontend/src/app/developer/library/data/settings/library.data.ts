@@ -14,12 +14,6 @@ export const settingsComponents: ComponentItem[] = [
     "tags": ["Layout", "Settings", "Profile", "Header"]
   },
   {
-    "name": "SettingsMobileHeader",
-    "file": "settings-mobile-header.tsx",
-    "description": "Header navigasi mobile Settings dengan tombol kembali dan label halaman aktif.",
-    "tags": ["Layout", "Settings", "Navigation", "Mobile"]
-  },
-  {
     "name": "SettingsNavigationConfig",
     "file": "settings-navigation-config.ts",
     "description": "Konfigurasi grup menu Settings, permission, dan helper active state navigasi.",

@@ -1,0 +1,2 @@
+:HL["/_next/static/css/0fc0f4cd9ad9778e.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"creative-report","param":null,"prefetchHints":0,"slots":{"children":{"name":"performa","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"56eNj9wMW0RDxsKz6Kc95"}

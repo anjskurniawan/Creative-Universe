@@ -62,7 +62,7 @@ export default function Workspace({
           viewport={viewport}
           className={
             contentProps?.className ??
-            `flex h-full min-h-0 flex-1 flex-col items-start overflow-y-auto ${desktop ? "p-4" : "p-1"} lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden`
+            `flex h-full min-h-0 flex-1 flex-col items-start overflow-y-auto p-4 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden`
           }
         >
           {children}

@@ -68,12 +68,12 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
   }
 
   if (sessionCheckFailed) {
-    return <UniversalErrorView showHomeAction={false} onRetry={() => window.location.reload()} />;
+    return <UniversalErrorView errorKind="session" showHomeAction={false} onRetry={() => window.location.reload()} />;
   }
 
   const isRoot = user?.roles.some((role) => role.toLowerCase() === "root") ?? false;
   if (isAuthenticated && (user?.emergency_maintenance || emergencyForced) && !isRoot) {
-    return <UniversalErrorView showHomeAction={false} onRetry={() => window.location.reload()} />;
+    return <UniversalErrorView errorKind="maintenance" showHomeAction={false} onRetry={() => window.location.reload()} />;
   }
 
   const currentIsGuestPath = isGuestPath(currentPath);

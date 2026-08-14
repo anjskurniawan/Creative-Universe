@@ -82,6 +82,9 @@ export function TaskPrintPreview({ task, creativeAgentContent, isCreativeAgentGe
   const border = green ? "#00aa0a" : "#6931f1";
   const parts = dateParts(task.task_given_date);
   const suggestions = agentSuggestions(creativeAgentContent, isCreativeAgentGenerating);
+  const delayReasons = Object.values(task.delay_reasons ?? {})
+    .map((entry) => entry.reason?.trim())
+    .filter((reason): reason is string => Boolean(reason));
 
   return (
     <article className="flex min-h-[632px] w-[403px] flex-col items-center justify-center gap-2 rounded-2xl p-4 font-sans text-black" style={{ backgroundColor: green ? "#f5fff2" : "#eeecfc" }}>
@@ -113,6 +116,8 @@ export function TaskPrintPreview({ task, creativeAgentContent, isCreativeAgentGe
         const widthClass = index === 0 ? "w-[67px]" : index === 1 ? "w-[96px]" : index === 2 ? "w-[87px]" : "w-[80px]";
         return <div key={step.status} className={`flex ${widthClass} shrink-0 flex-col items-center gap-1 text-center`}><p className="h-[13px] whitespace-nowrap text-[8px] leading-[13px]" style={{ color }}>{timestamp || ""}</p><div className="flex size-[44px] items-center justify-center rounded-full" style={{ backgroundColor: stepSoft }}><FigmaStepIcon name={step.icon} color={color} soft={stepSoft} /></div><span className="flex h-[21px] w-full items-center justify-center whitespace-nowrap rounded border px-1 py-1 text-[8px] leading-[13px]" style={{ backgroundColor: stepSoft, borderColor: stepBorder, borderWidth: "0.1px", color }}>{step.label}</span></div>;
       })}</div></section>
+
+      {delayReasons.length > 0 && <section className="w-full rounded-lg bg-white p-2"><h2 className="text-sm font-semibold text-[#2f2f2f]">Alasan Terlambat</h2><ul className="mt-2 list-disc space-y-1 pl-5 text-[10px] leading-[13px] text-[#555]">{delayReasons.map((reason, index) => <li key={`${reason}-${index}`}>{reason}</li>)}</ul></section>}
 
       <section className="w-full rounded-lg bg-white p-2"><h2 className="text-sm font-semibold text-[#2f2f2f]">Detail</h2><div className="flex items-start gap-2 py-2"><div className="flex h-[126px] w-[126px] shrink-0 items-center justify-center gap-1 rounded border p-2 text-center" style={{ backgroundColor: soft, borderColor: border, borderWidth: "0.1px", color: primary }}><FigmaUiIcon name="stars" color={primary} className="size-6" /><span className="text-[10px] font-semibold leading-[13px]">Creative Agent Suggest</span></div><ul className="flex flex-1 list-disc flex-col gap-[5px] pl-4 pt-1 text-[10px] leading-[13px] text-[#555]">{suggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}</ul></div></section>
     </article>

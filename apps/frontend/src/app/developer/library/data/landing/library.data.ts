@@ -3,20 +3,20 @@ import type { ComponentItem } from "@/app/developer/library/library.data";
 export const landingComponents: ComponentItem[] = [
   {
     "name": "ApplicationUniverse",
-    "file": "application-universe.tsx",
-    "description": "Komponen ApplicationUniverse pada kategori landing.",
+    "file": "universe/AppUniverse/AppUniverse.tsx",
+    "description": "Komponen ApplicationUniverse pada kategori universe.",
     "tags": [
       "Component",
-      "landing"
+      "universe"
     ]
   },
   {
     "name": "AuthPortal",
-    "file": "auth-portal.tsx",
-    "description": "Komponen AuthPortal pada kategori landing.",
+    "file": "universe/AuthPortal/AuthPortal.tsx",
+    "description": "Komponen AuthPortal pada kategori universe.",
     "tags": [
       "Component",
-      "landing",
+      "universe",
       "Auth"
     ]
   },
@@ -31,21 +31,20 @@ export const landingComponents: ComponentItem[] = [
   },
   {
     "name": "LandingText",
-    "file": "landing-text.tsx",
-    "description": "Komponen LandingText pada kategori landing.",
+    "file": "universe/LandingText/LandingText.tsx",
+    "description": "Komponen LandingText pada kategori universe.",
     "tags": [
       "Component",
-      "landing"
+      "universe"
     ]
   },
   {
     "name": "MediaAgent",
-    "file": "media-agent.tsx",
-    "description": "Komponen MediaAgent pada kategori landing.",
+    "file": "universe/MediaAgent/MediaAgent.tsx",
+    "description": "Komponen MediaAgent pada kategori universe.",
     "tags": [
       "Component",
-      "landing"
+      "universe"
     ]
   }
 ];
-

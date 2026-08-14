@@ -61,10 +61,10 @@ export default function AccountAppearanceSettings() {
       {status && <InlineAlert variant="positive" fillStyle="subtleFill"><Heading>Berhasil</Heading><Content>{status}</Content></InlineAlert>}
       {error && <InlineAlert variant="negative" fillStyle="subtleFill"><Heading>Gagal menyimpan</Heading><Content>{error}</Content></InlineAlert>}
       <div className="grid gap-4 sm:grid-cols-2">
-        <ComboBox label="Bahasa" selectedKey={language} onSelectionChange={(key) => setLanguage(String(key ?? "id"))}>
+        <ComboBox label="Bahasa" selectedKey={language} onSelectionChange={(key) => setLanguage(String(key ?? "id"))} size="L">
           <ComboBoxItem id="id">Bahasa Indonesia</ComboBoxItem><ComboBoxItem id="en">English</ComboBoxItem>
         </ComboBox>
-        <ComboBox label="Zona waktu" selectedKey={timezone} onSelectionChange={(key) => setTimezone(String(key ?? "Asia/Bangkok"))}>
+        <ComboBox label="Zona waktu" selectedKey={timezone} onSelectionChange={(key) => setTimezone(String(key ?? "Asia/Bangkok"))} size="L">
           <ComboBoxItem id="Asia/Bangkok">WIB (UTC+7)</ComboBoxItem><ComboBoxItem id="Asia/Makassar">WITA (UTC+8)</ComboBoxItem><ComboBoxItem id="Asia/Jayapura">WIT (UTC+9)</ComboBoxItem>
         </ComboBox>
       </div>
