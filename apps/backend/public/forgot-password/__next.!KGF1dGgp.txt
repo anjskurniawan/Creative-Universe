@@ -3,5 +3,5 @@
 3:I[5857,["2344","static/chunks/2344-84a08026dad2b889.js","9097","static/chunks/app/(auth)/layout-fd483499599a5ca6.js"],"default"]
 4:I[28101,[],""]
 5:I[45633,[],""]
-0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"Component":"$3","slots":{"children":["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]},"serverProvidedParams":{"params":{},"promises":["$@6"]}}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"56eNj9wMW0RDxsKz6Kc95"}
+0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"Component":"$3","slots":{"children":["$","$L4",null,{"parallelRouterKey":"children","template":["$","$L5",null,{}]}]},"serverProvidedParams":{"params":{},"promises":["$@6"]}}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"mJNgcgMT7yj7NkppYUSav"}
 6:"$0:rsc:props:children:1:props:serverProvidedParams:params"
