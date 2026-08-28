@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function AuthCardHeader({ title }: { title: string }) { return <div className="flex items-center justify-between border-b border-slate-200 px-8 py-4"><p className="text-sm font-semibold uppercase tracking-wider text-sky-700">{title}</p><Link href="/" aria-label="Tutup" className="flex size-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-50"><span className="material-symbols-rounded">close</span></Link></div>; }

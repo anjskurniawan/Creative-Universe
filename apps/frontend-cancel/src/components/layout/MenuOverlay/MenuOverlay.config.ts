@@ -1,0 +1,2 @@
+export const COMPACT_MENU_ITEM_HEIGHT = 64;
+export const MENU_OVERLAY_AUTO_SELECT_DELAY = 900;

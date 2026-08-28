@@ -1,0 +1,1 @@
+export default function AuthCardFooter({ children }: { children: React.ReactNode }) { return <footer className="min-h-[52px] border-t border-slate-200 px-6 py-4 text-xs tracking-[0.6px] text-slate-400">{children}</footer>; }
