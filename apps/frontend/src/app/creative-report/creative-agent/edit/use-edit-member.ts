@@ -4,7 +4,7 @@ import { resolveStorageUrl } from "@/core/api/client";
 import { creativeReportApi } from "@/features/creative-report/api";
 import { getOddsCategories, type OddsCategory } from "@/features/odds/api";
 import type { CreativeMemberProfile } from "@/features/creative-report/types";
-import { useAuth } from "@/providers/auth-provider";
+import { useAuth } from "@/hooks/auth";
 
 export function useEditMember() {
   const memberId = useSearchParams().get("memberId");

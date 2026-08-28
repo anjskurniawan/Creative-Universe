@@ -1,3 +1,12 @@
+# Active frontend ownership
+
+This is the only active CreativeUniverse frontend. Before reorganizing or adding code, read the repository-root `AGENTS.md` and `docs/frontend/rebuild-architecture.md`.
+
+- Preserve all existing UI, behavior, routes, API contracts, permissions, business rules, validation, accessibility, and responsive behavior during structural work.
+- Restructure foundation-first and then one feature at a time; update all imports in the same move and keep lint, type-check, and static build green.
+- Never import from or modify `apps/frontend-cancel/`.
+- Do not touch `apps/backend/` as part of frontend restructuring.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

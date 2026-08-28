@@ -1,1 +1,0 @@
-export { HeroHeadingPreview } from "../typography";

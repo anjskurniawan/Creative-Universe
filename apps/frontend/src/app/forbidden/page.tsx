@@ -1,4 +1,4 @@
-import { UniversalErrorView } from "@/components/feedback/universal-error-view";
+import { UniversalErrorView } from "@/components/feedback/UniversalErrorView";
 
 export default function ForbiddenPage() {
   return <UniversalErrorView errorKind="forbidden" />;

@@ -11,7 +11,8 @@ export const panelComponents: ComponentItem[] = [
     "children": [
       {
         "name": "ConsoleOutputPanel",
-        "file": "maintenance/console-output-panel.tsx",
+        "file": "ConsoleOutputPanel/ConsoleOutputPanel.tsx",
+        "sourcePath": "@/features/panel-maintenance/components/ConsoleOutputPanel/ConsoleOutputPanel.tsx",
         "description": "Komponen Maintenance\\consoleOutputPanel pada kategori panel.",
         "tags": [
           "Component",
@@ -21,7 +22,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "EmergencyMaintenanceCard",
-        "file": "maintenance/emergency-maintenance-card.tsx",
+        "file": "EmergencyMaintenanceCard/EmergencyMaintenanceCard.tsx",
+        "sourcePath": "@/features/panel-maintenance/components/EmergencyMaintenanceCard/EmergencyMaintenanceCard.tsx",
         "description": "Komponen Maintenance\\emergencyMaintenanceCard pada kategori panel.",
         "tags": [
           "Component",
@@ -32,7 +34,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "MaintenanceActionsGrid",
-        "file": "maintenance/maintenance-actions-grid.tsx",
+        "file": "MaintenanceActionsGrid/MaintenanceActionsGrid.tsx",
+        "sourcePath": "@/features/panel-maintenance/components/MaintenanceActionsGrid/MaintenanceActionsGrid.tsx",
         "description": "Komponen Maintenance\\maintenanceActionsGrid pada kategori panel.",
         "tags": [
           "Component",
@@ -43,7 +46,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "SystemStatusGrid",
-        "file": "maintenance/system-status-grid.tsx",
+        "file": "SystemStatusGrid/SystemStatusGrid.tsx",
+        "sourcePath": "@/features/panel-maintenance/components/SystemStatusGrid/SystemStatusGrid.tsx",
         "description": "Komponen Maintenance\\systemStatusGrid pada kategori panel.",
         "tags": [
           "Component",
@@ -65,7 +69,8 @@ export const panelComponents: ComponentItem[] = [
     "children": [
       {
         "name": "ProfileApps",
-        "file": "profile/profile-apps.tsx",
+        "file": "ProfileApps/ProfileApps.tsx",
+        "sourcePath": "@/app/(core)/panel/profile/_components/ProfileApps/ProfileApps.tsx",
         "description": "Komponen Profile\\profileApps pada kategori panel.",
         "tags": [
           "Component",
@@ -77,7 +82,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "ProfileCard",
-        "file": "profile/profile-card.tsx",
+        "file": "ProfileCard/ProfileCard.tsx",
+        "sourcePath": "@/app/(core)/panel/profile/_components/ProfileCard/ProfileCard.tsx",
         "description": "Komponen Profile\\profileCard pada kategori panel.",
         "tags": [
           "Component",
@@ -99,7 +105,8 @@ export const panelComponents: ComponentItem[] = [
     "children": [
       {
         "name": "RoleEditorModal",
-        "file": "roles/role-editor-modal.tsx",
+        "file": "RoleEditorModal/RoleEditorModal.tsx",
+        "sourcePath": "@/features/panel-roles/components/RoleEditorModal/RoleEditorModal.tsx",
         "description": "Komponen Roles\\roleEditorModal pada kategori panel.",
         "tags": [
           "Component",
@@ -111,7 +118,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "RoleTable",
-        "file": "roles/role-table.tsx",
+        "file": "RoleTable/RoleTable.tsx",
+        "sourcePath": "@/features/panel-roles/components/RoleTable/RoleTable.tsx",
         "description": "Komponen Roles\\roleTable pada kategori panel.",
         "tags": [
           "Component",
@@ -132,7 +140,8 @@ export const panelComponents: ComponentItem[] = [
     "children": [
       {
         "name": "UserDetailModal",
-        "file": "users/user-detail-modal.tsx",
+        "file": "UserDetailModal/UserDetailModal.tsx",
+        "sourcePath": "@/features/panel-users/components/UserDetailModal/UserDetailModal.tsx",
         "description": "Komponen Users\\userDetailModal pada kategori panel.",
         "tags": [
           "Component",
@@ -144,7 +153,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "UserFilters",
-        "file": "users/user-filters.tsx",
+        "file": "UserFilters/UserFilters.tsx",
+        "sourcePath": "@/features/panel-users/components/UserFilters/UserFilters.tsx",
         "description": "Komponen Users\\userFilters pada kategori panel.",
         "tags": [
           "Component",
@@ -155,7 +165,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "UserMobileGrid",
-        "file": "users/user-mobile-grid.tsx",
+        "file": "UserMobileGrid/UserMobileGrid.tsx",
+        "sourcePath": "@/features/panel-users/components/UserMobileGrid/UserMobileGrid.tsx",
         "description": "Komponen Users\\userMobileGrid pada kategori panel.",
         "tags": [
           "Component",
@@ -167,7 +178,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "UserTable",
-        "file": "users/user-table.tsx",
+        "file": "UserTable/UserTable.tsx",
+        "sourcePath": "@/features/panel-users/components/UserTable/UserTable.tsx",
         "description": "Komponen Users\\userTable pada kategori panel.",
         "tags": [
           "Component",
@@ -179,7 +191,8 @@ export const panelComponents: ComponentItem[] = [
       },
       {
         "name": "UserWhitelistModal",
-        "file": "users/user-whitelist-modal.tsx",
+        "file": "UserWhitelistModal/UserWhitelistModal.tsx",
+        "sourcePath": "@/features/panel-users/components/UserWhitelistModal/UserWhitelistModal.tsx",
         "description": "Komponen Users\\userWhitelistModal pada kategori panel.",
         "tags": [
           "Component",
@@ -192,4 +205,3 @@ export const panelComponents: ComponentItem[] = [
     ]
   }
 ];
-

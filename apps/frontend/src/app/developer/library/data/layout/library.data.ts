@@ -4,6 +4,7 @@ export const layoutComponents: ComponentItem[] = [
   {
     "name": "AppTitle",
     "file": "app-title.tsx",
+    "sourcePath": "@/app/creative-report/_components/AppTitle/AppTitle.tsx",
     "description": "Judul landing sub-aplikasi yang dinamis, responsif, dan interaktif memenuhi area konten.",
     "tags": [
       "Layout",
@@ -13,7 +14,7 @@ export const layoutComponents: ComponentItem[] = [
   },
   {
     "name": "Container",
-    "file": "universe/Layouts/Container/Container.tsx",
+    "file": "Container/Container.tsx",
     "description": "Pembungkus viewport utama yang mengatur padding, ukuran layar, dan komposisi Workspace.",
     "tags": [
       "Layout",
@@ -23,7 +24,7 @@ export const layoutComponents: ComponentItem[] = [
   },
   {
     "name": "Content",
-    "file": "universe/Layouts/Content/Content.tsx",
+    "file": "Content/Content.tsx",
     "description": "Wadah area konten utama dengan pengaturan viewport dan overflow.",
     "tags": [
       "Layout",
@@ -32,28 +33,9 @@ export const layoutComponents: ComponentItem[] = [
     ]
   },
   {
-    "name": "Menu",
-    "file": "menu.tsx",
-    "description": "Drawer navigasi responsif untuk menampilkan item menu pada viewport mobile.",
-    "tags": [
-      "Navigation",
-      "Menu",
-      "Mobile"
-    ]
-  },
-  {
-    "name": "Navbar",
-    "file": "navbar.tsx",
-    "description": "Navigasi atas global yang memuat menu, breadcrumb, dan kontrol workspace.",
-    "tags": [
-      "Navigation",
-      "Header",
-      "Responsive"
-    ]
-  },
-  {
     "name": "RouteGuard",
-    "file": "route-guard.tsx",
+    "file": "RouteGuard/RouteGuard.tsx",
+    "sourcePath": "@/app/_components/RouteGuard/RouteGuard.tsx",
     "description": "Pelindung tampilan route yang memeriksa status autentikasi sebelum merender halaman.",
     "tags": [
       "Security",
@@ -62,18 +44,8 @@ export const layoutComponents: ComponentItem[] = [
     ]
   },
   {
-    "name": "SettingsLayout",
-    "file": "settings-layout.tsx",
-    "description": "Layout halaman pengaturan dengan navigasi section dan area detail.",
-    "tags": [
-      "Settings",
-      "Layout",
-      "Navigation"
-    ]
-  },
-  {
     "name": "Sidebar",
-    "file": "universe/SideBar/SideBar.tsx",
+    "file": "SideBar/SideBar.tsx",
     "description": "Sidebar global yang merender menu utama, section, dan footer utility.",
     "tags": [
       "Navigation",
@@ -83,7 +55,7 @@ export const layoutComponents: ComponentItem[] = [
   },
   {
     "name": "ViewportDebug",
-    "file": "viewport-debug.tsx",
+    "file": "ViewportDebug/ViewportDebug.tsx",
     "description": "Panel bantuan pengembangan untuk menampilkan informasi viewport saat debugging.",
     "tags": [
       "Development",
@@ -93,7 +65,7 @@ export const layoutComponents: ComponentItem[] = [
   },
   {
     "name": "Workspace",
-    "file": "universe/Layouts/Workspace/Workspace.tsx",
+    "file": "Workspace/Workspace.tsx",
     "description": "Komposisi workspace yang menghubungkan Navbar, Sidebar, Content, dan Menu.",
     "tags": [
       "Layout",
@@ -103,7 +75,7 @@ export const layoutComponents: ComponentItem[] = [
   },
   {
     "name": "NavBar",
-    "file": "universe/NavBar/",
+    "file": "NavBar/",
     "description": "Universe NavBar component family.",
     "tags": [
       "Folder"
@@ -111,7 +83,7 @@ export const layoutComponents: ComponentItem[] = [
     "children": [
       {
         "name": "AppButton",
-        "file": "universe/NavBar/AppButton/AppButton.tsx",
+        "file": "NavBar/AppButton/AppButton.tsx",
         "description": "Komponen Navbar\\appButton pada kategori layout.",
         "tags": [
           "Component",
@@ -122,7 +94,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "AppIcon",
-        "file": "universe/NavBar/AppIcon/AppIcon.tsx",
+        "file": "NavBar/AppIcon/AppIcon.tsx",
         "description": "Komponen Navbar\\appIcon pada kategori layout.",
         "tags": [
           "Component",
@@ -132,7 +104,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "AppsDropdown",
-        "file": "universe/NavBar/Dropdown/AppsDropdown/AppsDropdown.tsx",
+        "file": "NavBar/Dropdown/AppsDropdown/AppsDropdown.tsx",
         "description": "Komponen Navbar\\appsDropdown pada kategori layout.",
         "tags": [
           "Component",
@@ -142,7 +114,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "Avatar",
-        "file": "universe/NavBar/Avatar/Avatar.tsx",
+        "file": "NavBar/Avatar/Avatar.tsx",
         "description": "Komponen Navbar\\avatar pada kategori layout.",
         "tags": [
           "Component",
@@ -152,7 +124,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "Breadcrumb",
-        "file": "universe/NavBar/Breadcrumb/Breadcrumb.tsx",
+        "file": "NavBar/Breadcrumb/Breadcrumb.tsx",
         "description": "Komponen Navbar\\breadcrumb pada kategori layout.",
         "tags": [
           "Component",
@@ -162,7 +134,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "ButtonMenu",
-        "file": "universe/NavBar/ButtonMenu/ButtonMenu.tsx",
+        "file": "NavBar/ButtonMenu/ButtonMenu.tsx",
         "description": "Komponen Navbar\\buttonMenu pada kategori layout.",
         "tags": [
           "Component",
@@ -174,8 +146,9 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "MessageDropdown",
-        "file": "universe/NavBar/Dropdown/MessageDropdown/MessageDropdown.tsx",
-        "description": "Komponen Navbar\\messageDropdown pada kategori layout.",
+        "file": "NavBar/Dropdown/MessageDropdown/MessageDropdown.tsx",
+        "sourcePath": "@/features/messages/components/MessageDropdown/MessageDropdown.tsx",
+        "description": "Dropdown pesan milik feature Messages yang dikomposisikan oleh NavBar.",
         "tags": [
           "Component",
           "layout",
@@ -184,7 +157,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "NavBar",
-        "file": "universe/NavBar/NavBar.tsx",
+        "file": "NavBar/NavBar.tsx",
         "description": "Primary NavBar component in the Universe family.",
         "tags": [
           "Component",
@@ -194,8 +167,9 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "NotificationDropdown",
-        "file": "universe/NavBar/Dropdown/NotificationDropdown/NotificationDropdown.tsx",
-        "description": "Komponen Navbar\\notificationDropdown pada kategori layout.",
+        "file": "NavBar/Dropdown/NotificationDropdown/NotificationDropdown.tsx",
+        "sourcePath": "@/features/notifications/components/NotificationDropdown/NotificationDropdown.tsx",
+        "description": "Dropdown notifikasi milik feature Notifications yang dikomposisikan oleh NavBar.",
         "tags": [
           "Component",
           "layout",
@@ -204,7 +178,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "ProfileDropdown",
-        "file": "universe/NavBar/Dropdown/ProfileDropdown/ProfileDropdown.tsx",
+        "file": "NavBar/Dropdown/ProfileDropdown/ProfileDropdown.tsx",
         "description": "Komponen Navbar\\profileDropdown pada kategori layout.",
         "tags": [
           "Component",
@@ -226,7 +200,7 @@ export const layoutComponents: ComponentItem[] = [
     "children": [
       {
         "name": "Card",
-        "file": "profile/card.tsx",
+        "file": "profile/Card/Card.tsx",
         "description": "Komponen Profile\\card pada kategori layout.",
         "tags": [
           "Component",
@@ -239,6 +213,7 @@ export const layoutComponents: ComponentItem[] = [
       {
         "name": "DetailCard",
         "file": "profile/detail-card.tsx",
+        "sourcePath": "@/app/creative-report/creative-agent/_components/DetailCard/DetailCard.tsx",
         "description": "Komponen Profile\\detailCard pada kategori layout.",
         "tags": [
           "Component",
@@ -251,6 +226,7 @@ export const layoutComponents: ComponentItem[] = [
       {
         "name": "PopupPerson",
         "file": "profile/popup-person.tsx",
+        "sourcePath": "@/app/creative-report/performa/_components/AssessmentTable/AssessmentTableRow/PopupPerson/PopupPerson.tsx",
         "description": "Komponen Profile\\popupPerson pada kategori layout.",
         "tags": [
           "Component",
@@ -264,7 +240,7 @@ export const layoutComponents: ComponentItem[] = [
   },
   {
     "name": "Sidebar",
-    "file": "universe/SideBar/",
+    "file": "SideBar/",
     "description": "Folder Sidebar.",
     "tags": [
       "Folder"
@@ -272,7 +248,7 @@ export const layoutComponents: ComponentItem[] = [
     "children": [
       {
         "name": "SidebarFooter",
-        "file": "universe/SideBar/SideBarFooter/SideBarFooter.tsx",
+        "file": "SideBar/SideBarFooter/SideBarFooter.tsx",
         "description": "Komponen Sidebar\\sidebarFooter pada kategori layout.",
         "tags": [
           "Component",
@@ -283,7 +259,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "SidebarItem",
-        "file": "universe/SideBar/SideBarItem/SideBarItem.tsx",
+        "file": "SideBar/SideBarItem/SideBarItem.tsx",
         "description": "Komponen Sidebar\\sidebarItem pada kategori layout.",
         "tags": [
           "Component",
@@ -294,7 +270,7 @@ export const layoutComponents: ComponentItem[] = [
       },
       {
         "name": "SidebarSection",
-        "file": "universe/SideBar/SideBarSection/SideBarSection.tsx",
+        "file": "SideBar/SideBarSection/SideBarSection.tsx",
         "description": "Komponen Sidebar\\sidebarSection pada kategori layout.",
         "tags": [
           "Component",

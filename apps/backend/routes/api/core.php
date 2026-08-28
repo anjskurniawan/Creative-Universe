@@ -44,6 +44,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::patch('/profile', [ProfileController::class, 'update']);
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
+    Route::post('/profile/banner', [ProfileController::class, 'updateBanner']);
     Route::get('/profile/sessions', [ProfileSessionController::class, 'index']);
     Route::delete('/profile/sessions/{session}', [ProfileSessionController::class, 'destroy']);
     Route::get('/profile/activities', [ProfileController::class, 'activities']);

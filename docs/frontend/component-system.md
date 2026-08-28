@@ -1,27 +1,31 @@
 # Frontend Component System
 
-> Status: Current
-> Last verified: 2026-08-13
+> Status: Current transitional structure
+> Last verified: 2026-08-24
 
-Reusable components live under apps/frontend/src/components/. Component ownership follows implementation and domain, not only similar visual appearance.
+The components described here live in the active `apps/frontend/src/components/` and `apps/frontend/src/features/` trees. Historical placement remains evidence while the application is restructured in place. Every move follows [Frontend in-place restructuring architecture](rebuild-architecture.md), preserves behavior, and updates all consumers atomically.
 
 ## Current structure
 
 - spectrum/: reserved for future project-owned collection components that compose multiple React Spectrum S2 exports. It is empty until such a collection is needed.
 - universe/: project-owned components; use this for project primitives, composition, and components that are not exported by a dependency.
-- `universe/SideBar/`: the shared desktop sidebar family, with `SideBar.tsx` as the composition entry and PascalCase child folders for its footer, item, and section components.
-- `universe/Layouts/`: reusable layout family containing `Container`, `Content`, and `Workspace` component folders with PascalCase filenames. `Container`, `Content`, and `Workspace` keep their public props in `*.types.ts`; `Workspace` also keeps route/menu state in `Workspace.logic.ts`.
-- The default `Container` gutter is `8px` on mobile and `24px` from the `lg` breakpoint; consumers that provide `className` explicitly own their outer gutter.
-- `universe/Background/`: reusable decorative background family, including `ImageBackground` for full-page image loading states.
-- `universe/AuthPortal/`: authenticated landing composition; `AuthPortal.tsx` owns markup while `AuthPortal.logic.ts` owns auth-derived state and media rotation.
-- `universe/LandingText/`: landing heading composition; `LandingText.tsx` owns markup while `LandingText.logic.ts` owns greeting, animation visibility, and typing completion state.
-- `universe/MediaAgent/`: media card renderer for image and video assets, with its public props in `MediaAgent.types.ts`.
-- `universe/AppUniverse/`: animated application orbit; `AppUniverse.tsx` owns GSAP composition and its public props/config types live in `AppUniverse.types.ts`.
+- `layout/`: reusable application-frame ownership. `Container`, `Workspace`, `Content`, `NavBar`, and `SideBar` keep their complete component families here; `Workspace/MenuOverlay` is nested because it has no consumer outside Workspace.
+- `universe/Layouts/SettingLayout/`: transitional settings-domain layout retained until PANEL-001; it is not part of the generic layout family.
+- The default `Container` gutter is `0` on mobile and `24px` from the `lg` breakpoint; consumers that provide `className` explicitly own their outer gutter.
+- `features/auth/components/ParallaxBackground/`: auth/landing ambient background family used by login, onboarding, and guest portal.
+- `app/_components/LoadingBackground/`: root-page-only loading background; it is not a reusable global feedback component.
+- `features/auth/components/`: authentication and landing ownership:
+  - `AuthCard/`, `Login/`, and `Onboarding/` own the authentication form/card flows.
+  - `Portal/Auth/` and `Portal/Guest/` own the authenticated and public landing compositions.
+  - `LandingText/`, `MediaAgent/`, and `AppUniverse/` are landing-auth component siblings; their markup, logic, types, and animation contracts were moved intact.
+- `feedback/UniversalErrorView/`, `feedback/ErrorTetrisGame/`, and `feedback/Toast/`: generic runtime error/session/maintenance and transient status feedback organized as PascalCase component folders.
 - ui/, primitives/, typography/: existing primitives and UI patterns.
-- layout/, navigation/, panel/: reusable shells and composition.
+- `layout/`: reusable shell composition; `navigation/` is transitional domain debt whose SideMenu, messages, and notifications assignments are recorded in the shell ownership audit; `panel/` remains domain debt for PANEL-001.
 - docs/: internal playground and documentation UI.
 - src/app/: route-local pages, layouts, and metadata.
-- src/features/: domain API, state, and composition for ODDS, KV Retail, Creative AI, Generator, and other domains.
+- src/features/: domain API, state, and composition for Auth, ODDS, KV Retail, Creative AI, Generator, and other domains.
+
+Developer library metadata may provide `sourcePath` when the canonical owner is outside `src/components/`. Auth, Login, Onboarding, and Landing entries now resolve to 20 verified `features/auth/components` source files while their menu/category identifiers remain stable.
 
 ## Ownership rules
 

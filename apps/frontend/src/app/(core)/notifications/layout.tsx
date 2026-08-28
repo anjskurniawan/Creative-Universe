@@ -3,8 +3,8 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import Container from "@/components/universe/Layouts/Container/Container";
-import { useAuth } from "@/providers/auth-provider";
+import Container from "@/components/layout/Container/Container";
+import { useAuth } from "@/hooks/auth";
 
 export default function NotificationsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -27,7 +27,7 @@ export default function NotificationsLayout({ children }: { children: ReactNode 
         activeMenuHref={pathname}
         menuItems={menuItems}
         contentProps={{
-          className: "flex h-full w-full flex-col overflow-hidden rounded-[16px] bg-[#f3fbff] text-cu-ink shadow-[0px_14px_42px_0px_rgba(44,42,39,0.16)]",
+          className: "flex h-full w-full flex-col overflow-hidden rounded-none bg-[#f3fbff] text-cu-ink shadow-[0px_14px_42px_0px_rgba(44,42,39,0.16)] lg:rounded-[16px]",
           sidebarExpanded,
           onToggleSidebarExpanded: () => setSidebarExpanded((current) => !current),
           contentProps: { className: "flex h-full min-h-0 w-full flex-1 flex-col items-start overflow-y-auto p-4" },

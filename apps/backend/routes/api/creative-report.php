@@ -7,6 +7,7 @@ Route::middleware(['auth:sanctum', 'app:creative-report'])
     ->prefix('creative-reports')
     ->group(function () {
         Route::get('/members/pending', [AssessmentController::class, 'pendingMembers']);
+        Route::patch('/members/reorder', [AssessmentController::class, 'reorderMembers']);
         Route::get('/members', [AssessmentController::class, 'members']);
         Route::get('/members/{member}', [AssessmentController::class, 'member']);
         Route::match(['put', 'post'], '/members/{member}', [AssessmentController::class, 'updateMember']);

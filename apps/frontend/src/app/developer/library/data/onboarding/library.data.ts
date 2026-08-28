@@ -3,7 +3,8 @@ import type { ComponentItem } from "@/app/developer/library/library.data";
 export const onboardingComponents: ComponentItem[] = [
   {
     "name": "OnboardingCard",
-    "file": "onboarding-card.tsx",
+    "file": "OnboardingCard/OnboardingCard.tsx",
+    "sourcePath": "@/features/auth/components/Onboarding/OnboardingCard/OnboardingCard.tsx",
     "description": "Wadah utama untuk alur onboarding pengguna baru.",
     "tags": [
       "Onboarding",
@@ -13,7 +14,8 @@ export const onboardingComponents: ComponentItem[] = [
   },
   {
     "name": "OnboardingForm",
-    "file": "onboarding-form.tsx",
+    "file": "OnboardingForm/OnboardingForm.tsx",
+    "sourcePath": "@/features/auth/components/Onboarding/OnboardingForm/OnboardingForm.tsx",
     "description": "Form bertahap untuk mengumpulkan data awal dan menyelesaikan onboarding.",
     "tags": [
       "Onboarding",
@@ -31,7 +33,8 @@ export const onboardingComponents: ComponentItem[] = [
     "children": [
       {
         "name": "StepDivision",
-        "file": "steps/step-division.tsx",
+        "file": "steps/StepDivision/StepDivision.tsx",
+        "sourcePath": "@/features/auth/components/Onboarding/steps/StepDivision/StepDivision.tsx",
         "description": "Komponen Steps\\stepDivision pada kategori onboarding.",
         "tags": [
           "Component",
@@ -40,7 +43,8 @@ export const onboardingComponents: ComponentItem[] = [
       },
       {
         "name": "StepFullname",
-        "file": "steps/step-fullname.tsx",
+        "file": "steps/StepFullName/StepFullName.tsx",
+        "sourcePath": "@/features/auth/components/Onboarding/steps/StepFullName/StepFullName.tsx",
         "description": "Komponen Steps\\stepFullname pada kategori onboarding.",
         "tags": [
           "Component",
@@ -49,7 +53,8 @@ export const onboardingComponents: ComponentItem[] = [
       },
       {
         "name": "StepPosition",
-        "file": "steps/step-position.tsx",
+        "file": "steps/StepPosition/StepPosition.tsx",
+        "sourcePath": "@/features/auth/components/Onboarding/steps/StepPosition/StepPosition.tsx",
         "description": "Komponen Steps\\stepPosition pada kategori onboarding.",
         "tags": [
           "Component",
@@ -58,7 +63,8 @@ export const onboardingComponents: ComponentItem[] = [
       },
       {
         "name": "StepPreparing",
-        "file": "steps/step-preparing.tsx",
+        "file": "steps/StepPreparing/StepPreparing.tsx",
+        "sourcePath": "@/features/auth/components/Onboarding/steps/StepPreparing/StepPreparing.tsx",
         "description": "Komponen Steps\\stepPreparing pada kategori onboarding.",
         "tags": [
           "Component",
@@ -67,7 +73,8 @@ export const onboardingComponents: ComponentItem[] = [
       },
       {
         "name": "StepReady",
-        "file": "steps/step-ready.tsx",
+        "file": "steps/StepReady/StepReady.tsx",
+        "sourcePath": "@/features/auth/components/Onboarding/steps/StepReady/StepReady.tsx",
         "description": "Komponen Steps\\stepReady pada kategori onboarding.",
         "tags": [
           "Component",
@@ -76,7 +83,8 @@ export const onboardingComponents: ComponentItem[] = [
       },
       {
         "name": "StepSplash",
-        "file": "steps/step-splash.tsx",
+        "file": "steps/StepSplash/StepSplash.tsx",
+        "sourcePath": "@/features/auth/components/Onboarding/steps/StepSplash/StepSplash.tsx",
         "description": "Komponen Steps\\stepSplash pada kategori onboarding.",
         "tags": [
           "Component",
@@ -85,7 +93,8 @@ export const onboardingComponents: ComponentItem[] = [
       },
       {
         "name": "StepWelcome",
-        "file": "steps/step-welcome.tsx",
+        "file": "steps/StepWelcome/StepWelcome.tsx",
+        "sourcePath": "@/features/auth/components/Onboarding/steps/StepWelcome/StepWelcome.tsx",
         "description": "Komponen Steps\\stepWelcome pada kategori onboarding.",
         "tags": [
           "Component",
@@ -94,7 +103,8 @@ export const onboardingComponents: ComponentItem[] = [
       },
       {
         "name": "StepWhatsapp",
-        "file": "steps/step-whatsapp.tsx",
+        "file": "steps/StepWhatsapp/StepWhatsapp.tsx",
+        "sourcePath": "@/features/auth/components/Onboarding/steps/StepWhatsapp/StepWhatsapp.tsx",
         "description": "Komponen Steps\\stepWhatsapp pada kategori onboarding.",
         "tags": [
           "Component",
@@ -104,4 +114,3 @@ export const onboardingComponents: ComponentItem[] = [
     ]
   }
 ];
-

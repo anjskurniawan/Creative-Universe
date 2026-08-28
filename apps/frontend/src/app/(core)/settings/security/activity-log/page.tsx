@@ -1,4 +1,4 @@
-import ActivityLog from "@/components/settings/activity-log";
+import ActivityLog from "./_components/ActivityLog/ActivityLog";
 
 export default function ActivityLogPage() {
   return (

@@ -1,0 +1,1 @@
+export { ErrorTetrisGame } from "./ErrorTetrisGame";

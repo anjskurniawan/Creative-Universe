@@ -311,6 +311,19 @@ PROMPT;
         return $this->sendResponse($task->load('users'), 'Judul task KV Retail berhasil diperbarui.');
     }
 
+    public function updateDeadline(Request $request, $id)
+    {
+        $this->ensureTaskRouteAccess($request->user());
+        $task = \App\SubApps\KvRetail\Models\KvRetailTask::findOrFail($id);
+        $user = $request->user();
+        abort_unless($user?->hasRole(['Root', 'Manajer', 'SPV']) || $task->created_by === $user?->id, 403, 'Unauthorized action.');
+        $validated = $request->validate(['deadline_date' => 'required|date']);
+        $task->update(['deadline_date' => $validated['deadline_date']]);
+        $assignedUserIds = $task->users->pluck('id')->map(fn ($id) => (int) $id)->toArray();
+        if (! empty($assignedUserIds)) $this->broadcastTaskUpdated($task, $assignedUserIds);
+        return $this->sendResponse($task->load('users'), 'Deadline task KV Retail berhasil diperbarui.');
+    }
+
     public function uploadFile(Request $request, $id)
     {
         $this->ensureTaskRouteAccess($request->user());

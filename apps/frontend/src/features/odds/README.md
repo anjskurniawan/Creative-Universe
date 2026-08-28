@@ -10,14 +10,24 @@ Chat menggunakan public contract Core; ODDS tidak memiliki implementasi chat glo
 
 ## Workspace Layout
 
-ODDS memakai shell Sub-App dan komponen global `SideMenu`; tidak ada sidebar
-khusus/legacy ODDS. Data menu ODDS tetap dibentuk dari permission dan badge
-task yang sama, lalu dipasok ke `SideMenu`. Desktop memakai varian `Expand` dan
-mobile memakai `Collaps`, agar perilaku navigasinya konsisten dengan Sub-App
-lain. Route ODDS tidak merender navbar global; `SideMenu` adalah navigasi utama
-workspace ODDS. Inbox Core tidak ditampilkan di menu ODDS agar navigasi hanya
-memuat fungsi milik ODDS. Wrapper ODDS memakai padding sidebar 16 px yang
-simetris agar panel dan seluruh tombol menu memiliki jarak kiri/kanan seimbang.
+`components/OddsShell/OddsShell.tsx` owns the ODDS Sub-App shell, permission-
+filtered menu data, task badge counters, realtime refresh, theme state, and
+desktop/mobile viewport selection. The route `app/odds/layout.tsx` only composes
+that feature shell. Menu data is passed through the shared `Container` and
+workspace navigation; ODDS does not render a global navbar or Inbox menu.
+
+`context/OddsThemeContext.tsx` owns the shared light/dark/retro contract used by
+the shell, request page, dashboard sections, and task detail. Permission names,
+menu labels/order, section query values, badge rules, realtime event names, and
+shell classes are product contracts and must remain unchanged during later
+structural checkpoints.
+
+The `/odds` and `/odds/option` entry files are routing-only. Their complete
+single-route implementations live respectively at
+`app/odds/_components/OddsPage/` and
+`app/odds/option/_components/OddsOptionPage/`. Dashboard reports, rankings,
+escalations, configuration state, and schedule configuration remain route-local;
+the feature API remains the shared owner of their ODDS transport contracts.
 
 ### Dashboard Designer Cards
 
@@ -44,12 +54,45 @@ Client tetap menjadi kontrak UI untuk implementasi berikutnya.
 
 ## Request Creation
 
-`/odds/new` adalah satu form request, bukan wizard. Semua informasi kategori,
-designer, detail brief, referensi, dan ringkasan submit tampil bersamaan.
+`app/odds/new/page.tsx` is a routing-only wrapper around route-local
+`_components/NewOddsTaskPage/NewOddsTaskPage.tsx`. The route-local component
+owns browser orchestration for initial data, draft query/loading/saving,
+attachment upload state, catalog commits, submit, launch feedback, and final
+navigation. Reusable request presentation and multi-step state live in the
+PascalCase `components/OddsRequestBuilder/` family.
+
+`/odds/new` presents the current request sequence for category, designer,
+brief, reference, deadline, and review.
 Designer direkomendasikan otomatis dan tetap dapat diganti user. Deadline boleh
 kosong agar SLA kategori digunakan. Referensi bersifat opsional: user dapat
 mengunggah file publik, mengisi link, atau mengirim request tanpa lampiran.
 File diunggah terlebih dahulu ke storage ODDS dan dipindahkan ke konteks task
 ketika request berhasil dibuat.
 
-Public API module: `api/index.ts`. Module ini juga menjadi tempat DTO ODDS sementara sampai types dipisahkan pada F24.
+The developer-catalogued retro request family lives under
+`components/Retro/`. It is not imported by the active request route, but its
+catalog records and `OddsGameboyFrame` preview remain valid technical consumers,
+so the family is retained rather than deleted.
+
+Public API module: `api/index.ts`. `types/request.ts` is the single owner for
+`OddsRequestForm` and `OddsRequestBuilderDraft`; the former duplicate route
+`TaskForm` has been retired. Remaining API DTO separation is deferred until
+every lifecycle consumer is audited.
+
+## Task lifecycle
+
+`components/OddsTaskDetail/OddsTaskDetail.tsx` is the shared lifecycle surface
+for `/odds/detail` and `/odds/detail/dummy`. Its complete component family owns
+brief acceptance/return, execution actions, review and revision states,
+discussion/history/audit, protected output handling, timers, responsive tabs,
+and dummy-only QA boundaries. The dummy data/provider remains route-local.
+
+`OddsTaskCard/`, `OddsTaskChat/`, `OddsRichTextEditor/`, and
+`OddsDesignerTaskRowCard/` are PascalCase ODDS feature component families. Their consumer audit
+found no non-ODDS product route or feature consumer; developer catalog entries
+are preview metadata and do not change domain ownership.
+
+`components/BriefDetails/` owns the standard/table editors and previews. Pure
+ODDS browser helpers for brief references, designer recommendation, and menu
+visibility live under `utils/`; no UI implementation remains directly at the
+feature components root.

@@ -23,6 +23,8 @@ export const kvRetailApi = {
         method: "PATCH",
         body: JSON.stringify({ task_name: taskName }),
       }),
+    updateDeadline: (taskId: number | string, deadlineDate: string) =>
+      apiFetch<KvRetailTask>(`${PREFIX}/tasks/${taskId}/deadline`, { method: "PATCH", body: JSON.stringify({ deadline_date: deadlineDate }) }),
     updateStatus: (taskId: number | string, body: unknown) =>
       apiFetch<KvRetailTask>(`${PREFIX}/tasks/${taskId}/status`, {
         method: "PATCH",

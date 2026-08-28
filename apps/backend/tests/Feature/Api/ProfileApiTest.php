@@ -107,6 +107,27 @@ class ProfileApiTest extends TestCase
         Storage::disk('public')->assertMissing('avatars/old-avatar.jpg');
     }
 
+    public function test_active_user_can_replace_banner_and_old_file_is_removed(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('banners/old-banner.jpg', 'old');
+
+        $user = User::factory()->create([
+            'banner_path' => 'banners/old-banner.jpg',
+        ]);
+
+        $response = $this->actingAs($user)->post('/api/v1/profile/banner', [
+            'banner' => UploadedFile::fake()->image('banner.webp', 1200, 400),
+        ], ['Accept' => 'application/json']);
+
+        $response->assertOk()->assertJsonPath('data.banner_url', '/storage/'.$user->refresh()->banner_path);
+
+        $newPath = $user->banner_path;
+        $this->assertNotSame('banners/old-banner.jpg', $newPath);
+        Storage::disk('public')->assertExists($newPath);
+        Storage::disk('public')->assertMissing('banners/old-banner.jpg');
+    }
+
     public function test_active_user_can_view_activities(): void
     {
         $user = User::factory()->create([]);

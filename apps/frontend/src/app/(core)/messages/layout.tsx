@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useState } from "react";
-import Container from "@/components/universe/Layouts/Container/Container";
+import Container from "@/components/layout/Container/Container";
 
 export default function MessagesLayout({ children }: { children: ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -13,7 +13,7 @@ export default function MessagesLayout({ children }: { children: ReactNode }) {
         viewport="Desktop"
         menuTitle="Messages"
         contentProps={{
-          className: "flex h-full w-full flex-col overflow-hidden rounded-[16px] bg-[#f3fbff] text-cu-ink shadow-[0px_14px_42px_0px_rgba(44,42,39,0.16)]",
+          className: "flex h-full w-full flex-col overflow-hidden rounded-none bg-[#f3fbff] text-cu-ink shadow-[0px_14px_42px_0px_rgba(44,42,39,0.16)] lg:rounded-[16px]",
           sidebarExpanded,
           onToggleSidebarExpanded: () => setSidebarExpanded((current) => !current),
           hideSidebar: true,

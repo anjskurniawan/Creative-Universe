@@ -1,5 +1,5 @@
-import OddsTaskDetailView from "@/features/odds/components/task-detail/odds-task-detail-view";
-import { DummyOddsDetailProvider } from "./dummy-odds-detail-provider";
+import OddsTaskDetailView from "@/features/odds/components/OddsTaskDetail/OddsTaskDetail";
+import { DummyOddsDetailProvider } from "./_components/DummyOddsDetailProvider/DummyOddsDetailProvider";
 
 export default function DummyOddsDetailRoute() {
   return (

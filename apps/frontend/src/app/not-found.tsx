@@ -1,4 +1,4 @@
-import { UniversalErrorView } from "@/components/feedback/universal-error-view";
+import { UniversalErrorView } from "@/components/feedback/UniversalErrorView";
 
 export default function NotFoundPage() {
   return <UniversalErrorView errorKind="not-found" />;

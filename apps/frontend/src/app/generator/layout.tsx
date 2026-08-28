@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import NavBar from "@/components/universe/NavBar/NavBar";
+import NavBar from "@/components/layout/NavBar/NavBar";
 
 export default function GeneratorLayout({ children }: { children: ReactNode }) {
   return (

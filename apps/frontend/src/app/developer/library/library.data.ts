@@ -21,6 +21,7 @@ import { rootComponents } from "./data/root/library.data";
 export interface ComponentItem {
   name: string;
   file: string;
+  sourcePath?: string;
   description: string;
   version?: string;
   history?: string;

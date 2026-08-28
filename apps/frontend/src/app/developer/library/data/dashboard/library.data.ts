@@ -3,7 +3,8 @@ import type { ComponentItem } from "@/app/developer/library/library.data";
 export const dashboardComponents: ComponentItem[] = [
   {
     "name": "ActivityLogSection",
-    "file": "activity-log-section.tsx",
+    "file": "ActivityLogSection/ActivityLogSection.tsx",
+    "sourcePath": "@/app/(core)/panel/dashboard/_components/ActivityLogSection/ActivityLogSection.tsx",
     "description": "Tabel aktivitas terbaru yang menampilkan operator, kategori, aksi, dan waktu.",
     "tags": [
       "Dashboard",
@@ -13,7 +14,8 @@ export const dashboardComponents: ComponentItem[] = [
   },
   {
     "name": "DashboardSystemControl",
-    "file": "dashboard-system-control.tsx",
+    "file": "DashboardSystemControl/DashboardSystemControl.tsx",
+    "sourcePath": "@/app/(core)/panel/dashboard/_components/DashboardSystemControl/DashboardSystemControl.tsx",
     "description": "Panel kontrol maintenance dan perintah utilitas sistem.",
     "tags": [
       "Dashboard",
@@ -23,7 +25,8 @@ export const dashboardComponents: ComponentItem[] = [
   },
   {
     "name": "DashboardSystemHealth",
-    "file": "dashboard-system-health.tsx",
+    "file": "DashboardSystemHealth/DashboardSystemHealth.tsx",
+    "sourcePath": "@/app/(core)/panel/dashboard/_components/DashboardSystemHealth/DashboardSystemHealth.tsx",
     "description": "Panel pemantauan kesehatan sistem dan respons API.",
     "tags": [
       "Dashboard",
@@ -33,7 +36,8 @@ export const dashboardComponents: ComponentItem[] = [
   },
   {
     "name": "DefaultStatsGrid",
-    "file": "default-stats-grid.tsx",
+    "file": "DefaultStatsGrid/DefaultStatsGrid.tsx",
+    "sourcePath": "@/app/(core)/panel/dashboard/_components/DefaultStatsGrid/DefaultStatsGrid.tsx",
     "description": "Grid statistik ringkas untuk pengguna non-root.",
     "tags": [
       "Dashboard",
@@ -43,7 +47,8 @@ export const dashboardComponents: ComponentItem[] = [
   },
   {
     "name": "QuickActionsSection",
-    "file": "quick-actions-section.tsx",
+    "file": "QuickActionsSection/QuickActionsSection.tsx",
+    "sourcePath": "@/app/(core)/panel/dashboard/_components/QuickActionsSection/QuickActionsSection.tsx",
     "description": "Kumpulan shortcut menuju aksi dan fitur yang sering digunakan.",
     "tags": [
       "Dashboard",
@@ -53,7 +58,8 @@ export const dashboardComponents: ComponentItem[] = [
   },
   {
     "name": "RootStatsGrid",
-    "file": "root-stats-grid.tsx",
+    "file": "RootStatsGrid/RootStatsGrid.tsx",
+    "sourcePath": "@/app/(core)/panel/dashboard/_components/RootStatsGrid/RootStatsGrid.tsx",
     "description": "Grid statistik operasional dan infrastruktur khusus administrator root.",
     "tags": [
       "Dashboard",
@@ -63,7 +69,8 @@ export const dashboardComponents: ComponentItem[] = [
   },
   {
     "name": "SystemEnvBar",
-    "file": "system-env-bar.tsx",
+    "file": "SystemEnvBar/SystemEnvBar.tsx",
+    "sourcePath": "@/app/(core)/panel/dashboard/_components/SystemEnvBar/SystemEnvBar.tsx",
     "description": "Bar informasi versi aplikasi dan konfigurasi environment server.",
     "tags": [
       "Dashboard",
@@ -72,4 +79,3 @@ export const dashboardComponents: ComponentItem[] = [
     ]
   }
 ];
-

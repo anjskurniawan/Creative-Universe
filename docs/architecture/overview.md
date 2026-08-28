@@ -1,7 +1,7 @@
 # Architecture Overview
 
 > Status: Current
-> Last verified: 2026-08-13
+> Last verified: 2026-08-24
 
 CreativeUniverse is a monorepo with Laravel as its API/backend and Next.js as its static frontend.
 
@@ -14,7 +14,8 @@ The browser receives static HTML, CSS, and JavaScript from the Next.js frontend.
 | Path | Ownership |
 | --- | --- |
 | apps/backend/ | Laravel 11 API, database, policies, queues, broadcasting, file services, and tests |
-| apps/frontend/ | Next.js App Router, UI, browser API client, static export, and Storybook |
+| apps/frontend/ | Only active Next.js application; complete product undergoing structure-only in-place reorganization |
+| apps/frontend-cancel/ | Permanently cancelled clean-rebuild snapshot; strictly read-only and excluded from the active build graph |
 | scripts/ | Root build and storage helpers |
 | docs/ | Current-state documentation |
 | logs/logs.md | Newest-first immutable work history |

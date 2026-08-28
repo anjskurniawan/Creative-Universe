@@ -1,0 +1,715 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import { type PerformanceSidebarItem } from "@/features/kv-retail/components/PerformanceSidebar/PerformanceSidebar";
+import { TaskPageTitle } from "@/features/kv-retail/components/TaskPageTitle/TaskPageTitle";
+import { TaskDesktopPageTransition } from "@/components/ui/TaskDesktopPageTransition/TaskDesktopPageTransition";
+import { TaskCard, TaskCardMobile, type TaskCardConfig, type TaskCardState } from "@/features/kv-retail/components/TaskCard";
+import { type TaskcardMobileChange, type TaskcardMobileTone } from "@/features/kv-retail/components/TaskCard/TaskCardMobile";
+import { TaskFormModal } from "@/features/kv-retail/components/TaskFormModal/TaskFormModal";
+import { PerformanceNavbar } from "@/features/kv-retail/components/PerformanceNavbar/PerformanceNavbar";
+import Container from "@/components/layout/Container/Container";
+import { resolveStorageUrl } from "@/core/api/client";
+import { coreApi } from "@/core/api";
+import { kvRetailApi, type KvRetailTask, type KvRetailTaskDeletedEvent, type KvRetailTaskEvent } from "@/features/kv-retail/api";
+import { useKvRetailDesktopSidebar, useKvRetailTasks } from "@/features/kv-retail/hooks";
+import { getEchoClient } from "@/core/realtime";
+import { useAuth } from "@/hooks/auth";
+import { TaskKpiMetrics, type TaskMetricState } from "@/features/kv-retail/components/TaskKpiMetrics/TaskKpiMetrics";
+import { TaskSearchBar } from "@/features/kv-retail/components/TaskSearchBar/TaskSearchBar";
+import { TaskFilterDropdown } from "@/features/kv-retail/components/TaskFilterDropdown/TaskFilterDropdown";
+
+export type TaskPageScope = "all" | "unfinished" | "current-month";
+
+type TaskSettings = Partial<TaskCardConfig> & {
+  task_page_title_today?: string;
+  task_page_title_unfinished?: string;
+  task_page_title_month?: string;
+};
+
+const TASK_SETTING_KEYS = "task_page_title_today,task_page_title_unfinished,task_page_title_month,vendor_options,delete_overlay_title,delete_overlay_cancel,delete_overlay_confirm,upload_overlay_title_support,upload_overlay_title_draft,upload_overlay_cancel,upload_overlay_submit,upload_overlay_saving,submit_link_title,submit_link_desc,submit_link_placeholder,submit_link_cancel,submit_link_submit,view_link_title,view_link_desc,view_link_cancel,view_link_copy,btn_status_draft,btn_status_progress,btn_status_approve,btn_status_email,detail_status_1,detail_status_2,detail_dropdown_file,detail_dropdown_upload,detail_link_file,task_empty_state".split(",");
+
+function normalizeFileList(value: unknown): (string | null)[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  return value.map((item) => (typeof item === "string" ? item : null));
+}
+
+function formatMobileTaskDate(value?: string | null) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return `${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
+}
+
+function getMobileTaskTone(task: KvRetailTask): TaskcardMobileTone {
+  if (task.status === "Done") return "done";
+  if (!task.deadline_date) return "default";
+
+  const deadline = new Date(task.deadline_date);
+  if (Number.isNaN(deadline.getTime())) return "default";
+
+  deadline.setHours(0, 0, 0, 0);
+  return deadline.getTime() < new Date().setHours(0, 0, 0, 0) ? "emergency" : "default";
+}
+
+function delayReasonStageForStatus(status: TaskCardState): string | null {
+  const stages: Partial<Record<TaskCardState, string>> = {
+    "Progress Design": "ACC Draft",
+    "Approval Design": "Progress Design",
+    "Kirim Email": "Approval Design",
+  };
+
+  return stages[status] ?? null;
+}
+
+function nextTaskStatus(status: string): TaskCardState | null {
+  const currentIndex = TASK_CARD_STATES.indexOf(status as TaskCardState);
+  return currentIndex >= 0 && currentIndex < TASK_CARD_STATES.length - 1
+    ? TASK_CARD_STATES[currentIndex + 1]
+    : null;
+}
+
+function requiredDelayReasonStage(task: KvRetailTask): string | undefined {
+  const nextStatus = nextTaskStatus(task.status);
+  const stage = nextStatus ? delayReasonStageForStatus(nextStatus) : null;
+
+  return stage && task.timing_evaluation?.violations?.[stage]?.late ? stage : undefined;
+}
+
+function getMobileTaskChanges(task: KvRetailTask): TaskcardMobileChange[] {
+  const labels: Array<[string, string]> = [
+    ["ACC Draft", "ACC Draft"],
+    ["Progress", "Progress Design"],
+    ["Approve", "Approval Design"],
+    ["Email", "Kirim Email"],
+  ];
+
+  return labels.flatMap<TaskcardMobileChange>(([key, label]) => {
+    const timestamp = task.task_timestamps?.[key];
+    if (!timestamp) return [];
+
+    const isBottleneck = task.timing_evaluation?.violations?.[label]?.late;
+    const recordedReason = task.delay_reasons?.[label]?.reason ?? task.delay_reasons?.[key]?.reason;
+    return [{
+      label,
+      timestamp: isBottleneck ? `${timestamp} · Bottleneck` : timestamp,
+      reason: recordedReason || (isBottleneck ? "Melewati batas waktu pada tahap ini." : undefined),
+    }];
+  });
+}
+
+function getMobileAssignedUsers(users?: unknown[]) {
+  if (!Array.isArray(users)) return "";
+
+  return users
+    .map((user) => {
+      if (typeof user !== "object" || user === null || !("name" in user)) return "";
+      const name = (user as { name?: unknown }).name;
+      return typeof name === "string" ? name : "";
+    })
+    .filter(Boolean)
+    .join(", ");
+}
+
+function getMobileAssignedAvatars(users?: unknown[]) {
+  if (!Array.isArray(users)) return [];
+
+  return users.flatMap((user) => {
+    if (typeof user !== "object" || user === null || !("name" in user)) return [];
+    const record = user as Record<string, unknown>;
+    const name = typeof record.name === "string" ? record.name : "";
+    if (!name) return [];
+    const photoPath = [record.avatar_url, record.profile_photo_url, record.photo_url, record.avatar]
+      .find((value): value is string => typeof value === "string" && value.length > 0);
+    return [{ name, photoUrl: photoPath ? resolveStorageUrl(photoPath) : null }];
+  });
+}
+
+function getMobileCountdown(task: KvRetailTask) {
+  if (!task.deadline_date) return "Tanpa tenggat";
+  const deadline = new Date(task.deadline_date);
+  if (Number.isNaN(deadline.getTime())) return "Tanpa tenggat";
+
+  deadline.setHours(0, 0, 0, 0);
+  const days = Math.round((deadline.getTime() - new Date().setHours(0, 0, 0, 0)) / 86_400_000);
+  if (days < 0) return `Telat ${Math.abs(days)} Hari`;
+  if (days === 0) return "Hari Ini";
+  return `${days} Hari lagi`;
+}
+
+const TASK_CARD_STATES: TaskCardState[] = [
+  "0",
+  "ACC Draft",
+  "Progress Design",
+  "Approval Design",
+  "Kirim Email",
+  "Done",
+];
+
+
+
+const PRIMARY_MENU: PerformanceSidebarItem[] = [
+  {
+    label: "Daftar Tugas",
+    icon: "list_alt_check",
+    href: "/kv-retail",
+    status: "Active",
+  },
+  { label: "Segera Selesaikan", icon: "alarm", href: "/kv-retail/unfinished" },
+  { label: "Tugas Bulan Ini", icon: "calendar_month", href: "/kv-retail/month" },
+  { label: "Performa", icon: "analytics", href: "/kv-retail/performance" },
+  {
+    label: "Setting",
+    icon: "settings",
+    href: "/kv-retail/option",
+  },
+];
+
+export function TaskPage({ scope = "all" }: { scope?: TaskPageScope }) {
+  const [desktopTheme, setDesktopTheme] = useState<"light" | "dark" | "retro">("light");
+  const { expanded: desktopShellExpanded, toggleExpanded: toggleDesktopShellExpanded } = useKvRetailDesktopSidebar();
+  
+  const { tasks, isLoading: isTasksLoading, refresh: fetchTasks, merge: mergeTask, mutate: mutateTask, remove: removeTask } = useKvRetailTasks();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const { user, hasPermission } = useAuth();
+  const [filterVendor, setFilterVendor] = useState("Semua Vendor");
+  const [sortOption, setSortOption] = useState("Tenggat Waktu Terdekat");
+
+
+  const [todayTitle, setTodayTitle] = useState("Daftar Tugas");
+  const [unfinishedTitle, setUnfinishedTitle] = useState("Segera Selesaikan");
+  const [monthTitle, setMonthTitle] = useState("Tugas Bulan Ini");
+  const [taskConfig, setTaskConfig] = useState<TaskCardConfig>({});
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const summaryScrollDrag = useRef({ pointerId: -1, startX: 0, scrollLeft: 0 });
+  const taskListScrollRef = useRef<HTMLDivElement>(null);
+  const [showTaskListFade, setShowTaskListFade] = useState(false);
+  const mobileTaskListScrollRef = useRef<HTMLElement>(null);
+  const [showMobileTaskListFade, setShowMobileTaskListFade] = useState(false);
+  const scopedPageTitle = scope === "current-month"
+    ? monthTitle
+    : scope === "unfinished"
+    ? unfinishedTitle
+    : todayTitle;
+  const desktopTaskRoute = scope === "unfinished"
+    ? "/kv-retail/unfinished"
+    : scope === "current-month"
+    ? "/kv-retail/month"
+    : "/kv-retail";
+  const desktopNavigationTitle = scopedPageTitle;
+  const isTaskAdministrator = hasPermission("kv-retail.tasks.create");
+  const isMentionOnlyUser = Boolean(user && !isTaskAdministrator);
+  const compactMobileMenuItems = useMemo(
+    () => PRIMARY_MENU
+      .filter((item) => !isMentionOnlyUser || item.label === "Daftar Tugas")
+      .map(({ label, href }) => ({ label, href })),
+    [isMentionOnlyUser],
+  );
+
+  useEffect(() => {
+    if (isMentionOnlyUser && scope !== "all") {
+      window.location.replace("/kv-retail");
+    }
+  }, [isMentionOnlyUser, scope]);
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const data = await coreApi.settings.get<TaskSettings>(TASK_SETTING_KEYS);
+        if (data?.task_page_title_today) setTodayTitle(data.task_page_title_today);
+        if (data?.task_page_title_unfinished) setUnfinishedTitle(data.task_page_title_unfinished);
+        if (data?.task_page_title_month) setMonthTitle(data.task_page_title_month);
+        
+        // Populate config
+        const newConfig: TaskCardConfig = {};
+        for (const key in data) {
+          if (!key.startsWith("task_page_title_")) {
+            const configKey = key as keyof TaskCardConfig;
+            newConfig[configKey] = data[configKey];
+          }
+        }
+        setTaskConfig(newConfig);
+      } catch (err) {
+        console.error("Gagal memuat pengaturan:", err);
+      }
+    }
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const echo = getEchoClient();
+    if (!echo) return;
+
+    const channelName = `App.Models.Core.User.${user.id}`;
+    const channel = echo.private(channelName);
+    const refreshAssignedTasks = (event: KvRetailTaskEvent) => {
+      if (event?.task) {
+        setCurrentTime(Date.now());
+        mergeTask(event.task);
+        return;
+      }
+
+      void fetchTasks();
+    };
+
+    channel.listen(".kv-retail.task.assigned", refreshAssignedTasks);
+    channel.listen(".kv-retail.task.updated", refreshAssignedTasks);
+    channel.listen(".kv-retail.task.deleted", (event: KvRetailTaskDeletedEvent) => removeTask(event.task_id));
+
+    return () => {
+      channel.stopListening(".kv-retail.task.assigned");
+      channel.stopListening(".kv-retail.task.updated");
+      channel.stopListening(".kv-retail.task.deleted");
+    };
+  }, [fetchTasks, mergeTask, removeTask, user?.id]);
+
+
+  const handleStepClick = async (taskId: number, step: string, delayReason?: string) => {
+    const now = new Date();
+    const pad = (num: number) => String(num).padStart(2, "0");
+    const formatted = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    
+    let mappedState: TaskCardState = "0";
+    if (step === "ACC Draft") mappedState = "ACC Draft";
+    else if (step === "Progress") mappedState = "Progress Design";
+    else if (step === "Approve") mappedState = "Approval Design";
+    else if (step === "Email") mappedState = "Kirim Email";
+
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const reasonStage = delayReasonStageForStatus(mappedState);
+    const requiresReason = Boolean(reasonStage && task.timing_evaluation?.violations?.[reasonStage]?.late);
+    if (requiresReason && !delayReason) return;
+
+    const newTimestamps = { ...(task.task_timestamps || {}), [step]: formatted };
+
+    try {
+      setCurrentTime(now.getTime());
+      await mutateTask(
+        taskId,
+        (currentTask) => ({ ...currentTask, status: mappedState, task_timestamps: newTimestamps }),
+        () => kvRetailApi.tasks.updateStatus(taskId, {
+          status: mappedState,
+          task_timestamps: newTimestamps,
+          ...(delayReason ? { delay_reason: delayReason } : {}),
+        }),
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleNextClick = async (taskId: number, link?: string, delayReason?: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    const currentIndex = TASK_CARD_STATES.indexOf(task.status as TaskCardState);
+    if (currentIndex === TASK_CARD_STATES.length - 1) return; // Prevent resetting when already Done
+    
+    const nextIndex = currentIndex + 1;
+    const nextStatus = TASK_CARD_STATES[nextIndex];
+    const reasonStage = delayReasonStageForStatus(nextStatus);
+    const requiresReason = Boolean(reasonStage && task.timing_evaluation?.violations?.[reasonStage]?.late);
+    if (requiresReason && !delayReason) return;
+
+    try {
+      const payload: { status: TaskCardState; file_link?: string; delay_reason?: string } = { status: nextStatus };
+      if (link) payload.file_link = link;
+      if (delayReason) payload.delay_reason = delayReason;
+
+      setCurrentTime(new Date().getTime());
+      await mutateTask(
+        taskId,
+        (currentTask) => ({ ...currentTask, status: nextStatus, file_link: link ?? currentTask.file_link }),
+        () => kvRetailApi.tasks.updateStatus(taskId, payload),
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async (taskId: number) => {
+    try {
+      await kvRetailApi.tasks.remove(taskId);
+      removeTask(taskId);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleTitleSave = async (taskId: number, taskName: string) => {
+    await mutateTask(
+      taskId,
+      (task) => ({ ...task, task_name: taskName }),
+      () => kvRetailApi.tasks.updateTitle(taskId, taskName),
+    );
+  };
+
+  const handleDeadlineSave = async (taskId: number, deadlineDate: string) => {
+    await mutateTask(taskId, (task) => ({ ...task, deadline_date: deadlineDate }), () => kvRetailApi.tasks.updateDeadline(taskId, deadlineDate));
+  };
+
+  const handleMobileFileUpload = async (taskId: number, fileType: "support_file" | "draft_file", fileIndex: number, file: File) => {
+    const formData = new FormData();
+    formData.append(fileType, file);
+    formData.append("file_index", String(fileIndex));
+
+    const savedTask = await kvRetailApi.tasks.uploadFile(taskId, formData);
+    mergeTask(savedTask);
+  };
+
+  const handleMobileSubmitLink = async (taskId: number, fileLink: string, delayReason?: string) => {
+    await handleNextClick(taskId, fileLink, delayReason);
+  };
+
+  const handleMobileViewFile = (file: string) => {
+    window.open(resolveStorageUrl(file) ?? undefined, "_blank");
+  };
+
+  const scopedTasks = tasks.filter((task) => {
+    if (scope === "unfinished") return task.status !== "Done";
+    if (scope !== "current-month") return true;
+
+    const taskDate = new Date(task.task_given_date || task.created_at || "");
+    const now = new Date();
+    return !Number.isNaN(taskDate.getTime()) &&
+      taskDate.getMonth() === now.getMonth() &&
+      taskDate.getFullYear() === now.getFullYear();
+  });
+
+  const totalTasks = scopedTasks.length;
+  const inProgress = scopedTasks.filter(t => t.status !== "Done").length;
+  const terlambat = scopedTasks.filter(t => {
+    if (t.status === "Done") return false;
+    if (!t.deadline_date) return false;
+    const d = new Date(t.deadline_date);
+    const diff = Math.ceil((d.getTime() - currentTime) / (1000 * 3600 * 24));
+    return diff < 0; // past deadline
+  }).length;
+  const onTrack = inProgress - terlambat;
+  const selesai = scopedTasks.filter(t => t.status === "Done").length;
+
+  const dynamicMetrics = [
+    { state: "Total" as TaskMetricState, title: "Total Tugas", value: totalTasks, icon: "assignment" },
+    { state: "Progress" as TaskMetricState, title: "In Progress", value: inProgress, icon: "hourglass_bottom" },
+    { state: "OnTrack" as TaskMetricState, title: "On Track", value: onTrack, icon: "track_changes" },
+    { state: "Terlambat" as TaskMetricState, title: "Terlambat", value: terlambat, icon: "warning_amber" },
+    { state: "Done" as TaskMetricState, title: "Selesai", value: selesai, icon: "check_circle" },
+  ];
+
+  const desktopMetrics = scope === "unfinished"
+    ? dynamicMetrics.filter((metric) => metric.state === "Total")
+    : dynamicMetrics;
+
+  const vendorOptions = [
+    "Semua Vendor",
+    ...Array.from(new Set(scopedTasks.map(t => t.pic_vendor).filter((vendor): vendor is string => Boolean(vendor)))),
+  ];
+  const sortOptions = ["Tenggat Waktu Terdekat", "Tenggat Waktu Terjauh", "Terbaru Ditambahkan"];
+
+  const filteredTasks = [...scopedTasks].filter((task) => {
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchName = task.task_name?.toLowerCase().includes(q);
+      const matchVendor = task.pic_vendor?.toLowerCase().includes(q);
+      if (!matchName && !matchVendor) return false;
+    }
+    
+    if (filterVendor !== "Semua Vendor" && task.pic_vendor !== filterVendor) return false;
+
+    return true;
+  }).sort((a, b) => {
+    // 1. Send "Done" tasks to the bottom
+    const aDone = a.status === "Done" ? 1 : 0;
+    const bDone = b.status === "Done" ? 1 : 0;
+    if (aDone !== bDone) {
+      return aDone - bDone;
+    }
+
+    // 2. Then apply the chosen sort option
+    if (sortOption === "Terbaru Ditambahkan") {
+      return new Date(b.created_at || b.task_given_date || 0).getTime() - new Date(a.created_at || a.task_given_date || 0).getTime();
+    }
+    if (sortOption === "Tenggat Waktu Terdekat") {
+      return new Date(a.deadline_date || 0).getTime() - new Date(b.deadline_date || 0).getTime();
+    }
+    if (sortOption === "Tenggat Waktu Terjauh") {
+      return new Date(b.deadline_date || 0).getTime() - new Date(a.deadline_date || 0).getTime();
+    }
+    return 0;
+  });
+
+  useEffect(() => {
+    const scrollArea = taskListScrollRef.current;
+    if (!scrollArea) return;
+
+    const updateScrollFade = () => {
+      const hasMoreContent = scrollArea.scrollHeight - scrollArea.clientHeight > 2;
+      const isAtBottom = scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 2;
+      setShowTaskListFade(hasMoreContent && !isAtBottom);
+    };
+
+    updateScrollFade();
+    scrollArea.addEventListener("scroll", updateScrollFade, { passive: true });
+    const observer = new ResizeObserver(updateScrollFade);
+    observer.observe(scrollArea);
+    if (scrollArea.firstElementChild) observer.observe(scrollArea.firstElementChild);
+
+    return () => {
+      scrollArea.removeEventListener("scroll", updateScrollFade);
+      observer.disconnect();
+    };
+  }, [filteredTasks.length]);
+
+  useEffect(() => {
+    const scrollArea = mobileTaskListScrollRef.current;
+    if (!scrollArea) return;
+
+    const updateScrollFade = () => {
+      const hasMoreContent = scrollArea.scrollHeight - scrollArea.clientHeight > 2;
+      const isAtBottom = scrollArea.scrollTop + scrollArea.clientHeight >= scrollArea.scrollHeight - 2;
+      setShowMobileTaskListFade(hasMoreContent && !isAtBottom);
+    };
+
+    updateScrollFade();
+    scrollArea.addEventListener("scroll", updateScrollFade, { passive: true });
+    const observer = new ResizeObserver(updateScrollFade);
+    observer.observe(scrollArea);
+    return () => {
+      scrollArea.removeEventListener("scroll", updateScrollFade);
+      observer.disconnect();
+    };
+  }, [filteredTasks.length]);
+
+  return (
+    <>
+      <div
+        className={`h-dvh overflow-hidden p-3 lg:hidden ${desktopTheme === "dark" ? "bg-[radial-gradient(circle_at_8%_6%,#294c3b_0,transparent_28%),radial-gradient(circle_at_91%_4%,#242a27_0,transparent_38%),linear-gradient(135deg,#111513_0%,#0b0d0c_58%,#1a1e1c_100%)]" : desktopTheme === "retro" ? "bg-[#dfe2d3] font-mono" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}
+        data-kv-retail-mobile-theme={desktopTheme}
+      >
+        <div className={`flex h-[calc(100dvh-24px)] flex-col overflow-hidden rounded-[22px] ${desktopTheme === "dark" ? "border border-white/10 bg-[#111413]/90 shadow-[0_12px_32px_rgba(0,0,0,0.34)]" : desktopTheme === "retro" ? "border-[3px] border-[#24252b] bg-[#c9ccc0] shadow-[0_6px_0_#24252b]" : "border border-white/80 bg-white/80 shadow-[0_12px_32px_rgba(0,4,117,0.2)] backdrop-blur-md"}`}>
+          <PerformanceNavbar
+            theme={desktopTheme}
+            title={desktopNavigationTitle}
+            compact
+            compactMenuItems={compactMobileMenuItems}
+          />
+          <main aria-label={`${scopedPageTitle} mobile`} className="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pb-6 pt-6">
+            <TaskPageTitle theme={desktopTheme} mobile>{scopedPageTitle}</TaskPageTitle>
+            <div className="mt-5 flex shrink-0 min-w-0 items-stretch gap-2">
+              <div className="relative min-w-0 flex-1">
+                <TaskKpiMetrics metrics={desktopMetrics} theme={desktopTheme} fill={scope === "unfinished"} onAddTask={!isMentionOnlyUser ? () => setIsModalOpen(true) : undefined} />
+                {desktopMetrics.length > 1 && <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 right-0 w-10 rounded-r-2xl bg-gradient-to-l ${desktopTheme === "dark" ? "from-[#171717] via-[#171717]/55 to-transparent" : desktopTheme === "retro" ? "from-[#eceee6] via-[#eceee6]/55 to-transparent" : "from-white via-white/55 to-transparent"}`} />}
+              </div>
+            </div>
+            <section aria-label="Cari dan filter tugas" className="mt-3 flex shrink-0 items-center gap-2">
+               <TaskSearchBar value={searchQuery} onChange={setSearchQuery} theme={desktopTheme} compact placeholder="Cari tugas..." />
+              <TaskFilterDropdown icon="storefront" label="Vendor" options={vendorOptions} value={filterVendor} onChange={setFilterVendor} theme={desktopTheme} compact />
+              <TaskFilterDropdown icon="sort" label="Urutkan" options={sortOptions} value={sortOption} onChange={setSortOption} theme={desktopTheme} compact />
+            </section>
+            <div className="relative mt-4 min-h-0 flex-1">
+            <section
+              ref={mobileTaskListScrollRef}
+              aria-label="Daftar tugas"
+              className="flex h-full flex-col gap-3 overflow-y-auto pb-2 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              style={showMobileTaskListFade ? {
+                maskImage: "linear-gradient(to bottom, #000 0, #000 calc(100% - 28px), transparent 100%)",
+                WebkitMaskImage: "linear-gradient(to bottom, #000 0, #000 calc(100% - 28px), transparent 100%)",
+              } : undefined}
+            >
+              {isTasksLoading && Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className={`h-24 animate-pulse rounded-2xl ${desktopTheme === "dark" ? "bg-white/5" : desktopTheme === "retro" ? "border-2 border-[#24252b] bg-[#dfe2d3]" : "bg-white/70"}`} />
+              ))}
+              {!isTasksLoading && filteredTasks.map((task) => (
+                <TaskCardMobile
+                  key={task.id}
+                  title={task.task_name || "Tugas tanpa judul"}
+                  dateRange={`${formatMobileTaskDate(task.task_given_date)} - ${formatMobileTaskDate(task.deadline_date)}`}
+                  vendor={task.pic_vendor || "-"}
+                  assignedTo={getMobileAssignedUsers(task.users)}
+                  assignedAvatars={getMobileAssignedAvatars(task.users)}
+                  status={(TASK_CARD_STATES.includes(task.status as TaskCardState) ? task.status : "0") as TaskCardState}
+                  tone={getMobileTaskTone(task)}
+                  changes={getMobileTaskChanges(task)}
+                  countdownLabel={getMobileCountdown(task)}
+                  delayReasonStage={requiredDelayReasonStage(task)}
+                  fileLabels={[
+                    taskConfig.detail_status_1 || "3D Gambar Kerja",
+                    taskConfig.detail_status_2 || "Draft Final",
+                  ]}
+                  uploadedFileStates={[
+                    Boolean(normalizeFileList(task.support_file_path)?.some(Boolean)),
+                    Boolean(normalizeFileList(task.draft_file_path)?.some(Boolean)),
+                  ]}
+                  fileSlotFiles={[
+                    normalizeFileList(task.support_file_path) || [null, null, null],
+                    normalizeFileList(task.draft_file_path) || [null, null, null],
+                  ]}
+                  fileLink={task.file_link}
+                  theme={desktopTheme}
+                  onChangeStatus={(delayReason) => {
+                    const nextStep: Record<string, "ACC Draft" | "Progress" | "Approve" | "Email" | null> = {
+                      "0": "ACC Draft",
+                      "ACC Draft": "Progress",
+                      "Progress Design": "Approve",
+                      "Approval Design": "Email",
+                      "Kirim Email": null,
+                      Done: null,
+                    };
+                    const step = nextStep[task.status];
+                    if (step) return handleStepClick(task.id, step, delayReason);
+                    return handleNextClick(task.id, undefined, delayReason);
+                  }}
+                  onDelete={() => handleDelete(task.id)}
+                  onUpload={(file, groupIndex, fileIndex) => handleMobileFileUpload(task.id, groupIndex === 0 ? "support_file" : "draft_file", fileIndex, file)}
+                  onViewFile={handleMobileViewFile}
+                  onSubmitLink={(fileLink, delayReason) => handleMobileSubmitLink(task.id, fileLink, delayReason)}
+                />
+              ))}
+              {!isTasksLoading && filteredTasks.length === 0 && (
+                <p className={`py-8 text-center text-sm ${desktopTheme === "dark" ? "text-[#a7ada8]" : desktopTheme === "retro" ? "text-[#687065]" : "text-[#707780]"}`}>
+                  {taskConfig.task_empty_state || "Belum ada tugas yang sesuai."}
+                </p>
+              )}
+            </section>
+            </div>
+          </main>
+        </div>
+      </div>
+
+
+
+      <div className={`hidden h-screen w-screen overflow-hidden lg:block ${desktopTheme === "dark" ? "bg-[#111413]" : desktopTheme === "retro" ? "bg-[#dfe2d3]" : "bg-[radial-gradient(circle_at_8%_6%,#00e7ef_0,transparent_25%),radial-gradient(circle_at_95%_90%,#00a4ff_0,transparent_31%),linear-gradient(135deg,#00a4ff_0%,#000675_44%,#04044a_100%)]"}`}>
+      <Container
+        viewport="Desktop"
+        contentProps={{
+          className: `flex h-full w-full flex-col overflow-hidden rounded-[16px] shadow-[0px_14px_42px_0px_rgba(44,42,39,0.16)] ${desktopTheme === "dark" ? "bg-[#111413] text-white" : desktopTheme === "retro" ? "bg-[#c9ccc0] font-mono" : "bg-[#f3fbff]"}`,
+          sidebarTheme: desktopTheme,
+          sidebarExpanded: desktopShellExpanded,
+          onToggleSidebarExpanded: toggleDesktopShellExpanded,
+          onToggleSidebarTheme: () => setDesktopTheme((theme) => theme === "dark" ? "light" : "dark"),
+          onToggleSidebarRetro: () => setDesktopTheme((theme) => theme === "retro" ? "light" : "retro"),
+          contentProps: { className: "flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden p-4" },
+        }}
+        menuItems={PRIMARY_MENU.filter((item) => !isMentionOnlyUser || item.label === "Daftar Tugas").map((item) => ({ label: item.label, icon: item.icon, href: item.href, isActive: item.href === desktopTaskRoute }))}
+        activeMenuHref={desktopTaskRoute}
+        menuTitle="KV Retail"
+      >
+      <TaskDesktopPageTransition className="relative min-w-0 flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="w-full shrink-0 pb-4">
+          <header className="flex min-h-[45px] flex-wrap items-start justify-between gap-4">
+            <div>
+              <TaskPageTitle theme={desktopTheme}>{desktopNavigationTitle}</TaskPageTitle>
+            </div>
+          </header>
+
+          <div className="mt-4 flex min-w-0 items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <TaskKpiMetrics
+                metrics={desktopMetrics}
+                theme={desktopTheme}
+                onAddTask={!isMentionOnlyUser ? () => setIsModalOpen(true) : undefined}
+              />
+            </div>
+
+            <section
+              aria-label="Filter tugas"
+              className="flex shrink-0 flex-nowrap items-center gap-[9px]"
+            >
+               <TaskSearchBar value={searchQuery} onChange={setSearchQuery} theme={desktopTheme} />
+
+              <TaskFilterDropdown 
+                icon="storefront" 
+                label="Vendor" 
+                options={vendorOptions}
+                value={filterVendor}
+                onChange={setFilterVendor}
+                theme={desktopTheme}
+              />
+              <TaskFilterDropdown 
+                icon="sort" 
+                label="Urutkan" 
+                options={sortOptions}
+                value={sortOption}
+                onChange={setSortOption}
+                theme={desktopTheme}
+              />
+            </section>
+          </div>
+        </div>
+
+        <section
+          aria-label="Task Card"
+          className="relative flex-1 min-h-0 w-full"
+        >
+          <div ref={taskListScrollRef} className="h-full overflow-y-auto pb-20 pr-2 -mr-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex flex-col items-stretch gap-3">
+              {isTasksLoading && Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className={`h-[122px] animate-pulse rounded-2xl ${desktopTheme === "dark" ? "bg-[#202820]" : desktopTheme === "retro" ? "border-2 border-[#24252b] bg-[#dfe2d3]" : "bg-[#f3faff]"}`} />
+              ))}
+              {!isTasksLoading && filteredTasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  id={task.id}
+                  currentUser={user}
+                  createdBy={task.created_by ?? undefined}
+                  state={task.status as TaskCardState}
+                  timestamps={task.task_timestamps || {}}
+                  title={task.task_name ?? undefined}
+                  picVendor={task.pic_vendor ?? undefined}
+                  givenDate={task.task_given_date ?? undefined}
+                  deadlineDate={task.deadline_date ?? undefined}
+                  assignedUsers={task.users}
+                  supportFileUrl={normalizeFileList(task.support_file_path)}
+                  draftFileUrl={normalizeFileList(task.draft_file_path)}
+                  fileLink={task.file_link}
+                  isLate={Boolean(task.timing_evaluation?.late)}
+                  onTitleSave={(taskName: string) => handleTitleSave(task.id, taskName)}
+                  onDeadlineSave={(deadlineDate: string) => handleDeadlineSave(task.id, deadlineDate)}
+                  delayReasonStage={requiredDelayReasonStage(task)}
+                  onStepClick={(step: string, delayReason?: string) => handleStepClick(task.id, step, delayReason)}
+                  onNextClick={(link?: string, delayReason?: string) => handleNextClick(task.id, link, delayReason)}
+                  onDeleteConfirm={() => handleDelete(task.id)}
+                  onRefresh={fetchTasks}
+                config={taskConfig}
+                theme={desktopTheme}
+                />
+              ))}
+              {!isTasksLoading && filteredTasks.length === 0 && (
+                <div className="py-12 text-center text-gray-500">
+                  {taskConfig.task_empty_state || "Belum ada tugas yang sesuai."}
+                </div>
+              )}
+            </div>
+          </div>
+          {showTaskListFade && (
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t ${desktopTheme === "dark" ? "from-[#111413]/55 via-[#111413]/20 to-transparent" : desktopTheme === "retro" ? "from-[#c9ccc0]/55 via-[#c9ccc0]/20 to-transparent" : "from-white/55 via-white/20 to-transparent"}`}
+            />
+          )}
+        </section>
+      </TaskDesktopPageTransition>
+
+      </Container>
+      </div>
+
+      <TaskFormModal 
+        isOpen={isModalOpen} 
+        onClose={() => {
+          setIsModalOpen(false);
+          fetchTasks(); // refresh after add
+        }} 
+      />
+    </>
+  );
+}
+
+export default TaskPage;

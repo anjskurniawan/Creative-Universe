@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeMemberProfile, CreativeReportAssessment } from "@/features/creative-report/types";
-import { useAuth } from "@/providers/auth-provider";
-import { useCreativeReportSettings } from "../settings";
-import type { DetailCardRating } from "@/components/layout/profile/detail-card";
+import { useAuth } from "@/hooks/auth";
+import { useCreativeReportSettings } from "@/features/creative-report/settings";
+import type { DetailCardRating } from "./_components/DetailCard/DetailCard";
 
 const labels = [
   ["creativity", "Creativity"],

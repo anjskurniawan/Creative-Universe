@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import MessagesPageContent from "@/components/messages/messages-page";
+import MessagesPageContent from "@/features/messages/components/MessagesPageContent/MessagesPageContent";
 
 export default function MessagesPage() {
   return (

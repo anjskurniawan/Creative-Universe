@@ -3,36 +3,43 @@ import type { ComponentItem } from "@/app/developer/library/library.data";
 export const landingComponents: ComponentItem[] = [
   {
     "name": "ApplicationUniverse",
-    "file": "universe/AppUniverse/AppUniverse.tsx",
-    "description": "Komponen ApplicationUniverse pada kategori universe.",
+    "file": "AppUniverse/AppUniverse.tsx",
+    "sourcePath": "@/features/auth/components/AppUniverse/AppUniverse.tsx",
+    "description": "Komponen ApplicationUniverse pada feature autentikasi dan landing.",
     "tags": [
       "Component",
       "universe"
     ]
   },
   {
-    "name": "AuthPortal",
-    "file": "universe/AuthPortal/AuthPortal.tsx",
-    "description": "Komponen AuthPortal pada kategori universe.",
+    "name": "Auth",
+    "file": "Portal/Auth/Auth.tsx",
+    "sourcePath": "@/features/auth/components/Portal/Auth/Auth.tsx",
+    "description": "Komponen portal landing untuk pengguna terautentikasi.",
     "tags": [
       "Component",
       "universe",
+      "Portal",
       "Auth"
     ]
   },
   {
-    "name": "GuestPortal",
-    "file": "guest-portal.tsx",
-    "description": "Komponen GuestPortal pada kategori landing.",
+    "name": "Guest",
+    "file": "Portal/Guest/Guest.tsx",
+    "sourcePath": "@/features/auth/components/Portal/Guest/Guest.tsx",
+    "description": "Komponen portal landing untuk pengguna tamu.",
     "tags": [
       "Component",
-      "landing"
+      "universe",
+      "Portal",
+      "Guest"
     ]
   },
   {
     "name": "LandingText",
-    "file": "universe/LandingText/LandingText.tsx",
-    "description": "Komponen LandingText pada kategori universe.",
+    "file": "LandingText/LandingText.tsx",
+    "sourcePath": "@/features/auth/components/LandingText/LandingText.tsx",
+    "description": "Komponen teks landing pada feature autentikasi.",
     "tags": [
       "Component",
       "universe"
@@ -40,8 +47,9 @@ export const landingComponents: ComponentItem[] = [
   },
   {
     "name": "MediaAgent",
-    "file": "universe/MediaAgent/MediaAgent.tsx",
-    "description": "Komponen MediaAgent pada kategori universe.",
+    "file": "MediaAgent/MediaAgent.tsx",
+    "sourcePath": "@/features/auth/components/MediaAgent/MediaAgent.tsx",
+    "description": "Komponen media landing pada feature autentikasi.",
     "tags": [
       "Component",
       "universe"

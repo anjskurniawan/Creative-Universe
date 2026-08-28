@@ -20,6 +20,8 @@ Apply this workflow to every project-related task, including read-only work and 
 - Writer: `skills/work-log/scripts/add-log-entry.ps1`.
 - Validator: `skills/work-log/scripts/validate-logs.ps1`.
 
+Temporary entry files are workflow artifacts only. Never create task log files in the repository root. Use the fixed temporary filename `.worklog-entry.md` (or an equivalent file under a system temp directory), pass `-RemoveEntryFileOnSuccess` to the writer, and verify that the temporary file no longer exists after a successful write. Existing historical `*-log.md` files are not canonical logs and must not be created by this workflow.
+
 Resolve paths from the skill directory, not from the shell's current working directory. Do not use `AGENTS.md` as the log database.
 
 ## Required Workflow
@@ -42,11 +44,12 @@ Resolve paths from the skill directory, not from the shell's current working dir
 
 1. Read `references/log-format.md` completely and prepare exactly one complete entry.
 2. Assign a unique entry ID. For a correction, set `Supersedes Entry ID` to the older entry; never alter the older entry.
-3. Insert the new entry with `scripts/add-log-entry.ps1`. Do not write directly when the script is available.
+3. Insert the new entry with `scripts/add-log-entry.ps1 -RemoveEntryFileOnSuccess`. Do not write directly when the script is available. The entry source must be the temporary `.worklog-entry.md`, never a root `*-log.md` artifact.
 4. Run `scripts/validate-logs.ps1` and read back the newest entry.
 5. Verify that the new entry is first, every previous entry is preserved byte-for-byte, and validation reflects what was actually run.
-6. Only after all checks succeed, output exactly: `Berhasil di catat di logs`.
-7. If writing or validation fails, do not output the success phrase. Report the failure and preserve the existing log unchanged.
+6. Verify the temporary entry file was removed. If the writer succeeded but later validation fails, do not output the success phrase; report the failure and preserve the existing log unchanged.
+7. Only after all checks succeed, output exactly: `Berhasil di catat di logs`.
+8. If writing or validation fails, do not output the success phrase. Clean up the temporary entry file manually in a `finally`/cleanup step and preserve the existing log unchanged.
 
 ## Immutable Newest-First History
 

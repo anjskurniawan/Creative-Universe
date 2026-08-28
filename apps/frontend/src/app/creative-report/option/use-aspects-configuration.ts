@@ -6,7 +6,7 @@ import {
   saveCreativeReportSettings,
   type CreativeReportAspect,
   type CreativeReportAspectGroupTitles,
-} from "../settings";
+} from "@/features/creative-report/settings";
 
 export function useAspectsConfiguration() {
   // --- STATE DEFINITIONS ---

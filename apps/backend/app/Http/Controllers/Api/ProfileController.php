@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Actions\Core\UpdateProfileAction;
 use App\Actions\Core\UpdateUserAvatarAction;
+use App\Actions\Core\UpdateUserBannerAction;
 use App\Http\Requests\Api\UpdateAvatarRequest;
+use App\Http\Requests\Api\UpdateBannerRequest;
 use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Http\Resources\UserProfileResource;
 use Illuminate\Http\JsonResponse;
@@ -40,6 +42,18 @@ class ProfileController extends BaseApiController
         return $this->sendResponse(
             (new UserProfileResource($user))->resolve($request),
             'Avatar berhasil diperbarui.'
+        );
+    }
+
+    public function updateBanner(
+        UpdateBannerRequest $request,
+        UpdateUserBannerAction $action
+    ): JsonResponse {
+        $user = $action->handle($request->user(), $request->file('banner'));
+
+        return $this->sendResponse(
+            (new UserProfileResource($user))->resolve($request),
+            'Banner berhasil diperbarui.'
         );
     }
 

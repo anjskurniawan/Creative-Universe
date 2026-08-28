@@ -4,17 +4,34 @@
 
 ## Scope and Repository Structure
 
+### Frontend in-place restructuring program
+
+- `apps/frontend/` is the only active frontend. It contains the complete former legacy application and must retain its UI, features, behavior, API contracts, permissions, business rules, accessibility, and verified edge cases throughout restructuring.
+- The clean rebuild was permanently cancelled on 2026-08-24. Its preserved snapshot is `apps/frontend-cancel/`, which is strictly read-only: never edit it, import from it, link it, run generated writes in it, or include it in the active build graph. It may be removed only after a separate explicit user instruction.
+- `docs/frontend/rebuild-architecture.md` is the canonical contract for restructuring the active frontend in place. Read it before any frontend initialization, reorganization, component move, feature restructuring, CSS-boundary change, or new frontend code.
+- This program changes internal ownership and dependency structure only. Do not fix or intentionally change UI, visual styling, routes, behavior, APIs, permissions, business logic, validation, responsive behavior, or accessibility unless the user separately authorizes that change.
+- Work foundation-first, then one complete feature at a time. Keep lint, type-check, static build, and existing routes operational at every completed phase.
+- Maintain `docs/frontend/migration-inventory.md` as the canonical restructuring registry. The former clean-rebuild QA registry in `docs/frontend/migrated-components.md` is historical and does not control this program.
+- Apply the component-level automation rules in `docs/frontend/rebuild-architecture.md` and `docs/frontend/component-tree-migration.md`: before adding or changing a reusable component, trace every route/page consumer and recalculate its level. One page stays page-specific; two or more pages in one domain promote it to feature-specific; consumers across two or more domains require cross-feature evaluation; a domain-neutral component used by at least three pages across multiple domains may promote to generic UI. Move the implementation and imports when the threshold is met, unless domain state or dependency boundaries block promotion.
+- Re-evaluate level on every consumer addition/removal. Move the implementation and update every import in the same phase; do not leave compatibility shims unless explicitly approved.
+- `src/app/` owns routing only; reusable presentation belongs to `src/components/`; domain UI, API, hooks, and types belong to `src/features/<domain>/`; pure infrastructure belongs to `src/core/`.
+- The active frontend must retain exactly one global stylesheet, `src/app/global.css`, for Spectrum S2 foundations and minimal application globals. Legacy Tailwind/reset behavior must be scoped under `.cu-style`, never applied as an unscoped parallel global reset.
+- Spectrum S2 is the default component system when an official S2 component fits. Genuinely new custom components use React Aria as the accessibility/interaction foundation with project-owned Tailwind styling.
+- Define ESLint dependency boundaries at the foundation phase before moving feature code. Temporary exceptions must be explicit, narrow, documented in the registry, and removed by the owning phase.
+- Unused routes or components may be deleted only after consumer audit proves they are unreachable. Do not touch `apps/backend/` during frontend restructuring.
+
 ## Development Commands
 
 ## Coding Conventions
 
-- Place every reusable frontend component under `apps/frontend/src/components/`; do not add component implementations directly at the components root. Reusable composed layouts may use `apps/frontend/src/components/layouts/` as their dedicated category.
-- Use `apps/frontend/src/components/universe/` by default for project-owned components, including components scaffolded from React Aria Components and components built from scratch.
+- The placement and dependency rules in `docs/frontend/rebuild-architecture.md` supersede the active frontend's historical folder conventions.
+- Place reusable frontend presentation under the narrowest valid owner defined by the architecture contract; do not add implementations directly at the components root.
+- Use `apps/frontend/src/components/ui/` only for domain-neutral generic primitives that meet the documented consumer threshold. New custom primitives use React Aria plus Tailwind.
 - Use `apps/frontend/src/components/spectrum/` only for components implemented with or wrapping React Spectrum S2 from `@react-spectrum/s2`.
-- When the user does not explicitly request Spectrum S2, treat `universe` as the default component family.
-- Keep component ownership explicit: do not silently move a Universe component into Spectrum, mix both implementations in one primitive, or expose one family under the other family's path.
+- Prefer Spectrum S2 by default when its official API fits; do not rebuild an available Spectrum control as custom UI without a documented reason.
+- Historical folders such as `components/universe/` may exist during transition but are not target ownership. Remove them only as their consumers are audited and moved.
 - Create each component in a PascalCase subdirectory, with its primary implementation using the same PascalCase filename.
-- Keep route-specific page layouts and route shells under `apps/frontend/src/app/`; place reusable composed layouts under `apps/frontend/src/components/layouts/`. Use `universe/` or `spectrum/` for reusable design-system primitives and components, not as a replacement for the layouts category.
+- Keep route-specific UI under route-local `_components/`; place reusable shells under `components/layout/` and domain UI under `features/<domain>/components/`.
 
 ## Testing and Validation
 
@@ -50,8 +67,8 @@
 ### Optional local skill: react-aria
 
 - Read and follow `skills/react-aria/SKILL.md` when the user explicitly requests React Aria, `react-aria-components`, an Aria-based component, or any create, update, review, refactor, fix, or test involving an existing Aria-backed component.
-- For every genuinely new reusable Universe component, use this skill first as a mandatory discovery gate before writing the implementation. Search the bundled component catalog by behavior and relevant synonyms, then read the exact component reference when a possible match exists.
-- When a suitable React Aria component or primitive exists, scaffold the new Universe component from that API and preserve its accessibility, interaction, state, collection, and keyboard contracts. The result still belongs under `apps/frontend/src/components/universe/` and owns its project styling.
+- For every genuinely new custom component not served by Spectrum S2, use this skill first as a mandatory discovery gate before writing the implementation. Search the bundled component catalog by behavior and relevant synonyms, then read the exact component reference when a possible match exists.
+- When a suitable React Aria component or primitive exists, scaffold the custom component from that API and preserve its accessibility, interaction, state, collection, and keyboard contracts. Place it at the consumer-derived target from the restructuring architecture and style it with project-owned Tailwind under the appropriate `.cu-style` boundary.
 - When no suitable React Aria scaffold exists after checking the bundled catalog and relevant component references, record the no-match decision, stop applying the Aria implementation workflow, and build the Universe component independently with appropriate accessibility and validation.
 - Do not invoke this skill for an explicit Spectrum S2 request unless the Spectrum workflow intentionally falls back to React Aria for a custom Spectrum component. Use `skills/react-spectrum-s2/SKILL.md` as the primary skill in that case.
 - This is a project-local, agent-neutral skill sourced from `https://react-aria.adobe.com`. Do not register it globally, duplicate it into a vendor catalog, or configure the optional React Aria MCP server unless the user explicitly asks.
@@ -59,7 +76,7 @@
 ### Optional local skill: react-spectrum-s2
 
 - Read and follow `skills/react-spectrum-s2/SKILL.md` when the user explicitly requests a component related to React Spectrum, Spectrum S2, `@react-spectrum/s2`, or asks to change an existing component under `apps/frontend/src/components/spectrum/`.
-- Do not invoke this skill for generic component requests or Universe components. `apps/frontend/src/components/universe/` remains the default when Spectrum S2 is not explicitly requested.
+- Spectrum S2 is the default for new controls when an official S2 API fits. Invoke this skill for explicit Spectrum work and for changes to components under `apps/frontend/src/components/spectrum/`; use the React Aria discovery workflow only when a suitable S2 control does not fit.
 - For Spectrum component work, read the exact bundled component reference and any directly relevant guide before implementation. Use the official S2 API, subpath imports, composition model, styling macro, accessibility contract, and testing guidance rather than guessing.
 - Store reusable output from this skill under `apps/frontend/src/components/spectrum/` using the project component structure. Project rules in `AGENTS.md` and `docs/frontend/component-system.md` remain authoritative for repository paths, static-export constraints, documentation, validation, and work logging.
 - This is a project-local, agent-neutral skill sourced from `https://react-spectrum.adobe.com`. Do not register it globally, duplicate it into a vendor catalog, or configure the optional React Spectrum MCP server unless the user explicitly asks.
@@ -69,7 +86,7 @@
 - Read and follow `skills/component-organizer/SKILL.md` only when the user explicitly asks to organize, tidy, split, restructure, or clean the file/folder structure of an existing frontend component, or explicitly invokes `component-organizer`.
 - Do not trigger it for ordinary component creation, bug fixes, visual changes, behavior changes, or generic refactoring that does not request structural organization.
 - Preserve the component's behavior, props, rendered UI, Tailwind styling, accessibility, public exports, and consumers unless the user separately requests a contract change.
-- Use the live CreativeUniverse path and casing as authority: default project-owned components belong to `apps/frontend/src/components/universe/`, explicit Spectrum S2 components to `apps/frontend/src/components/spectrum/`, reusable layouts to their established layout category, and route-local UI beside its route.
+- Use consumer evidence and `docs/frontend/rebuild-architecture.md` as authority: one-page UI belongs route-locally, domain UI under `features/<domain>/`, generic UI under `components/ui/`, Spectrum S2 compositions under `components/spectrum/`, reusable layouts under `components/layout/`, and generic feedback under `components/feedback/`.
 - Keep organization proportional. The primary `<ComponentName>.tsx` always remains; `.types.ts`, `.config.ts`, `.logic.ts`, child folders, and `index.ts` are created only when their complexity or reuse justifies them.
 - This is a project-local, agent-neutral skill. Do not register, install, copy, or expose it as a global or Codex catalog skill.
 

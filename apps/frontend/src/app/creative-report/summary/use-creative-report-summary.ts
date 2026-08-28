@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportUserDetail } from "@/features/creative-report/types";
-import { useCreativeReportSettings } from "../settings";
+import { useCreativeReportSettings } from "@/features/creative-report/settings";
 
 export function useCreativeReportSummary() {
   const { settings } = useCreativeReportSettings();

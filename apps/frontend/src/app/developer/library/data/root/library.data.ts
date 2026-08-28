@@ -4,7 +4,8 @@ export const rootComponents: ComponentItem[] = [
   {
     "name": "OddsDesignerTaskRowCard",
     "file": "odds-designer-task-row-card.tsx",
-    "description": "Komponen OddsDesignerTaskRowCard pada root components.",
+    "sourcePath": "@/features/odds/components/OddsDesignerTaskRowCard/OddsDesignerTaskRowCard.tsx",
+    "description": "Komponen task-row khusus domain ODDS.",
     "tags": [
       "Component",
       "root",
@@ -15,7 +16,8 @@ export const rootComponents: ComponentItem[] = [
   {
     "name": "OddsRichTextEditor",
     "file": "odds-rich-text-editor.tsx",
-    "description": "Komponen OddsRichTextEditor pada root components.",
+    "sourcePath": "@/features/odds/components/OddsRichTextEditor/OddsRichTextEditor.tsx",
+    "description": "Editor rich-text khusus workflow ODDS.",
     "tags": [
       "Component",
       "root",
@@ -25,7 +27,8 @@ export const rootComponents: ComponentItem[] = [
   {
     "name": "OddsTaskChat",
     "file": "odds-task-chat.tsx",
-    "description": "Komponen OddsTaskChat pada root components.",
+    "sourcePath": "@/features/odds/components/OddsTaskChat/OddsTaskChat.tsx",
+    "description": "Chat task khusus lifecycle ODDS.",
     "tags": [
       "Component",
       "root",
@@ -34,4 +37,3 @@ export const rootComponents: ComponentItem[] = [
     ]
   }
 ];
-

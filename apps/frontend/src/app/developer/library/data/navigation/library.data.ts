@@ -3,7 +3,8 @@ import type { ComponentItem } from "@/app/developer/library/library.data";
 export const navigationComponents: ComponentItem[] = [
   {
     "name": "MessageBell",
-    "file": "message-bell.tsx",
+    "file": "MessageBell/MessageBell.tsx",
+    "sourcePath": "@/features/messages/components/MessageBell/MessageBell.tsx",
     "description": "Tombol indikator pesan yang membuka akses ke pesan terbaru.",
     "tags": [
       "Navigation",
@@ -13,7 +14,8 @@ export const navigationComponents: ComponentItem[] = [
   },
   {
     "name": "NotificationBell",
-    "file": "notification-bell.tsx",
+    "file": "NotificationBell/NotificationBell.tsx",
+    "sourcePath": "@/features/notifications/components/NotificationBell/NotificationBell.tsx",
     "description": "Tombol indikator notifikasi dengan state unread dan daftar pemberitahuan.",
     "tags": [
       "Navigation",
@@ -23,7 +25,8 @@ export const navigationComponents: ComponentItem[] = [
   },
   {
     "name": "SideMenu",
-    "file": "side-menu.tsx",
+    "file": "sidemenu/SideMenu/SideMenu.tsx",
+    "sourcePath": "@/components/navigation/sidemenu/SideMenu/SideMenu.tsx",
     "description": "Komposisi side menu modul yang menggabungkan icon, avatar, dan kontrol navigasi.",
     "tags": [
       "Navigation",
@@ -33,7 +36,8 @@ export const navigationComponents: ComponentItem[] = [
   },
   {
     "name": "SidebarUtilityActions",
-    "file": "sidebar-utility-actions.tsx",
+    "file": "SidebarUtilityActions/SidebarUtilityActions.tsx",
+    "sourcePath": "@/components/navigation/SidebarUtilityActions/SidebarUtilityActions.tsx",
     "description": "Kumpulan aksi utilitas yang ditempatkan pada sidebar navigasi.",
     "tags": [
       "Navigation",
@@ -51,7 +55,8 @@ export const navigationComponents: ComponentItem[] = [
     "children": [
       {
         "name": "Avatar",
-        "file": "sidemenu/avatar.tsx",
+        "file": "sidemenu/SideMenuAvatar/SideMenuAvatar.tsx",
+        "sourcePath": "@/components/navigation/sidemenu/SideMenuAvatar/SideMenuAvatar.tsx",
         "description": "Komponen Sidemenu\\avatar pada kategori navigation.",
         "tags": [
           "Component",
@@ -61,7 +66,8 @@ export const navigationComponents: ComponentItem[] = [
       },
       {
         "name": "Button",
-        "file": "sidemenu/button.tsx",
+        "file": "sidemenu/SideMenuButton/SideMenuButton.tsx",
+        "sourcePath": "@/components/navigation/sidemenu/SideMenuButton/SideMenuButton.tsx",
         "description": "Komponen Sidemenu\\button pada kategori navigation.",
         "tags": [
           "Component",
@@ -72,7 +78,8 @@ export const navigationComponents: ComponentItem[] = [
       },
       {
         "name": "Collaps",
-        "file": "sidemenu/collaps.tsx",
+        "file": "sidemenu/SideMenuCollaps/SideMenuCollaps.tsx",
+        "sourcePath": "@/components/navigation/sidemenu/SideMenuCollaps/SideMenuCollaps.tsx",
         "description": "Komponen Sidemenu\\collaps pada kategori navigation.",
         "tags": [
           "Component",
@@ -82,7 +89,8 @@ export const navigationComponents: ComponentItem[] = [
       },
       {
         "name": "Expand",
-        "file": "sidemenu/expand.tsx",
+        "file": "sidemenu/SideMenuExpand/SideMenuExpand.tsx",
+        "sourcePath": "@/components/navigation/sidemenu/SideMenuExpand/SideMenuExpand.tsx",
         "description": "Komponen Sidemenu\\expand pada kategori navigation.",
         "tags": [
           "Component",
@@ -92,7 +100,8 @@ export const navigationComponents: ComponentItem[] = [
       },
       {
         "name": "Iconapp",
-        "file": "sidemenu/iconapp.tsx",
+        "file": "sidemenu/SideMenuIconApp/SideMenuIconApp.tsx",
+        "sourcePath": "@/components/navigation/sidemenu/SideMenuIconApp/SideMenuIconApp.tsx",
         "description": "Komponen Sidemenu\\iconapp pada kategori navigation.",
         "tags": [
           "Component",
@@ -103,4 +112,3 @@ export const navigationComponents: ComponentItem[] = [
     ]
   }
 ];
-

@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { creativeReportApi } from "@/features/creative-report/api";
 import type { CreativeReportIndex } from "@/features/creative-report/types";
-import { useAuth } from "@/providers/auth-provider";
-import { type ReportMetric } from "@/components/creative-report/report-toolbar";
+import { useAuth } from "@/hooks/auth";
+import { type ReportMetric } from "./_components/ReportToolbar/ReportToolbar";
 
 export const JOBDESKS = ["Semua jobdesk", "SPV", "Videographer", "Designer", "Content Creator"];
 
@@ -110,6 +110,11 @@ export function useCreativeReportPerformance() {
         : [...current, id],
     );
 
+  const reorderGroupMembers = useCallback(async (groupId: number, memberIds: number[]) => {
+    await creativeReportApi.members.reorder(groupId, memberIds);
+    await load();
+  }, [load]);
+
   return {
     canEdit,
     month,
@@ -128,6 +133,7 @@ export function useCreativeReportPerformance() {
     metrics,
     monthLabel,
     toggle,
+    reorderGroupMembers,
     load,
   };
 }

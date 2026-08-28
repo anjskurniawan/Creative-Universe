@@ -3,7 +3,8 @@ import type { ComponentItem } from "@/app/developer/library/library.data";
 export const loginComponents: ComponentItem[] = [
   {
     "name": "LoginCard",
-    "file": "login-card.tsx",
+    "file": "LoginCard/LoginCard.tsx",
+    "sourcePath": "@/features/auth/components/Login/LoginCard/LoginCard.tsx",
     "description": "Kartu layout utama yang membungkus pengalaman login.",
     "tags": [
       "Login",
@@ -13,23 +14,13 @@ export const loginComponents: ComponentItem[] = [
   },
   {
     "name": "LoginForm",
-    "file": "login-form.tsx",
+    "file": "LoginForm/LoginForm.tsx",
+    "sourcePath": "@/features/auth/components/Login/LoginForm/LoginForm.tsx",
     "description": "Form interaktif untuk memasukkan kredensial dan mengirim proses login.",
     "tags": [
       "Login",
       "Form",
       "Authentication"
     ]
-  },
-  {
-    "name": "LoginParticleBackground",
-    "file": "login-particle-background.tsx",
-    "description": "Latar belakang animasi partikel untuk halaman login.",
-    "tags": [
-      "Login",
-      "Background",
-      "Animation"
-    ]
   }
 ];
-

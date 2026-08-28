@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import Container from "@/components/universe/Layouts/Container/Container";
+import Container from "@/components/layout/Container/Container";
 
 const creativeReportMenu = [
   {
@@ -42,7 +42,6 @@ export default function CreativeReportLayout({ children }: { children: React.Rea
       <Container
         viewport={viewport}
         contentProps={{
-          className: "w-full h-full flex flex-col overflow-hidden bg-[#f3fbff] rounded-[16px] shadow-[0px_14px_42px_0px_rgba(44,42,39,0.16)]",
           sidebarTheme: "light",
           sidebarExpanded,
           onToggleSidebarExpanded: () => setSidebarExpanded((current) => !current),

@@ -1,9 +1,9 @@
 # Next.js Static Export
 
-> Status: Current
-> Last verified: 2026-08-13
+> Status: Current active frontend contract
+> Last verified: 2026-08-24
 
-The frontend in apps/frontend/ uses Next.js 16.2.9 with the App Router. Production must remain compatible with static export.
+The only active application in `apps/frontend/` uses Next.js 16.2.9 with the App Router and static export. Its existing runtime and product contracts must remain intact during in-place restructuring. The cancelled clean rebuild is preserved at `apps/frontend-cancel/` and must not be built or used as a source.
 
 ## Configuration
 
@@ -33,4 +33,4 @@ The frontend does not currently expose separate route pages for HTTP 401 or HTTP
 
 ## Build and constraints
 
-Run focused linting and type checks, then npm --prefix apps/frontend run build. Do not add behavior requiring a persistent Next.js server: a production API Route backend, server-only request state, runtime Server Actions, or dynamic routes without complete static output.
+All frontend verification commands run against `apps/frontend/`. Do not run generated-write commands in `apps/frontend-cancel/`. Do not add behavior requiring a persistent Next.js server: a production API Route backend, server-only request state, runtime Server Actions, or dynamic routes without complete static output.

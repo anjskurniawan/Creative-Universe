@@ -19,7 +19,7 @@ class CreativeMember extends Model
     protected $table = 'creative_report_members';
 
     protected $fillable = [
-        'user_id', 'name', 'position_id', 'position_name', 'status', 'joined_at',
+        'user_id', 'name', 'position_id', 'position_name', 'sort_order', 'status', 'joined_at',
         'resigned_at', 'reviewed_by', 'reviewed_at', 'card_image_path', 'profile_metrics',
     ];
 

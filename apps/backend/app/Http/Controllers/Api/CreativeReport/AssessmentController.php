@@ -61,10 +61,36 @@ class AssessmentController extends BaseApiController
             'name' => $rows->first()->group->name,
             'sort_order' => $rows->first()->group->sort_order,
             'staff_count' => $rows->count(),
-            'assessments' => AssessmentResource::collection($rows)->resolve($request),
+            'assessments' => AssessmentResource::collection($rows->sortBy(fn ($row) => [$row->member?->sort_order ?? 0, $row->member?->id ?? $row->id]))->resolve($request),
         ])->sortBy('sort_order')->values();
 
         return $this->sendResponse(['month' => $period, 'groups' => $groups, 'notice' => null], 'Laporan creative berhasil diambil.');
+    }
+
+    public function reorderMembers(Request $request): JsonResponse
+    {
+        Gate::authorize('update', Assessment::query()->firstOrFail());
+
+        $validated = $request->validate([
+            'group_id' => ['required', 'integer', 'exists:creative_report_groups,id'],
+            'member_ids' => ['required', 'array', 'min:1'],
+            'member_ids.*' => ['integer', 'distinct', 'exists:creative_report_members,id'],
+        ]);
+
+        $members = CreativeMember::query()
+            ->whereHas('assessments', fn ($query) => $query->where('creative_report_group_id', $validated['group_id']))
+            ->whereIn('id', $validated['member_ids'])
+            ->get();
+
+        abort_unless($members->count() === count($validated['member_ids']), 422, 'Urutan member tidak sesuai group.');
+
+        DB::transaction(function () use ($validated) {
+            foreach ($validated['member_ids'] as $index => $memberId) {
+                CreativeMember::query()->whereKey($memberId)->update(['sort_order' => $index + 1]);
+            }
+        });
+
+        return $this->sendResponse(null, 'Urutan member berhasil diperbarui.');
     }
 
     public function update(UpdateAssessmentRequest $request, Assessment $assessment): JsonResponse

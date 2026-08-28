@@ -1,3 +1,1 @@
-export default function DeveloperLayoutPage() {
-  return null;
-}
+export { default } from "./_components/DeveloperLayoutPage/DeveloperLayoutPage";

@@ -1,6 +1,6 @@
 ---
 name: component-organizer
-description: Reorganize an existing CreativeApp frontend component into a proportional, searchable Next.js, TypeScript, and Tailwind CSS folder structure. Use only when the user explicitly asks to organize, tidy, split, restructure, or clean a component's files or invokes component-organizer. Preserve behavior, props, markup, styles, accessibility, and imports unless the user separately requests functional changes.
+description: Reorganize an existing CreativeUniverse frontend component into a proportional, searchable Next.js, TypeScript, and Tailwind CSS folder structure. Use only when the user explicitly asks to organize, tidy, split, restructure, or clean a component's files or invokes component-organizer. Preserve behavior, props, markup, styles, accessibility, and imports unless the user separately requests functional changes.
 ---
 
 # Component Organizer
@@ -11,19 +11,21 @@ Reorganize only the explicitly named component. Keep the refactor structural: pr
 
 - Run only after an explicit request to organize or tidy a component structure.
 - Do not trigger for ordinary feature work, bug fixes, visual changes, new components, or unrelated refactors.
-- Do not move shared components, rename public exports, or change ownership families without explicit authorization.
-- A component-organizer request does not authorize migration, package installation, commit, push, or broad repository cleanup.
+- Do not move shared components or rename public exports outside the explicit structural scope. Ownership changes must follow the canonical consumer thresholds and update all imports atomically.
+- A component-organizer request does not authorize feature changes, package installation, commit, push, backend edits, or broad repository cleanup.
 
 ## Resolve the component owner
 
-Inspect the current source tree and consumers before writing. Use the actual path and casing as authority.
+Inspect the current source tree and every consumer before writing. Use `docs/frontend/rebuild-architecture.md` and actual consumer evidence as authority.
 
-- Default project-owned/Aria-backed components: `frontend/src/components/universe/<ComponentName>/`.
-- React Spectrum S2 components: `frontend/src/components/spectrum/<ComponentName>/` only when the component already belongs there or Spectrum is explicitly requested.
-- Reusable composed layouts: preserve the established project category, currently `frontend/src/components/layouts/` or an existing explicitly named layout folder.
-- Route-local UI: keep beside its route under `frontend/src/app/` unless the user explicitly asks to promote it.
+- One-page UI: `apps/frontend/src/app/.../_components/<ComponentName>/`.
+- Feature-specific UI used by at least two pages in one domain: `apps/frontend/src/features/<domain>/components/<ComponentName>/`.
+- Domain-neutral UI used by at least three pages across at least two domains: `apps/frontend/src/components/ui/<ComponentName>/`.
+- React Spectrum S2 adapters/compositions: `apps/frontend/src/components/spectrum/<ComponentName>/`.
+- Reusable composed layouts: `apps/frontend/src/components/layout/<ComponentName>/`.
+- Generic feedback surfaces: `apps/frontend/src/components/feedback/<ComponentName>/`.
 - Parent-specific children: nest under the parent component folder.
-- Cross-feature shared children: propose promotion to the owning component family; do not move them silently.
+- Cross-feature business components require explicit ownership review and must not be promoted to generic UI solely from consumer count.
 
 ## Organize proportionally
 

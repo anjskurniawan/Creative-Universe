@@ -1,0 +1,103 @@
+import { MaterialIcon } from "@/components/ui/MaterialIcon/MaterialIcon";
+import Link from "next/link";
+import type { ComponentItem } from "@/app/developer/library/library.data";
+import { VisualPreview } from "@/app/developer/library/_components/VisualPreview/VisualPreview";
+import { LibraryLogHistory } from "@/app/developer/library/_components/LibraryLogHistory/LibraryLogHistory";
+
+type LibraryPreviewProps = {
+  category: string;
+  component?: ComponentItem;
+};
+
+function EmptyPreview() {
+  return (
+    <div className="flex min-h-full w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-slate-400 shadow-sm">
+      <MaterialIcon name="category" size="md" className="text-slate-300" />
+      <span className="text-xs">Silakan pilih komponen di sebelah kiri untuk melihat detail.</span>
+    </div>
+  );
+}
+
+function ComponentHeader({ category, component }: { category: string; component: ComponentItem }) {
+  const componentPath = component.sourcePath ?? "@/components/" + category + "/" + component.file;
+  const importPath = componentPath.replace(".tsx", "");
+
+  const copyComponentPath = () => {
+    void navigator.clipboard.writeText(componentPath);
+    window.dispatchEvent(new CustomEvent("show-toast", {
+      detail: { status: "success", message: "Path komponen berhasil disalin ke papan klip!" },
+    }));
+  };
+
+  return (
+    <div className="flex flex-col gap-4 border-b border-slate-50 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-bold text-slate-800">{component.name}</h2>
+          <span className="rounded-full border border-brand/15 bg-brand/5 px-2 py-0.5 text-[9px] font-semibold text-brand">v{component.version ?? "0.0"}</span>
+        </div>
+        <div className="mt-1 flex items-center gap-1.5 font-mono text-xs text-slate-400">
+          <MaterialIcon name="code" size="xs" />
+          <span>import &#123; {component.name} &#125; from &quot;{importPath}&quot;</span>
+        </div>
+      </div>
+      <button type="button" onClick={copyComponentPath} title="Salin path komponen"
+        className="flex items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50 px-3 py-1.5 font-mono text-xs text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+        <MaterialIcon name="content_copy" size="xs" />
+        <span>{componentPath}</span>
+      </button>
+    </div>
+  );
+}
+
+function ComponentInformation({ component }: { component: ComponentItem }) {
+  return (
+    <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+      <div className="flex flex-col gap-2">
+        <h3 className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Deskripsi Fungsi</h3>
+        <p className="text-xs leading-relaxed text-slate-600">{component.description}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <h3 className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Design Tags</h3>
+        <div className="flex flex-wrap gap-1.5">
+          {component.tags?.length ? component.tags.map((tag) => (
+            <span key={tag} className="rounded-full border border-[#6d46eb]/10 bg-[#ede9fe]/45 px-2 py-0.5 text-[9px] font-medium text-[#6d46eb]">{tag}</span>
+          )) : <span className="text-[10px] italic text-slate-400">Tidak ada tag</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChildComponents({ components }: { components: NonNullable<ComponentItem["childComponents"]> }) {
+  if (!components.length) return null;
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Child Components</h3>
+      <div className="flex flex-wrap gap-1.5">
+        {components.map((child) => (
+          <Link
+            key={`${child.category}/${child.file}`}
+            href={`/developer/library?cat=${encodeURIComponent(child.category)}&comp=${encodeURIComponent(child.file)}`}
+            className="inline-flex items-center rounded-full border border-brand/15 bg-brand/5 px-2.5 py-1 text-[10px] font-medium text-brand transition-colors hover:border-brand/30 hover:bg-brand/10"
+          >
+            {child.name}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function LibraryPreview({ category, component }: LibraryPreviewProps) {
+  if (!component) return <EmptyPreview />;
+  return (
+    <div className="flex min-h-full flex-col gap-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
+      <ComponentHeader category={category} component={component} />
+      <ComponentInformation component={component} />
+      {component.childComponents && <ChildComponents components={component.childComponents} />}
+      <VisualPreview category={category} component={component} />
+      <LibraryLogHistory componentName={component.name} version={component.version} markdown={component.history} />
+    </div>
+  );
+}

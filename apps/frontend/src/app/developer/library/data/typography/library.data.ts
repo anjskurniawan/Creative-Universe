@@ -3,7 +3,7 @@ import type { ComponentItem } from "@/app/developer/library/library.data";
 export const typographyComponents: ComponentItem[] = [
   {
     "name": "HeaderTitle",
-    "file": "header-title.tsx",
+    "file": "HeaderTitle/HeaderTitle.tsx",
     "description": "Judul header terstandar untuk bagian atas halaman atau section.",
     "tags": [
       "Typography",
@@ -13,7 +13,7 @@ export const typographyComponents: ComponentItem[] = [
   },
   {
     "name": "HeroHeading",
-    "file": "hero-heading.tsx",
+    "file": "HeroHeading/HeroHeading.tsx",
     "description": "Heading besar untuk membangun hierarki visual pada area hero.",
     "tags": [
       "Typography",
@@ -22,4 +22,3 @@ export const typographyComponents: ComponentItem[] = [
     ]
   }
 ];
-

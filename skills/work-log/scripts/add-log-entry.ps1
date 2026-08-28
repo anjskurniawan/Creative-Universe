@@ -5,7 +5,9 @@ param(
 
     [string] $LogPath,
 
-    [int] $LockTimeoutSeconds = 30
+    [int] $LockTimeoutSeconds = 30,
+
+    [switch] $RemoveEntryFileOnSuccess
 )
 
 $ErrorActionPreference = 'Stop'
@@ -141,6 +143,10 @@ try {
         }
 
         Write-Output "Recorded Entry ID: $entryId"
+        if ($RemoveEntryFileOnSuccess -and (Test-Path -LiteralPath $entryPathResolved -PathType Leaf)) {
+            Remove-Item -LiteralPath $entryPathResolved -Force
+            Write-Output "Removed temporary entry file: $entryPathResolved"
+        }
     } catch {
         if (Test-Path -LiteralPath $backupPath -PathType Leaf) {
             [IO.File]::Copy($backupPath, $logFullPath, $true)

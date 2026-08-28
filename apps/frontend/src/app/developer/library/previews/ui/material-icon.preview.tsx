@@ -1,1 +1,0 @@
-export { MaterialIconPreview } from "../ui";

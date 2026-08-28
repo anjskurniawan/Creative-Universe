@@ -13,6 +13,7 @@ Route::middleware(['auth:sanctum', 'app:kv-retail'])->group(function () {
     Route::post('/kv-retail/performance/ai-report', [TaskController::class, 'performanceAiReport'])->middleware('permission:kv-retail.tasks.create');
     Route::post('/kv-retail/tasks', [TaskController::class, 'store'])->middleware('permission:kv-retail.tasks.create');
     Route::patch('/kv-retail/tasks/{task}/title', [TaskController::class, 'updateTitle'])->middleware('permission:kv-retail.tasks.update-status');
+    Route::patch('/kv-retail/tasks/{task}/deadline', [TaskController::class, 'updateDeadline'])->middleware('permission:kv-retail.tasks.update-status');
     Route::patch('/kv-retail/tasks/{task}/status', [TaskController::class, 'updateStatus'])->middleware('permission:kv-retail.tasks.update-status');
     Route::post('/kv-retail/tasks/{task}/files', [TaskController::class, 'uploadFile'])->middleware('permission:kv-retail.tasks.update-status');
     Route::delete('/kv-retail/tasks/{task}', [TaskController::class, 'destroy'])->middleware('permission:kv-retail.tasks.delete');

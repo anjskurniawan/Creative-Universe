@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:css-boundaries": "node scripts/verify-css-boundaries.mjs"
   },
   "dependencies": {
     "@react-spectrum/s2": "^1.6.0",
@@ -37,6 +38,7 @@
     "@types/three": "^0.184.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "eslint-plugin-boundaries": "^7.2.0",
     "playwright": "latest",
     "prettier": "^3.9.6",
     "typescript": "^5",

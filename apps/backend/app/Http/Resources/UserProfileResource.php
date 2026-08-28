@@ -62,6 +62,9 @@ class UserProfileResource extends JsonResource
             'avatar_url' => $this->avatar_path
                 ? Storage::disk('public')->url($this->avatar_path)
                 : null,
+            'banner_url' => $this->banner_path
+                ? Storage::disk('public')->url($this->banner_path)
+                : null,
             'card_image_url' => $creativeMember?->card_image_path
                 ? Storage::disk('public')->url($creativeMember->card_image_path)
                 : null,

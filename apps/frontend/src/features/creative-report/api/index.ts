@@ -35,6 +35,11 @@ export const creativeReportApi = {
     return apiFetch<CreativeReportUserDetail>(`${PREFIX}/users/${userId}${query}`, options);
   },
   members: {
+    reorder: (groupId: number, memberIds: number[]) =>
+      apiFetch<null>(`${PREFIX}/members/reorder`, {
+        method: "PATCH",
+        body: JSON.stringify({ group_id: groupId, member_ids: memberIds }),
+      }),
     list: () => apiFetch<CreativeMemberProfile[]>(`${PREFIX}/members`),
     pending: () => apiFetch<CreativeMember[]>(`${PREFIX}/members/pending`),
     approve: (memberId: number) => apiFetch<CreativeMember>(`${PREFIX}/members/${memberId}/approve`, { method: "POST" }),
