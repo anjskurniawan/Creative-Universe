@@ -1,4 +1,58 @@
 ---
+## 2026-08-29 19:17:00 +07:00 - Menyiapkan commit routing hosting hybrid
+
+- **Entry ID:** `43ab0319-1b31-4f42-958b-a4a10a4af75f`
+- **Timestamp:** `2026-08-29T19:17:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `git`, `commit`, `deployment`, `apache`
+- **Status:** `Selesai`
+- **User Instruction:** Commit dan push perbaikan 404 hosting.
+- **Interpretation and Scope:** Membuat satu commit untuk routing public hybrid dan work-log terkait tanpa memasukkan environment atau perubahan tidak terkait.
+- **Relevant Prior Context:** Perbaikan `.htaccess` telah divalidasi: static root 200 dan API session mencapai Laravel.
+- **Assumptions:** Tidak ada perubahan user lain di worktree selain dua file yang ditinjau.
+- **Decisions:** Men-stage hanya `.htaccess` dan `logs/logs.md`.
+- **Work Performed:** Meninjau log range, status, dan diff sebelum staging.
+- **Result:** Scope commit aman ditentukan.
+- **Reference Files Inspected:** `apps/backend/public/.htaccess`, `logs/logs.md`.
+- **Reference Files Changed:** Tidak ada pada tahap persiapan.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** Repository log-range script, `git status`, `git diff`.
+- **Technical Validation:** Root static 200 dan API auth response 401 normal sebelum login telah diverifikasi sebelumnya.
+- **Visual or Live Validation:** Tidak ada tambahan.
+- **Errors and Blockers:** Tidak ada.
+- **Risks and Open Questions:** Hosting harus melakukan pull/deploy commit terbaru agar perubahan berlaku.
+- **Supersedes Entry ID:** Tidak ada.
+- **Follow-up:** Stage, commit, push normal, lalu deploy di cPanel.
+
+---
+## 2026-08-29 19:16:30 +07:00 - Memperbaiki 404 hosting static dan Laravel
+
+- **Entry ID:** `f0a2b89c-e5db-4b02-9b3f-359d49bb2e2e`
+- **Timestamp:** `2026-08-29T19:16:30+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `deployment`, `apache`, `laravel`, `static-export`, `routing`
+- **Status:** `Selesai`
+- **User Instruction:** Menanyakan penyebab hosting menjadi 404 setelah commit.
+- **Interpretation and Scope:** Mendiagnosis dan memperbaiki routing Apache yang harus melayani static Next.js dan API Laravel dari satu public directory.
+- **Relevant Prior Context:** `routes/web.php` tidak memiliki route halaman frontend; public directory memuat `index.html` static dan `index.php` Laravel.
+- **Assumptions:** Hosting memakai Apache dengan `.htaccess` aktif seperti Laragon lokal.
+- **Decisions:** Membatasi rewrite Laravel hanya pada API, Sanctum, broadcasting, dan health; halaman frontend fallback ke `index.html`.
+- **Work Performed:** Memperbarui `apps/backend/public/.htaccess` dan menguji response static root serta API.
+- **Result:** Root static mengembalikan HTTP 200, sementara endpoint sesi API tetap diteruskan ke Laravel dan mengembalikan 401 normal sebelum login.
+- **Reference Files Inspected:** `apps/backend/routes/web.php`, `apps/backend/public/.htaccess`, `apps/backend/public/index.html`.
+- **Reference Files Changed:** `apps/backend/public/.htaccess`.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** `Get-Content`, `curl`, `apply_patch`.
+- **Technical Validation:** `creativeuniverse.test/` HTTP 200 static HTML; `/api/v1/auth/me` HTTP 401 JSON tanpa sesi.
+- **Visual or Live Validation:** Tidak dilakukan pada hosting; Laragon lokal tervalidasi.
+- **Errors and Blockers:** Hosting perlu menarik commit baru untuk menerima perubahan `.htaccess`.
+- **Risks and Open Questions:** Static export berikutnya harus mempertahankan `.htaccess` hybrid ini agar tidak kembali 404.
+- **Supersedes Entry ID:** `477db8be-e0b9-4270-9eef-d10a88ee76c0`.
+- **Follow-up:** Commit dan push `.htaccess`, lalu deploy/pull ulang di hosting.
+
+---
 ## 2026-08-29 19:16:00 +07:00 - Menyiapkan commit perbaikan routing dan sesi
 
 - **Entry ID:** `07e12cb8-19ae-449a-9832-1438307b0632`

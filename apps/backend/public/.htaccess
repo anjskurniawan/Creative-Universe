@@ -1,14 +1,20 @@
-<IfModule mod_rewrite.c>
-    <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
+DirectoryIndex index.html index.php
 
+<IfModule mod_rewrite.c>
+    Options -MultiViews -Indexes
     RewriteEngine On
 
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ index.php [L]
+    # Laravel owns API, Sanctum, broadcasting, and its health route.
+    RewriteRule ^(?:api(?:/|$)|sanctum(?:/|$)|broadcasting(?:/|$)|up$) index.php [L]
+
+    # Serve exported Next.js files and directories directly.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Static frontend fallback for browser routes.
+    RewriteRule ^ index.html [L]
 </IfModule>
