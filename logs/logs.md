@@ -1,4 +1,355 @@
 ---
+## 2026-08-29 19:16:00 +07:00 - Menyiapkan commit perbaikan routing dan sesi
+
+- **Entry ID:** `07e12cb8-19ae-449a-9832-1438307b0632`
+- **Timestamp:** `2026-08-29T19:16:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `git`, `commit`, `auth`, `laravel`
+- **Status:** `Selesai`
+- **User Instruction:** Commit dan push seluruh perbaikan yang telah disetujui.
+- **Interpretation and Scope:** Membuat satu commit terarah untuk entry point Laravel, rewrite routing, fallback API development, serta catatan work-log terkait.
+- **Relevant Prior Context:** Login UI berhasil pada localhost dan `creativeuniverse.test`; environment file di-ignore dan tidak akan distage.
+- **Assumptions:** Semua perubahan tracked saat ini merupakan scope perbaikan sesi/routing yang diminta pengguna.
+- **Decisions:** Mengecualikan `.env` dan hanya men-stage empat path yang ditinjau.
+- **Work Performed:** Meninjau status, diff, ignore rule, dan log range sebelum staging.
+- **Result:** Scope commit aman ditentukan: Laravel public index/rewrite, Next development proxy fallback, serta work-log.
+- **Reference Files Inspected:** `apps/backend/public/index.php`, `apps/backend/public/.htaccess`, `apps/frontend/next.config.ts`, `logs/logs.md`, ignore rules.
+- **Reference Files Changed:** Tidak ada pada tahap persiapan.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** `git status`, `git diff`, `git check-ignore`, repository log-range script.
+- **Technical Validation:** Login browser telah lulus sebelum commit; environment local dan backend environment terkonfirmasi ignored.
+- **Visual or Live Validation:** Login Root browser berhasil sebelumnya pada localhost dan creativeuniverse.test.
+- **Errors and Blockers:** Tidak ada.
+- **Risks and Open Questions:** Static export di masa depan masih berisiko menimpa Laravel public; perlu penyesuaian build target terpisah sebagai pekerjaan lanjutan.
+- **Supersedes Entry ID:** Tidak ada.
+- **Follow-up:** Stage, commit, push normal, dan verifikasi upstream.
+
+---
+## 2026-08-29 19:12:00 +07:00 - Memperbaiki verifikasi sesi creativeuniverse.test
+
+- **Entry ID:** `477db8be-e0b9-4270-9eef-d10a88ee76c0`
+- **Timestamp:** `2026-08-29T19:12:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `laravel`, `auth`, `session`, `local-development`, `apache`
+- **Status:** `Selesai`
+- **User Instruction:** Membenahi error sesi saat membuka `creativeuniverse.test`.
+- **Interpretation and Scope:** Memastikan Laragon domain meneruskan API Laravel dan memverifikasi login lewat browser pada domain tersebut.
+- **Relevant Prior Context:** Virtual host sudah mengarah ke `apps/backend/public`, tetapi health endpoint sebelumnya 404 setelah static export menghapus `.htaccess` Laravel.
+- **Assumptions:** Laragon Apache menggunakan konfigurasi vhost auto-generated untuk `creativeuniverse.test`.
+- **Decisions:** Memulihkan rewrite `.htaccess` standar Laravel di public backend agar route non-file termasuk API diteruskan ke `index.php`.
+- **Work Performed:** Memeriksa vhost Laragon, menambahkan `.htaccess`, menguji `/up` dan endpoint sesi, lalu menjalankan login UI dengan browser automation.
+- **Result:** `creativeuniverse.test/up` mengembalikan 200 dan login Root melalui `creativeuniverse.test/login` berhasil menuju landing page terautentikasi.
+- **Reference Files Inspected:** `C:/laragon/etc/apache2/sites-enabled/auto.creativeuniverse.test.conf`, `apps/backend/public`, frontend login page.
+- **Reference Files Changed:** `apps/backend/public/.htaccess`.
+- **Files Created, Moved, or Deleted:** Membuat `apps/backend/public/.htaccess`.
+- **Commands and Tools Used:** `Invoke-WebRequest`, `curl`, `rg`, `apply_patch`, Playwright CLI.
+- **Technical Validation:** `/up` HTTP 200; `/api/v1/auth/me` 401 sebelum login; UI login Root sukses menggunakan cookie sesi.
+- **Visual or Live Validation:** Playwright memverifikasi form login `root` dan halaman landing Root pada domain Laragon.
+- **Errors and Blockers:** Tidak ada.
+- **Risks and Open Questions:** Static export berikutnya menghapus target public; build script perlu dipisahkan dari Laravel public agar `index.php` dan `.htaccess` tidak tertimpa.
+- **Supersedes Entry ID:** `356bd16b-7d2d-4edf-99fc-5785214fb4d8`.
+- **Follow-up:** Gunakan `root` / `admin` untuk login lokal dan hindari menimpa Laravel public saat export static berikutnya.
+
+---
+## 2026-08-29 09:18:00 +07:00 - Template environment production hosting
+
+- **Entry ID:** `9010959c-054a-4794-8aa5-6b6e9d5dc049`
+- **Timestamp:** `2026-08-29T09:18:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `deployment`, `hosting`, `environment`, `security`
+- **Status:** `Selesai`
+- **User Instruction:** Meminta versi lengkap `.env` production yang dapat langsung disalin.
+- **Interpretation and Scope:** Menyediakan template production lengkap dengan URL literal dan placeholder aman untuk setiap rahasia.
+- **Relevant Prior Context:** Konfigurasi sebelumnya menunjukkan environment local dan URL yang mungkin memakai format Markdown; secret telah dibagikan sehingga harus dirotasi.
+- **Assumptions:** Hosting menggunakan domain apex `creative.doran.id`, database MySQL cPanel, dan root Laravel di `AppCreative/apps/backend`.
+- **Decisions:** Tidak mengulang secret yang terpapar; semua password/API key memakai placeholder eksplisit.
+- **Work Performed:** Menyusun template `.env` production untuk aplikasi, database, session, CORS, storage, queue, mail, dan integration.
+- **Result:** Template siap disalin pengguna setelah mengganti seluruh placeholder.
+- **Reference Files Inspected:** Environment hosting yang dibagikan pengguna, `apps/backend/.env.example`.
+- **Reference Files Changed:** Tidak ada.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** Tidak ada.
+- **Technical Validation:** Template perlu divalidasi di hosting melalui clear config cache dan login ulang.
+- **Visual or Live Validation:** Tidak dilakukan.
+- **Errors and Blockers:** Tidak ada.
+- **Risks and Open Questions:** Placeholder rahasia tidak boleh dibiarkan kosong; semua kredensial lama yang terekspos harus dirotasi.
+- **Supersedes Entry ID:** `82a7a46d-8cf0-4cdc-b7ba-8506c826914b`.
+- **Follow-up:** Tempel template, isi placeholder, hapus config cache, lalu uji login.
+
+---
+## 2026-08-29 09:15:00 +07:00 - Diagnosis konfigurasi sesi hosting
+
+- **Entry ID:** `82a7a46d-8cf0-4cdc-b7ba-8506c826914b`
+- **Timestamp:** `2026-08-29T09:15:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `deployment`, `hosting`, `auth`, `session`, `security`
+- **Status:** `Analisis`
+- **User Instruction:** Memperbaiki sesi hosting yang tidak dapat diverifikasi dengan meninjau environment production.
+- **Interpretation and Scope:** Menilai konfigurasi environment yang dibagikan dan memberi koreksi aman tanpa mengakses atau mengubah server.
+- **Relevant Prior Context:** Domain sekarang berhasil diarahkan ke backend public melalui symlink; frontend menampilkan kegagalan verifikasi sesi.
+- **Assumptions:** Nilai URL berformat Markdown yang dibagikan mungkin sama seperti nilai file `.env` hosting.
+- **Decisions:** Merekomendasikan environment production dan format URL literal, serta clear config cache setelah perubahan.
+- **Work Performed:** Meninjau nilai environment yang dibagikan untuk APP, session, Sanctum, dan CORS.
+- **Result:** Ditemukan `APP_ENV=local` dan indikasi URL Markdown yang dapat menyebabkan konfigurasi hosting tidak valid; kredensial sensitif juga terekspos di percakapan.
+- **Reference Files Inspected:** Konfigurasi environment hosting yang dibagikan pengguna.
+- **Reference Files Changed:** Tidak ada.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** Tidak ada.
+- **Technical Validation:** Tidak dapat dilakukan tanpa akses server; koreksi perlu diterapkan dan cache konfigurasi dibersihkan.
+- **Visual or Live Validation:** Tidak dilakukan.
+- **Errors and Blockers:** Akses dan log hosting tidak tersedia.
+- **Risks and Open Questions:** Semua password/token/key yang dibagikan harus dirotasi; cache Laravel dapat tetap memakai nilai sebelumnya hingga dibersihkan.
+- **Supersedes Entry ID:** Tidak ada.
+- **Follow-up:** Koreksi nilai environment, hapus config cache, lalu uji login dan endpoint `/api/v1/auth/me`.
+
+---
+## 2026-08-29 09:00:00 +07:00 - Panduan symlink storage Laravel cPanel
+
+- **Entry ID:** `f2e96fb8-05bd-4bcd-b1f0-337f557d435c`
+- **Timestamp:** `2026-08-29T09:00:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `deployment`, `cpanel`, `laravel`, `storage`
+- **Status:** `Selesai`
+- **User Instruction:** Menanyakan penggunaan symlink `storage/app/public` ke folder storage di `public_html`.
+- **Interpretation and Scope:** Memberikan command khusus path hosting dan batas aman tanpa mengubah server.
+- **Relevant Prior Context:** Deploy manual menempatkan source Laravel di `app_creative/apps/backend` dan document root domain tetap `public_html`.
+- **Assumptions:** `public_html` adalah folder fisik yang digunakan domain dan tidak sudah memiliki folder storage aplikasi yang perlu dipertahankan.
+- **Decisions:** Menggunakan symlink standar Laravel hanya untuk `storage`, bukan untuk seluruh document root.
+- **Work Performed:** Menyusun command symlink dan pemeriksaan eksistensi target.
+- **Result:** Panduan siap dijalankan satu kali melalui Terminal/cron cPanel.
+- **Reference Files Inspected:** `docs/deployment/local-and-cpanel.md`.
+- **Reference Files Changed:** `Tidak ada`.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** `ln -s` command (disusun, tidak dijalankan di server).
+- **Technical Validation:** Path konsisten dengan struktur hosting yang ditampilkan pengguna.
+- **Visual or Live Validation:** Tidak dilakukan.
+- **Errors and Blockers:** Tidak ada.
+- **Risks and Open Questions:** Hosting yang memblokir symlink juga dapat memblokir link storage; perlu uji file storage setelah dibuat.
+- **Supersedes Entry ID:** `Tidak ada`.
+- **Follow-up:** Buat symlink sekali dan akses file di `/storage/...` untuk verifikasi.
+
+---
+## 2026-08-28 14:42:00 +07:00 - Memperbaiki CSRF login Root melalui localhost Next
+
+- **Entry ID:** `356bd16b-7d2d-4edf-99fc-5785214fb4d8`
+- **Timestamp:** `2026-08-28T14:42:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `frontend`, `backend`, `auth`, `csrf`, `local-development`
+- **Status:** `Selesai`
+- **User Instruction:** Memperbaiki login Root lokal yang masih gagal.
+- **Interpretation and Scope:** Menelusuri UI login end-to-end dan memperbaiki arsitektur request agar CSRF cookie terbaca pada localhost Next.
+- **Relevant Prior Context:** Login backend langsung berhasil, namun UI menerima 419 karena browser localhost tidak dapat membaca cookie yang dibuat untuk host 127.0.0.1.
+- **Assumptions:** Next dev tetap dijalankan di localhost:3000 dan Laravel lokal di 127.0.0.1:8000.
+- **Decisions:** Browser memakai API same-origin dengan Next rewrite; rewrite fallback development diarahkan ke Laravel port 8000.
+- **Work Performed:** Memperbarui fallback API host, mengosongkan public API host di environment lokal, restart Next, dan menguji form login browser.
+- **Result:** Root login berhasil melalui UI dan diarahkan ke landing page aplikasi.
+- **Reference Files Inspected:** `apps/frontend/src/core/api/client.ts`, `apps/frontend/src/core/auth/api.ts`, `apps/frontend/next.config.ts`, `apps/backend/app/Http/Requests/Auth/LoginRequest.php`.
+- **Reference Files Changed:** `apps/frontend/next.config.ts`, `apps/frontend/.env.local`.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** `apply_patch`, `npm run dev`, Playwright CLI browser automation, `rg`, `Get-Content`.
+- **Technical Validation:** Login UI dengan `root` berhasil dan navigation ke `/` terjadi; session user Root tampil di halaman landing.
+- **Visual or Live Validation:** Playwright menjalankan form login localhost dengan username Root; hasil browser menunjukkan landing page terautentikasi.
+- **Errors and Blockers:** Sebelumnya login UI mendapat 419 karena cross-origin CSRF header kosong; sudah diselesaikan melalui proxy same-origin.
+- **Risks and Open Questions:** Fallback rewrite 127.0.0.1 hanya untuk development; static production tetap memerlukan `NEXT_PUBLIC_API_URL` eksplisit saat build.
+- **Supersedes Entry ID:** `3196b222-452f-45f9-8437-5dd656bd2a1f`.
+- **Follow-up:** Tidak ada.
+
+---
+## 2026-08-28 14:38:00 +07:00 - Memulihkan login Root lokal
+
+- **Entry ID:** `3196b222-452f-45f9-8437-5dd656bd2a1f`
+- **Timestamp:** `2026-08-28T14:38:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `backend`, `auth`, `local-development`, `root`
+- **Status:** `Selesai`
+- **User Instruction:** Memastikan login Root lokal dapat berhasil.
+- **Interpretation and Scope:** Mengatur kredensial Root lokal dan memverifikasi keseluruhan alur CSRF, login, serta session API.
+- **Relevant Prior Context:** Frontend localhost telah diarahkan ke backend lokal yang aktif pada port 8000.
+- **Assumptions:** Password lokal `admin` diizinkan untuk akun Root sesuai instruksi pengguna untuk memastikan login lokal.
+- **Decisions:** Mereset hash password user `root` ke password lokal `admin` tanpa mengubah role atau data akun lainnya.
+- **Work Performed:** Memverifikasi user Root, memperbarui hash password, dan menguji request CSRF/login/session dengan cookie session.
+- **Result:** Login dan endpoint `/api/v1/auth/me` berhasil untuk username `root`; role tetap Root.
+- **Reference Files Inspected:** `apps/backend/app/Http/Requests/Auth/LoginRequest.php`, `apps/backend/app/Http/Controllers/Api/AuthController.php`, `apps/frontend/src/core/auth/api.ts`.
+- **Reference Files Changed:** Database lokal: password user `root` diperbarui.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** `php artisan tinker`, `Invoke-WebRequest`.
+- **Technical Validation:** `sanctum/csrf-cookie` 204; POST `/api/v1/auth/login` berhasil; GET `/api/v1/auth/me` berhasil dengan cookie sesi.
+- **Visual or Live Validation:** API live diuji; browser UI perlu hard refresh dan login ulang.
+- **Errors and Blockers:** Percobaan payload awal memakai field `login` gagal validasi; endpoint mengharuskan field `username`, kemudian diperbaiki dan lulus.
+- **Risks and Open Questions:** Password `admin` hanya boleh untuk environment lokal.
+- **Supersedes Entry ID:** `ba6b662d-dabe-4d12-a4ac-8efb123d6ba7`.
+- **Follow-up:** Gunakan `root` / `admin` pada login localhost.
+
+---
+## 2026-08-28 14:35:00 +07:00 - Memperbaiki verifikasi sesi localhost Next
+
+- **Entry ID:** `ba6b662d-dabe-4d12-a4ac-8efb123d6ba7`
+- **Timestamp:** `2026-08-28T14:35:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `frontend`, `backend`, `auth`, `local-development`, `session`
+- **Status:** `Selesai`
+- **User Instruction:** Memperbaiki error sesi tidak tersedia.
+- **Interpretation and Scope:** Mengaktifkan koneksi frontend localhost ke backend Laravel lokal dan memastikan backend serta CORS/CSRF dapat merespons.
+- **Relevant Prior Context:** `creativeuniverse.test` mengembalikan 404, sedangkan Laravel aktif melalui `php artisan serve` di port 8000 setelah public entry point dipulihkan.
+- **Assumptions:** Frontend dijalankan pada `http://localhost:3000` dan backend lokal pada `http://127.0.0.1:8000`.
+- **Decisions:** Menggunakan API host eksplisit untuk development lintas-origin, bukan rewrite yang fallback-nya menuju host 404.
+- **Work Performed:** Mengubah frontend environment, menghentikan dan menjalankan ulang Next dev server, serta menguji CSRF dan CORS backend.
+- **Result:** Next localhost aktif di port 3000; backend menerima CSRF dengan CORS origin localhost dan credentials.
+- **Reference Files Inspected:** `apps/frontend/next.config.ts`, `apps/frontend/src/core/auth/api.ts`, `apps/frontend/src/core/api/client.ts`, `apps/backend/routes/api/core.php`.
+- **Reference Files Changed:** `apps/frontend/.env.local`.
+- **Files Created, Moved, or Deleted:** Tidak ada.
+- **Commands and Tools Used:** `rg`, `Get-Content`, `Invoke-WebRequest`, `Stop-Process`, `npm run dev`, `apply_patch`.
+- **Technical Validation:** `/sanctum/csrf-cookie` merespons 204 dan mengirim CORS `http://localhost:3000` serta credentials; `/api/v1/auth/me` merespons 401 tanpa login seperti yang diharapkan.
+- **Visual or Live Validation:** Next dev server menunjukkan `GET /login/` 200; login browser belum diuji kredensialnya.
+- **Errors and Blockers:** Tidak ada blocker teknis tersisa; browser perlu direfresh setelah server restart.
+- **Risks and Open Questions:** Environment `.env.local` tidak di-commit; production harus tetap menggunakan URL API production/same-origin yang sesuai.
+- **Supersedes Entry ID:** `8cc58cc4-74cb-4f0c-9952-10cd05b0e2cc`.
+- **Follow-up:** Hard refresh localhost dan login ulang.
+
+---
+## 2026-08-28 13:24:00 +07:00 - Memulihkan entry point Laravel yang hilang
+
+- **Entry ID:** `4f2b4e45-0e65-4fc0-96a2-198ca9746936`
+- **Timestamp:** `2026-08-28T13:24:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `backend`, `laravel`, `local-development`, `auth`
+- **Status:** `Selesai`
+- **User Instruction:** Membenahi sesi lokal yang tetap error.
+- **Interpretation and Scope:** Memeriksa endpoint lokal dan memulihkan file entry Laravel yang hilang.
+- **Relevant Prior Context:** Static export sebelumnya menimpa `apps/backend/public`, menghapus `index.php` Laravel.
+- **Assumptions:** Laravel 11 dan backend lokal dijalankan pada port 8000.
+- **Decisions:** Mengembalikan `public/index.php` standar Laravel 11.
+- **Work Performed:** Menambahkan `apps/backend/public/index.php` dan menjalankan backend lokal.
+- **Result:** `/up` merespons 200; API Laravel sudah ter-bootstrap.
+- **Reference Files Inspected:** `apps/backend/bootstrap/app.php`, `apps/backend/composer.json`, `apps/frontend/.env.local`.
+- **Reference Files Changed:** `apps/backend/public/index.php`.
+- **Files Created, Moved, or Deleted:** Membuat `apps/backend/public/index.php`.
+- **Commands and Tools Used:** `apply_patch`, `php artisan serve`, `Invoke-WebRequest`.
+- **Technical Validation:** Endpoint `/up` mengembalikan 200; endpoint API yang tidak dikenal mengembalikan JSON Laravel 404.
+- **Visual or Live Validation:** Belum dilakukan pada browser.
+- **Errors and Blockers:** Endpoint `auth/session` bukan route yang tersedia; frontend perlu login melalui route auth yang benar.
+- **Risks and Open Questions:** Static build berikutnya dapat menimpa kembali folder public backend.
+- **Supersedes Entry ID:** `Tidak ada`.
+- **Follow-up:** Restart frontend lalu login ulang; pisahkan target static export dari Laravel public pada deployment berikutnya.
+
+---
+## 2026-08-28 13:20:00 +07:00 - Memperbaiki API URL frontend lokal
+
+- **Entry ID:** `8cc58cc4-74cb-4f0c-9952-10cd05b0e2cc`
+- **Timestamp:** `2026-08-28T13:20:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `frontend`, `local-development`, `auth`, `api`
+- **Status:** `Selesai`
+- **User Instruction:** Membenahi sesi tidak tersedia pada localhost.
+- **Interpretation and Scope:** Mengarahkan frontend lokal ke host backend lokal yang benar.
+- **Relevant Prior Context:** `.env.local` menonaktifkan `NEXT_PUBLIC_API_URL`, sedangkan backend memakai `creativeuniverse.test`.
+- **Assumptions:** Backend lokal aktif di `http://creativeuniverse.test`.
+- **Decisions:** Mengaktifkan `NEXT_PUBLIC_API_URL=http://creativeuniverse.test` pada environment frontend lokal.
+- **Work Performed:** Mengubah `apps/frontend/.env.local`.
+- **Result:** Request frontend lokal akan diarahkan ke backend `creativeuniverse.test`.
+- **Reference Files Inspected:** `apps/frontend/.env.local`, `apps/frontend/src/core/api/client.ts`, `apps/backend/.env`.
+- **Reference Files Changed:** `apps/frontend/.env.local`.
+- **Files Created, Moved, or Deleted:** `Tidak ada`.
+- **Commands and Tools Used:** `Get-Content`, `apply_patch`.
+- **Technical Validation:** Nilai environment diverifikasi melalui inspeksi file setelah perubahan.
+- **Visual or Live Validation:** Belum dilakukan; dev server perlu direstart.
+- **Errors and Blockers:** Tidak ada.
+- **Risks and Open Questions:** Backend harus aktif dan CORS/Sanctum harus mengizinkan localhost.
+- **Supersedes Entry ID:** `Tidak ada`.
+- **Follow-up:** Restart `npm run dev`, lalu uji login dari `http://localhost:3000`.
+
+---
+## 2026-08-28 13:13:00 +07:00 - Konfirmasi command cronjob AppCreative
+
+- **Entry ID:** `0db8fc3e-0e0e-48c4-b1ab-3f2bb5bcbbf6`
+- **Timestamp:** `2026-08-28T13:13:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `deployment`, `cpanel`, `cronjob`
+- **Status:** `Selesai`
+- **User Instruction:** Meminta command cronjob untuk menyalin backend public ke `public_html`.
+- **Interpretation and Scope:** Memberikan satu command cronjob berdasarkan path AppCreative pada screenshot.
+- **Relevant Prior Context:** Project berada di `/home/creativedoran/app_creative`; static output berada di `apps/backend/public`.
+- **Assumptions:** Username cPanel adalah `creativedoran` dan `public_html` adalah document root aktif.
+- **Decisions:** Menggunakan `rsync` interval lima menit dengan trailing slash agar isi folder public tersalin.
+- **Work Performed:** Menyusun command cronjob final.
+- **Result:** Command siap ditempel pada cPanel Cron Jobs.
+- **Reference Files Inspected:** `docs/deployment/local-and-cpanel.md`.
+- **Reference Files Changed:** `Tidak ada`
+- **Files Created, Moved, or Deleted:** `Tidak ada`
+- **Commands and Tools Used:** `rsync` command (disusun, tidak dijalankan di server).
+- **Technical Validation:** Path konsisten dengan screenshot; server belum diakses langsung.
+- **Visual or Live Validation:** Tidak dilakukan.
+- **Errors and Blockers:** Tidak ada.
+- **Risks and Open Questions:** Opsi `--delete` menghapus file public_html yang tidak ada di sumber.
+- **Supersedes Entry ID:** `Tidak ada`
+- **Follow-up:** Tempel command pada cPanel Cron Jobs dengan interval 5 menit.
+
+---
+## 2026-08-28 13:11:20 +07:00 - Panduan permission folder cPanel
+
+- **Entry ID:** `d93f41f4-4ef3-4e7d-a55d-1f55ce8d8cc7`
+- **Timestamp:** `2026-08-28T13:11:20+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `deployment`, `cpanel`, `permissions`
+- **Status:** `Selesai`
+- **User Instruction:** Menanyakan struktur permission folder yang benar untuk deployment cPanel.
+- **Interpretation and Scope:** Memberikan panduan permission aman untuk static package dan Laravel backend tanpa mengubah file.
+- **Relevant Prior Context:** Repository memakai static export ke `apps/backend/public`; deployment cPanel sebelumnya gagal pada remote Git dan `.cpanel.yml`.
+- **Assumptions:** Hosting menggunakan user account cPanel biasa tanpa akses root.
+- **Decisions:** Merekomendasikan least privilege: folder 755, file 644, dan hanya folder runtime Laravel yang writable.
+- **Work Performed:** Menyusun mapping permission untuk document root, source Laravel, storage, cache, dan environment.
+- **Result:** Panduan permission siap diterapkan; tidak ada perubahan repository.
+- **Reference Files Inspected:** `docs/deployment/local-and-cpanel.md`, `scripts/build-static.mjs`.
+- **Reference Files Changed:** `Tidak ada`
+- **Files Created, Moved, or Deleted:** `Tidak ada`
+- **Commands and Tools Used:** `Get-Content`.
+- **Technical Validation:** Tidak ada command server yang dijalankan karena akses cPanel tidak tersedia.
+- **Visual or Live Validation:** Tidak dilakukan.
+- **Errors and Blockers:** Permission aktual server belum dapat diverifikasi.
+- **Risks and Open Questions:** Jika hanya static export yang dipakai, permission Laravel runtime tidak diperlukan; jika API Laravel aktif, `storage` dan `bootstrap/cache` harus writable.
+- **Supersedes Entry ID:** `Tidak ada`
+- **Follow-up:** Terapkan permission melalui File Manager/Terminal cPanel dan uji endpoint static serta `/api/v1/health`.
+
+---
+## 2026-08-28 13:10:00 +07:00 - Diagnosis cPanel gagal menghubungi remote Git
+
+- **Entry ID:** `b7a1c4f1-1e49-4f04-a3a8-5f6bdba8f95d`
+- **Timestamp:** `2026-08-28T13:10:00+07:00`
+- **Agent/Model:** `Codex GPT-5`
+- **Task/Thread ID:** `Tidak ada`
+- **Tags:** `deployment`, `cpanel`, `git`, `diagnosis`
+- **Status:** `Analisis`
+- **User Instruction:** Mendiagnosis error deployment cPanel yang menyatakan sistem tidak dapat menghubungi remote repository.
+- **Interpretation and Scope:** Pemeriksaan read-only terhadap remote Git, status branch, file deployment cPanel, dan dokumentasi deployment.
+- **Relevant Prior Context:** Static export telah dibuat dan commit/push lokal sebelumnya berhasil; cPanel menampilkan remote SSH `git@github.com`.
+- **Assumptions:** Pesan pada screenshot berasal dari fitur Git Version Control cPanel pada repository yang ditunjukkan.
+- **Decisions:** Tidak mengubah repository atau kredensial; diagnosis dibatasi pada penyebab yang dapat dibuktikan dari screenshot dan worktree.
+- **Work Performed:** Memeriksa remote/status Git, mencari `.cpanel.yml`, membaca dokumentasi deployment, dan membandingkan persyaratan deploy yang ditampilkan cPanel.
+- **Result:** Worktree lokal bersih dan sinkron dengan `origin/main`; `.cpanel.yml` tidak ditemukan. cPanel memakai remote SSH sehingga kegagalan kontak paling mungkin karena SSH key/deploy key belum tersedia atau tidak berizin, dan deploy tetap tidak dapat dijalankan sampai `.cpanel.yml` valid tersedia.
+- **Reference Files Inspected:** `docs/deployment/local-and-cpanel.md`, `skills/work-log/SKILL.md`, `skills/work-log/references/log-format.md`, konfigurasi Git repository.
+- **Reference Files Changed:** `Tidak ada`
+- **Files Created, Moved, or Deleted:** `Tidak ada`
+- **Commands and Tools Used:** `git remote -v`, `git status --short --branch`, `rg --files`, `Get-Content`.
+- **Technical Validation:** Remote lokal HTTPS valid; branch `main` sinkron; pencarian file `.cpanel.yml`/`.cpanel.yaml` tidak menemukan file.
+- **Visual or Live Validation:** Screenshot cPanel ditinjau; tidak ada akses langsung ke server cPanel.
+- **Errors and Blockers:** cPanel tidak dapat menghubungi remote SSH; file `.cpanel.yml` belum ada. Perbaikan server memerlukan akses cPanel/GitHub dan keputusan isi deployment.
+- **Risks and Open Questions:** Belum diketahui apakah cPanel mendukung HTTPS token atau harus memakai SSH deploy key; document root dan perintah deploy belum ditentukan.
+- **Supersedes Entry ID:** `Tidak ada`
+- **Follow-up:** Tambahkan SSH key cPanel ke GitHub sebagai deploy key atau gunakan remote HTTPS dengan token; setelah clone/pull berhasil, tambahkan dan validasi `.cpanel.yml` sesuai document root.
+
+---
 ## 2026-08-28 12:54:49 +07:00 - Verifikasi static export sebelum commit
 
 - **Entry ID:** `314bf4ac-9117-4a02-9aee-2a3b6bd1b27b`

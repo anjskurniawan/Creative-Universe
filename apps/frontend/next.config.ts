@@ -5,7 +5,7 @@ import macros from "unplugin-parcel-macros";
 // Create a single instance of the plugin that's shared between server and client builds.
 const plugin = macros.webpack();
 
-const apiHost = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") || "http://creativeuniverse.test";
+const apiHost = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") || "http://127.0.0.1:8000";
 
 const localDevOrigins = ["192.168.1.41", "192.168.137.1", "localhost", "127.0.0.1"];
 try {
