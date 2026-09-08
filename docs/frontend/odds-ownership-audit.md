@@ -1,7 +1,7 @@
 # ODDS Ownership Audit
 
 > Status: Current  
-> Last verified: 2026-08-24
+> Last verified: 2026-09-08
 
 This document maps the active ODDS frontend before and during `ODDS-001`. It is a structural ownership reference, not authorization to alter lifecycle, permissions, API contracts, UI, or backend behavior.
 
@@ -30,6 +30,12 @@ This document maps the active ODDS frontend before and during `ODDS-001`. It is 
 - `src/app/odds/_components/TaskCardDate/` remains route-local because its audited consumer is only the ODDS route.
 
 The generic-looking rich-text, chat, retro, task-card, and designer-row surfaces have completed consumer audits. Developer previews and catalog records are technical consumers, not evidence of cross-domain reuse; the product consumers are exclusively ODDS, so these surfaces remain domain-owned.
+
+## Toast feedback
+
+`TaskFeedbackToast` in `features/odds/components/OddsTaskCard/TaskFeedbackToast/` coordinates ODDS feedback state with the official `@react-spectrum/s2/Toast` queue. It renders no custom toast markup. Its consumers are `OddsShell`, `OddsTaskDetail`, `OddsTaskChat`, and the `/odds` task-action publisher; all remain in the ODDS domain, so this stateful integration stays feature-owned.
+
+`TaskFeedbackToastHost` is mounted once by `OddsShell`, outside `.cu-style` and beneath the existing root Spectrum Provider. It renders the ODDS `ToastContainer` at `bottom end` and listens for `odds:task-feedback`. Success maps to `ToastQueue.positive`, error to `negative`, and loading to `info`. Terminal messages use Spectrum's 5000 ms timeout with native focus/hover pausing; loading has no timeout. Replacing feedback or unmounting closes only the associated toast, without clearing the next message. Stable message/status dependencies prevent unrelated rerenders from re-enqueueing notifications. Manual/automatic dismissal calls the owning state cleanup.
 
 ## Permissions and actors
 

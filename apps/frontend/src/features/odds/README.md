@@ -32,7 +32,9 @@ the feature API remains the shared owner of their ODDS transport contracts.
 ### Dashboard Designer Cards
 
 Dashboard Designer aktif untuk user dengan `view-assigned-odds-tasks` tanpa
-mode control. Main content aktif berisi card:
+mode control, serta SPV melalui menu Dashboard (`/odds?section=workspace`).
+SPV memiliki menu tugas designer pribadi sekaligus menu supervisi; daftar tugas
+pribadi tetap difilter berdasarkan assignee. Main content aktif berisi card:
 
 - Total Tugas Hari Ini
 - Total Dalam Antrian

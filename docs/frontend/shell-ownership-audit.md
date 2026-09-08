@@ -1,7 +1,7 @@
 # Frontend Shell Ownership Audit
 
 > Status: Active restructuring reference  
-> Last verified: 2026-08-24
+> Last verified: 2026-09-08
 
 This document records consumer evidence and canonical ownership for SHELL-001. It covers structure only; responsive behavior, navigation state, focus, animation, API usage, and rendered UI remain unchanged.
 
@@ -21,6 +21,10 @@ The 38-file shell family now lives under `apps/frontend/src/components/layout/`:
 All implementation files, types, config, logic, children, previews, route consumers, and developer registry paths moved together. Three orphan developer-registry records (`menu.tsx`, `navbar.tsx`, and `settings-layout.tsx`) were removed because no matching active source file exists; the live NavBar and settings entries remain represented by their canonical component families. `Container`, `Workspace`, and `Content` retain their original composition and class defaults. NavBar, SideBar, and MenuOverlay retain their existing controlled state, callbacks, portal behavior, and public exports.
 
 The historical `components/universe/Layouts/index.ts` had no consumers and was deleted after the moved exports became invalid. `components/universe/Layouts/SettingLayout/` remains intentionally because it is settings-domain composition assigned to PANEL-001.
+
+## Navigation item identity
+
+`SideBarSection` and `Workspace/MenuOverlay` key navigation items by the serialized pair `[href, label]`. Labels may repeat for distinct destinations, as with SPV's personal and supervisory ODDS menus. Including the label also distinguishes developer preview links that share the placeholder `#`. Keep each pair unique among sibling items; neither grouping nor list position defines identity. The existing labels, hrefs, permissions, active selection, and click handlers are unchanged.
 
 ## Completed feedback slice
 

@@ -51,7 +51,7 @@ export default function MenuOverlay({
 
               return (
                 <button
-                  key={item.label}
+                  key={JSON.stringify([item.href, item.label])}
                   type="button"
                   onClick={() => onItemClick?.(item, index)}
                   className={`flex h-16 w-full snap-center items-center text-left transition-[opacity,transform,font-size] duration-200 focus:outline-none overflow-hidden ${

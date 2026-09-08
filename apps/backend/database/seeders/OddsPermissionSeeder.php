@@ -87,5 +87,7 @@ class OddsPermissionSeeder extends Seeder
             'cancel-odds-tasks',
             'request-odds-queue-priority',
         ]);
+
+        $this->call(SpvDesignerAccessSeeder::class);
     }
 }

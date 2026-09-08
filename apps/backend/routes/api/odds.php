@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\Odds\TaskController;
 use App\Http\Controllers\Api\Odds\TaskDraftController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum', 'app:odds', 'can:access-odds'])->prefix('odds')->group(function () {
+Route::middleware(['auth:sanctum', 'app:odds'])->prefix('odds')->group(function () {
     Route::get('/categories', [ConfigController::class, 'categories']);
     Route::post('/categories', [ConfigController::class, 'storeCategory'])->middleware('can:manage-odds-config');
     Route::patch('/categories/{category}', [ConfigController::class, 'updateCategory'])->middleware('can:manage-odds-config');

@@ -114,7 +114,7 @@ class OddsDefaultSeeder extends Seeder
             ]
         );
 
-        User::role(['Designer', 'Videographer', 'Content Creator'])->get()->each(function (User $user) {
+        User::role(['Designer', 'Videographer', 'Content Creator', 'SPV'])->get()->each(function (User $user) {
             DesignerProfile::withTrashed()->firstOrCreate(
                 ['user_id' => $user->id],
                 [

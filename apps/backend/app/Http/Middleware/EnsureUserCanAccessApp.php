@@ -26,7 +26,7 @@ class EnsureUserCanAccessApp
             abort(401);
         }
 
-        if ($app === 'core' || $user->hasRole('Root')) {
+        if (in_array($app, ['core', 'odds'], true) || $user->hasRole('Root')) {
             return $next($request);
         }
 

@@ -48,6 +48,7 @@ export function OddsShell({ children }: { children: ReactNode }) {
   const canViewRankings = hasPermission("view-odds-rankings");
   const canCreateTask = hasPermission("create-odds-tasks");
   const canViewAssignedTasks = hasPermission("view-assigned-odds-tasks");
+  const isSpv = user?.roles.includes("SPV") ?? false;
   const isRoot = user?.roles.some((role) => role.trim().toLowerCase() === "root") ?? false;
 
   // State to hold counts
@@ -134,10 +135,10 @@ export function OddsShell({ children }: { children: ReactNode }) {
   const menuItems = useMemo<OddsMenuItem[]>(() => {
     const items: OddsMenuItem[] = [];
 
-    if (!canShowConfigSections && !canReviewSpv && !canViewAllTasks && !canReviewQueueSkip) {
+    if (isSpv || (!canShowConfigSections && !canReviewSpv && !canViewAllTasks && !canReviewQueueSkip)) {
       if (canViewAssignedTasks) {
         items.push(
-          { id: "workspace", label: "Dashboard", icon: "dashboard", href: "/odds", group: "tasks" },
+          { id: "workspace", label: "Dashboard", icon: "dashboard", href: isSpv ? "/odds?section=workspace" : "/odds", group: "tasks" },
           { id: "designer_today_tasks", label: "Tugas Hari Ini", icon: "today", href: "/odds?section=designer_today_tasks", group: "tasks" },
           { id: "designer_queue", label: "Dalam Antrean", icon: "hourglass_top", href: "/odds?section=designer_queue", group: "tasks" },
           { id: "designer_all_tasks", label: "Semua Tugas", icon: "assignment", href: "/odds?section=designer_all_tasks", group: "tasks" },
@@ -149,7 +150,7 @@ export function OddsShell({ children }: { children: ReactNode }) {
         );
       } else {
         items.push(
-          { id: "workspace", label: "Dashboard", icon: "dashboard", href: "/odds", group: "tasks" },
+          { id: "workspace", label: "Dashboard", icon: "dashboard", href: isSpv ? "/odds?section=workspace" : "/odds", group: "tasks" },
           { id: "client_drafts", label: "Draft", icon: "draft", href: "/odds?section=client_drafts", group: "tasks" },
           { id: "client_all_requests", label: "Semua Request", icon: "assignment", href: "/odds?section=client_all_requests", group: "tasks" },
           { id: "client_queue", label: "Dalam Antrean", icon: "hourglass_top", href: "/odds?section=client_queue", group: "tasks" },
@@ -159,7 +160,8 @@ export function OddsShell({ children }: { children: ReactNode }) {
           { id: "client_archive", label: "Selesai", icon: "task_alt", href: "/odds?section=client_archive", group: "tasks" }
         );
       }
-    } else {
+    }
+    if (canShowConfigSections || canReviewSpv || canViewAllTasks || canReviewQueueSkip) {
       if (canShowConfigSections) {
         items.push(
           { id: "categories", label: "Kategori", icon: "category", href: "/odds?section=categories", group: "manage" },
@@ -210,6 +212,7 @@ export function OddsShell({ children }: { children: ReactNode }) {
     canViewRankings,
     canViewAssignedTasks,
     isRoot,
+    isSpv,
   ]);
 
   const isSectionActive = useCallback((item: typeof menuItems[0]) => {

@@ -99,13 +99,13 @@ class OddsWorkflowApiTest extends TestCase
         ]);
     }
 
-    public function test_user_without_odds_access_is_forbidden(): void
+    public function test_user_without_explicit_odds_access_can_list_tasks(): void
     {
         $user = User::factory()->create();
 
         $this->actingAs($user)
             ->getJson('/api/v1/odds/tasks')
-            ->assertForbidden();
+            ->assertOk();
     }
 
     public function test_manager_can_manage_odds_config(): void
@@ -1154,6 +1154,44 @@ class OddsWorkflowApiTest extends TestCase
             ->getJson('/api/v1/odds/reports/summary')
             ->assertOk()
             ->assertJsonPath('data.ai_insight', 'Insight AI bersifat ringkasan pendukung, bukan sumber kebenaran laporan.');
+    }
+
+    public function test_spv_can_work_as_designer_and_retain_supervision(): void
+    {
+        $this->seed(\Database\Seeders\SpvDesignerAccessSeeder::class);
+        $this->seed(\Database\Seeders\SpvDesignerAccessSeeder::class);
+        $this->assertSame(1, DesignerProfile::where('user_id', $this->spv->id)->count());
+        $this->assertTrue($this->spv->can('review-odds-leader'));
+        $this->assertFalse($this->manager->can('start-odds-tasks'));
+
+        $otherTaskId = $this->createTask();
+        $this->actingAs($this->spv)->postJson("/api/v1/odds/tasks/{$otherTaskId}/start")
+            ->assertUnprocessable()->assertJsonValidationErrors('task_id');
+        $this->actingAs($this->spv)->postJson("/api/v1/odds/tasks/{$otherTaskId}/results", ['result_notes' => 'Other assignment'])
+            ->assertUnprocessable()->assertJsonValidationErrors('task_id');
+
+        $this->designer = $this->spv;
+        $taskId = $this->createTask();
+        $this->actingAs($this->spv)->postJson("/api/v1/odds/tasks/{$taskId}/brief/accept")
+            ->assertOk()->assertJsonPath('data.status', 'queued');
+        $this->actingAs($this->spv)->postJson("/api/v1/odds/tasks/{$taskId}/start")
+            ->assertOk()->assertJsonPath('data.status', 'in_progress');
+        $this->actingAs($this->spv)->postJson("/api/v1/odds/tasks/{$taskId}/results", ['result_notes' => 'SPV output'])
+            ->assertCreated()->assertJsonPath('data.submitted_by', $this->spv->id);
+        $this->assertDatabaseHas('odds_tasks', ['id' => $taskId, 'status' => 'leader_review']);
+    }
+
+    public function test_spv_profile_backfill_preserves_existing_configuration(): void
+    {
+        $profile = DesignerProfile::create([
+            'user_id' => $this->spv->id, 'status' => 'off',
+            'specializations' => [$this->category->id], 'is_active' => false,
+        ]);
+        $profile->delete();
+        $this->seed(\Database\Seeders\SpvDesignerAccessSeeder::class);
+        $this->assertTrue($profile->fresh()->trashed());
+        $this->assertSame('off', $profile->fresh()->status);
+        $this->assertSame([$this->category->id], $profile->fresh()->specializations);
     }
 
     private function createTask(): int

@@ -524,6 +524,7 @@ function OddsPageContent() {
   const canViewRankings = hasPermission("view-odds-rankings");
   const canUseControl = canManageConfig || canReviewSpv || canViewAllTasks || canApproveExtra || canApproveUrgent || canManageEscalations || canReviewQueueSkip || canViewReports || canViewRankings;
   const canCreateTask = hasPermission("create-odds-tasks");
+  const isSpv = user?.roles.includes("SPV") ?? false;
   const canViewAssignedTasks = hasPermission("view-assigned-odds-tasks");
 
   const [categories, setCategories] = useState<OddsCategory[]>([]);
@@ -657,11 +658,11 @@ function OddsPageContent() {
       if (section.id === "skip_requests") return canReviewQueueSkip && !hideCancelSkipMenus;
       if (section.id === "reports") return canViewReports;
       if (section.id === "rankings") return canViewRankings;
-      if (["designer_today_tasks", "designer_queue", "designer_all_tasks", "designer_review", "designer_spv_review", "designer_client_review", "designer_revisions", "designer_done", "designer_report", "designer_settings"].includes(section.id)) return canViewAssignedTasks && !canUseControl;
+      if (["designer_today_tasks", "designer_queue", "designer_all_tasks", "designer_review", "designer_spv_review", "designer_client_review", "designer_revisions", "designer_done", "designer_report", "designer_settings"].includes(section.id)) return canViewAssignedTasks && (!canUseControl || isSpv);
       if (["client_drafts", "client_all_requests", "client_queue", "client_working", "client_action_required", "client_revisions", "client_archive"].includes(section.id)) return !canViewAssignedTasks && !canUseControl;
       return canViewAllTasks || canReviewSpv;
     });
-  }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewQueueSkip, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports, canViewAssignedTasks, canUseControl, hideCancelSkipMenus]);
+  }, [canApproveExtra, canApproveUrgent, canManageEscalations, canReviewQueueSkip, canReviewSpv, canShowConfigSections, canViewAllTasks, canViewRankings, canViewReports, canViewAssignedTasks, canUseControl, hideCancelSkipMenus, isSpv]);
 
   const searchParams = useSearchParams();
   const activeSectionParam = searchParams.get("section") as ConfigSection | null;

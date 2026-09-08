@@ -23,7 +23,7 @@ if (-not (Test-Path -LiteralPath $logDirectory -PathType Container)) {
     throw "Log directory does not exist: $logDirectory"
 }
 
-$entry = (Get-Content -Raw -LiteralPath $entryPathResolved).Trim()
+$entry = ([IO.File]::ReadAllText($entryPathResolved, [Text.UTF8Encoding]::new($false))).Trim()
 if ($entry -notmatch '(?ms)^---\r?\n## \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [+-]\d{2}:\d{2} - .+') {
     throw 'Entry title does not match the required timestamped Markdown structure.'
 }
@@ -93,7 +93,7 @@ try {
     }
 
     $existing = if (Test-Path -LiteralPath $logFullPath -PathType Leaf) {
-        Get-Content -Raw -LiteralPath $logFullPath
+        [IO.File]::ReadAllText($logFullPath, [Text.UTF8Encoding]::new($false))
     } else {
         ''
     }
@@ -134,7 +134,7 @@ try {
             [IO.File]::Move($tempPath, $logFullPath)
         }
 
-        $written = Get-Content -Raw -LiteralPath $logFullPath
+        $written = [IO.File]::ReadAllText($logFullPath, [Text.UTF8Encoding]::new($false))
         if (-not $written.StartsWith($normalizedEntry)) {
             throw 'Read-back failed: the new entry is not first.'
         }

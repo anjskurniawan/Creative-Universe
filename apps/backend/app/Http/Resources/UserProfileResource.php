@@ -42,7 +42,7 @@ class UserProfileResource extends JsonResource
         $applications = $this->hasRole('Root')
             ? Application::query()->orderBy('sort_order')->get()
             : Application::query()
-                ->where('key', 'core')
+                ->whereIn('key', ['core', 'odds'])
                 ->orWhereHas('users', fn ($query) => $query->whereKey($this->getKey()))
                 ->orderBy('sort_order')
                 ->get();

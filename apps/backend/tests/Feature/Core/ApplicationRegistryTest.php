@@ -92,16 +92,29 @@ class ApplicationRegistryTest extends TestCase
         $this->assertFalse($user->can('manage-odds-config'));
     }
 
-    public function test_auth_profile_exposes_only_assigned_apps_plus_core_for_non_root(): void
+    public function test_auth_profile_exposes_core_and_odds_by_default_for_non_root(): void
     {
         $user = User::factory()->create();
         $user->assignRole(Role::findByName('Designer'));
-        $odds = Application::where('key', 'odds')->firstOrFail();
-        $user->applications()->attach($odds, ['granted_by' => $user->id]);
 
         $response = $this->actingAs($user)->getJson('/api/v1/auth/me')->assertOk();
 
         $this->assertSame(['core', 'odds'], array_column($response->json('data.applications'), 'key'));
+    }
+
+    public function test_default_odds_access_does_not_grant_management_permissions(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->getJson('/api/v1/odds/categories')->assertOk();
+        $this->actingAs($user)->postJson('/api/v1/odds/categories', [])->assertForbidden();
+        $this->assertFalse($user->can('manage-odds-config'));
+        $this->assertSame(0, $user->applications()->count());
+    }
+
+    public function test_guest_cannot_access_odds(): void
+    {
+        $this->getJson('/api/v1/odds/categories')->assertUnauthorized();
     }
 
     public function test_root_profile_receives_global_application_access(): void
