@@ -24,7 +24,7 @@ class InternalClientFeedbackController extends BaseApiController
 
     public function index(Request $request): JsonResponse
     {
-        abort_unless($request->user()?->hasAnyRole(['Root', 'Manajer']), 403);
+        abort_unless($request->user()?->hasAnyRole(['Root', 'Manajer', 'SPV']), 403);
         return $this->sendResponse(InternalClientFeedback::query()->latest()->get(), 'Data feedback berhasil diambil.');
     }
 }
