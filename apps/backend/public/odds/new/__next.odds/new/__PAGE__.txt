@@ -2,5 +2,5 @@
 2:I[80654,["5592","static/chunks/c15bf2b0-1dcdd042325c0017.js","4367","static/chunks/4367-38694ced038ddef0.js","1248","static/chunks/1248-4b3e0f30b4bfed4b.js","3674","static/chunks/3674-f153b3f04cdd4814.js","2466","static/chunks/2466-0ee84bbf63eb0e2d.js","4644","static/chunks/app/odds/new/page-42d61e8dc15276a1.js"],"NewOddsTaskPage"]
 3:I[35640,[],"OutletBoundary"]
 4:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"4W8DHUEqiCJFL_n4tROqe"}
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"_C3Rj_diHP9H8SubD_6gP"}
 5:null

@@ -2,5 +2,5 @@
 2:I[64183,["2344","static/chunks/2344-84a08026dad2b889.js","3674","static/chunks/3674-f153b3f04cdd4814.js","311","static/chunks/app/generator/pricetag/search/page-36149537146f00f1.js"],"default"]
 3:I[35640,[],"OutletBoundary"]
 4:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"4W8DHUEqiCJFL_n4tROqe"}
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"_C3Rj_diHP9H8SubD_6gP"}
 5:null
