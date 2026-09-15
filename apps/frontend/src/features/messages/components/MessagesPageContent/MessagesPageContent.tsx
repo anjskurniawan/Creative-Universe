@@ -411,11 +411,11 @@ export default function MessagesPageContent() {
 
   return (
     <div className="grid h-full w-full grid-cols-1 overflow-hidden rounded-lg border border-cu-line bg-cu-surface text-cu-ink shadow-sm lg:grid-cols-12">
-      <aside className="flex min-h-0 flex-col border-b border-cu-line bg-cu-surface-soft lg:col-span-4 lg:border-b-0 lg:border-r">
+      <aside className={`${activeConversation ? "hidden lg:flex" : "flex"} min-h-0 flex-col border-b border-cu-line bg-cu-surface-soft lg:col-span-4 lg:border-b-0 lg:border-r`}>
         <div className="flex items-center justify-between border-b border-cu-line bg-white px-5 py-4">
           <div>
             <h1 className="text-lg font-semibold text-cu-ink">Pesan</h1>
-            <p className="mt-0.5 text-xs text-cu-muted">Chat langsung dan diskusi task ODDS.</p>
+            <p className="mt-0.5 hidden text-xs text-cu-muted sm:block">Chat langsung dan diskusi task ODDS.</p>
           </div>
           <button
             type="button"
@@ -428,7 +428,7 @@ export default function MessagesPageContent() {
         </div>
 
         {!showContacts && (
-          <div className="space-y-3 border-b border-cu-line bg-white px-4 py-3">
+          <div className="hidden space-y-3 border-b border-cu-line bg-white px-4 py-3 sm:block">
             <label className="relative block"><MaterialIcon name="search" size="sm" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-cu-muted" /><input value={conversationSearch} onChange={(event) => setConversationSearch(event.target.value)} placeholder="Cari pesan atau task..." className="h-10 w-full rounded-lg border border-cu-line bg-cu-surface-soft pl-10 pr-3 text-sm outline-none focus:border-cu-info" /></label>
             <div className="grid grid-cols-2 gap-2">
             <button
@@ -535,11 +535,19 @@ export default function MessagesPageContent() {
         </div>
       </aside>
 
-      <main className="flex min-h-0 min-w-0 flex-col bg-white lg:col-span-8">
+      <main className={`${activeConversation ? "flex" : "hidden lg:flex"} min-h-0 min-w-0 flex-col bg-white lg:col-span-8`}>
         {activeConversation ? (
           <>
-            <header className="flex items-center justify-between gap-4 border-b border-cu-line bg-white px-6 py-4">
+            <header className="flex items-center justify-between gap-2 border-b border-cu-line bg-white px-3 py-3 sm:gap-4 sm:px-6 sm:py-4">
               <div className="flex min-w-0 items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setActiveConversation(null)}
+                  className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-cu-muted transition hover:bg-cu-panel-soft hover:text-cu-ink lg:hidden"
+                  aria-label="Kembali ke daftar percakapan"
+                >
+                  <MaterialIcon name="arrow_back" size="sm" />
+                </button>
                 <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-cu-line bg-cu-surface-soft">
                   <ConversationAvatar conversation={activeConversation} />
                 </div>
@@ -558,13 +566,13 @@ export default function MessagesPageContent() {
                 {activeIsTaskRoom && activeTask?.id && (
                   <Link
                     href={`/odds/detail?id=${activeTask.id}`}
-                    className="inline-flex h-9 items-center gap-2 rounded-lg border border-cu-line bg-white px-3 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft"
+                    className="hidden h-9 items-center gap-2 rounded-lg border border-cu-line bg-white px-3 text-sm font-semibold text-cu-ink transition hover:bg-cu-panel-soft sm:inline-flex"
                   >
                     <MaterialIcon name="open_in_new" size="sm" />
                     Detail Task
                   </Link>
                 )}
-                <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                <span className={`hidden rounded-full border px-2.5 py-1 text-xs font-semibold sm:inline-flex ${
                   activeConversation.status === "closed"
                     ? "border-cu-line bg-cu-panel-soft text-cu-muted"
                     : "border-cu-success/20 bg-cu-success/10 text-cu-success"
@@ -574,7 +582,7 @@ export default function MessagesPageContent() {
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto bg-[#f7f8fa] p-6 cu-popup-scrollbar-light">
+            <div className="flex-1 overflow-y-auto bg-[#f7f8fa] p-3 sm:p-6 cu-popup-scrollbar-light">
               <div className="flex flex-col space-y-4">
                 {hasMoreMessages && (
                   <button
@@ -621,7 +629,7 @@ export default function MessagesPageContent() {
               </div>
             </div>
 
-            <footer className="border-t border-cu-line bg-white px-5 py-4">
+            <footer className="border-t border-cu-line bg-white px-3 py-3 sm:px-5 sm:py-4">
               {chatError && (
                 <p className="mb-3 rounded-lg border border-cu-danger/20 bg-cu-danger/10 px-3 py-2 text-sm text-cu-danger">
                   {chatError}

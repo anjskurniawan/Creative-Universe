@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -32,8 +32,11 @@ if (!existsSync(join(exportDirectory, "index.html"))) {
   throw new Error(`Static export was not found at ${exportDirectory}`);
 }
 
-rmSync(deploymentDirectory, { recursive: true, force: true });
 mkdirSync(deploymentDirectory, { recursive: true });
+for (const entry of readdirSync(deploymentDirectory)) {
+  if (entry === ".htaccess" || entry === "index.php") continue;
+  rmSync(join(deploymentDirectory, entry), { recursive: true, force: true });
+}
 cpSync(exportDirectory, deploymentDirectory, { recursive: true });
 
 console.log(`Static package created at: ${deploymentDirectory}`);

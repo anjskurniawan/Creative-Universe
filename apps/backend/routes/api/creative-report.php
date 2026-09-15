@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\CreativeReport\AssessmentController;
+use App\Http\Controllers\Api\CreativeReport\InternalClientFeedbackController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/internal-client-feedback', [InternalClientFeedbackController::class, 'store']);
+Route::middleware('auth:sanctum')->get('/internal-client-feedback', [InternalClientFeedbackController::class, 'index']);
 
 Route::middleware(['auth:sanctum', 'app:creative-report'])
     ->prefix('creative-reports')

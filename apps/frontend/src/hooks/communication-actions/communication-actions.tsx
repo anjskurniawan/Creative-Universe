@@ -36,6 +36,7 @@ interface CommunicationActionsContextValue {
   renderMessageBell: CommunicationBellRenderer;
   renderNotificationBell: CommunicationBellRenderer;
   refreshNavDropdowns: () => Promise<void>;
+  notificationUnreadCount: number;
   renderNavMessageDropdown: CommunicationNavDropdownRenderer;
   renderNavNotificationDropdown: CommunicationNavDropdownRenderer;
   chatApi: {
@@ -60,6 +61,7 @@ export function CommunicationActionsProvider({
   refreshNavDropdowns,
   renderNavMessageDropdown,
   renderNavNotificationDropdown,
+  notificationUnreadCount,
   chatApi,
   subscribeToConversationMessages,
 }: CommunicationActionsContextValue & { children: ReactNode }) {
@@ -70,6 +72,7 @@ export function CommunicationActionsProvider({
       refreshNavDropdowns,
       renderNavMessageDropdown,
       renderNavNotificationDropdown,
+      notificationUnreadCount,
       chatApi,
       subscribeToConversationMessages,
     }}>

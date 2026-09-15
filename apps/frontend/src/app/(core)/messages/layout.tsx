@@ -17,7 +17,7 @@ export default function MessagesLayout({ children }: { children: ReactNode }) {
           sidebarExpanded,
           onToggleSidebarExpanded: () => setSidebarExpanded((current) => !current),
           hideSidebar: true,
-          contentProps: { className: "flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden p-4" },
+          contentProps: { className: "flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden p-2 sm:p-4" },
         }}
       >
         {children}

@@ -1592,9 +1592,9 @@ function OddsPageContent() {
              ========================================================================= */
           <div className="flex flex-col gap-4">
             {/* Row 1: Metrics + Score + Chart */}
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+            <div className="flex flex-col gap-4 2xl:flex-row 2xl:items-start">
               {/* Flexible Metrics Group (4 cards) */}
-              <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4">
+              <div className="grid w-full flex-1 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <DesignerMetric
                   label="Total Tugas Hari Ini"
                   value={`${todayTasksCount} task`}
@@ -3237,7 +3237,7 @@ function DesignerLastRequestCard({ tasks }: { tasks: OddsTask[] }) {
     .slice(0, 5);
 
   return (
-    <article className="flex h-[211px] min-h-[130px] min-w-[200px] flex-col gap-2 rounded-lg bg-white/90 p-2 shadow-[0_5px_14px_rgba(44,42,39,0.06)] lg:w-[420px] 2xl:w-[620px]">
+    <article className="flex h-[211px] min-h-[130px] w-full min-w-0 flex-col gap-2 rounded-lg bg-white/90 p-2 shadow-[0_5px_14px_rgba(44,42,39,0.06)] 2xl:w-[620px] 2xl:shrink-0">
       <div className="flex w-full shrink-0 items-center justify-between px-2">
         <p className="whitespace-nowrap text-sm font-medium leading-none text-[#3B4446]">Request Terbaru</p>
         <button

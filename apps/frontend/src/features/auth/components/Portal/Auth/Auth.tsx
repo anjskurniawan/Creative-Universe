@@ -35,7 +35,7 @@ export function Auth({ className = "" }: AuthProps) {
         viewport="Desktop"
         sticky={false}
         showNavigation={false}
-        showApps={false}
+        showApps={true}
         bordered={false}
         className="items-end"
       />
@@ -46,7 +46,7 @@ export function Auth({ className = "" }: AuthProps) {
           onTypingComplete={completeTyping}
         />
         {creativeRole ? (
-          <div className="relative min-h-0 h-full w-full overflow-hidden">
+          <div className="relative hidden min-h-0 h-full w-full overflow-hidden lg:block">
             <div
               className={`absolute inset-0 transition-opacity duration-[3000ms] ease-in-out ${
                 showMediaAgent ? "opacity-100" : "pointer-events-none opacity-0"
@@ -71,6 +71,7 @@ export function Auth({ className = "" }: AuthProps) {
           <ApplicationUniverse
             applications={accessibleApplications}
             isReady={hasTypingCompleted}
+            className="hidden lg:flex"
           />
         )}
       </main>

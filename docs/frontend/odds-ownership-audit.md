@@ -17,6 +17,8 @@ This document maps the active ODDS frontend before and during `ODDS-001`. It is 
 
 `src/app/odds/layout.tsx` is a routing-only wrapper around `src/features/odds/components/OddsShell/OddsShell.tsx`. The feature shell owns ODDS menu composition, permission filtering, task counters, realtime invalidation, theme state, viewport selection, and the exact `Container` composition. `src/features/odds/context/OddsThemeContext.tsx` owns the light/dark/retro context consumed across ODDS routes and task-detail UI.
 
+When SPV also has designer access, personal menu entries whose function is already represented by an available supervisory entry are hidden; unique personal execution entries remain visible. This prevents duplicate menu items without changing their permissions or destinations.
+
 ## Feature ownership
 
 - `src/features/odds/api/index.ts` owns the browser API contracts and domain response types.

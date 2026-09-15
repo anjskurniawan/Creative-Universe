@@ -141,12 +141,12 @@ export function OddsShell({ children }: { children: ReactNode }) {
           { id: "workspace", label: "Dashboard", icon: "dashboard", href: isSpv ? "/odds?section=workspace" : "/odds", group: "tasks" },
           { id: "designer_today_tasks", label: "Tugas Hari Ini", icon: "today", href: "/odds?section=designer_today_tasks", group: "tasks" },
           { id: "designer_queue", label: "Dalam Antrean", icon: "hourglass_top", href: "/odds?section=designer_queue", group: "tasks" },
-          { id: "designer_all_tasks", label: "Semua Tugas", icon: "assignment", href: "/odds?section=designer_all_tasks", group: "tasks" },
-          { id: "designer_spv_review", label: "Review Leader", icon: "rate_review", href: "/odds?section=designer_spv_review", group: "tasks" },
-          { id: "designer_client_review", label: "Review Client", icon: "reviews", href: "/odds?section=designer_client_review", group: "tasks" },
+          ...(!canViewAllTasks && !canReviewSpv ? [{ id: "designer_all_tasks", label: "Semua Tugas", icon: "assignment", href: "/odds?section=designer_all_tasks", group: "tasks" as const }] : []),
+          ...(!canReviewSpv ? [{ id: "designer_spv_review", label: "Review Leader", icon: "rate_review", href: "/odds?section=designer_spv_review", group: "tasks" as const }] : []),
+          ...(!canReviewSpv && !canViewAllTasks ? [{ id: "designer_client_review", label: "Review Client", icon: "reviews", href: "/odds?section=designer_client_review", group: "tasks" as const }] : []),
           { id: "designer_revisions", label: "Revisi", icon: "error", href: "/odds?section=designer_revisions", group: "tasks" },
           { id: "designer_done", label: "Selesai", icon: "task_alt", href: "/odds?section=designer_done", group: "tasks" },
-          { id: "designer_report", label: "Report", icon: "monitoring", href: "/odds?section=designer_report", group: "reports" },
+          ...(!canViewReports ? [{ id: "designer_report", label: "Report", icon: "monitoring", href: "/odds?section=designer_report", group: "reports" as const }] : []),
         );
       } else {
         items.push(
@@ -211,6 +211,7 @@ export function OddsShell({ children }: { children: ReactNode }) {
     canViewReports,
     canViewRankings,
     canViewAssignedTasks,
+    canViewReports,
     isRoot,
     isSpv,
   ]);

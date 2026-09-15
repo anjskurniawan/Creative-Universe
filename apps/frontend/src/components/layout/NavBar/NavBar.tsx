@@ -43,6 +43,7 @@ export default function NavBar({
     refreshNavDropdowns,
     renderNavMessageDropdown,
     renderNavNotificationDropdown,
+    notificationUnreadCount,
   } = useCommunicationActions();
   const { user } = auth;
   const pathname = usePathname();
@@ -194,6 +195,14 @@ export default function NavBar({
               dark={dark}
               state={openMenu === "notifications" ? "Focus" : "Default"}
             />
+            {notificationUnreadCount > 0 && (
+              <span
+                aria-label={`${notificationUnreadCount} notifikasi belum dibaca`}
+                className="absolute right-1 top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full border-2 border-white bg-cu-danger px-0.5 text-[9px] font-bold leading-none text-white"
+              >
+                {notificationUnreadCount > 9 ? "9+" : notificationUnreadCount}
+              </span>
+            )}
           </button>
           {openMenu === "notifications" && (
             renderNavNotificationDropdown({ isOpen: true, onClose: () => setOpenMenu(null) })

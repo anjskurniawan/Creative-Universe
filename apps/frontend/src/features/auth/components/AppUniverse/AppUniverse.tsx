@@ -71,6 +71,11 @@ export function ApplicationUniverse({ applications, isReady, className = "", isE
 
       // Fungsi pemicu rotasi melingkar berlawanan arah
       const animatePlanets = (orbit: PlanetConfig["orbit"], duration: number, direction: 1 | -1) => {
+          const orbitSelector = `[data-orbit="${orbit}"]`;
+          const planetSelector = `[data-planet-orbit="${orbit}"]`;
+          if (!universeRef.current?.querySelector(orbitSelector) || !universeRef.current?.querySelector(planetSelector)) {
+            return;
+          }
           const orbitTween = gsap.to(`[data-orbit="${orbit}"]`, {
             rotation: direction * 360,
             duration,

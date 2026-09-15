@@ -1,9 +1,13 @@
 # Messages and Notifications Ownership Audit
 
 > Status: Active restructuring reference  
-> Last verified: 2026-08-24
+> Last verified: 2026-09-11
 
 This document records CORE-001 consumer evidence, canonical ownership, and preserved frontend contracts. It covers structural placement only; message, notification, realtime, unread, API, responsive, and accessibility behavior remains unchanged.
+
+## Responsive messages workspace
+
+`/messages` uses a mobile-first single-panel flow. On mobile, the conversation list is shown first; selecting a conversation hides the list and shows the chat panel with a back button. When no conversation is selected, the chat panel remains hidden. From the `lg` breakpoint upward, the list and chat panel are displayed side by side. Chat history, attachments, replies, mentions, unread state, and realtime subscriptions use the same existing contracts in both layouts.
 
 ## Route and page ownership
 
